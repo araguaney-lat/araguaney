@@ -20,7 +20,7 @@ export async function createCampaignAction(data: CampaignFormData): Promise<Camp
     token: session?.accessToken,
     body: JSON.stringify(data),
   })
-  revalidateTag("campaigns")
+  revalidateTag("campaigns", "max")
   return campaign
 }
 
@@ -34,6 +34,6 @@ export async function updateCampaignAction(
     token: session?.accessToken,
     body: JSON.stringify(data),
   })
-  revalidateTag("campaigns")
+  revalidateTag("campaigns", "max")
   return campaign
 }

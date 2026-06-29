@@ -22,7 +22,7 @@ export async function createCenterAction(data: CenterFormData): Promise<Center> 
     token: session?.accessToken,
     body: JSON.stringify(data),
   })
-  revalidateTag("centers")
+  revalidateTag("centers", "max")
   return center
 }
 
@@ -36,6 +36,6 @@ export async function updateCenterAction(
     token: session?.accessToken,
     body: JSON.stringify(data),
   })
-  revalidateTag("centers")
+  revalidateTag("centers", "max")
   return center
 }
