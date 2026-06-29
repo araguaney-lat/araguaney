@@ -19,6 +19,9 @@
 |---|-------|-------------|-------------|--------|
 | 4 | Dashboard nacional (admin) | Agregado visual de stock por categoría y centro | 🟠 | ✅ Done |
 | 5 | Página pública de necesidades | "Qué falta" sin login; cacheable | 🟡 | ✅ Done |
+| 23 | Home page | Landing pública con descripción del proyecto, acceso a `/necesidades` y CTA de login; reemplaza el redirect directo a `/dashboard` | 🟡 | ⬜ Pendiente |
+| 24 | Login UI | Pantalla de login con diseño propio (logo, branding); actualmente es formulario básico sin estilos | 🟡 | ⬜ Pendiente |
+| 25 | i18n — español / inglés | Internacionalización con `next-intl`; español por default; inglés como segunda lengua; aplica a todas las páginas públicas y el dashboard | 🟠 | ⬜ Pendiente |
 
 #### Infra / seguridad
 
@@ -32,7 +35,7 @@
 | 19 | Configurar Resend en producción | Agregar `RESEND_API_KEY` + dominio verificado en Resend; SDK ya instalado; configurar `FROM_EMAIL` en env Railway y Vercel | 🟢 | ⬜ Pendiente |
 | 20 | PgBouncer tuning (Railway) | Railway Postgres incluye PgBouncer en modo transaction; ajustar `pool_size=5`, `max_overflow=10`, `pool_pre_ping=True` en `database.py`; deshabilitar `AUTOCOMMIT` — previene agotamiento de conexiones bajo carga | 🟡 | ✅ Done |
 | 21 | Alertas de ataques (Cloudflare + Sentry) | Activar notificaciones de Cloudflare por spikes de tráfico; configurar alerta Sentry para errores 429 (rate limit hit) y 403 (Cloudflare block) en producción | 🟡 | ⬜ Pendiente |
-| 22 | Deploy inicial: dominio + DNS + Railway + Vercel | Apuntar dominio a Cloudflare; configurar Railway service + Postgres + Redis; configurar Vercel project + env vars; smoke test end-to-end | 🟠 | ⬜ Pendiente |
+| 22 | Deploy inicial: dominio + DNS + Railway + Vercel | Apuntar dominio a Cloudflare; configurar Railway service + Postgres + Redis; configurar Vercel project + env vars; smoke test end-to-end | 🟠 | ✅ Done |
 
 #### OTP / Autenticación en dos pasos (2FA)
 
