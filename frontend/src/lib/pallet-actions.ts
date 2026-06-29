@@ -12,7 +12,7 @@ export async function createPalletAction(notes?: string) {
     const data = await apiFetch("/v1/pallets", {
       method: "POST",
       token: session.accessToken,
-      body: { notes: notes ?? null },
+      body: JSON.stringify({ notes: notes ?? null }),
     })
     revalidatePath("/dashboard/pallets")
     return { data }
@@ -29,7 +29,7 @@ export async function addBoxToPalletAction(palletId: string, boxCode: string) {
     const data = await apiFetch(`/v1/pallets/${palletId}/add-box`, {
       method: "POST",
       token: session.accessToken,
-      body: { code: boxCode },
+      body: JSON.stringify({ code: boxCode }),
     })
     revalidatePath("/dashboard/pallets")
     return { data }

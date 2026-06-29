@@ -18,13 +18,13 @@ export async function createShipmentAction(data: {
     const result = await apiFetch("/v1/shipments", {
       method: "POST",
       token: session.accessToken,
-      body: {
+      body: JSON.stringify({
         campaign_id: data.campaign_id ?? null,
         destination: data.destination ?? "Venezuela",
         carrier: data.carrier ?? null,
         reference: data.reference ?? null,
         notes: data.notes ?? null,
-      },
+      }),
     })
     revalidatePath("/dashboard/shipments")
     return { data: result }
@@ -41,7 +41,7 @@ export async function addPalletToShipmentAction(shipmentId: string, palletId: st
     const data = await apiFetch(`/v1/shipments/${shipmentId}/add-pallet`, {
       method: "POST",
       token: session.accessToken,
-      body: { pallet_id: palletId },
+      body: JSON.stringify({ pallet_id: palletId }),
     })
     revalidatePath("/dashboard/shipments")
     return { data }
