@@ -8,6 +8,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@sentry/nextjs": "^10.62.0",
     "@zxing/browser": "^0.1.5",
     "@zxing/library": "^0.21.3",
     "next": "^16.2.9",
