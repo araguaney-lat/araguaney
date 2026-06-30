@@ -11,20 +11,18 @@ export default function LoginPage() {
   const [error, formAction, isPending] = useActionState(loginAction, null)
 
   return (
-    <div style={{ minHeight: "100vh", display: "grid", gridTemplateColumns: "1fr 1fr" }}>
-      {/* Brand panel */}
-      <div style={{
-        position: "relative",
-        background: "linear-gradient(160deg,#F3C033,#E0A100 60%,#C98A00)",
-        padding: "54px 50px",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "space-between",
-        overflow: "hidden",
-      }}>
-        <div style={{ position: "absolute", right: -60, bottom: -60, width: 360, height: 360, borderRadius: "50%", background: "rgba(255,255,255,.16)" }} />
-        {/* Logo */}
-        <Link href="/" style={{ display: "flex", alignItems: "center", gap: 11, position: "relative", textDecoration: "none" }}>
+    <div style={{ minHeight: "100vh" }} className="flex flex-col md:grid md:grid-cols-2">
+
+      {/* Brand panel — full width compact on mobile, half on desktop */}
+      <div style={{ background: "linear-gradient(160deg,#F3C033,#E0A100 60%,#C98A00)", position: "relative", overflow: "hidden" }}
+        className="flex flex-col items-center justify-center text-center
+                   px-6 py-[44px] md:py-[54px] md:px-[50px] md:items-start md:text-left md:justify-between">
+        <div style={{ position: "absolute", right: -60, bottom: -60, width: 360, height: 360, borderRadius: "50%", background: "rgba(255,255,255,.16)" }}
+          className="hidden md:block" />
+
+        {/* Logo link */}
+        <Link href="/" style={{ display: "flex", alignItems: "center", gap: 11, position: "relative", textDecoration: "none" }}
+          className="justify-center md:justify-start">
           <span style={{ width: 40, height: 40, borderRadius: "50%", background: "#fff" }}
             className="flex items-center justify-center overflow-hidden flex-none">
             <Image src={LOGO} alt="Araguaney" width={36} height={36} className="object-contain" />
@@ -33,8 +31,14 @@ export default function LoginPage() {
             Araguaney
           </span>
         </Link>
-        {/* Center content */}
-        <div style={{ position: "relative" }}>
+
+        {/* Mobile: subtitle under logo */}
+        <p style={{ margin: "4px 0 0", fontSize: 12.5, color: "#5C4500" }} className="md:hidden">
+          Panel del centro de acopio
+        </p>
+
+        {/* Desktop: center content */}
+        <div style={{ position: "relative" }} className="hidden md:block">
           <Image src={LOGO} alt="" width={150} height={150}
             style={{ marginBottom: 24, filter: "drop-shadow(0 12px 20px rgba(120,86,0,.25))" }} />
           <h2 style={{ fontFamily: "var(--font-source-serif)", margin: "0 0 16px", fontSize: 34, lineHeight: 1.15, fontWeight: 600, color: "#3B2A00", maxWidth: 360 }}>
@@ -44,26 +48,28 @@ export default function LoginPage() {
             Accede al panel de tu centro para registrar donaciones, sellar cajas y preparar envíos con manifiesto.
           </p>
         </div>
-        <div style={{ position: "relative", fontSize: 12.5, color: "#6B5200" }}>
+        <div style={{ fontSize: 12.5, color: "#6B5200", position: "relative" }} className="hidden md:block">
           Sin datos personales de donantes ni beneficiarios.
         </div>
       </div>
 
       {/* Form panel */}
-      <div style={{ background: "#FBF7EE", padding: "64px 60px", display: "flex", flexDirection: "column", justifyContent: "center" }}>
+      <div style={{ background: "#FBF7EE" }}
+        className="flex flex-col justify-center px-6 py-[28px] md:py-[64px] md:px-[60px]">
         <div style={{ maxWidth: 380, width: "100%", margin: "0 auto" }}>
-          <h1 style={{ fontFamily: "var(--font-source-serif)", margin: "0 0 10px", fontSize: 32, fontWeight: 600 }}>
+          <h1 style={{ fontFamily: "var(--font-source-serif)", margin: "0 0 6px", fontWeight: 600 }}
+            className="text-[26px] md:text-[32px]">
             Inicia sesión
           </h1>
-          <p style={{ margin: "0 0 32px", fontSize: 14.5, color: "#6E6557" }}>
-            Bienvenido de vuelta al panel de tu centro de acopio.
+          <p style={{ margin: "0 0 24px", color: "#6E6557" }} className="text-[13.5px] md:text-[14.5px]">
+            Accede al panel de tu centro.
+            <span className="hidden md:inline"> de acopio.</span>
           </p>
 
-          <form action={formAction} className="space-y-0">
+          <form action={formAction}>
             <input type="hidden" name="callbackUrl" value="/dashboard" />
 
-            {/* Email */}
-            <label style={{ display: "block", fontSize: 12.5, fontWeight: 600, color: "#52493D", marginBottom: 7 }}>
+            <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#52493D", marginBottom: 6 }}>
               Correo electrónico
             </label>
             <input
@@ -73,29 +79,31 @@ export default function LoginPage() {
               required
               placeholder="coordinador@centro.org"
               style={{
-                display: "block", width: "100%", height: 48, background: "#fff",
-                border: "1.5px solid #E6DCC8", borderRadius: 10, padding: "0 15px",
-                fontSize: 14.5, color: "#2B2723", marginBottom: 18, outline: "none",
+                display: "block", width: "100%", height: 46, background: "#fff",
+                border: "1.5px solid #E6DCC8", borderRadius: 10, padding: "0 14px",
+                fontSize: 14, color: "#2B2723", marginBottom: 16, outline: "none",
               }}
             />
 
-            {/* Password */}
-            <div className="flex items-center justify-between" style={{ marginBottom: 7 }}>
-              <label style={{ fontSize: 12.5, fontWeight: 600, color: "#52493D" }}>Contraseña</label>
-              <a href="#" style={{ fontSize: 12.5, color: "#1F5E8C", fontWeight: 600 }}>¿Olvidaste tu contraseña?</a>
-            </div>
+            <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#52493D", marginBottom: 6 }}>
+              Contraseña
+            </label>
             <input
               name="password"
               type="password"
               autoComplete="current-password"
               required
-              placeholder="••••••••••"
+              placeholder="••••••••"
               style={{
-                display: "block", width: "100%", height: 48, background: "#fff",
-                border: "1.5px solid #E6DCC8", borderRadius: 10, padding: "0 15px",
-                fontSize: 14.5, color: "#2B2723", marginBottom: 18, outline: "none",
+                display: "block", width: "100%", height: 46, background: "#fff",
+                border: "1.5px solid #E6DCC8", borderRadius: 10, padding: "0 14px",
+                fontSize: 14, color: "#2B2723", marginBottom: 10, outline: "none",
               }}
             />
+
+            <div style={{ textAlign: "right", marginBottom: 20 }}>
+              <a href="#" style={{ fontSize: 12.5, color: "#1F5E8C", fontWeight: 600 }}>¿Olvidaste tu contraseña?</a>
+            </div>
 
             {error?.error && (
               <p style={{ fontSize: 13, color: "#c0392b", marginBottom: 12 }}>
@@ -116,14 +124,14 @@ export default function LoginPage() {
                 borderRadius: 10, fontWeight: 700, fontSize: 15,
                 boxShadow: "0 14px 26px -12px rgba(31,94,140,.7)",
                 border: "none", cursor: isPending ? "not-allowed" : "pointer",
-                opacity: isPending ? 0.7 : 1, marginBottom: 22,
+                opacity: isPending ? 0.7 : 1, marginBottom: 18,
               }}
             >
               {isPending ? "Entrando…" : "Entrar"}
             </button>
           </form>
 
-          <div className="flex items-center gap-[14px]" style={{ marginBottom: 22, color: "#B6AC99", fontSize: 12 }}>
+          <div className="flex items-center gap-[12px]" style={{ marginBottom: 18, color: "#B6AC99", fontSize: 12 }}>
             <span style={{ flex: 1, height: 1, background: "#E6DCC8" }} />
             o
             <span style={{ flex: 1, height: 1, background: "#E6DCC8" }} />
@@ -133,21 +141,16 @@ export default function LoginPage() {
             display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
             width: "100%", height: 48, background: "#fff", border: "1.5px solid #E6DCC8",
             borderRadius: 10, fontWeight: 600, fontSize: 14, color: "#2B2723",
-            cursor: "pointer", marginBottom: 26,
+            cursor: "pointer", marginBottom: 22,
           }}>
             <span style={{ width: 18, height: 18, borderRadius: "50%", border: "2px solid #C9BEA9" }} />
             Continuar con Google
           </button>
 
-          <p style={{ margin: "0 0 18px", fontSize: 13, color: "#7A7163", textAlign: "center" }}>
-            ¿Tu centro aún no usa Araguaney?{" "}
-            <Link href="/contacto" style={{ color: "#1F5E8C", fontWeight: 600 }}>Solicita el alta</Link>
+          <p style={{ margin: 0, fontSize: 12.5, color: "#7A7163", textAlign: "center" }}>
+            ¿Tu centro aún no usa Araguaney?<br className="md:hidden" />
+            {" "}<Link href="/contacto" style={{ color: "#1F5E8C", fontWeight: 600 }}>Solicita el alta</Link>
           </p>
-
-          <div className="flex items-center justify-center gap-2" style={{ fontSize: 11, color: "#A89E8C" }}>
-            <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#1F7A4D" }} />
-            Protegido con Cloudflare Turnstile
-          </div>
         </div>
       </div>
     </div>
