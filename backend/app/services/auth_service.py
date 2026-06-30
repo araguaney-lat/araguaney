@@ -121,6 +121,10 @@ class AuthService(BaseService):
         if not user.is_verified:
             raise api_error("EMAIL_NOT_VERIFIED", "Email address not verified", status_code=403)
 
+        if user.totp_enabled and user.totp_secret:
+            partial = self._create_partial_token(str(user.id))
+            return {"requires_totp": True, "partial_token": partial}
+
         token = self.create_access_token(
             str(user.id),
             center_id=str(user.center_id) if user.center_id else None,
@@ -132,6 +136,12 @@ class AuthService(BaseService):
             "center_role": user.center_role,
             "center_id": str(user.center_id) if user.center_id else None,
         }
+
+    @staticmethod
+    def _create_partial_token(user_id: str) -> str:
+        expire = datetime.now(timezone.utc) + timedelta(minutes=5)
+        payload = {"sub": user_id, "exp": expire, "scope": "totp_pending"}
+        return jwt.encode(payload, settings.secret_key, algorithm=settings.algorithm)
 
     def logout(self, token: str) -> None:
         try:
@@ -233,3 +243,107 @@ class AuthService(BaseService):
         repo.commit()
         # TODO: enqueue send_password_changed_email_task
         return {"message": "Password updated successfully."}
+
+    # ── TOTP / 2FA ─────────────────────────────────────────────────────────────
+
+    def totp_setup(self, user: User) -> dict:
+        """Generate a new TOTP secret and store it (not enabled yet). Returns QR URI + secret."""
+        from app.utils.crypto import encrypt_value
+        from app.utils.totp import generate_totp_secret, get_totp_uri
+
+        secret = generate_totp_secret()
+        user.totp_secret = encrypt_value(secret)
+        self.db.commit()
+
+        return {"qr_uri": get_totp_uri(secret, user.email), "secret": secret}
+
+    def totp_confirm(self, user: User, code: str) -> dict:
+        """Verify TOTP code and enable 2FA. Returns one-time backup codes."""
+        import json
+        from app.utils.crypto import decrypt_value
+        from app.utils.totp import generate_backup_codes, verify_totp_code
+
+        if not user.totp_secret:
+            raise api_error("TOTP_NOT_SETUP", "Run /totp/setup first", status_code=400)
+
+        secret = decrypt_value(user.totp_secret)
+        if not verify_totp_code(secret, code):
+            raise api_error("INVALID_TOTP_CODE", "Invalid or expired code", status_code=400)
+
+        plaintext_codes, hashed_codes = generate_backup_codes()
+        user.totp_enabled = True
+        user.totp_backup_codes = json.dumps(hashed_codes)
+        self.db.commit()
+
+        return {"backup_codes": plaintext_codes}
+
+    def totp_disable(self, user: User, code: str) -> dict:
+        """Verify TOTP code (or backup code) and disable 2FA."""
+        import json
+        from app.utils.crypto import decrypt_value
+        from app.utils.totp import verify_backup_code, verify_totp_code
+
+        if not user.totp_enabled or not user.totp_secret:
+            raise api_error("TOTP_NOT_ENABLED", "2FA is not enabled", status_code=400)
+
+        secret = decrypt_value(user.totp_secret)
+        valid = verify_totp_code(secret, code)
+
+        if not valid and user.totp_backup_codes:
+            valid, remaining = verify_backup_code(code, user.totp_backup_codes)
+            if valid:
+                user.totp_backup_codes = json.dumps(remaining)
+
+        if not valid:
+            raise api_error("INVALID_TOTP_CODE", "Invalid or expired code", status_code=400)
+
+        user.totp_enabled = False
+        user.totp_secret = None
+        user.totp_backup_codes = None
+        self.db.commit()
+
+        return {"message": "2FA disabled"}
+
+    def totp_challenge(self, partial_token: str, code: str) -> dict:
+        """Verify partial token + TOTP code during login. Returns full access token."""
+        import json
+        from app.utils.crypto import decrypt_value
+        from app.utils.totp import verify_backup_code, verify_totp_code
+
+        try:
+            payload = jwt.decode(partial_token, settings.secret_key, algorithms=[settings.algorithm])
+        except jwt.PyJWTError:
+            raise api_error("INVALID_TOKEN", "Invalid or expired token", status_code=401)
+
+        if payload.get("scope") != "totp_pending":
+            raise api_error("INVALID_TOKEN", "Invalid token scope", status_code=401)
+
+        user_id = payload.get("sub")
+        from uuid import UUID
+        user = UserRepository(self.db).find_by_id(UUID(user_id))
+        if not user or not user.totp_enabled or not user.totp_secret:
+            raise api_error("INVALID_TOKEN", "Invalid token", status_code=401)
+
+        secret = decrypt_value(user.totp_secret)
+        valid = verify_totp_code(secret, code)
+
+        if not valid and user.totp_backup_codes:
+            valid, remaining = verify_backup_code(code, user.totp_backup_codes)
+            if valid:
+                user.totp_backup_codes = json.dumps(remaining)
+                self.db.commit()
+
+        if not valid:
+            raise api_error("INVALID_TOTP_CODE", "Invalid or expired code", status_code=400)
+
+        token = self.create_access_token(
+            str(user.id),
+            center_id=str(user.center_id) if user.center_id else None,
+            center_role=user.center_role,
+        )
+        return {
+            "access_token": token,
+            "token_type": "bearer",
+            "center_role": user.center_role,
+            "center_id": str(user.center_id) if user.center_id else None,
+        }

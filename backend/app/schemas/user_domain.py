@@ -21,3 +21,4 @@ class UserOut(StrictORMModel):
     center_role: str | None
     center_id: UUID | None
     is_active: bool
+    totp_enabled: bool

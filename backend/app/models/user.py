@@ -39,6 +39,11 @@ class User(Base):
     center_id = Column(UUID(as_uuid=True), ForeignKey("centers.id", ondelete="SET NULL"), nullable=True, index=True)
     center_role = Column(String, nullable=True)  # national_admin | coordinator | volunteer
 
+    # 2FA / TOTP
+    totp_secret = Column(String, nullable=True)        # Fernet-encrypted base32 secret
+    totp_enabled = Column(Boolean, nullable=False, server_default="false")
+    totp_backup_codes = Column(String, nullable=True)  # JSON array of bcrypt-hashed codes
+
     # Timestamps
     created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
     updated_at = Column(DateTime(timezone=True), nullable=True, onupdate=func.now())
