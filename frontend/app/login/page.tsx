@@ -145,17 +145,17 @@ export default function LoginPage() {
 
             <button
               type="submit"
-              disabled={isPending}
+              disabled={isPending || !turnstileToken}
               style={{
                 display: "flex", alignItems: "center", justifyContent: "center",
                 width: "100%", height: 50, background: "#1F5E8C", color: "#fff",
                 borderRadius: 10, fontWeight: 700, fontSize: 15,
                 boxShadow: "0 14px 26px -12px rgba(31,94,140,.7)",
-                border: "none", cursor: isPending ? "not-allowed" : "pointer",
-                opacity: isPending ? 0.7 : 1, marginBottom: 18,
+                border: "none", cursor: isPending || !turnstileToken ? "not-allowed" : "pointer",
+                opacity: isPending || !turnstileToken ? 0.7 : 1, marginBottom: 18,
               }}
             >
-              {isPending ? "Entrando…" : "Entrar"}
+              {isPending ? "Entrando…" : !turnstileToken ? "Verificando seguridad…" : "Entrar"}
             </button>
           </form>
 
