@@ -110,17 +110,71 @@ def scoped(self, stmt, center_id: uuid.UUID | None):
 
 ---
 
-## 5. Roles y permisos
+## 5. Secciones de la aplicación
 
-| Rol (`users.center_role`) | `center_id` | Puede |
+| Sección | Para quién | Condición |
 |---|---|---|
-| `volunteer` | su centro | Intake, crear/llenar/sellar cajas, imprimir etiquetas |
-| `coordinator` | su centro | Lo anterior + crear/cerrar tarimas y envíos, generar manifiesto, gestionar usuarios del centro |
-| `national_admin` | `NULL` | Ver agregado de todos los centros, alta de centros, administrar catálogo maestro |
+| `/dashboard` | volunteers, coordinators, national_admins | `users.role = user` (cualquier `center_role`) |
+| `/studio` | superadmin de plataforma | `users.role = superadmin` |
+| público | sin login | rutas `/`, `/qr/[code]`, `/necesidades` |
+
+> `users.role` del boilerplate (`user|admin|superadmin`) gobierna el acceso a secciones.
+> `center_role` (`volunteer|coordinator|national_admin`) controla qué ve cada usuario dentro de `/dashboard`.
+
+---
+
+## 6. Roles y permisos
+
+### Roles de dominio (`center_role`) — todos operan en `/dashboard`
+
+| Rol | `center_id` | Puede |
+|---|---|---|
+| `volunteer` | su centro | Intake, crear/llenar/sellar cajas, imprimir etiquetas, ver sus propias solicitudes |
+| `coordinator` | su centro | Todo lo del volunteer + crear/cerrar tarimas y envíos, generar manifiesto, agregar volunteers a su centro (con invitación), reiniciar contraseña de volunteers de su centro, gestionar miembros de campaña (solo de su centro) |
+| `national_admin` | `NULL` | Ver agregado nacional, crear/editar centros y campañas, crear cualquier usuario (cualquier centro y rol), reiniciar contraseña de cualquier usuario de dominio, promover ProductTypes a global, ver auditoría, gestionar solicitudes |
 | público (sin login) | — | Ver ficha mínima de caja/tarima por QR; panel "qué falta" |
 
-> `users.role` del boilerplate (`user|admin|superadmin`) NO se reutiliza para el dominio;
-> sigue gobernando el gating de plataforma. El rol de dominio es `center_role`.
+El sidebar del `national_admin` en `/dashboard` tiene dos secciones:
+
+```
+[operativo]           [administración — solo national_admin]
+  Inicio                Usuarios
+  Campañas              Solicitudes
+  Centros               Auditoría
+  Transferencias
+```
+
+### Rol de plataforma (`superadmin`) — opera en `/studio`
+
+| Puede |
+|---|
+| Crear y gestionar national_admins |
+| Reiniciar contraseña de cualquier usuario (incluidos national_admins) |
+| Ver auditoría general de la plataforma |
+| Ver métricas de la aplicación (centros activos, cajas selladas, envíos) |
+| Configuración del sistema (variables, flags) |
+| Bloquear/desbloquear cualquier usuario |
+| Monitoreo de anomalías (fase posterior) |
+
+### Reglas de creación de usuarios
+
+| Quién crea | Roles que puede asignar | `center_id` posible |
+|---|---|---|
+| `superadmin` | `national_admin` (y cualquier otro) | Cualquier centro o NULL |
+| `national_admin` | `volunteer`, `coordinator` | Cualquier centro |
+| `coordinator` | Solo `volunteer` | Solo su propio centro |
+
+### Flujo de invitación / reset de contraseña
+
+1. Admin crea usuario → sistema genera clave temporal → envía email de invitación
+2. Usuario entra → sistema fuerza cambio de contraseña (`must_change_password = true`)
+3. Desde perfil, el usuario puede cambiar contraseña en cualquier momento
+4. Botón **"Reiniciar contraseña"** por fila en el user manager — genera nueva clave temporal, reenvía email; disponible según scope:
+   - `superadmin`: cualquier usuario
+   - `national_admin`: coordinators y volunteers (no otros national_admins)
+   - `coordinator`: solo volunteers de su centro
+
+> Todo usuario recién creado queda asignado automáticamente a la campaña "Donaciones Generales".
 
 ---
 

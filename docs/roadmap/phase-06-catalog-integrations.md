@@ -1,74 +1,232 @@
-### Fase 6 — Integración de catálogos externos y estándares humanitarios ⬜
-
-> Conectar el sistema con fuentes de datos internacionales para eliminar la captura manual de productos,
-> garantizar el cumplimiento de estándares humanitarios (WHO, IFRC, IOM) y habilitar interoperabilidad
-> con sistemas como RITA/Sahana Eden.
->
-> Criterios de aceptación: un voluntario puede registrar "ibuprofeno 500 mg" escaneando el código de barras
-> o escribiendo las primeras letras del INN, sin captura manual de concentración/forma/lote; los manifiestos
-> exportados son compatibles con el formato RITA/Sahana.
+### Fase 6 — Catálogos de referencia + lookups en tiempo real ⬜
 
 ---
 
-#### Prerequisitos (cuentas gratuitas — acción manual)
+#### Principios de diseño
 
-| Servicio | URL | Para qué | Estado |
-|----------|-----|---------|--------|
-| UNSPSC / UNDP | https://www.ungm.org/UNSPSC | Descargar codeset completo en español | ⬜ Pendiente |
-| GS1 / Verified by GS1 | https://www.gs1.org/services/verified-by-gs1 | 30 lookups/día gratis para validar GTIN | ⬜ Pendiente |
+**Conectividad:**
+Usar un producto existente en catálogo → funciona sin internet.
+Registrar un ProductType nuevo → requiere internet para validar contra fuentes externas.
+Si no hay conexión, el sistema lo dice claramente y bloquea la creación; no hay modo degradado silencioso porque los errores tipográficos y los duplicados envenenan los datos de todos los centros.
+
+**Scope de ProductType — dos niveles:**
+
+| `campaign_id` | Visible para |
+|---|---|
+| `NULL` | Todos los centros, todas las campañas (seeds globales + productos promovidos por admin) |
+| `UUID campaña X` | Todos los centros que trabajen en campaña X |
+
+No existe un scope "privado al centro" — la unidad operativa es la campaña, no el centro.
+Si un producto nuevo llega en el contexto de la Operación Venezuela, lo pueden usar todos los centros de esa campaña sin contaminación del catálogo global.
+
+**Campaña obligatoria en intake:**
+Todo `Intake` debe tener `campaign_id`. Siempre existe una campaña **"Donaciones Generales"** abierta para recibir donaciones que no corresponden a una operación específica. Esto evita el problema de recepciones sin contexto y mantiene el agregado nacional coherente.
+
+**Usuarios ↔ Campañas (many-to-many):**
+Un usuario puede pertenecer a una o varias campañas activas. Esta asociación determina qué productos ve y en qué contexto opera.
+
+| Rol | Puede asignar usuarios a campañas |
+|---|---|
+| `national_admin` | Cualquier usuario a cualquier campaña |
+| `coordinator` | Solo usuarios de su propio centro |
+| `volunteer` | No puede asignar |
+
+Reglas de visibilidad derivadas de la asignación:
+- El usuario solo ve ProductTypes globales (`campaign_id IS NULL`) + los de sus campañas asignadas
+- El autocomplete de intake filtra por las campañas del usuario
+- Si el usuario tiene **una sola** campaña activa → se preselecciona automáticamente en el intake, sin selector
+- Si tiene **varias** campañas activas → selector obligatorio al iniciar el intake
+- La campaña "Donaciones Generales" se asigna automáticamente a todos los usuarios al crearlos (nunca queda huérfano)
+
+**Flujo de un ProductType nuevo:**
+1. Coordinador inicia intake en Campaña X (autoseleccionada o elegida)
+2. El producto no aparece en el autocomplete (no está en global ni en Campaña X)
+3. Sistema pide conexión — sin internet, bloquea la creación
+4. Con internet: lookup vía barcode (Open Food Facts) o INN (RxNorm)
+5. Nuevo producto se crea con `campaign_id = X` — visible para todos los asignados a esa campaña
+6. national_admin puede promover a global (`campaign_id → NULL`)
 
 ---
 
-#### Backend — Semilla de catálogos (carga única)
+#### Prerrequisitos de datos (acción manual única, sin costo)
+
+| Fuente | Qué obtener | Para qué |
+|--------|------------|---------|
+| WHO Model List of Essential Medicines | ~500 medicamentos INN + ATC + forma + concentración | Seed global de medicamentos |
+| IOM Emergency Relief Items Catalogue | ~300 no-food items con specs y código de material | Seed global de no-food |
+| IFRC/ICRC Catalogue | Artículos complementarios de kits | Complemento seed IOM |
+
+> No se requieren cuentas ni API keys — son CSVs públicos descargados una vez.
+
+---
+
+#### Auditoría — Eventos de Fase 6
+
+Todos vía `fire_audit(background_tasks, ...)` en los routers:
+
+| Evento | Cuándo | Metadata |
+|---|---|---|
+| `PRODUCT_TYPE_CREATED` | Nuevo ProductType creado | `{campaign_id, inn_name, form, strength, created_by_role}` |
+| `PRODUCT_TYPE_PROMOTED` | `campaign_id → NULL` (promovido a global) | `{from_campaign_id, promoted_by}` |
+| `USER_CAMPAIGN_ASSIGNED` | Usuario asignado a campaña | `{user_id, campaign_id, assigned_by_role}` |
+| `USER_CAMPAIGN_REMOVED` | Usuario removido de campaña | `{user_id, campaign_id}` |
+| `INTAKE_CREATED` | Ya existe — se amplía la metadata con `campaign_id` | `{campaign_id, center_id}` |
+
+---
+
+#### Backend — Migraciones arquitecturales
 
 | # | Tarea | Descripción | Complejidad | Estado |
 |---|-------|-------------|-------------|--------|
-| 1 | Seed UNSPSC | Importar segmentos relevantes del codeset UNSPSC (57000000 Humanitarian Relief Items + familia de medicamentos y alimentos) como `product_categories`; script idempotente | 🟠 | ⬜ Pendiente |
-| 2 | Seed WHO + ATC | Importar WHO Model List of Essential Medicines con nombre INN, código ATC, forma farmacéutica y concentración como `product_types` base para medicamentos | 🟠 | ⬜ Pendiente |
-| 3 | Seed IFRC/ICRC + IOM | Importar catálogo de no-food items (mantas, kits, herramientas) con código de material IFRC y specs técnicas | 🟡 | ⬜ Pendiente |
+| 1 | `012_user_campaigns` | Tabla `user_campaigns(user_id FK, campaign_id FK, assigned_by FK, assigned_at)`; PK compuesta `(user_id, campaign_id)`; índices en ambas FK; la campaña "Donaciones Generales" se asigna automáticamente al crear un usuario (trigger en service, no en DB) | 🟠 | ⬜ Pendiente |
+| 2 | `013_intake_campaign_required` | Agregar `campaign_id UUID NOT NULL FK → campaigns(id)` a `intakes`; la migración primero crea la campaña "Donaciones Generales" (si no existe) y asigna ese `campaign_id` a todos los intakes históricos antes de poner el `NOT NULL`; índice en `(campaign_id)` | 🟠 | ⬜ Pendiente |
+| 3 | `014_product_type_scope` | Agregar `campaign_id UUID NULLABLE FK → campaigns(id)` a `product_types`; `NULL` = global; índice en `(campaign_id)` | 🟡 | ⬜ Pendiente |
+| 4 | `UserCampaignRepository` | `assign(user_id, campaign_id, assigned_by)`, `list_by_user(user_id)`, `list_by_campaign(campaign_id)`, `remove(user_id, campaign_id)`; guard: coordinator solo puede asignar usuarios de su propio `center_id` | 🟡 | ⬜ Pendiente |
+| 5 | Actualizar `ProductTypeRepository` | `list(user_id)` resuelve las campañas del usuario y retorna globales + los de esas campañas; guard de dedup `(inn_name, form, strength)` con `unaccent + lower` dentro del scope visible; `create()` exige `campaign_id` salvo `national_admin` | 🟠 | ⬜ Pendiente |
+| 6 | Endpoint de promoción (admin) | `POST /v1/studio/product-types/{id}/promote` — `national_admin` mueve `campaign_id → NULL`; log en auditoría | 🟡 | ⬜ Pendiente |
+| 7 | Endpoints de asignación de campañas | `POST /v1/campaigns/{id}/members` y `DELETE /v1/campaigns/{id}/members/{user_id}` — coordinator (solo su centro) y national_admin; `GET /v1/campaigns/{id}/members` — lista de asignados | 🟡 | ⬜ Pendiente |
+| 8 | Actualizar `IntakeService` y schemas | `IntakeCreate` incluye `campaign_id` requerido; validar que campaña está activa y el usuario tiene acceso a ella; `IntakeOut` expone `campaign_id` | 🟡 | ⬜ Pendiente |
 
 ---
 
-#### Backend — APIs en tiempo real
+#### Backend — Seeds (carga única en migración)
 
 | # | Tarea | Descripción | Complejidad | Estado |
 |---|-------|-------------|-------------|--------|
-| 4 | Open Food Facts — lookup por barcode | `GET /v1/catalog/barcode/{gtin}` → consulta Open Food Facts API y retorna nombre, categoría, caducidad recomendada; cacheable en Redis | 🟡 | ⬜ Pendiente |
-| 5 | GS1 GTIN — validación | `GET /v1/catalog/gtin/{gtin}/validate` → verifica que el GTIN existe en GS1; rate-limited a 30/día; fallback graceful si cuota agotada | 🟡 | ⬜ Pendiente |
-| 6 | RxNorm — normalización INN | `GET /v1/catalog/rxnorm/search?q=` → llama NLM RxNorm API, devuelve nombre INN normalizado y código RxNorm; para el autocomplete de medicamentos | 🟡 | ⬜ Pendiente |
-| 7 | COFEPRIS — registro sanitario MX | `GET /v1/catalog/cofepris/search?q=` → scraping o consulta a base pública COFEPRIS; valida que el medicamento tiene registro sanitario en México | 🔴 | ⬜ Pendiente |
+| 6 | Seed campaña "Donaciones Generales" | Incluida en migración `012`; `is_active=true`, `destination_country=NULL`; sirve como campaña fallback permanente; no se puede desactivar desde el UI (guard en service) | 🟢 | ⬜ Pendiente |
+| 7 | Seed WHO Essential Medicines | Migración `014_seed_who_medicines` idempotente: ~500 medicamentos con `inn_name`, `form`, `strength`, `category=MEDICINE`, `is_controlled`, `min_shelf_life_days=365`, `campaign_id=NULL` | 🟠 | ⬜ Pendiente |
+| 8 | Seed IOM/IFRC no-food items | Migración `015_seed_iom_nonfood`: ~300 artículos; `campaign_id=NULL` | 🟠 | ⬜ Pendiente |
+| 9 | Seed alimentos frecuentes | Migración `016_seed_common_food`: ~50 alimentos básicos; `category=FOOD`, `min_shelf_life_days=180`, `campaign_id=NULL` | 🟡 | ⬜ Pendiente |
+
+> Seeds idempotentes: `INSERT ... ON CONFLICT (inn_name, form, strength) WHERE campaign_id IS NULL DO NOTHING`.
 
 ---
 
-#### Frontend — Autocomplete y lookup
+#### Backend — APIs de lookup (requeridas solo al crear nuevo ProductType)
 
 | # | Tarea | Descripción | Complejidad | Estado |
 |---|-------|-------------|-------------|--------|
-| 8 | Autocomplete de producto en intake | Campo `product_type` con búsqueda tipo-ahead que consulta `/v1/catalog/` y sugiere productos del catálogo WHO/IFRC/UNSPSC; seleccionar prellenea INN, forma, concentración | 🟠 | ⬜ Pendiente |
-| 9 | Barcode → lookup automático | Al escanear barcode en intake, consultar Open Food Facts + GS1; prellenar nombre y categoría si hay match; mostrar alerta si GTIN desconocido | 🟡 | ⬜ Pendiente |
+| 10 | Búsqueda en catálogo local | `GET /v1/catalog/search?q=&campaign_id=` → retorna globales + los de la campaña; sin internet requerido; base del autocomplete en intake | 🟢 | ⬜ Pendiente |
+| 11 | Barcode lookup vía Open Food Facts | `GET /v1/catalog/barcode/{gtin}` → Open Food Facts API; caché Redis 24 h; `503` claro si sin internet | 🟡 | ⬜ Pendiente |
+| 12 | INN autocomplete vía RxNorm | `GET /v1/catalog/rxnorm?q=` → NLM RxNorm REST API; `503` si sin internet; rate-limit 60/min (API pública sin key) | 🟡 | ⬜ Pendiente |
+| 13 | Validación GTIN | Dígito de control EAN-8/13/UPC-A en backend sin API key; lookup GS1 como enriquecimiento opcional | 🟢 | ⬜ Pendiente |
 
 ---
 
-#### Interoperabilidad
+#### Frontend — Flujo de intake y nuevo ProductType
 
 | # | Tarea | Descripción | Complejidad | Estado |
 |---|-------|-------------|-------------|--------|
-| 10 | Export RITA/Sahana Eden | Manifiesto de envío exportable en formato XML compatible con RITA/Sahana Eden (campos: INN, lote, caducidad, cantidad, código UNSPSC, código IFRC) | 🔴 | ⬜ Pendiente |
-| 11 | Export IFRC packing list | PDF/Excel del manifiesto con columnas exigidas por IFRC: código de material, descripción, unidad, cantidad, peso, valor | 🟡 | ⬜ Pendiente |
+| 14 | Selector de campaña en intake | Campo requerido al crear intake; muestra campañas activas; "Donaciones Generales" siempre aparece primero; el selector persiste como contexto para el autocomplete de productos | 🟡 | ⬜ Pendiente |
+| 15 | Autocomplete en intake (catálogo local) | Campo tipo-ahead que consulta `/v1/catalog/search?campaign_id=X`; offline-OK; seleccionar prellenea INN, forma, concentración, categoría | 🟠 | ⬜ Pendiente |
+| 16 | Indicador de conectividad + bloqueo | Banner en formulario de nuevo ProductType: "● Con conexión — lookups activos" / "● Sin conexión — solo puedes usar productos del catálogo existente"; botón de crear deshabilitado sin conexión | 🟡 | ⬜ Pendiente |
+| 17 | Barcode → prellenado + bloqueo offline | Al escanear/ingresar GTIN: llama `/v1/catalog/barcode/{gtin}`; prellenado si hay match; `503` → "Sin conexión — no se puede registrar el producto"; no permite continuar | 🟡 | ⬜ Pendiente |
+| 18 | INN autocomplete con RxNorm | Campo `inn_name` con sugerencias de `/v1/catalog/rxnorm?q=`; `503` → aviso visible; guard de dedup sigue activo | 🟡 | ⬜ Pendiente |
+| 19 | Vista "Catálogo de la campaña" en Studio | `/studio/catalog` — lista ProductTypes de cada campaña con estado (campaña / global); botón "Promover al catálogo global" para national_admin | 🟡 | ⬜ Pendiente |
+| 20 | Gestión de miembros de campaña en Studio | `/studio/campaigns/{id}/members` — lista de usuarios asignados; botón para agregar (selector de usuarios del centro para coordinador, cualquier usuario para admin); botón para remover | 🟡 | ⬜ Pendiente |
+| 21 | Auto-asignación a "Donaciones Generales" | Al crear un usuario desde `/studio/users`, el sistema lo asigna automáticamente a la campaña "Donaciones Generales"; visible en la vista de miembros | 🟢 | ⬜ Pendiente |
 
 ---
 
-#### Home page — Sección de estándares
+#### Peso — Modelo y métricas
+
+> El peso es crítico para logística (carga máxima de camiones y aviones, metas de tonelaje). Se captura en el ProductType y fluye hacia arriba automáticamente.
+
+**Dónde vive el peso:**
+
+| Campo | Tabla | Tipo | Obligatorio | Descripción |
+|---|---|---|---|---|
+| `unit_weight_kg` | `product_types` | `Decimal(8,3) NULLABLE` | No | Peso por unidad; viene del seed/barcode lookup o lo llena el coordinador |
+| `weight_kg` | `boxes` | `Decimal(8,3) NULLABLE` | No | Auto: `unit_weight_kg × quantity`; si no hay en ProductType, entrada manual opcional |
+| `tare_weight_kg` | `pallets` | `Decimal(8,3) NULLABLE` | No | Peso vacío de la tarima; para peso bruto real |
+| `weight_goal_kg` | `campaigns` | `Decimal(10,3) NULLABLE` | No | Meta de tonelaje de la campaña; si NULL → no se muestra barra de progreso |
+
+**Regla de visualización de progreso:**
+- `Campaign.weight_goal_kg IS NULL` → mostrar solo "X kg acopiados" (sin barra)
+- `Campaign.weight_goal_kg IS NOT NULL` → mostrar barra de progreso "X kg / Y kg (Z%)"
+
+**Visibilidad por rol:**
+
+| Quién ve | Qué ve |
+|---|---|
+| Todos los usuarios autenticados | Métricas de su centro: "Tu centro: X kg acopiados" (número simple, sin meta) |
+| Todos los usuarios autenticados | Métricas de cada campaña en la que participan: total kg + barra si hay meta |
+| `national_admin` | Panel nacional: suma de todas las campañas + barra por campaña si tiene meta |
 
 | # | Tarea | Descripción | Complejidad | Estado |
 |---|-------|-------------|-------------|--------|
-| 12 | Sección "Estándares que respaldamos" | Bloque en la home pública con logos/nombres de WHO, IFRC/ICRC, IOM, UNSPSC, GS1; texto breve que explica cómo cada uno garantiza la calidad del inventario y la trazabilidad; enlaza a la página de cada organismo | 🟢 | ⬜ Pendiente |
+| 22 | Migración campos de peso | `unit_weight_kg` en `product_types`; `weight_kg` en `boxes`; `tare_weight_kg` en `pallets`; `weight_goal_kg` en `campaigns` — todos `NULLABLE` | 🟡 | ⬜ Pendiente |
+| 23 | Auto-cálculo de `weight_kg` en Box | En `BoxService.seal()`: si `product_type.unit_weight_kg` existe → calcular y guardar `weight_kg`; si no → dejar NULL (coordinador puede editar antes de sellar) | 🟡 | ⬜ Pendiente |
+| 24 | Endpoint de métricas de peso | `GET /v1/dashboard/weight?campaign_id=&center_id=` — retorna `{total_kg, goal_kg, progress_pct}` por campaña y `{center_kg}` por centro; `national_admin` puede omitir filtros para ver todo | 🟡 | ⬜ Pendiente |
+| 25 | Componente de progreso en dashboard | Tarjeta por campaña: muestra kg acopiados; si hay `weight_goal_kg` → barra de progreso con porcentaje; si no → solo el número. Visible para todos los roles | 🟡 | ⬜ Pendiente |
+| 26 | Métrica de centro (número simple) | En el dashboard de cada usuario: "Tu centro ha acopiado X kg" — un solo número, sin meta, sin barra | 🟢 | ⬜ Pendiente |
 
 ---
 
-> **Nota sobre COFEPRIS (task 7):** La consulta pública de COFEPRIS no expone una API oficial;
-> puede requerir scraping con aviso legal o un enfoque manual (CSV descargable periódicamente).
-> Evaluar antes de implementar.
->
-> **Nota sobre RITA/Sahana (task 10):** Interoperación de lectura (importar listas de necesidades de
-> RITA) queda para una iteración posterior; esta fase solo cubre la exportación.
+#### Ficha QR enriquecida (mobile-first)
+
+> Al escanear el QR de una caja o tarima, la pantalla pública muestra toda la información relevante. Diseño mobile-first: se usa principalmente desde celulares en el almacén o en tránsito.
+
+| # | Tarea | Descripción | Complejidad | Estado |
+|---|-------|-------------|-------------|--------|
+| 27 | Endpoint de ficha enriquecida | `GET /v1/public/qr/{code}` — retorna datos completos de caja o tarima según el `code`; cacheable en el edge (Cloudflare); sin login | 🟡 | ⬜ Pendiente |
+| 28 | Página QR mobile-first `/qr/[code]` | Layout vertical optimizado para celular; para **caja**: nombre del producto, categoría, INN/forma/concentración, lote, caducidad, cantidad, peso, status (badge), centro de origen, campaña, historial de eventos (timeline); para **tarima**: lista de productos con cantidades y peso total, status, número de cajas; tipografía grande, contraste alto | 🟠 | ⬜ Pendiente |
+| 29 | Estado visual del historial | Timeline al pie de la ficha QR: "Creada", "Sellada", "Transferida desde [Centro X]" (si aplica), "En envío", etc.; fechas en formato local | 🟡 | ⬜ Pendiente |
+
+---
+
+#### Línea de tiempo de estado (componente transversal)
+
+> Un componente reutilizable `<StatusTimeline>` que muestra en qué etapa está cualquier entidad (caja, tarima, envío, transferencia). Minimalista: ícono de estado + etiqueta + timestamp cuando ya ocurrió. Vertical en móvil, horizontal en escritorio.
+
+**Etapas por entidad:**
+
+| Entidad | Etapas en orden |
+|---|---|
+| Caja | Recibida · En preparación · Sellada · En tarima · En envío · Despachada |
+| Caja transferida | …Sellada · **Transferida** · En tarima · En envío · Despachada |
+| Caja rechazada | Recibida · En preparación · **Rechazada** (rojo, fin) |
+| Tarima | Abierta · Cerrada · Despachada |
+| Envío | Abierto · Cerrado · Despachado |
+| Transferencia | Solicitada · Aprobada · En tránsito · Recibida |
+| Transferencia rechazada | Solicitada · **Rechazada** (rojo, fin) |
+
+**Estados visuales de cada paso:**
+- `done` — círculo relleno + checkmark + timestamp en gris
+- `current` — círculo con anillo resaltado (color primario) + etiqueta en negrita
+- `pending` — círculo vacío + etiqueta en gris claro
+- `error` — círculo rojo + etiqueta en rojo (RECHAZADA)
+
+**Dónde se usa:**
+- Ficha QR de caja (mobile-first, pública)
+- Ficha QR de tarima (mobile-first, pública)
+- Vista de detalle de caja en dashboard
+- Vista de detalle de tarima en dashboard
+- Vista de detalle de envío en dashboard
+- Vista de detalle de transferencia en dashboard y Studio
+
+| # | Tarea | Descripción | Complejidad | Estado |
+|---|-------|-------------|-------------|--------|
+| 32 | Componente `StatusTimeline` | `src/components/StatusTimeline.tsx`; props: `steps: TimelineStep[]`; responsive (vertical móvil, horizontal escritorio); sin dependencias externas, solo Tailwind | 🟡 | ⬜ Pendiente |
+| 33 | Integrar en ficha QR pública | En `/qr/[code]`: timeline al centro de la pantalla para caja y tarima; timestamps en formato `DD MMM, HH:mm` | 🟡 | ⬜ Pendiente |
+| 34 | Integrar en vistas de detalle del dashboard | En vistas de detalle de caja, tarima, envío y transferencia; mismo componente, datos desde el endpoint de detalle | 🟡 | ⬜ Pendiente |
+
+---
+
+#### Interoperabilidad y home page
+
+| # | Tarea | Descripción | Complejidad | Estado |
+|---|-------|-------------|-------------|--------|
+| 30 | Export IFRC packing list (Excel) | Manifiesto en `.xlsx` con columnas IFRC: código de material, descripción, unidad, cantidad, peso | 🟡 | ⬜ Pendiente |
+| 31 | Sección "Estándares que respaldamos" | Bloque en home pública: logos/nombres de WHO, IFRC/ICRC, IOM, UNSPSC; texto breve de trazabilidad | 🟢 | ⬜ Pendiente |
+
+---
+
+> **Decisiones de diseño:**
+> - `product_types.campaign_id IS NULL` = catálogo global (seeds + promovidos). `campaign_id = X` = scoped a campaña X, visible para todos los centros de esa campaña.
+> - `intakes.campaign_id NOT NULL` — toda recepción tiene contexto operacional. La campaña "Donaciones Generales" garantiza que siempre hay un fallback sin forzar una operación específica.
+> - La deduplicación usa `unaccent(lower(...))` de PostgreSQL: "ibuprofén" = "ibuprofen" = "Ibuprofeno" dentro del mismo scope visible.
+> - Promover no copia — solo mueve `campaign_id → NULL`. Si dos campañas crearon el mismo producto, el admin elige el canónico; el otro queda scoped a su campaña.
+> - `weight_goal_kg IS NULL` = sin meta = sin barra de progreso; nunca se muestra una barra vacía o en 0%.
+> - El peso se captura donde más información existe (ProductType/seed) y fluye hacia abajo; solo se pide manualmente cuando no hay referencia.
+> - COFEPRIS y RITA/Sahana export: diferidos a iteración posterior.
