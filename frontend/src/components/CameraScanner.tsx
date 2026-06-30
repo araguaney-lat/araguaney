@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useCallback } from "react"
 import { BrowserMultiFormatReader } from "@zxing/browser"
-import { NotFoundException } from "@zxing/library"
+import type { IScannerControls } from "@zxing/browser"
 
 interface Props {
   onResult: (text: string) => void
@@ -12,23 +12,24 @@ interface Props {
 
 export function CameraScanner({ onResult, onClose, label = "Apunta la cámara al código" }: Props) {
   const videoRef = useRef<HTMLVideoElement>(null)
-  const readerRef = useRef<BrowserMultiFormatReader | null>(null)
+  const controlsRef = useRef<IScannerControls | null>(null)
 
   const stop = useCallback(() => {
-    readerRef.current?.reset()
+    controlsRef.current?.stop()
+    controlsRef.current = null
   }, [])
 
   useEffect(() => {
     if (!videoRef.current) return
     const reader = new BrowserMultiFormatReader()
-    readerRef.current = reader
 
-    reader.decodeFromVideoDevice(undefined, videoRef.current, (result, err) => {
+    reader.decodeFromVideoDevice(undefined, videoRef.current, (result, err, controls) => {
+      controlsRef.current = controls
       if (result) {
         stop()
         onResult(result.getText())
       }
-      if (err && !(err instanceof NotFoundException)) {
+      if (err && err.name !== "NotFoundException") {
         console.error(err)
       }
     })
@@ -59,7 +60,6 @@ export function CameraScanner({ onResult, onClose, label = "Apunta la cámara al
           ref={videoRef}
           className="absolute inset-0 h-full w-full object-cover"
         />
-        {/* Viewfinder */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <div className="h-56 w-56 border-2 border-white/70 rounded-lg shadow-[0_0_0_9999px_rgba(0,0,0,0.5)]" />
         </div>
