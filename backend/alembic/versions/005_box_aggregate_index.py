@@ -1,13 +1,13 @@
 """add ix_boxes_pt_status for aggregate dashboard query
 
 Revision ID: 005
-Revises: 004
+Revises: 004_campaigns
 Create Date: 2026-06-30
 """
 from alembic import op
 
 revision = "005"
-down_revision = "004"
+down_revision = "004_campaigns"
 branch_labels = None
 depends_on = None
 
