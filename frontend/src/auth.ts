@@ -24,6 +24,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           const me = await meRes.json()
           return {
             accessToken: token,
+            platformRole: me.role ?? null,
             centerRole: me.center_role ?? null,
             centerId: me.center_id ?? null,
             userId: me.id,
@@ -53,6 +54,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         const data = await res.json()
         return {
           accessToken: data.access_token,
+          platformRole: data.role ?? null,
           centerRole: data.center_role ?? null,
           centerId: data.center_id ?? null,
           userId: _extractSub(data.access_token),
@@ -64,6 +66,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     async jwt({ token, user }) {
       if (user) {
         token.accessToken = user.accessToken
+        token.platformRole = user.platformRole
         token.centerRole = user.centerRole
         token.centerId = user.centerId
         token.userId = user.userId
@@ -72,6 +75,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     },
     async session({ session, token }) {
       session.accessToken = token.accessToken
+      session.platformRole = token.platformRole
       session.centerRole = token.centerRole
       session.centerId = token.centerId
       session.userId = token.userId

@@ -5,12 +5,10 @@ import { usePathname } from "next/navigation"
 import { logoutAction } from "@/lib/actions"
 
 const NAV = [
-  { href: "/studio", label: "Hub", exact: true },
+  { href: "/studio", label: "Métricas", exact: true },
   { href: "/studio/users", label: "Usuarios" },
-  { href: "/studio/campaigns", label: "Campañas" },
-  { href: "/studio/centers", label: "Centros" },
-  { href: "/studio/requests", label: "Solicitudes" },
   { href: "/studio/audit", label: "Auditoría" },
+  { href: "/studio/settings", label: "Configuración" },
 ]
 
 export function StudioSidebar() {
@@ -21,13 +19,13 @@ export function StudioSidebar() {
       <div className="mb-6 px-2">
         <Link href="/studio" className="block">
           <span className="text-base font-semibold text-zinc-900">Studio</span>
-          <span className="mt-0.5 block text-xs text-zinc-500">Admin Nacional</span>
+          <span className="mt-0.5 block text-xs text-zinc-500">Administración de plataforma</span>
         </Link>
         <Link
           href="/dashboard"
           className="mt-2 inline-block rounded bg-zinc-100 px-2 py-0.5 text-xs text-zinc-500 hover:bg-zinc-200 transition-colors"
         >
-          ← Dashboard operativo
+          ← Dashboard
         </Link>
       </div>
 

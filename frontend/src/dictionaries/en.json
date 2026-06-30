@@ -113,7 +113,8 @@
       "settings": "Settings",
       "logout": "Sign out",
       "requests": "Requests",
-      "studio": "Studio"
+      "users": "Users",
+      "audit": "Audit"
     },
     "role": {
       "national_admin": "National Admin",
