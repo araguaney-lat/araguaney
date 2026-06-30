@@ -40,10 +40,35 @@ export async function loginAction(_: unknown, formData: FormData) {
   } catch (error) {
     if (error instanceof AuthError) {
       const msg = (error.cause?.err as Error | undefined)?.message ?? ""
+      if (msg.startsWith("TOTP_REQUIRED:")) {
+        return { requires_totp: true, partial_token: msg.slice("TOTP_REQUIRED:".length) }
+      }
+      // Note: the frontend stores the partial_token in sessionStorage and redirects to /login/2fa
       if (msg === "EMAIL_NOT_VERIFIED") return { error: "email_not_verified" }
       if (msg === "ACCOUNT_DISABLED") return { error: "account_disabled" }
       return { error: "Invalid email or password" }
     }
+    throw error
+  }
+}
+
+export async function totpChallengeAction(partial_token: string, code: string) {
+  const res = await fetch(`${API_URL}/v1/auth/totp/challenge`, {
+    method: "POST",
+    body: JSON.stringify({ partial_token, code }),
+    headers: { "Content-Type": "application/json" },
+  })
+
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}))
+    return { error: (data.error?.message as string | undefined) ?? "Código incorrecto." }
+  }
+
+  const data = await res.json()
+  try {
+    await signIn("credentials", { accessToken: data.access_token, redirectTo: "/dashboard" })
+  } catch (error) {
+    if (error instanceof AuthError) return { error: "Error al iniciar sesión. Intenta de nuevo." }
     throw error
   }
 }

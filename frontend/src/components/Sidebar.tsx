@@ -68,14 +68,26 @@ export function Sidebar({ centerRole, centerName }: SidebarProps) {
         })}
       </nav>
 
-      <form action={logoutAction} className="mt-4">
-        <button
-          type="submit"
-          className="w-full rounded-lg px-3 py-2 text-left text-sm text-zinc-500 hover:bg-zinc-50 hover:text-zinc-900"
+      <div className="mt-4 border-t border-zinc-100 pt-3 space-y-0.5">
+        <Link
+          href="/dashboard/settings"
+          className={`block rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+            pathname.startsWith("/dashboard/settings")
+              ? "bg-zinc-100 text-zinc-900"
+              : "text-zinc-500 hover:bg-zinc-50 hover:text-zinc-900"
+          }`}
         >
-          Cerrar sesión
-        </button>
-      </form>
+          Configuración
+        </Link>
+        <form action={logoutAction}>
+          <button
+            type="submit"
+            className="w-full rounded-lg px-3 py-2 text-left text-sm text-zinc-500 hover:bg-zinc-50 hover:text-zinc-900"
+          >
+            Cerrar sesión
+          </button>
+        </form>
+      </div>
     </aside>
   )
 }

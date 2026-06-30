@@ -10,8 +10,26 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       credentials: {
         identifier: { label: "Email or username" },
         password: { label: "Password", type: "password" },
+        // Bypass field: populated after TOTP challenge completes
+        accessToken: { label: "Access Token" },
       },
       async authorize(credentials) {
+        // Post-TOTP bypass: token already verified by backend
+        if (credentials.accessToken) {
+          const token = credentials.accessToken as string
+          const meRes = await fetch(`${API_URL}/v1/auth/me`, {
+            headers: { Authorization: `Bearer ${token}` },
+          })
+          if (!meRes.ok) return null
+          const me = await meRes.json()
+          return {
+            accessToken: token,
+            centerRole: me.center_role ?? null,
+            centerId: me.center_id ?? null,
+            userId: me.id,
+          }
+        }
+
         const form = new URLSearchParams()
         form.append("username", credentials.identifier as string)
         form.append("password", credentials.password as string)
@@ -21,6 +39,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           body: form,
           headers: { "Content-Type": "application/x-www-form-urlencoded" },
         })
+
+        if (res.status === 202) {
+          const data = await res.json()
+          throw new Error(`TOTP_REQUIRED:${data.partial_token}`)
+        }
 
         if (!res.ok) {
           const data = await res.json().catch(() => ({}))

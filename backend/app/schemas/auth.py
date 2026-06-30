@@ -33,3 +33,23 @@ class OAuthLogin(StrictModel):
     name: str | None = None
     avatar_url: str | None = None
     provider: str = "google"
+
+
+# ── TOTP / 2FA ────────────────────────────────────────────────────────────────
+
+class TOTPSetupOut(StrictModel):
+    qr_uri: str
+    secret: str
+
+
+class TOTPConfirmIn(StrictModel):
+    code: str
+
+
+class TOTPConfirmOut(StrictModel):
+    backup_codes: list[str]
+
+
+class TOTPChallengeIn(StrictModel):
+    partial_token: str
+    code: str

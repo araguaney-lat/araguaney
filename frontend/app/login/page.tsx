@@ -1,31 +1,39 @@
 "use client"
 
-import { useActionState, useState } from "react"
+import { useActionState, useEffect, useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import Turnstile from "react-turnstile"
 import { loginAction } from "@/lib/actions"
 
 const LOGO = "https://res.cloudinary.com/dtvdqlxtd/image/upload/v1782794310/image_degkq9.png"
+const SESSION_KEY = "araguaney_partial_token"
 
 export default function LoginPage() {
-  const [error, formAction, isPending] = useActionState(loginAction, null)
+  const router = useRouter()
+  const [state, formAction, isPending] = useActionState(loginAction, null)
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
   const [turnstileKey, setTurnstileKey] = useState(0)
 
   const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!
 
+  useEffect(() => {
+    if (state && "requires_totp" in state && state.requires_totp) {
+      sessionStorage.setItem(SESSION_KEY, (state as { partial_token: string }).partial_token)
+      router.push("/login/2fa")
+    }
+  }, [state, router])
+
   return (
     <div style={{ minHeight: "100vh" }} className="flex flex-col md:grid md:grid-cols-2">
 
-      {/* Brand panel — full width compact on mobile, half on desktop */}
+      {/* Brand panel */}
       <div style={{ background: "linear-gradient(160deg,#F3C033,#E0A100 60%,#C98A00)", position: "relative", overflow: "hidden" }}
-        className="flex flex-col items-center justify-center text-center
-                   px-6 py-[44px] md:py-[54px] md:px-[50px] md:items-start md:text-left md:justify-between">
+        className="flex flex-col items-center justify-center text-center px-6 py-[44px] md:py-[54px] md:px-[50px] md:items-start md:text-left md:justify-between">
         <div style={{ position: "absolute", right: -60, bottom: -60, width: 360, height: 360, borderRadius: "50%", background: "rgba(255,255,255,.16)" }}
           className="hidden md:block" />
 
-        {/* Logo link */}
         <Link href="/" style={{ display: "flex", alignItems: "center", gap: 11, position: "relative", textDecoration: "none" }}
           className="justify-center md:justify-start">
           <span style={{ width: 40, height: 40, borderRadius: "50%", background: "#fff" }}
@@ -37,12 +45,10 @@ export default function LoginPage() {
           </span>
         </Link>
 
-        {/* Mobile: subtitle under logo */}
         <p style={{ margin: "4px 0 0", fontSize: 12.5, color: "#5C4500" }} className="md:hidden">
           Panel del centro de acopio
         </p>
 
-        {/* Desktop: center content */}
         <div style={{ position: "relative" }} className="hidden md:block">
           <Image src={LOGO} alt="" width={150} height={150}
             style={{ marginBottom: 24, filter: "drop-shadow(0 12px 20px rgba(120,86,0,.25))" }} />
@@ -71,7 +77,9 @@ export default function LoginPage() {
             <span className="hidden md:inline"> de acopio.</span>
           </p>
 
-          <form action={formAction} onSubmit={() => { if (error) { setTurnstileKey((k) => k + 1); setTurnstileToken(null) } }}>
+          <form action={formAction} onSubmit={() => {
+            if (state && "error" in state) { setTurnstileKey((k) => k + 1); setTurnstileToken(null) }
+          }}>
             <input type="hidden" name="callbackUrl" value="/dashboard" />
             <input type="hidden" name="turnstileToken" value={turnstileToken ?? ""} />
 
@@ -121,15 +129,15 @@ export default function LoginPage() {
               />
             </div>
 
-            {error?.error && (
+            {state && "error" in state && state.error && (
               <p style={{ fontSize: 13, color: "#c0392b", marginBottom: 12 }}>
-                {error.error === "email_not_verified"
+                {state.error === "email_not_verified"
                   ? "Verifica tu email antes de iniciar sesión."
-                  : error.error === "account_disabled"
+                  : state.error === "account_disabled"
                   ? "Tu cuenta está desactivada."
-                  : error.error === "Completa la verificación de seguridad."
+                  : state.error === "Completa la verificación de seguridad."
                   ? "Completa la verificación de seguridad."
-                  : error.error === "Verificación de seguridad fallida. Intenta de nuevo."
+                  : state.error === "Verificación de seguridad fallida. Intenta de nuevo."
                   ? "Verificación de seguridad fallida. Intenta de nuevo."
                   : "Credenciales inválidas."}
               </p>
@@ -150,22 +158,6 @@ export default function LoginPage() {
               {isPending ? "Entrando…" : "Entrar"}
             </button>
           </form>
-
-          <div className="flex items-center gap-[12px]" style={{ marginBottom: 18, color: "#B6AC99", fontSize: 12 }}>
-            <span style={{ flex: 1, height: 1, background: "#E6DCC8" }} />
-            o
-            <span style={{ flex: 1, height: 1, background: "#E6DCC8" }} />
-          </div>
-
-          <button style={{
-            display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
-            width: "100%", height: 48, background: "#fff", border: "1.5px solid #E6DCC8",
-            borderRadius: 10, fontWeight: 600, fontSize: 14, color: "#2B2723",
-            cursor: "pointer", marginBottom: 22,
-          }}>
-            <span style={{ width: 18, height: 18, borderRadius: "50%", border: "2px solid #C9BEA9" }} />
-            Continuar con Google
-          </button>
 
           <p style={{ margin: 0, fontSize: 12.5, color: "#7A7163", textAlign: "center" }}>
             ¿Tu centro aún no usa Araguaney?<br className="md:hidden" />
