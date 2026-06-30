@@ -3,9 +3,9 @@
 ## Progreso general
 
 ```mermaid
-pie title Tareas completadas (97 tareas)
+pie title Tareas completadas (109 tareas)
     "Listas" : 50
-    "Pendientes" : 47
+    "Pendientes" : 59
 ```
 
 | Fase | Nombre | Listas | Pendientes | Progreso |
@@ -16,7 +16,8 @@ pie title Tareas completadas (97 tareas)
 | 3 | [Tarima, envío y manifiesto](phase-03-pallet-shipment-manifest.md) | 9 | 0 | ✅ 100% |
 | 4 | [Panel agregado nacional + endurecimiento + OTP + scanning móvil](phase-04-national-dashboard-hardening.md) | 10 | 15 | 🟡 40% |
 | 5 | [Studio — panel de administración + solicitudes](phase-05-studio.md) | 0 | 22 | ⬜ 0% |
-| **Total** | | **50** | **47** | **🟡 52%** |
+| 6 | [Integración de catálogos externos y estándares humanitarios](phase-06-catalog-integrations.md) | 0 | 12 | ⬜ 0% |
+| **Total** | | **50** | **59** | **🟡 46%** |
 
 > Las tareas 1 y 2 de Fase 0 (Envs + aplicar migración) requieren acción manual con DB activa.
 
