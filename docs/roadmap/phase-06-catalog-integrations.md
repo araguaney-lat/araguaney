@@ -175,6 +175,44 @@ Todos vía `fire_audit(background_tasks, ...)` en los routers:
 
 ---
 
+#### Línea de tiempo de estado (componente transversal)
+
+> Un componente reutilizable `<StatusTimeline>` que muestra en qué etapa está cualquier entidad (caja, tarima, envío, transferencia). Minimalista: ícono de estado + etiqueta + timestamp cuando ya ocurrió. Vertical en móvil, horizontal en escritorio.
+
+**Etapas por entidad:**
+
+| Entidad | Etapas en orden |
+|---|---|
+| Caja | Recibida · En preparación · Sellada · En tarima · En envío · Despachada |
+| Caja transferida | …Sellada · **Transferida** · En tarima · En envío · Despachada |
+| Caja rechazada | Recibida · En preparación · **Rechazada** (rojo, fin) |
+| Tarima | Abierta · Cerrada · Despachada |
+| Envío | Abierto · Cerrado · Despachado |
+| Transferencia | Solicitada · Aprobada · En tránsito · Recibida |
+| Transferencia rechazada | Solicitada · **Rechazada** (rojo, fin) |
+
+**Estados visuales de cada paso:**
+- `done` — círculo relleno + checkmark + timestamp en gris
+- `current` — círculo con anillo resaltado (color primario) + etiqueta en negrita
+- `pending` — círculo vacío + etiqueta en gris claro
+- `error` — círculo rojo + etiqueta en rojo (RECHAZADA)
+
+**Dónde se usa:**
+- Ficha QR de caja (mobile-first, pública)
+- Ficha QR de tarima (mobile-first, pública)
+- Vista de detalle de caja en dashboard
+- Vista de detalle de tarima en dashboard
+- Vista de detalle de envío en dashboard
+- Vista de detalle de transferencia en dashboard y Studio
+
+| # | Tarea | Descripción | Complejidad | Estado |
+|---|-------|-------------|-------------|--------|
+| 32 | Componente `StatusTimeline` | `src/components/StatusTimeline.tsx`; props: `steps: TimelineStep[]`; responsive (vertical móvil, horizontal escritorio); sin dependencias externas, solo Tailwind | 🟡 | ⬜ Pendiente |
+| 33 | Integrar en ficha QR pública | En `/qr/[code]`: timeline al centro de la pantalla para caja y tarima; timestamps en formato `DD MMM, HH:mm` | 🟡 | ⬜ Pendiente |
+| 34 | Integrar en vistas de detalle del dashboard | En vistas de detalle de caja, tarima, envío y transferencia; mismo componente, datos desde el endpoint de detalle | 🟡 | ⬜ Pendiente |
+
+---
+
 #### Interoperabilidad y home page
 
 | # | Tarea | Descripción | Complejidad | Estado |
