@@ -1,7 +1,7 @@
 import Image from "next/image"
 import Link from "next/link"
 
-const LOGO = "https://res.cloudinary.com/dtvdqlxtd/image/upload/v1782786229/araguaney_hwthy5.png"
+const LOGO = "https://res.cloudinary.com/dtvdqlxtd/image/upload/v1782794310/image_degkq9.png"
 
 export default function ContactoPage() {
   return (
