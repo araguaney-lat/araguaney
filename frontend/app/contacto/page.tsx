@@ -1,5 +1,6 @@
 import Image from "next/image"
 import Link from "next/link"
+import ContactForm from "@/components/ContactForm"
 
 const LOGO = "https://res.cloudinary.com/dtvdqlxtd/image/upload/v1782794310/image_degkq9.png"
 
@@ -69,7 +70,7 @@ export default function ContactoPage() {
           {/* Contact info — desktop only */}
           <div className="hidden md:flex flex-col gap-[18px] mt-9">
             {[
-              { bg: "#FBEFC9", c: "#B07D00", title: "Correo", val: "hola@araguaney.org" },
+              { bg: "#FBEFC9", c: "#B07D00", title: "Correo", val: "hola@araguaney.lat" },
               { bg: "#E9F1F8", c: "#1F5E8C", title: "Alta de centro", val: "Respuesta en menos de 48 horas hábiles" },
               { bg: "#FBEFC9", c: "#B07D00", title: "Centros activos", val: "Operando en México · destino Venezuela" },
             ].map((item) => (
@@ -92,49 +93,7 @@ export default function ContactoPage() {
         {/* Right: form */}
         <div style={{ background: "#fff" }}
           className="px-5 md:px-[50px] py-7 md:py-[56px] md:border-l md:border-[#EFE7D6]">
-          <form className="max-w-[440px]">
-
-            {/* Name + Org — stacked on mobile, 2-col on desktop */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-[18px] mb-4 md:mb-[18px]">
-              {[
-                { label: "Nombre", placeholder: "Tu nombre" },
-                { label: "Organización", placeholder: "Tu fundación" },
-              ].map((f) => (
-                <div key={f.label}>
-                  <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#52493D", marginBottom: 6 }}>{f.label}</label>
-                  <input placeholder={f.placeholder} style={{ width: "100%", height: 46, background: "#FCFAF4", border: "1.5px solid #E6DCC8", borderRadius: 10, padding: "0 14px", fontSize: 14, color: "#2B2723", outline: "none" }} />
-                </div>
-              ))}
-            </div>
-
-            <div style={{ marginBottom: 14 }}>
-              <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#52493D", marginBottom: 6 }}>Correo</label>
-              <input type="email" placeholder="tu@correo.org" style={{ width: "100%", height: 46, background: "#FCFAF4", border: "1.5px solid #E6DCC8", borderRadius: 10, padding: "0 14px", fontSize: 14, color: "#2B2723", outline: "none" }} />
-            </div>
-
-            {/* Chips — desktop only */}
-            <div className="hidden md:block" style={{ marginBottom: 14 }}>
-              <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#52493D", marginBottom: 7 }}>¿Cómo podemos ayudarte?</label>
-              <div className="flex gap-2 flex-wrap">
-                {["Dar de alta un centro", "Sumarme como voluntario", "Otra consulta"].map((opt, i) => (
-                  <span key={opt} style={{ fontSize: 13, padding: "8px 14px", borderRadius: 99, fontWeight: 600, cursor: "pointer", background: i === 0 ? "#1F5E8C" : "#FCFAF4", color: i === 0 ? "#fff" : "#52493D", border: i === 0 ? "none" : "1.5px solid #E6DCC8" }}>
-                    {opt}
-                  </span>
-                ))}
-              </div>
-            </div>
-
-            <div style={{ marginBottom: 18 }}>
-              <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#52493D", marginBottom: 6 }}>Mensaje</label>
-              <textarea placeholder="Cuéntanos sobre tu centro." rows={4}
-                style={{ width: "100%", background: "#FCFAF4", border: "1.5px solid #E6DCC8", borderRadius: 10, padding: "12px 14px", fontSize: 14, color: "#2B2723", lineHeight: 1.5, outline: "none", resize: "vertical" }} />
-            </div>
-
-            <button type="submit"
-              style={{ width: "100%", height: 50, background: "#1F5E8C", color: "#fff", borderRadius: 10, fontWeight: 700, fontSize: 15, border: "none", cursor: "pointer", boxShadow: "0 14px 26px -12px rgba(31,94,140,.7)" }}>
-              Enviar mensaje
-            </button>
-          </form>
+          <ContactForm />
         </div>
       </div>
 
