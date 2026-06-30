@@ -66,7 +66,7 @@
 | 27 | Página `/change-password` | Página pública (sin nav) que aparece tras login con `must_change_password`; formulario: nueva contraseña + confirmación; redirige a dashboard al completar | 🟡 | ⬜ Pendiente |
 | 28 | Sección de contraseña en perfil | En `/dashboard/profile` (o `/settings`): formulario de cambio de contraseña con contraseña actual; disponible para todos los roles | 🟡 | ⬜ Pendiente |
 | 29 | User manager para coordinador | `/dashboard/team` — coordinador ve los volunteers de su centro; botón crear volunteer; botón "Reinvitar" por fila; misma lógica de invitación | 🟡 | ⬜ Pendiente |
-| 39 | Sidebar colapsable | Botón de toggle (chevron) en el sidebar del dashboard que alterna entre modo expandido (ícono + etiqueta) y modo colapsado (solo íconos con tooltip al hover); estado persistido en `localStorage`; en móvil el comportamiento no cambia (sigue siendo drawer) | 🟡 | ⬜ Pendiente |
+| 39 | Sidebar colapsable | Botón de toggle con ícono `PanelLeftClose` / `PanelLeftOpen` (Lucide) — el mismo que usa Claude AI — que alterna entre modo expandido (ícono + etiqueta) y modo colapsado (solo íconos con tooltip al hover); estado persistido en `localStorage`; en móvil el comportamiento no cambia (sigue siendo drawer) | 🟡 | ⬜ Pendiente |
 
 ---
 
