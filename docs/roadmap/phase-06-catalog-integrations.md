@@ -128,12 +128,59 @@ Todos vía `fire_audit(background_tasks, ...)` en los routers:
 
 ---
 
+#### Peso — Modelo y métricas
+
+> El peso es crítico para logística (carga máxima de camiones y aviones, metas de tonelaje). Se captura en el ProductType y fluye hacia arriba automáticamente.
+
+**Dónde vive el peso:**
+
+| Campo | Tabla | Tipo | Obligatorio | Descripción |
+|---|---|---|---|---|
+| `unit_weight_kg` | `product_types` | `Decimal(8,3) NULLABLE` | No | Peso por unidad; viene del seed/barcode lookup o lo llena el coordinador |
+| `weight_kg` | `boxes` | `Decimal(8,3) NULLABLE` | No | Auto: `unit_weight_kg × quantity`; si no hay en ProductType, entrada manual opcional |
+| `tare_weight_kg` | `pallets` | `Decimal(8,3) NULLABLE` | No | Peso vacío de la tarima; para peso bruto real |
+| `weight_goal_kg` | `campaigns` | `Decimal(10,3) NULLABLE` | No | Meta de tonelaje de la campaña; si NULL → no se muestra barra de progreso |
+
+**Regla de visualización de progreso:**
+- `Campaign.weight_goal_kg IS NULL` → mostrar solo "X kg acopiados" (sin barra)
+- `Campaign.weight_goal_kg IS NOT NULL` → mostrar barra de progreso "X kg / Y kg (Z%)"
+
+**Visibilidad por rol:**
+
+| Quién ve | Qué ve |
+|---|---|
+| Todos los usuarios autenticados | Métricas de su centro: "Tu centro: X kg acopiados" (número simple, sin meta) |
+| Todos los usuarios autenticados | Métricas de cada campaña en la que participan: total kg + barra si hay meta |
+| `national_admin` | Panel nacional: suma de todas las campañas + barra por campaña si tiene meta |
+
+| # | Tarea | Descripción | Complejidad | Estado |
+|---|-------|-------------|-------------|--------|
+| 22 | Migración campos de peso | `unit_weight_kg` en `product_types`; `weight_kg` en `boxes`; `tare_weight_kg` en `pallets`; `weight_goal_kg` en `campaigns` — todos `NULLABLE` | 🟡 | ⬜ Pendiente |
+| 23 | Auto-cálculo de `weight_kg` en Box | En `BoxService.seal()`: si `product_type.unit_weight_kg` existe → calcular y guardar `weight_kg`; si no → dejar NULL (coordinador puede editar antes de sellar) | 🟡 | ⬜ Pendiente |
+| 24 | Endpoint de métricas de peso | `GET /v1/dashboard/weight?campaign_id=&center_id=` — retorna `{total_kg, goal_kg, progress_pct}` por campaña y `{center_kg}` por centro; `national_admin` puede omitir filtros para ver todo | 🟡 | ⬜ Pendiente |
+| 25 | Componente de progreso en dashboard | Tarjeta por campaña: muestra kg acopiados; si hay `weight_goal_kg` → barra de progreso con porcentaje; si no → solo el número. Visible para todos los roles | 🟡 | ⬜ Pendiente |
+| 26 | Métrica de centro (número simple) | En el dashboard de cada usuario: "Tu centro ha acopiado X kg" — un solo número, sin meta, sin barra | 🟢 | ⬜ Pendiente |
+
+---
+
+#### Ficha QR enriquecida (mobile-first)
+
+> Al escanear el QR de una caja o tarima, la pantalla pública muestra toda la información relevante. Diseño mobile-first: se usa principalmente desde celulares en el almacén o en tránsito.
+
+| # | Tarea | Descripción | Complejidad | Estado |
+|---|-------|-------------|-------------|--------|
+| 27 | Endpoint de ficha enriquecida | `GET /v1/public/qr/{code}` — retorna datos completos de caja o tarima según el `code`; cacheable en el edge (Cloudflare); sin login | 🟡 | ⬜ Pendiente |
+| 28 | Página QR mobile-first `/qr/[code]` | Layout vertical optimizado para celular; para **caja**: nombre del producto, categoría, INN/forma/concentración, lote, caducidad, cantidad, peso, status (badge), centro de origen, campaña, historial de eventos (timeline); para **tarima**: lista de productos con cantidades y peso total, status, número de cajas; tipografía grande, contraste alto | 🟠 | ⬜ Pendiente |
+| 29 | Estado visual del historial | Timeline al pie de la ficha QR: "Creada", "Sellada", "Transferida desde [Centro X]" (si aplica), "En envío", etc.; fechas en formato local | 🟡 | ⬜ Pendiente |
+
+---
+
 #### Interoperabilidad y home page
 
 | # | Tarea | Descripción | Complejidad | Estado |
 |---|-------|-------------|-------------|--------|
-| 20 | Export IFRC packing list (Excel) | Manifiesto en `.xlsx` con columnas IFRC: código de material, descripción, unidad, cantidad, peso | 🟡 | ⬜ Pendiente |
-| 21 | Sección "Estándares que respaldamos" | Bloque en home pública: logos/nombres de WHO, IFRC/ICRC, IOM, UNSPSC; texto breve de trazabilidad | 🟢 | ⬜ Pendiente |
+| 30 | Export IFRC packing list (Excel) | Manifiesto en `.xlsx` con columnas IFRC: código de material, descripción, unidad, cantidad, peso | 🟡 | ⬜ Pendiente |
+| 31 | Sección "Estándares que respaldamos" | Bloque en home pública: logos/nombres de WHO, IFRC/ICRC, IOM, UNSPSC; texto breve de trazabilidad | 🟢 | ⬜ Pendiente |
 
 ---
 
@@ -142,4 +189,6 @@ Todos vía `fire_audit(background_tasks, ...)` en los routers:
 > - `intakes.campaign_id NOT NULL` — toda recepción tiene contexto operacional. La campaña "Donaciones Generales" garantiza que siempre hay un fallback sin forzar una operación específica.
 > - La deduplicación usa `unaccent(lower(...))` de PostgreSQL: "ibuprofén" = "ibuprofen" = "Ibuprofeno" dentro del mismo scope visible.
 > - Promover no copia — solo mueve `campaign_id → NULL`. Si dos campañas crearon el mismo producto, el admin elige el canónico; el otro queda scoped a su campaña.
+> - `weight_goal_kg IS NULL` = sin meta = sin barra de progreso; nunca se muestra una barra vacía o en 0%.
+> - El peso se captura donde más información existe (ProductType/seed) y fluye hacia abajo; solo se pide manualmente cuando no hay referencia.
 > - COFEPRIS y RITA/Sahana export: diferidos a iteración posterior.
