@@ -13,7 +13,7 @@
     "@zxing/library": "^0.21.3",
     "next": "^16.2.9",
     "next-auth": "^5.0.0-beta.31",
-    "nodemailer": "^7.0.13",
+    "nodemailer": "^9.0.3",
     "react": "19.2.7",
     "react-dom": "19.2.7",
     "react-turnstile": "^1.1.5",
