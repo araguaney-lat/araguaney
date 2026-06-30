@@ -5,6 +5,7 @@ declare module "next-auth" {
   interface Session {
     accessToken: string
     userId: string
+    platformRole: string | null
     centerRole: string | null
     centerId: string | null
   }
@@ -12,6 +13,7 @@ declare module "next-auth" {
   interface User {
     accessToken: string
     userId: string
+    platformRole: string | null
     centerRole: string | null
     centerId: string | null
   }
@@ -21,6 +23,7 @@ declare module "next-auth/jwt" {
   interface JWT {
     accessToken: string
     userId: string
+    platformRole: string | null
     centerRole: string | null
     centerId: string | null
   }

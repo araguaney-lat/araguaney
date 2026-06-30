@@ -5,7 +5,7 @@ import { StudioSidebar } from "@/components/StudioSidebar"
 export default async function StudioLayout({ children }: { children: React.ReactNode }) {
   const session = await auth()
   if (!session) redirect("/login")
-  if (session.centerRole !== "national_admin") redirect("/dashboard")
+  if (session.platformRole !== "superadmin") redirect("/dashboard")
 
   return (
     <div className="flex h-screen overflow-hidden bg-zinc-50">

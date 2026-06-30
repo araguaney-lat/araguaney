@@ -2,27 +2,25 @@ import { auth } from "@/auth"
 import { apiFetch } from "@/lib/api"
 import Link from "next/link"
 
-interface Stats {
+interface NationalStats {
   total_centers: number
   active_centers: number
   total_boxes: number
   boxes_by_category: Record<string, number>
 }
 
-async function getStats(token: string): Promise<Stats | null> {
+async function getStats(token: string): Promise<NationalStats | null> {
   try {
-    return await apiFetch<Stats>("/v1/dashboard/national", { token })
+    return await apiFetch<NationalStats>("/v1/dashboard/national", { token })
   } catch {
     return null
   }
 }
 
 const QUICK_LINKS = [
-  { href: "/studio/users", label: "Usuarios", desc: "Crear y gestionar cuentas de operadores" },
-  { href: "/studio/campaigns", label: "Campañas", desc: "Administrar operaciones humanitarias" },
-  { href: "/studio/centers", label: "Centros", desc: "Alta y configuración de centros" },
-  { href: "/studio/requests", label: "Solicitudes", desc: "Bandeja de solicitudes de equipos" },
-  { href: "/studio/audit", label: "Auditoría", desc: "Registro de todas las acciones del sistema" },
+  { href: "/studio/users", label: "Usuarios", desc: "Gestionar cuentas, bloquear usuarios, crear national admins" },
+  { href: "/studio/audit", label: "Auditoría", desc: "Registro completo de todas las acciones del sistema" },
+  { href: "/studio/settings", label: "Configuración", desc: "Variables operativas del sistema" },
 ]
 
 export default async function StudioHubPage() {
@@ -33,7 +31,7 @@ export default async function StudioHubPage() {
     <div className="max-w-4xl">
       <div className="mb-8">
         <h1 className="text-2xl font-semibold text-zinc-900">Studio</h1>
-        <p className="text-sm text-zinc-500 mt-1">Panel de administración nacional — Araguaney</p>
+        <p className="text-sm text-zinc-500 mt-1">Administración de plataforma — Araguaney</p>
       </div>
 
       {stats && (
@@ -42,10 +40,7 @@ export default async function StudioHubPage() {
             { label: "Centros activos", value: stats.active_centers },
             { label: "Centros totales", value: stats.total_centers },
             { label: "Cajas registradas", value: stats.total_boxes },
-            {
-              label: "Categorías activas",
-              value: Object.keys(stats.boxes_by_category ?? {}).length,
-            },
+            { label: "Categorías activas", value: Object.keys(stats.boxes_by_category ?? {}).length },
           ].map((s) => (
             <div key={s.label} className="rounded-xl border border-zinc-200 bg-white p-4">
               <p className="text-2xl font-bold text-zinc-900">{s.value}</p>

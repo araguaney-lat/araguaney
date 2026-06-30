@@ -133,6 +133,7 @@ class AuthService(BaseService):
         return {
             "access_token": token,
             "token_type": "bearer",
+            "role": user.role,
             "center_role": user.center_role,
             "center_id": str(user.center_id) if user.center_id else None,
         }
@@ -344,6 +345,7 @@ class AuthService(BaseService):
         return {
             "access_token": token,
             "token_type": "bearer",
+            "role": user.role,
             "center_role": user.center_role,
             "center_id": str(user.center_id) if user.center_id else None,
         }

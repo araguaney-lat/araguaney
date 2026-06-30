@@ -22,7 +22,8 @@ type DashboardNav = {
   campaigns: string
   centers: string
   requests: string
-  studio: string
+  users: string
+  audit: string
   settings: string
   logout: string
 }
@@ -46,6 +47,11 @@ const NAV_ITEMS: NavItem[] = [
   { href: "/dashboard/requests", labelKey: "requests", roles: ["national_admin", "coordinator", "volunteer"] },
 ]
 
+const ADMIN_ITEMS: NavItem[] = [
+  { href: "/dashboard/admin/users", labelKey: "users", roles: ["national_admin"] },
+  { href: "/dashboard/admin/audit", labelKey: "audit", roles: ["national_admin"] },
+]
+
 interface SidebarProps {
   centerRole: CenterRole | null
   centerName?: string | null
@@ -57,6 +63,9 @@ export function Sidebar({ centerRole, centerName, nav, roleLabels }: SidebarProp
   const pathname = usePathname()
 
   const visibleItems = NAV_ITEMS.filter(
+    (item) => centerRole && item.roles.includes(centerRole)
+  )
+  const visibleAdminItems = ADMIN_ITEMS.filter(
     (item) => centerRole && item.roles.includes(centerRole)
   )
 
@@ -91,21 +100,33 @@ export function Sidebar({ centerRole, centerName, nav, roleLabels }: SidebarProp
             </Link>
           )
         })}
+
+        {visibleAdminItems.length > 0 && (
+          <div className="pt-3">
+            <p className="px-3 pb-1 text-xs font-semibold uppercase tracking-wider text-zinc-400">
+              Administración
+            </p>
+            {visibleAdminItems.map((item) => {
+              const isActive = pathname.startsWith(item.href)
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`block rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+                    isActive
+                      ? "bg-zinc-100 text-zinc-900"
+                      : "text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900"
+                  }`}
+                >
+                  {nav[item.labelKey]}
+                </Link>
+              )
+            })}
+          </div>
+        )}
       </nav>
 
       <div className="mt-4 border-t border-zinc-100 pt-3 space-y-0.5">
-        {centerRole === "national_admin" && (
-          <Link
-            href="/studio"
-            className={`block rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
-              pathname.startsWith("/studio")
-                ? "bg-blue-50 text-blue-700"
-                : "text-blue-600 hover:bg-blue-50 hover:text-blue-700"
-            }`}
-          >
-            {nav.studio}
-          </Link>
-        )}
         <Link
           href="/dashboard/settings"
           className={`block rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
