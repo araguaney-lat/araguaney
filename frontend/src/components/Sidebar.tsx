@@ -54,12 +54,13 @@ const ADMIN_ITEMS: NavItem[] = [
 
 interface SidebarProps {
   centerRole: CenterRole | null
+  platformRole?: string | null
   centerName?: string | null
   nav: DashboardNav
   roleLabels: DashboardRoleLabels
 }
 
-export function Sidebar({ centerRole, centerName, nav, roleLabels }: SidebarProps) {
+export function Sidebar({ centerRole, platformRole, centerName, nav, roleLabels }: SidebarProps) {
   const pathname = usePathname()
 
   const visibleItems = NAV_ITEMS.filter(
@@ -127,6 +128,18 @@ export function Sidebar({ centerRole, centerName, nav, roleLabels }: SidebarProp
       </nav>
 
       <div className="mt-4 border-t border-zinc-100 pt-3 space-y-0.5">
+        {platformRole === "superadmin" && (
+          <Link
+            href="/studio"
+            className={`block rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+              pathname.startsWith("/studio")
+                ? "bg-violet-50 text-violet-700"
+                : "text-violet-600 hover:bg-violet-50 hover:text-violet-700"
+            }`}
+          >
+            Studio
+          </Link>
+        )}
         <Link
           href="/dashboard/settings"
           className={`block rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
