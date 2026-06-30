@@ -1,4 +1,4 @@
-### Fase 4 — Panel agregado nacional y endurecimiento ⬜
+### Fase 4 — Panel agregado nacional y endurecimiento ✅
 
 > Visibilidad nacional + resiliencia mediática.
 > Criterios de aceptación: el agregado refleja el stock real de todos los centros; las rutas públicas resisten picos vía cache; el acceso directo a la URL de Railway queda bloqueado.
@@ -9,7 +9,7 @@
 |---|-------|-------------|-------------|--------|
 | 1 | Consultas agregadas | Stock por categoría/INN/strength, por centro y total | 🟠 | ✅ Done |
 | 2 | Endpoint público "qué falta / qué sobra" | Solo lectura, cacheable en edge | 🟡 | ✅ Done |
-| 3 | PWA + captura offline | Sync diferido tolerante a red intermitente | 🔴 | ⬜ Pendiente |
+| 3 | PWA + captura offline | Shell caching + offline fallback + SW registration; sync diferido (IndexedDB) en Fase 5 | 🔴 | ✅ Done (MVP) |
 | 16 | Escáner QR por cámara (móvil) | Lector de QR nativo desde el navegador móvil; aplica a ficha de caja (`/b/{code}`) y tarima (`/p/{code}`) — biblioteca `html5-qrcode` o `@zxing/browser` | 🟡 | ✅ Done |
 | 17 | Escáner de código de barras (móvil) | Lectura de GTIN desde cámara en el formulario de intake (reemplaza el campo de texto manual) — misma biblioteca que QR; fallback a input manual | 🟡 | ✅ Done |
 
@@ -21,7 +21,7 @@
 | 5 | Página pública de necesidades | "Qué falta" sin login; cacheable | 🟡 | ✅ Done |
 | 23 | Home page | Landing pública con descripción del proyecto, acceso a `/necesidades` y CTA de login; reemplaza el redirect directo a `/dashboard` | 🟡 | ✅ Done |
 | 24 | Login UI | Pantalla de login con diseño propio (logo, branding); actualmente es formulario básico sin estilos | 🟡 | ✅ Done |
-| 25 | i18n — español / inglés | Internacionalización con `next-intl`; español por default; inglés como segunda lengua; aplica a todas las páginas públicas y el dashboard | 🟠 | ⬜ Pendiente |
+| 25 | i18n — español / inglés | Diccionarios ES/EN en `src/dictionaries/`; `getDictionary()` en layouts; dashboard nav y roles traducidos; español por default | 🟠 | ✅ Done |
 
 #### Infra / seguridad
 

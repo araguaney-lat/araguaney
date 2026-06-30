@@ -99,6 +99,31 @@
       }
     ]
   },
+  "dashboard": {
+    "nav": {
+      "home": "Home",
+      "national": "National dashboard",
+      "intake": "Intake",
+      "boxes": "Boxes",
+      "pallets": "Pallets",
+      "shipments": "Shipments",
+      "scan": "Scan QR",
+      "campaigns": "Campaigns",
+      "centers": "Centers",
+      "settings": "Settings",
+      "logout": "Sign out"
+    },
+    "role": {
+      "national_admin": "National Admin",
+      "coordinator": "Coordinator",
+      "volunteer": "Volunteer"
+    },
+    "offline": {
+      "title": "No connection",
+      "desc": "Check your network and try again.",
+      "retry": "Retry"
+    }
+  },
   "footer": {
     "tagline": "The common standard for aid centers",
     "privacy": "No personal data of donors or recipients. Just inventory, traceable from box to shipment."
