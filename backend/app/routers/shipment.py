@@ -1,7 +1,7 @@
 import io
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, BackgroundTasks, Depends, Request
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 
@@ -13,6 +13,8 @@ from app.repositories.pallet_repository import PalletRepository
 from app.repositories.shipment_repository import ShipmentRepository
 from app.schemas.shipment import ShipmentCreate, ShipmentDetailOut, ShipmentOut
 from app.services.shipment_service import ShipmentService
+from app.utils.audit import fire_audit
+from app.utils.cloudflare import get_client_ip
 from app.utils.manifest import ManifestBoxRow, ManifestData, ManifestPalletSection, generate_manifest_pdf
 from app.utils.rate_limit import limiter
 
@@ -91,24 +93,32 @@ def remove_pallet_from_shipment(
 @limiter.limit("10/minute")
 def close_shipment(
     request: Request,
+    background_tasks: BackgroundTasks,
     shipment_id: UUID,
     db: Session = Depends(get_db),
     current_user: User = Depends(require_coordinator),
     scope: UUID | None = Depends(tenant_scope),
 ):
-    return ShipmentService(db).close(shipment_id, center_id=scope, user_id=current_user.id)
+    shipment = ShipmentService(db).close(shipment_id, center_id=scope, user_id=current_user.id)
+    fire_audit(background_tasks, "SHIPMENT_CLOSED", "shipment",
+               user_id=current_user.id, entity_id=str(shipment_id), ip=get_client_ip(request))
+    return shipment
 
 
 @router.post("/{shipment_id}/ship", response_model=ShipmentOut)
 @limiter.limit("5/minute")
 def ship_shipment(
     request: Request,
+    background_tasks: BackgroundTasks,
     shipment_id: UUID,
     db: Session = Depends(get_db),
     current_user: User = Depends(require_coordinator),
     scope: UUID | None = Depends(tenant_scope),
 ):
-    return ShipmentService(db).ship(shipment_id, center_id=scope, user_id=current_user.id)
+    shipment = ShipmentService(db).ship(shipment_id, center_id=scope, user_id=current_user.id)
+    fire_audit(background_tasks, "SHIPMENT_SHIPPED", "shipment",
+               user_id=current_user.id, entity_id=str(shipment_id), ip=get_client_ip(request))
+    return shipment
 
 
 @router.get("/{shipment_id}/manifest.pdf")

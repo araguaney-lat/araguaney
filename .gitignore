@@ -41,3 +41,7 @@ Thumbs.db
 .superpowers/
 .worktrees/
 scripts/
+
+# Screenshots and browser automation artifacts
+screenshots/
+.playwright-mcp/

@@ -1,13 +1,15 @@
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Query, Request
+from fastapi import APIRouter, BackgroundTasks, Depends, Query, Request
 from sqlalchemy.orm import Session
 
+from app.config import settings
 from app.database import get_db
 from app.dependencies import get_current_user, require_national_admin
 from app.models.user import User
 from app.repositories.audit_repository import AuditRepository
 from app.repositories.request_repository import RequestRepository, REQUEST_STATUSES
+from app.repositories.user_repository import UserRepository
 from app.schemas.studio import (
     RequestCreate,
     RequestMessageCreate,
@@ -79,6 +81,7 @@ def get_request(
 @limiter.limit("30/hour")
 def add_message(
     http_request: Request,
+    background_tasks: BackgroundTasks,
     request_id: UUID,
     data: RequestMessageCreate,
     db: Session = Depends(get_db),
@@ -96,6 +99,25 @@ def add_message(
     msg = repo.add_message(request_id=request_id, author_id=current_user.id, body=data.body)
     db.commit()
     db.refresh(msg)
+
+    # Email notification: admin replies → notify request author; user replies → skip (admin sees inbox)
+    if current_user.center_role == "national_admin" and req.author_id:
+        author = UserRepository(db).find_by_id(req.author_id)
+        if author and author.email:
+            site_url = settings.frontend_url.split(",")[0].strip().rstrip("/")
+            request_url = f"{site_url}/dashboard/requests"
+
+            def _send_email() -> None:
+                from app.email import send_request_reply_email
+                send_request_reply_email(
+                    to=author.email,
+                    request_title=req.title,
+                    reply_body=data.body,
+                    request_url=request_url,
+                )
+
+            background_tasks.add_task(_send_email)
+
     return msg
 
 

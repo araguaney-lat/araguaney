@@ -1,7 +1,7 @@
 import io
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, BackgroundTasks, Depends, Request
 from fastapi.responses import Response, StreamingResponse
 from sqlalchemy.orm import Session
 
@@ -12,6 +12,8 @@ from app.models.user import User
 from app.repositories.pallet_repository import PalletRepository
 from app.schemas.pallet import PalletCreate, PalletDetailOut, PalletOut, PalletPublicOut
 from app.services.pallet_service import PalletService
+from app.utils.audit import fire_audit
+from app.utils.cloudflare import get_client_ip
 from app.utils.pdf_pallet_label import PalletLabelData, generate_pallet_label_pdf
 from app.utils.qr import pallet_qr_png
 from app.utils.rate_limit import limiter
@@ -123,12 +125,16 @@ def remove_box_from_pallet(
 @limiter.limit("30/minute")
 def close_pallet(
     request: Request,
+    background_tasks: BackgroundTasks,
     pallet_id: UUID,
     db: Session = Depends(get_db),
     current_user: User = Depends(require_coordinator),
     scope: UUID | None = Depends(tenant_scope),
 ):
-    return PalletService(db).close(pallet_id, center_id=scope, user_id=current_user.id)
+    pallet = PalletService(db).close(pallet_id, center_id=scope, user_id=current_user.id)
+    fire_audit(background_tasks, "PALLET_CLOSED", "pallet",
+               user_id=current_user.id, entity_id=str(pallet_id), ip=get_client_ip(request))
+    return pallet
 
 
 @router.get("/v1/pallets/{pallet_id}/label.pdf")
