@@ -178,6 +178,12 @@ tiene un solo `batch` y una sola `expiry_date`. Si llega mezcla → se divide en
 | **Open Food Facts** | Autocompletado de alimentos por código de barras (API) | Gratis |
 | **GS1 / Verified by GS1 (GTIN)** | Validar código de barras (campo opcional) | 30 lookups/día gratis |
 | **COFEPRIS (MX)** | Identificación local de medicamentos/insumos | Gratis |
+| **RxNorm (NLM / NIH)** | Normalización de nombres de medicamentos; mapeo INN → código RxNorm; API REST pública | Gratis |
+| **IOM Emergency Relief Items Catalogue** | No-food items alineados a IFRC/ICRC; especificaciones técnicas + código de material | Gratis (web pública) |
+
+> **Home pública:** debe incluir una sección visible "Estándares que respaldamos" con logos/nombres
+> de WHO, IFRC/ICRC, IOM, UNSPSC y GS1, explicando cómo garantizan la calidad del inventario y
+> la trazabilidad. Implementación en Fase 6 (task 12) junto al Home page (Fase 4, task 23).
 
 ---
 
