@@ -1,0 +1,106 @@
+{
+  "nav": {
+    "home": "Home",
+    "why": "Why Araguaney",
+    "standards": "Standards",
+    "contact": "Contact",
+    "login": "Sign in"
+  },
+  "hero": {
+    "eyebrow_desktop": "Aid center coordination",
+    "eyebrow_mobile": "Aid centers",
+    "title": "Every donation delivered in order.",
+    "desc_mobile": "One standard to register, pack in homogeneous boxes with QR codes, and ship with a manifest.",
+    "desc_desktop": "Araguaney connects aid centers under one standard: registers items with category, batch, and expiry, packs them in homogeneous boxes with QR codes, and consolidates them into shipments with an exportable manifest.",
+    "cta_login": "Sign in",
+    "cta_why": "Why Araguaney",
+    "standards_label_desktop": "Built on global standards",
+    "standards_label_mobile": "Global standards"
+  },
+  "steps": {
+    "heading": "From collection to shipment",
+    "heading_suffix": ", in order",
+    "subtitle": "Three steps, one shared language across centers",
+    "items": [
+      {
+        "n": "01",
+        "title": "Register",
+        "desc": "Each donated item is captured with its category, batch, and expiry date.",
+        "desc_short": "Each item with category, batch, and expiry."
+      },
+      {
+        "n": "02",
+        "title": "Pack",
+        "desc": "Homogeneous boxes — one product, batch, and expiry — sealed with their QR code and label.",
+        "desc_short": "Homogeneous boxes sealed with QR."
+      },
+      {
+        "n": "03",
+        "title": "Ship",
+        "desc": "Boxes are consolidated into pallets and shipments with an exportable manifest, ready for customs.",
+        "desc_short": "Pallets and shipments with manifest."
+      }
+    ]
+  },
+  "why": {
+    "heading": "Why Araguaney",
+    "subtitle": "Dozens of aid centers in Mexico independently receive and send humanitarian supplies to Venezuela. Without a shared standard, it is impossible to know what is available or prepare cargo that meets international shipment requirements.",
+    "items": [
+      {
+        "icon": "📦",
+        "title": "Homogeneous boxes",
+        "desc": "Each box contains one product type, one batch, and one expiry. No mixing. QR code printed on the label."
+      },
+      {
+        "icon": "📋",
+        "title": "Exportable manifest",
+        "desc": "Each shipment generates a packing list with all boxes and pallets, ready for customs documentation."
+      },
+      {
+        "icon": "🗺️",
+        "title": "National aggregate view",
+        "desc": "A national dashboard shows total stock by category across all centers in real time."
+      },
+      {
+        "icon": "🔒",
+        "title": "No personal data",
+        "desc": "No donor or recipient personal data is stored. Just inventory, traceable from box to shipment."
+      }
+    ]
+  },
+  "standards": {
+    "heading": "Standards we support",
+    "subtitle": "Araguaney is built on internationally recognized humanitarian standards to ensure inventory quality, traceability, and compatibility with other aid systems.",
+    "items": [
+      {
+        "name": "WHO",
+        "full": "World Health Organization",
+        "desc": "Medicine donation guidelines: minimum 12-month shelf life, INN name, batch, and expiry required."
+      },
+      {
+        "name": "IFRC / ICRC",
+        "full": "International Red Cross / Red Crescent",
+        "desc": "Non-food item catalog and material codes for supply classification."
+      },
+      {
+        "name": "IOM",
+        "full": "International Organization for Migration",
+        "desc": "Emergency relief item catalog with technical specifications."
+      },
+      {
+        "name": "UNSPSC",
+        "full": "United Nations Standard Products and Services Code",
+        "desc": "Universal product taxonomy for categorizing all supply types."
+      },
+      {
+        "name": "GS1",
+        "full": "Global Standards One",
+        "desc": "Barcode and GTIN standards for item identification and traceability."
+      }
+    ]
+  },
+  "footer": {
+    "tagline": "The common standard for aid centers",
+    "privacy": "No personal data of donors or recipients. Just inventory, traceable from box to shipment."
+  }
+}
