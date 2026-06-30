@@ -21,6 +21,8 @@ type DashboardNav = {
   scan: string
   campaigns: string
   centers: string
+  requests: string
+  studio: string
   settings: string
   logout: string
 }
@@ -41,6 +43,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: "/dashboard/scan", labelKey: "scan", roles: ["national_admin", "coordinator", "volunteer"] },
   { href: "/dashboard/campaigns", labelKey: "campaigns", roles: ["national_admin", "coordinator", "volunteer"] },
   { href: "/dashboard/centers", labelKey: "centers", roles: ["national_admin"] },
+  { href: "/dashboard/requests", labelKey: "requests", roles: ["national_admin", "coordinator", "volunteer"] },
 ]
 
 interface SidebarProps {
@@ -91,6 +94,18 @@ export function Sidebar({ centerRole, centerName, nav, roleLabels }: SidebarProp
       </nav>
 
       <div className="mt-4 border-t border-zinc-100 pt-3 space-y-0.5">
+        {centerRole === "national_admin" && (
+          <Link
+            href="/studio"
+            className={`block rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+              pathname.startsWith("/studio")
+                ? "bg-blue-50 text-blue-700"
+                : "text-blue-600 hover:bg-blue-50 hover:text-blue-700"
+            }`}
+          >
+            {nav.studio}
+          </Link>
+        )}
         <Link
           href="/dashboard/settings"
           className={`block rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
