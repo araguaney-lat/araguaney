@@ -9,7 +9,7 @@ from app.utils.errors import api_error
 
 class ProductTypeService(BaseService):
 
-    def list(self, category: str | None = None) -> list[ProductType]:
+    def get_all(self, category: str | None = None) -> list[ProductType]:
         if category and category not in PRODUCT_CATEGORIES:
             raise api_error("INVALID_CATEGORY", f"Category must be one of: {', '.join(PRODUCT_CATEGORIES)}", field="category")
         return ProductTypeRepository(self.db).find_all(category=category)
