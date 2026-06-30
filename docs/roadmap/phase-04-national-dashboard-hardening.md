@@ -19,8 +19,8 @@
 |---|-------|-------------|-------------|--------|
 | 4 | Dashboard nacional (admin) | Agregado visual de stock por categoría y centro | 🟠 | ✅ Done |
 | 5 | Página pública de necesidades | "Qué falta" sin login; cacheable | 🟡 | ✅ Done |
-| 23 | Home page | Landing pública con descripción del proyecto, acceso a `/necesidades` y CTA de login; reemplaza el redirect directo a `/dashboard` | 🟡 | ⬜ Pendiente |
-| 24 | Login UI | Pantalla de login con diseño propio (logo, branding); actualmente es formulario básico sin estilos | 🟡 | ⬜ Pendiente |
+| 23 | Home page | Landing pública con descripción del proyecto, acceso a `/necesidades` y CTA de login; reemplaza el redirect directo a `/dashboard` | 🟡 | ✅ Done |
+| 24 | Login UI | Pantalla de login con diseño propio (logo, branding); actualmente es formulario básico sin estilos | 🟡 | ✅ Done |
 | 25 | i18n — español / inglés | Internacionalización con `next-intl`; español por default; inglés como segunda lengua; aplica a todas las páginas públicas y el dashboard | 🟠 | ⬜ Pendiente |
 
 #### Infra / seguridad
