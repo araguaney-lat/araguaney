@@ -1,7 +1,7 @@
 "use server"
 
 import { z } from "zod"
-import { Resend } from "resend"
+import nodemailer from "nodemailer"
 
 const schema = z.object({
   nombre: z.string().min(2).max(100),
@@ -26,6 +26,17 @@ async function verifyTurnstile(token: string): Promise<boolean> {
   return data.success
 }
 
+function createTransporter() {
+  const user = process.env.GMAIL_USER
+  const pass = process.env.GMAIL_APP_PASSWORD
+  if (!user || !pass) throw new Error("GMAIL_USER or GMAIL_APP_PASSWORD not configured")
+
+  return nodemailer.createTransport({
+    service: "gmail",
+    auth: { user, pass },
+  })
+}
+
 export type ContactResult = { ok: true } | { ok: false; error: string }
 
 export async function submitContact(formData: unknown): Promise<ContactResult> {
@@ -41,34 +52,29 @@ export async function submitContact(formData: unknown): Promise<ContactResult> {
     return { ok: false, error: "Verificación de seguridad fallida. Intenta de nuevo." }
   }
 
-  const apiKey = process.env.RESEND_API_KEY
-  if (!apiKey) {
-    return { ok: false, error: "Servicio de correo no configurado." }
-  }
-
-  const resend = new Resend(apiKey)
   const tipoLabel: Record<string, string> = {
     alta: "Dar de alta un centro",
     voluntario: "Sumarme como voluntario",
     consulta: "Otra consulta",
   }
 
-  const { error } = await resend.emails.send({
-    from: "Araguaney Contacto <contacto@araguaney.lat>",
-    to: ["hola@araguaney.lat"],
-    replyTo: correo,
-    subject: `[Contacto] ${tipoLabel[tipo]} — ${organizacion}`,
-    text: [
-      `Nombre: ${nombre}`,
-      `Organización: ${organizacion}`,
-      `Correo: ${correo}`,
-      `Tipo: ${tipoLabel[tipo]}`,
-      "",
-      mensaje,
-    ].join("\n"),
-  })
-
-  if (error) {
+  try {
+    const transporter = createTransporter()
+    await transporter.sendMail({
+      from: `"Araguaney Contacto" <${process.env.GMAIL_USER}>`,
+      to: "hola@araguaney.lat",
+      replyTo: correo,
+      subject: `[Contacto] ${tipoLabel[tipo]} — ${organizacion}`,
+      text: [
+        `Nombre: ${nombre}`,
+        `Organización: ${organizacion}`,
+        `Correo: ${correo}`,
+        `Tipo: ${tipoLabel[tipo]}`,
+        "",
+        mensaje,
+      ].join("\n"),
+    })
+  } catch {
     return { ok: false, error: "Error al enviar el correo. Intenta más tarde." }
   }
 
