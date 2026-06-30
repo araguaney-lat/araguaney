@@ -17,6 +17,21 @@ export interface User {
 
 export type CenterRole = "national_admin" | "coordinator" | "volunteer"
 
+export interface UserOut {
+  id: string
+  email: string
+  username: string
+  full_name: string | null
+  avatar_url: string | null
+  role: "user" | "admin" | "superadmin"
+  plan: "free" | "pro"
+  is_active: boolean
+  is_verified: boolean
+  center_id: string | null
+  center_role: CenterRole | null
+  created_at: string
+}
+
 export type ProductCategory =
   | "MEDICINE"
   | "MEDICAL_SUPPLY"

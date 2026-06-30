@@ -111,7 +111,9 @@
       "campaigns": "Campaigns",
       "centers": "Centers",
       "settings": "Settings",
-      "logout": "Sign out"
+      "logout": "Sign out",
+      "requests": "Requests",
+      "studio": "Studio"
     },
     "role": {
       "national_admin": "National Admin",
