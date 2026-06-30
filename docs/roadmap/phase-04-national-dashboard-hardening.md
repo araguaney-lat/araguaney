@@ -28,8 +28,8 @@
 | # | Tarea | Descripción | Complejidad | Estado |
 |---|-------|-------------|-------------|--------|
 | 6 | Cloudflare-only mode activado | `CLOUDFLARE_ONLY=true`; bloqueo directo a Railway URL — middleware ya en `main.py`, solo falta variable de entorno + DNS apuntando a Cloudflare | 🟡 | ✅ Done |
-| 7 | WAF + rate limiting afinados | Reglas Cloudflare para rutas críticas (`/v1/auth/*`, `/v1/intakes`, endpoints de PDF); activar Bot Fight Mode | 🟡 | ⬜ Pendiente |
-| 8 | Turnstile en formularios públicos | Token Turnstile en ficha pública QR + validación backend en `POST /v1/intakes`; `TURNSTILE_SECRET_KEY` en env | 🟢 | ⬜ Pendiente |
+| 7 | WAF + rate limiting afinados | Reglas Cloudflare para rutas críticas (`/v1/auth/*`, `/v1/intakes`, endpoints de PDF); activar Bot Fight Mode | 🟡 | ✅ Done |
+| 8 | Turnstile en formularios públicos | Token Turnstile en ficha pública QR + validación backend en `POST /v1/intakes`; `TURNSTILE_SECRET_KEY` en env | 🟢 | ✅ Done |
 | 9 | Spend caps Vercel + alertas | Configurar spend cap en Vercel dashboard; activar alertas de uso de banda | 🟢 | ⬜ Pendiente (plan de pago) |
 | 18 | Configurar Sentry en producción | Agregar `SENTRY_DSN` en Railway env vars — SDK ya inicializado en `main.py`; verificar que llegan errores 500 al dashboard de Sentry | 🟢 | ✅ Done |
 | 19 | Configurar Resend en producción | Agregar `RESEND_API_KEY` + dominio verificado en Resend; SDK ya instalado; configurar `FROM_EMAIL` en env Railway y Vercel | 🟢 | ⬜ Pendiente |
