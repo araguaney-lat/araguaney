@@ -99,6 +99,31 @@
       }
     ]
   },
+  "dashboard": {
+    "nav": {
+      "home": "Inicio",
+      "national": "Panel nacional",
+      "intake": "Recepción",
+      "boxes": "Cajas",
+      "pallets": "Tarimas",
+      "shipments": "Envíos",
+      "scan": "Escanear QR",
+      "campaigns": "Campañas",
+      "centers": "Centros",
+      "settings": "Configuración",
+      "logout": "Cerrar sesión"
+    },
+    "role": {
+      "national_admin": "Admin Nacional",
+      "coordinator": "Coordinador",
+      "volunteer": "Voluntario"
+    },
+    "offline": {
+      "title": "Sin conexión",
+      "desc": "Verifica tu red e intenta de nuevo.",
+      "retry": "Reintentar"
+    }
+  },
   "footer": {
     "tagline": "El estándar común para centros de acopio",
     "privacy": "Sin datos personales de donantes ni beneficiarios. Solo inventario, trazable de la caja al envío."

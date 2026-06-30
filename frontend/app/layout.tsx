@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import { Hanken_Grotesk, Source_Serif_4 } from "next/font/google"
+import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistration"
 import "./globals.css"
 
 const hanken = Hanken_Grotesk({
@@ -22,8 +23,10 @@ export const metadata: Metadata = {
   title: "Araguaney — Coordinación de centros de acopio",
   description:
     "Un mismo estándar para registrar, empacar en cajas homogéneas con QR y enviar con manifiesto exportable.",
+  manifest: "/manifest.webmanifest",
   icons: {
-    icon: "https://res.cloudinary.com/dtvdqlxtd/image/upload/v1782786243/araguaney_logo_ol8lm1.ico",
+    icon: "/icons/icon.svg",
+    apple: "/icons/icon.svg",
   },
   openGraph: {
     title: "Araguaney — Coordinación de centros de acopio",
@@ -50,7 +53,10 @@ export default function RootLayout({
       lang="es"
       className={`${hanken.variable} ${sourceSerif.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        {children}
+        <ServiceWorkerRegistration />
+      </body>
     </html>
   )
 }
