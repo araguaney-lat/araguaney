@@ -114,13 +114,29 @@ def scoped(self, stmt, center_id: uuid.UUID | None):
 
 | Rol (`users.center_role`) | `center_id` | Puede |
 |---|---|---|
-| `volunteer` | su centro | Intake, crear/llenar/sellar cajas, imprimir etiquetas |
-| `coordinator` | su centro | Lo anterior + crear/cerrar tarimas y envíos, generar manifiesto, gestionar usuarios del centro |
-| `national_admin` | `NULL` | Ver agregado de todos los centros, alta de centros, administrar catálogo maestro |
+| `volunteer` | su centro | Intake, crear/llenar/sellar cajas, imprimir etiquetas, ver sus propias solicitudes |
+| `coordinator` | su centro | Todo lo del volunteer + crear/cerrar tarimas y envíos, generar manifiesto, agregar volunteers a su centro (con invitación), reinvitar usuarios de su centro, gestionar miembros de campaña (solo de su centro) |
+| `national_admin` | `NULL` | Ver agregado nacional, crear/editar centros y campañas, crear cualquier usuario (cualquier centro y rol), reinvitar cualquier usuario, promover ProductTypes a global, ver auditoría, bandeja Studio |
 | público (sin login) | — | Ver ficha mínima de caja/tarima por QR; panel "qué falta" |
 
 > `users.role` del boilerplate (`user|admin|superadmin`) NO se reutiliza para el dominio;
 > sigue gobernando el gating de plataforma. El rol de dominio es `center_role`.
+
+### Reglas de creación de usuarios
+
+| Quién crea | Roles que puede asignar | `center_id` posible |
+|---|---|---|
+| `national_admin` | `volunteer`, `coordinator`, `national_admin` | Cualquier centro |
+| `coordinator` | Solo `volunteer` | Solo su propio centro |
+
+### Flujo de invitación (onboarding)
+
+1. Admin o coordinator crea usuario → sistema genera clave temporal → envía email de invitación
+2. Usuario entra → sistema fuerza cambio de contraseña (`must_change_password = true`)
+3. Desde perfil, el usuario puede cambiar contraseña en cualquier momento
+4. Botón **"Reinvitar"** por fila en el user manager — reenvía nueva clave temporal, sin límite de intentos
+
+> Todo usuario recién creado queda asignado automáticamente a la campaña "Donaciones Generales".
 
 ---
 

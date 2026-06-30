@@ -1,4 +1,4 @@
-### Fase 5 — Studio (panel de administración nacional) ✅ — 22/22
+### Fase 5 — Studio (panel de administración nacional) 🟡 — 22/29
 
 > Panel exclusivo para `national_admin`: gestión unificada de usuarios, campañas, centros y trazas de auditoría.
 > Criterios de aceptación: el `national_admin` puede crear/editar/desactivar usuarios y campañas desde `/studio`; toda acción relevante queda registrada en el log de auditoría; los eventos se purgan automáticamente a los 90 días.
@@ -38,8 +38,12 @@
 | # | Tarea | Descripción | Complejidad | Estado |
 |---|-------|-------------|-------------|--------|
 | 7 | Endpoint listar usuarios (admin) | `GET /v1/studio/users` — devuelve todos los usuarios con `center_id`, `center_role`, `is_active`; filtros por centro, rol y estado | 🟡 | ✅ Hecho |
-| 8 | Endpoint crear usuario (admin) | `POST /v1/studio/users` — `national_admin` crea usuarios en cualquier centro; envía email de bienvenida con credenciales temporales | 🟠 | ✅ Hecho |
+| 8 | Endpoint crear usuario (admin) | `POST /v1/studio/users` — `national_admin` crea usuarios en cualquier centro; genera clave temporal; envía email de invitación; `must_change_password = true` | 🟠 | ✅ Hecho |
 | 9 | Endpoint editar usuario (admin) | `PATCH /v1/studio/users/{id}` — cambiar `center_id`, `center_role`, `is_active`; registrar en auditoría | 🟡 | ✅ Hecho |
+| 23 | `must_change_password` en modelo y login | Campo `must_change_password: bool` en `User`; migración `009_must_change_password`; al hacer login con flag activo el backend retorna código especial `PASSWORD_CHANGE_REQUIRED`; el frontend redirige a `/change-password` | 🟠 | ⬜ Pendiente |
+| 24 | Endpoint cambio de contraseña (perfil) | `PATCH /v1/users/me/password` — requiere contraseña actual + nueva; limpia `must_change_password`; disponible para todos los roles | 🟡 | ⬜ Pendiente |
+| 25 | Endpoint "Reinvitar" | `POST /v1/studio/users/{id}/reinvite` — genera nueva clave temporal, pone `must_change_password = true`, envía email; disponible para `national_admin` (cualquier usuario) y `coordinator` (solo usuarios de su centro) | 🟡 | ⬜ Pendiente |
+| 26 | Endpoint crear volunteer (coordinator) | `POST /v1/center/users` — `coordinator` crea usuarios `volunteer` en su propio centro; misma lógica de invitación que el endpoint de Studio | 🟡 | ⬜ Pendiente |
 
 ---
 
@@ -56,8 +60,11 @@
 
 | # | Tarea | Descripción | Complejidad | Estado |
 |---|-------|-------------|-------------|--------|
-| 12 | Listado de usuarios `/studio/users` | Tabla con nombre, email, centro, rol, estado activo/inactivo; filtro por rol; botón de crear | 🟡 | ✅ Hecho |
+| 12 | Listado de usuarios `/studio/users` | Tabla con nombre, email, centro, rol, estado activo/inactivo; filtro por rol; botón de crear; botón "Reinvitar" por fila | 🟡 | ✅ Hecho |
 | 13 | Formulario de crear/editar usuario | Campos: nombre, email, contraseña temporal, centro (UUID), rol; edición inline de rol e is_active | 🟠 | ✅ Hecho |
+| 27 | Página `/change-password` | Página pública (sin nav) que aparece tras login con `must_change_password`; formulario: nueva contraseña + confirmación; redirige a dashboard al completar | 🟡 | ⬜ Pendiente |
+| 28 | Sección de contraseña en perfil | En `/dashboard/profile` (o `/settings`): formulario de cambio de contraseña con contraseña actual; disponible para todos los roles | 🟡 | ⬜ Pendiente |
+| 29 | User manager para coordinador | `/dashboard/team` — coordinador ve los volunteers de su centro; botón crear volunteer; botón "Reinvitar" por fila; misma lógica de invitación | 🟡 | ⬜ Pendiente |
 
 ---
 
