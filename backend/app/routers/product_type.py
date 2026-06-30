@@ -22,7 +22,7 @@ def list_product_types(
     db: Session = Depends(get_db),
     _: User = Depends(get_current_user),
 ):
-    return ProductTypeService(db).list(category=category)
+    return ProductTypeService(db).get_all(category=category)
 
 
 @router.get("/search", response_model=list[ProductTypeOut])
