@@ -2,6 +2,7 @@
 
 import { z } from "zod"
 import { Resend } from "resend"
+import { verifyTurnstile } from "@/lib/turnstile"
 
 const schema = z.object({
   nombre: z.string().min(2).max(100),
@@ -11,20 +12,6 @@ const schema = z.object({
   mensaje: z.string().min(10).max(2000),
   turnstileToken: z.string().min(1),
 })
-
-async function verifyTurnstile(token: string): Promise<boolean> {
-  const secret = process.env.TURNSTILE_SECRET_KEY
-  if (!secret) throw new Error("TURNSTILE_SECRET_KEY not configured")
-
-  const res = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ secret, response: token }),
-  })
-
-  const data = (await res.json()) as { success: boolean }
-  return data.success
-}
 
 export type ContactResult = { ok: true } | { ok: false; error: string }
 

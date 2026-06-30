@@ -5,6 +5,7 @@ import { AuthError } from "next-auth"
 import { redirect } from "next/navigation"
 import { revalidatePath } from "next/cache"
 import { apiFetch } from "@/lib/api"
+import { verifyTurnstile } from "@/lib/turnstile"
 
 const API_URL = process.env.API_URL ?? "http://localhost:8000"
 
@@ -24,6 +25,12 @@ function extractError(body: Record<string, unknown>, fallback = "Something went 
 
 export async function loginAction(_: unknown, formData: FormData) {
   const callbackUrl = (formData.get("callbackUrl") as string | null) || "/dashboard"
+
+  const token = formData.get("turnstileToken") as string | null
+  if (!token) return { error: "Completa la verificación de seguridad." }
+  const valid = await verifyTurnstile(token)
+  if (!valid) return { error: "Verificación de seguridad fallida. Intenta de nuevo." }
+
   try {
     await signIn("credentials", {
       identifier: formData.get("identifier") as string,
