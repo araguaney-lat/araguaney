@@ -60,6 +60,20 @@ Reglas de visibilidad derivadas de la asignación:
 
 ---
 
+#### Auditoría — Eventos de Fase 6
+
+Todos vía `fire_audit(background_tasks, ...)` en los routers:
+
+| Evento | Cuándo | Metadata |
+|---|---|---|
+| `PRODUCT_TYPE_CREATED` | Nuevo ProductType creado | `{campaign_id, inn_name, form, strength, created_by_role}` |
+| `PRODUCT_TYPE_PROMOTED` | `campaign_id → NULL` (promovido a global) | `{from_campaign_id, promoted_by}` |
+| `USER_CAMPAIGN_ASSIGNED` | Usuario asignado a campaña | `{user_id, campaign_id, assigned_by_role}` |
+| `USER_CAMPAIGN_REMOVED` | Usuario removido de campaña | `{user_id, campaign_id}` |
+| `INTAKE_CREATED` | Ya existe — se amplía la metadata con `campaign_id` | `{campaign_id, center_id}` |
+
+---
+
 #### Backend — Migraciones arquitecturales
 
 | # | Tarea | Descripción | Complejidad | Estado |

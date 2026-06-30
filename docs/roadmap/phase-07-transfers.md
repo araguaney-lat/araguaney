@@ -55,6 +55,23 @@ REQUESTED ──► APPROVED ──► IN_TRANSIT ──► RECEIVED
 
 ---
 
+#### Auditoría — Eventos de Fase 7
+
+Las transferencias tienen su propia tabla `transfer_events` (estado a estado + usuario + timestamp). Adicionalmente, cada transición escribe en `audit_log` vía `fire_audit` para que el `national_admin` lo vea en `/studio/audit` junto al resto de eventos del sistema:
+
+| Evento `audit_log` | Cuándo | Metadata |
+|---|---|---|
+| `TRANSFER_CREATED` | Transfer creado | `{from_center_id, to_center_id, box_count, initiated_by_role}` |
+| `TRANSFER_APPROVED` | `REQUESTED → APPROVED` | `{transfer_id, approved_by_role}` |
+| `TRANSFER_REJECTED` | `REQUESTED → REJECTED` | `{transfer_id, reason}` |
+| `TRANSFER_DISPATCHED` | `APPROVED → IN_TRANSIT` | `{transfer_id, box_count}` |
+| `TRANSFER_RECEIVED` | `IN_TRANSIT → RECEIVED` | `{transfer_id, from_center_id, to_center_id, box_count}` |
+| `BOX_TRANSFERRED` | Por cada caja al recibir | `{box_id, from_center_id, to_center_id, transfer_id}` — un evento por caja |
+
+> `TransferEvent` registra la secuencia operativa del transfer. `audit_log` centraliza todo en un solo lugar visible para el admin. Ambas tablas se escriben en cada transición.
+
+---
+
 #### Backend — Endpoints
 
 | # | Tarea | Descripción | Complejidad | Estado |

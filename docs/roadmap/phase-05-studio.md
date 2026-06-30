@@ -1,4 +1,4 @@
-### Fase 5 — Studio (panel de administración nacional) 🟡 — 22/29
+### Fase 5 — Studio (panel de administración nacional) 🟡 — 22/30
 
 > Panel exclusivo para `national_admin`: gestión unificada de usuarios, campañas, centros y trazas de auditoría.
 > Criterios de aceptación: el `national_admin` puede crear/editar/desactivar usuarios y campañas desde `/studio`; toda acción relevante queda registrada en el log de auditoría; los eventos se purgan automáticamente a los 90 días.
@@ -27,7 +27,8 @@
 | 1 | Migración `008_audit_and_requests` | Tabla `audit_log(id, user_id FK, action, entity_type, entity_id, metadata JSONB, ip, created_at)`; índices en `(entity_type, entity_id)`, `(user_id)`, `(created_at)` | 🟡 | ✅ Hecho |
 | 2 | Modelo + repository `AuditLog` | Modelo SQLAlchemy; `AuditRepository.log(user, action, entity)` helper; sin lógica de negocio, solo escritura | 🟢 | ✅ Hecho |
 | 3 | Middleware / decorator de auditoría | Utility `fire_audit(background_tasks, action, entity_type, ...)` — fire-and-forget via `BackgroundTasks`; abre sesión propia, no bloquea la respuesta | 🟠 | ✅ Hecho |
-| 4 | Cobertura de eventos críticos | `INTAKE_CREATED`, `BOX_SEALED`, `PALLET_CLOSED`, `SHIPMENT_CLOSED`, `SHIPMENT_SHIPPED`; user create/patch ya cubierto en studio.py | 🟠 | ✅ Hecho |
+| 4 | Cobertura de eventos críticos (operación) | `INTAKE_CREATED`, `BOX_SEALED`, `PALLET_CLOSED`, `SHIPMENT_CLOSED`, `SHIPMENT_SHIPPED`; user create/patch ya cubierto en studio.py | 🟠 | ✅ Hecho |
+| 30 | Cobertura de eventos de usuarios | `USER_INVITED` (al crear con clave temporal), `USER_REINVITED`, `USER_PASSWORD_CHANGED`, `USER_ROLE_CHANGED`, `USER_DEACTIVATED`, `USER_ACTIVATED`; `fire_audit` en cada endpoint correspondiente | 🟡 | ⬜ Pendiente |
 | 5 | Job de purga automática (ARQ) | Cron ARQ `purge_audit_logs_cron` diario 03:00 UTC; borra `created_at < now() - AUDIT_RETENTION_DAYS(90)`; registrado en `WorkerSettings.cron_jobs` | 🟡 | ✅ Hecho |
 | 6 | Endpoint de consulta de auditoría | `GET /v1/studio/audit` — solo `national_admin`; filtros: `entity_type`, `user_id`, `from_date`, `to_date`; paginado (limit/offset); rate-limited | 🟡 | ✅ Hecho |
 
