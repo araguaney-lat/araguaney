@@ -26,18 +26,18 @@ _PUBLIC_CACHE = "public, max-age=300, s-maxage=3600, stale-while-revalidate=8640
 # ── Public endpoints (cacheable) ──────────────────────────────────────────────
 
 @router.get("/b/{code}", response_model=BoxPublicOut)
-@limiter.limit("300/minute")
+@limiter.limit("30/minute")
 def box_public_ficha(
     request: Request,
     code: str,
     db: Session = Depends(get_db),
 ):
-    """Public box ficha — no PII, no auth required. Cache at the edge."""
+    """Public box ficha — called via Next.js proxy (Turnstile-gated). No edge cache."""
     result = BoxService(db).get_public(code)
     return Response(
         content=result.model_dump_json(),
         media_type="application/json",
-        headers={"Cache-Control": _PUBLIC_CACHE},
+        headers={"Cache-Control": "no-store"},
     )
 
 
