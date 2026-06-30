@@ -3,9 +3,9 @@
 ## Progreso general
 
 ```mermaid
-pie title Tareas completadas (130 tareas)
+pie title Tareas completadas (151 tareas)
     "Listas" : 85
-    "Pendientes" : 45
+    "Pendientes" : 66
 ```
 
 | Fase | Nombre | Listas | Pendientes | Progreso |
@@ -17,7 +17,8 @@ pie title Tareas completadas (130 tareas)
 | 4 | [Panel agregado nacional + endurecimiento + OTP + scanning móvil](phase-04-national-dashboard-hardening.md) | 23 | 2 | ✅ 92% |
 | 5 | [Studio — panel de administración + solicitudes](phase-05-studio.md) | 22 | 7 | 🟡 76% |
 | 6 | [Catálogos de referencia + lookups en tiempo real](phase-06-catalog-integrations.md) | 0 | 26 | ⬜ 0% |
-| **Total** | | **85** | **45** | **🟡 65%** |
+| 7 | [Transferencias entre centros](phase-07-transfers.md) | 0 | 21 | ⬜ 0% |
+| **Total** | | **85** | **66** | **🟡 56%** |
 
 > Las tareas 1 y 2 de Fase 0 (Envs + aplicar migración) requieren acción manual con DB activa.
 
@@ -34,6 +35,7 @@ Fase 0 ─► Fase 1 ─► Fase 2 ─► Fase 3 ─► Fase 4
 
 - Fase 4 (endurecimiento + scanning móvil) puede solaparse con 2–3 según prioridad mediática.
 - Fase 5 (Studio) depende de Fase 0 (usuarios/roles) pero es independiente de 1–4; puede arrancarse en paralelo.
+- Fase 7 (Transferencias) depende de Fases 1–3 (Box/Pallet/Shipment ya deben existir) y de Fase 6 (campaign_id en intakes, scoping de ProductType).
 
 ---
 
