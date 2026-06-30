@@ -1,14 +1,50 @@
 ### Fase 6 — Catálogos de referencia + lookups en tiempo real ⬜
 
-> **Principio de diseño:** _Usar un producto existente en catálogo → funciona sin internet. Registrar un ProductType nuevo → requiere internet para validar contra fuentes externas._
->
-> Los seeds cubren ~95 % de los artículos humanitarios comunes (medicamentos esenciales WHO, no-food IFRC/IOM, higiene, alimentos frecuentes).
-> Las APIs en tiempo real enriquecen el registro de productos nuevos y garantizan datos limpios — nunca son un "plus silencioso": si no hay conexión, el sistema lo dice claramente y bloquea la creación de duplicados/mal escritos.
->
-> **¿Por qué requerir internet en vez de modo offline-graceful?**
-> Un almacén sin cobertura puede operar registrando intakes con productos ya en catálogo.
-> Habilitar el registro offline de ProductTypes nuevos produciría duplicados e inconsistencias (ibuprofen / ibuprofeno / Ibuprofén / iboprofeno).
-> La restricción es deliberada: calidad de datos > conveniencia de captura.
+---
+
+#### Principios de diseño
+
+**Conectividad:**
+Usar un producto existente en catálogo → funciona sin internet.
+Registrar un ProductType nuevo → requiere internet para validar contra fuentes externas.
+Si no hay conexión, el sistema lo dice claramente y bloquea la creación; no hay modo degradado silencioso porque los errores tipográficos y los duplicados envenenan los datos de todos los centros.
+
+**Scope de ProductType — dos niveles:**
+
+| `campaign_id` | Visible para |
+|---|---|
+| `NULL` | Todos los centros, todas las campañas (seeds globales + productos promovidos por admin) |
+| `UUID campaña X` | Todos los centros que trabajen en campaña X |
+
+No existe un scope "privado al centro" — la unidad operativa es la campaña, no el centro.
+Si un producto nuevo llega en el contexto de la Operación Venezuela, lo pueden usar todos los centros de esa campaña sin contaminación del catálogo global.
+
+**Campaña obligatoria en intake:**
+Todo `Intake` debe tener `campaign_id`. Siempre existe una campaña **"Donaciones Generales"** abierta para recibir donaciones que no corresponden a una operación específica. Esto evita el problema de recepciones sin contexto y mantiene el agregado nacional coherente.
+
+**Usuarios ↔ Campañas (many-to-many):**
+Un usuario puede pertenecer a una o varias campañas activas. Esta asociación determina qué productos ve y en qué contexto opera.
+
+| Rol | Puede asignar usuarios a campañas |
+|---|---|
+| `national_admin` | Cualquier usuario a cualquier campaña |
+| `coordinator` | Solo usuarios de su propio centro |
+| `volunteer` | No puede asignar |
+
+Reglas de visibilidad derivadas de la asignación:
+- El usuario solo ve ProductTypes globales (`campaign_id IS NULL`) + los de sus campañas asignadas
+- El autocomplete de intake filtra por las campañas del usuario
+- Si el usuario tiene **una sola** campaña activa → se preselecciona automáticamente en el intake, sin selector
+- Si tiene **varias** campañas activas → selector obligatorio al iniciar el intake
+- La campaña "Donaciones Generales" se asigna automáticamente a todos los usuarios al crearlos (nunca queda huérfano)
+
+**Flujo de un ProductType nuevo:**
+1. Coordinador inicia intake en Campaña X (autoseleccionada o elegida)
+2. El producto no aparece en el autocomplete (no está en global ni en Campaña X)
+3. Sistema pide conexión — sin internet, bloquea la creación
+4. Con internet: lookup vía barcode (Open Food Facts) o INN (RxNorm)
+5. Nuevo producto se crea con `campaign_id = X` — visible para todos los asignados a esa campaña
+6. national_admin puede promover a global (`campaign_id → NULL`)
 
 ---
 
@@ -16,12 +52,26 @@
 
 | Fuente | Qué obtener | Para qué |
 |--------|------------|---------|
-| WHO Model List of Essential Medicines (PDF/CSV) | ~500 medicamentos INN + ATC + forma + concentración | Seed de `product_types` para medicamentos |
-| IOM Emergency Relief Items Catalogue | ~300 no-food items con specs y código de material | Seed de `product_types` para no-food |
-| IFRC/ICRC Catalogue | Artículos complementarios de kits | Complemento al seed IOM |
-| UNSPSC codeset | Segmentos: 51 (Drugs), 53 (Food), 46 (Defense/Safety), 42 (Medical) | Mapeo de categorías del sistema a UNSPSC |
+| WHO Model List of Essential Medicines | ~500 medicamentos INN + ATC + forma + concentración | Seed global de medicamentos |
+| IOM Emergency Relief Items Catalogue | ~300 no-food items con specs y código de material | Seed global de no-food |
+| IFRC/ICRC Catalogue | Artículos complementarios de kits | Complemento seed IOM |
 
-> No se requieren cuentas ni API keys para los seeds — son CSVs públicos descargados una vez.
+> No se requieren cuentas ni API keys — son CSVs públicos descargados una vez.
+
+---
+
+#### Backend — Migraciones arquitecturales
+
+| # | Tarea | Descripción | Complejidad | Estado |
+|---|-------|-------------|-------------|--------|
+| 1 | `012_user_campaigns` | Tabla `user_campaigns(user_id FK, campaign_id FK, assigned_by FK, assigned_at)`; PK compuesta `(user_id, campaign_id)`; índices en ambas FK; la campaña "Donaciones Generales" se asigna automáticamente al crear un usuario (trigger en service, no en DB) | 🟠 | ⬜ Pendiente |
+| 2 | `013_intake_campaign_required` | Agregar `campaign_id UUID NOT NULL FK → campaigns(id)` a `intakes`; la migración primero crea la campaña "Donaciones Generales" (si no existe) y asigna ese `campaign_id` a todos los intakes históricos antes de poner el `NOT NULL`; índice en `(campaign_id)` | 🟠 | ⬜ Pendiente |
+| 3 | `014_product_type_scope` | Agregar `campaign_id UUID NULLABLE FK → campaigns(id)` a `product_types`; `NULL` = global; índice en `(campaign_id)` | 🟡 | ⬜ Pendiente |
+| 4 | `UserCampaignRepository` | `assign(user_id, campaign_id, assigned_by)`, `list_by_user(user_id)`, `list_by_campaign(campaign_id)`, `remove(user_id, campaign_id)`; guard: coordinator solo puede asignar usuarios de su propio `center_id` | 🟡 | ⬜ Pendiente |
+| 5 | Actualizar `ProductTypeRepository` | `list(user_id)` resuelve las campañas del usuario y retorna globales + los de esas campañas; guard de dedup `(inn_name, form, strength)` con `unaccent + lower` dentro del scope visible; `create()` exige `campaign_id` salvo `national_admin` | 🟠 | ⬜ Pendiente |
+| 6 | Endpoint de promoción (admin) | `POST /v1/studio/product-types/{id}/promote` — `national_admin` mueve `campaign_id → NULL`; log en auditoría | 🟡 | ⬜ Pendiente |
+| 7 | Endpoints de asignación de campañas | `POST /v1/campaigns/{id}/members` y `DELETE /v1/campaigns/{id}/members/{user_id}` — coordinator (solo su centro) y national_admin; `GET /v1/campaigns/{id}/members` — lista de asignados | 🟡 | ⬜ Pendiente |
+| 8 | Actualizar `IntakeService` y schemas | `IntakeCreate` incluye `campaign_id` requerido; validar que campaña está activa y el usuario tiene acceso a ella; `IntakeOut` expone `campaign_id` | 🟡 | ⬜ Pendiente |
 
 ---
 
@@ -29,12 +79,12 @@
 
 | # | Tarea | Descripción | Complejidad | Estado |
 |---|-------|-------------|-------------|--------|
-| 1 | Seed WHO Essential Medicines | Migración Alembic idempotente (`009_seed_who_medicines`) que importa ~500 medicamentos del WHO Model List: `inn_name`, `form`, `strength`, `category=MEDICINE`, `is_controlled` según lista de psicotrópicos; `min_shelf_life_days=365` | 🟠 | ⬜ Pendiente |
-| 2 | Seed IOM/IFRC no-food items | Migración `010_seed_iom_nonfood` con ~300 artículos: mantas, lonas, kits de higiene, herramientas de rescate; `category` mapeada a las 8 categorías del sistema; código de material IFRC en metadata | 🟠 | ⬜ Pendiente |
-| 3 | Seed alimentos frecuentes | Migración `011_seed_common_food` con ~50 alimentos de primera necesidad (arroz, frijol, aceite, leche en polvo, agua embotellada); `category=FOOD`, `min_shelf_life_days=180` | 🟡 | ⬜ Pendiente |
+| 6 | Seed campaña "Donaciones Generales" | Incluida en migración `012`; `is_active=true`, `destination_country=NULL`; sirve como campaña fallback permanente; no se puede desactivar desde el UI (guard en service) | 🟢 | ⬜ Pendiente |
+| 7 | Seed WHO Essential Medicines | Migración `014_seed_who_medicines` idempotente: ~500 medicamentos con `inn_name`, `form`, `strength`, `category=MEDICINE`, `is_controlled`, `min_shelf_life_days=365`, `campaign_id=NULL` | 🟠 | ⬜ Pendiente |
+| 8 | Seed IOM/IFRC no-food items | Migración `015_seed_iom_nonfood`: ~300 artículos; `campaign_id=NULL` | 🟠 | ⬜ Pendiente |
+| 9 | Seed alimentos frecuentes | Migración `016_seed_common_food`: ~50 alimentos básicos; `category=FOOD`, `min_shelf_life_days=180`, `campaign_id=NULL` | 🟡 | ⬜ Pendiente |
 
-> Los seeds son idempotentes: usan `INSERT ... ON CONFLICT (inn_name, form, strength) DO NOTHING`.
-> Viven en la DB desde el primer deploy — sin internet requerido para operación normal de intakes.
+> Seeds idempotentes: `INSERT ... ON CONFLICT (inn_name, form, strength) WHERE campaign_id IS NULL DO NOTHING`.
 
 ---
 
@@ -42,24 +92,25 @@
 
 | # | Tarea | Descripción | Complejidad | Estado |
 |---|-------|-------------|-------------|--------|
-| 4 | Endpoint de búsqueda en catálogo | `GET /v1/catalog/search?q=&category=` → busca en `product_types` existentes (DB local); retorna sugerencias ordenadas por relevancia para el autocomplete | 🟢 | ⬜ Pendiente |
-| 5 | Barcode lookup vía Open Food Facts | `GET /v1/catalog/barcode/{gtin}` → consulta Open Food Facts API; cacheable en Redis 24 h; si sin internet, retorna `503` con mensaje claro; nunca fallback silencioso | 🟡 | ⬜ Pendiente |
-| 6 | INN autocomplete vía RxNorm | `GET /v1/catalog/rxnorm?q=` → consulta NLM RxNorm REST API; sugiere INN normalizado + código RxNorm; si sin internet, retorna `503`; rate-limit: 60/min (API pública sin key) | 🟡 | ⬜ Pendiente |
-| 7 | Guard de deduplicación | Al `POST /v1/product-types`: verificar si ya existe un `ProductType` con mismos `inn_name + form + strength` (insensible a mayúsculas/tildes vía `ILIKE` + `unaccent`); retornar `409 DUPLICATE` con el ID del existente | 🟡 | ⬜ Pendiente |
-| 8 | Validación GTIN (GS1) | Campo `gtin` en ProductType validado contra patrón EAN-8/EAN-13/UPC-A; verificación de dígito de control en backend (sin API key); lookup GS1 online opcional | 🟢 | ⬜ Pendiente |
-
-> **COFEPRIS:** No expone API oficial. Diferida a iteración posterior (descarga periódica de CSV).
+| 10 | Búsqueda en catálogo local | `GET /v1/catalog/search?q=&campaign_id=` → retorna globales + los de la campaña; sin internet requerido; base del autocomplete en intake | 🟢 | ⬜ Pendiente |
+| 11 | Barcode lookup vía Open Food Facts | `GET /v1/catalog/barcode/{gtin}` → Open Food Facts API; caché Redis 24 h; `503` claro si sin internet | 🟡 | ⬜ Pendiente |
+| 12 | INN autocomplete vía RxNorm | `GET /v1/catalog/rxnorm?q=` → NLM RxNorm REST API; `503` si sin internet; rate-limit 60/min (API pública sin key) | 🟡 | ⬜ Pendiente |
+| 13 | Validación GTIN | Dígito de control EAN-8/13/UPC-A en backend sin API key; lookup GS1 como enriquecimiento opcional | 🟢 | ⬜ Pendiente |
 
 ---
 
-#### Frontend — Flujo de registro de ProductType
+#### Frontend — Flujo de intake y nuevo ProductType
 
 | # | Tarea | Descripción | Complejidad | Estado |
 |---|-------|-------------|-------------|--------|
-| 9 | Autocomplete en campo de producto (intake) | Campo tipo-ahead que consulta primero `/v1/catalog/search` (local, offline-OK); seleccionar un resultado prellenea INN, forma, concentración, categoría | 🟠 | ⬜ Pendiente |
-| 10 | Barcode → prellenado automático | Al escanear o ingresar GTIN en formulario de nuevo ProductType: llama `/v1/catalog/barcode/{gtin}`; prellenado si hay match; si 503 → error claro "Sin conexión — no se puede validar el producto"; no permite continuar | 🟡 | ⬜ Pendiente |
-| 11 | INN autocomplete con RxNorm | En campo `inn_name` del formulario de nuevo ProductType: sugerencias desde `/v1/catalog/rxnorm?q=`; si 503 → aviso "Sin conexión — escribe el INN manualmente con cuidado" (sí permite continuar, el guard de dedup atrapa duplicados) | 🟡 | ⬜ Pendiente |
-| 12 | Indicador de conectividad | Banner o badge en el formulario de nuevo ProductType: "● Con conexión — lookups activos" / "● Sin conexión — solo puedes usar productos del catálogo existente"; usa `navigator.onLine` + ping al backend | 🟢 | ⬜ Pendiente |
+| 14 | Selector de campaña en intake | Campo requerido al crear intake; muestra campañas activas; "Donaciones Generales" siempre aparece primero; el selector persiste como contexto para el autocomplete de productos | 🟡 | ⬜ Pendiente |
+| 15 | Autocomplete en intake (catálogo local) | Campo tipo-ahead que consulta `/v1/catalog/search?campaign_id=X`; offline-OK; seleccionar prellenea INN, forma, concentración, categoría | 🟠 | ⬜ Pendiente |
+| 16 | Indicador de conectividad + bloqueo | Banner en formulario de nuevo ProductType: "● Con conexión — lookups activos" / "● Sin conexión — solo puedes usar productos del catálogo existente"; botón de crear deshabilitado sin conexión | 🟡 | ⬜ Pendiente |
+| 17 | Barcode → prellenado + bloqueo offline | Al escanear/ingresar GTIN: llama `/v1/catalog/barcode/{gtin}`; prellenado si hay match; `503` → "Sin conexión — no se puede registrar el producto"; no permite continuar | 🟡 | ⬜ Pendiente |
+| 18 | INN autocomplete con RxNorm | Campo `inn_name` con sugerencias de `/v1/catalog/rxnorm?q=`; `503` → aviso visible; guard de dedup sigue activo | 🟡 | ⬜ Pendiente |
+| 19 | Vista "Catálogo de la campaña" en Studio | `/studio/catalog` — lista ProductTypes de cada campaña con estado (campaña / global); botón "Promover al catálogo global" para national_admin | 🟡 | ⬜ Pendiente |
+| 20 | Gestión de miembros de campaña en Studio | `/studio/campaigns/{id}/members` — lista de usuarios asignados; botón para agregar (selector de usuarios del centro para coordinador, cualquier usuario para admin); botón para remover | 🟡 | ⬜ Pendiente |
+| 21 | Auto-asignación a "Donaciones Generales" | Al crear un usuario desde `/studio/users`, el sistema lo asigna automáticamente a la campaña "Donaciones Generales"; visible en la vista de miembros | 🟢 | ⬜ Pendiente |
 
 ---
 
@@ -67,14 +118,14 @@
 
 | # | Tarea | Descripción | Complejidad | Estado |
 |---|-------|-------------|-------------|--------|
-| 13 | Export IFRC packing list | Manifiesto en Excel (`.xlsx`) con columnas exigidas por IFRC: código de material, descripción, unidad, cantidad, peso, valor estimado | 🟡 | ⬜ Pendiente |
-| 14 | Sección "Estándares que respaldamos" | Bloque en home pública: logos/nombres de WHO, IFRC/ICRC, IOM, UNSPSC; explica cómo cada uno garantiza calidad de datos y trazabilidad | 🟢 | ⬜ Pendiente |
+| 20 | Export IFRC packing list (Excel) | Manifiesto en `.xlsx` con columnas IFRC: código de material, descripción, unidad, cantidad, peso | 🟡 | ⬜ Pendiente |
+| 21 | Sección "Estándares que respaldamos" | Bloque en home pública: logos/nombres de WHO, IFRC/ICRC, IOM, UNSPSC; texto breve de trazabilidad | 🟢 | ⬜ Pendiente |
 
 ---
 
 > **Decisiones de diseño:**
-> - Los seeds viajan en migraciones Alembic — se aplican automáticamente en cada deploy Railway, igual que el esquema.
-> - El autocomplete de intake busca primero en la DB local (task 9) — sin internet, los ~850 productos seeded están disponibles.
-> - La creación de ProductType nuevo (tasks 10–11) puede requerir o no internet según el campo: GTIN siempre requiere lookup; INN permite fallback manual porque el guard de dedup (task 7) protege contra duplicados.
-> - `unaccent` de PostgreSQL normaliza acentos en la deduplicación: "ibuprofén" = "ibuprofen" = "Ibuprofeno".
-> - Los 503 de lookup son informativos y visibles — nunca silenciosos.
+> - `product_types.campaign_id IS NULL` = catálogo global (seeds + promovidos). `campaign_id = X` = scoped a campaña X, visible para todos los centros de esa campaña.
+> - `intakes.campaign_id NOT NULL` — toda recepción tiene contexto operacional. La campaña "Donaciones Generales" garantiza que siempre hay un fallback sin forzar una operación específica.
+> - La deduplicación usa `unaccent(lower(...))` de PostgreSQL: "ibuprofén" = "ibuprofen" = "Ibuprofeno" dentro del mismo scope visible.
+> - Promover no copia — solo mueve `campaign_id → NULL`. Si dos campañas crearon el mismo producto, el admin elige el canónico; el otro queda scoped a su campaña.
+> - COFEPRIS y RITA/Sahana export: diferidos a iteración posterior.
