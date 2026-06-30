@@ -1,10 +1,9 @@
 "use client"
 
-import { useActionState, useEffect, useState } from "react"
+import { useActionState, useEffect } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import Turnstile from "react-turnstile"
 import { loginAction } from "@/lib/actions"
 
 const LOGO = "https://res.cloudinary.com/dtvdqlxtd/image/upload/v1782794310/image_degkq9.png"
@@ -13,10 +12,6 @@ const SESSION_KEY = "araguaney_partial_token"
 export default function LoginPage() {
   const router = useRouter()
   const [state, formAction, isPending] = useActionState(loginAction, null)
-  const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
-  const [turnstileKey, setTurnstileKey] = useState(0)
-
-  const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!
 
   useEffect(() => {
     if (state && "requires_totp" in state && state.requires_totp) {
@@ -73,15 +68,11 @@ export default function LoginPage() {
             Inicia sesión
           </h1>
           <p style={{ margin: "0 0 24px", color: "#6E6557" }} className="text-[13.5px] md:text-[14.5px]">
-            Accede al panel de tu centro.
-            <span className="hidden md:inline"> de acopio.</span>
+            Accede al panel de tu centro<span className="hidden md:inline"> de acopio</span>.
           </p>
 
-          <form action={formAction} onSubmit={() => {
-            if (state && "error" in state) { setTurnstileKey((k) => k + 1); setTurnstileToken(null) }
-          }}>
+          <form action={formAction}>
             <input type="hidden" name="callbackUrl" value="/dashboard" />
-            <input type="hidden" name="turnstileToken" value={turnstileToken ?? ""} />
 
             <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#52493D", marginBottom: 6 }}>
               Correo electrónico
@@ -115,18 +106,8 @@ export default function LoginPage() {
               }}
             />
 
-            <div style={{ textAlign: "right", marginBottom: 20 }}>
+            <div style={{ textAlign: "right", marginBottom: 24 }}>
               <a href="#" style={{ fontSize: 12.5, color: "#1F5E8C", fontWeight: 600 }}>¿Olvidaste tu contraseña?</a>
-            </div>
-
-            <div style={{ marginBottom: 16 }}>
-              <Turnstile
-                key={turnstileKey}
-                sitekey={siteKey}
-                onVerify={setTurnstileToken}
-                onExpire={() => setTurnstileToken(null)}
-                theme="light"
-              />
             </div>
 
             {state && "error" in state && state.error && (
@@ -135,27 +116,23 @@ export default function LoginPage() {
                   ? "Verifica tu email antes de iniciar sesión."
                   : state.error === "account_disabled"
                   ? "Tu cuenta está desactivada."
-                  : state.error === "Completa la verificación de seguridad."
-                  ? "Completa la verificación de seguridad."
-                  : state.error === "Verificación de seguridad fallida. Intenta de nuevo."
-                  ? "Verificación de seguridad fallida. Intenta de nuevo."
                   : "Credenciales inválidas."}
               </p>
             )}
 
             <button
               type="submit"
-              disabled={isPending || !turnstileToken}
+              disabled={isPending}
               style={{
                 display: "flex", alignItems: "center", justifyContent: "center",
                 width: "100%", height: 50, background: "#1F5E8C", color: "#fff",
                 borderRadius: 10, fontWeight: 700, fontSize: 15,
                 boxShadow: "0 14px 26px -12px rgba(31,94,140,.7)",
-                border: "none", cursor: isPending || !turnstileToken ? "not-allowed" : "pointer",
-                opacity: isPending || !turnstileToken ? 0.7 : 1, marginBottom: 18,
+                border: "none", cursor: isPending ? "not-allowed" : "pointer",
+                opacity: isPending ? 0.7 : 1, marginBottom: 18,
               }}
             >
-              {isPending ? "Entrando…" : !turnstileToken ? "Verificando seguridad…" : "Entrar"}
+              {isPending ? "Entrando…" : "Entrar"}
             </button>
           </form>
 
