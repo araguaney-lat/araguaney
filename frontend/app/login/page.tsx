@@ -1,14 +1,19 @@
 "use client"
 
-import { useActionState } from "react"
+import { useActionState, useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
+import Turnstile from "react-turnstile"
 import { loginAction } from "@/lib/actions"
 
 const LOGO = "https://res.cloudinary.com/dtvdqlxtd/image/upload/v1782794310/image_degkq9.png"
 
 export default function LoginPage() {
   const [error, formAction, isPending] = useActionState(loginAction, null)
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
+  const [turnstileKey, setTurnstileKey] = useState(0)
+
+  const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!
 
   return (
     <div style={{ minHeight: "100vh" }} className="flex flex-col md:grid md:grid-cols-2">
@@ -66,8 +71,9 @@ export default function LoginPage() {
             <span className="hidden md:inline"> de acopio.</span>
           </p>
 
-          <form action={formAction}>
+          <form action={formAction} onSubmit={() => { if (error) { setTurnstileKey((k) => k + 1); setTurnstileToken(null) } }}>
             <input type="hidden" name="callbackUrl" value="/dashboard" />
+            <input type="hidden" name="turnstileToken" value={turnstileToken ?? ""} />
 
             <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#52493D", marginBottom: 6 }}>
               Correo electrónico
@@ -105,12 +111,26 @@ export default function LoginPage() {
               <a href="#" style={{ fontSize: 12.5, color: "#1F5E8C", fontWeight: 600 }}>¿Olvidaste tu contraseña?</a>
             </div>
 
+            <div style={{ marginBottom: 16 }}>
+              <Turnstile
+                key={turnstileKey}
+                sitekey={siteKey}
+                onVerify={setTurnstileToken}
+                onExpire={() => setTurnstileToken(null)}
+                theme="light"
+              />
+            </div>
+
             {error?.error && (
               <p style={{ fontSize: 13, color: "#c0392b", marginBottom: 12 }}>
                 {error.error === "email_not_verified"
                   ? "Verifica tu email antes de iniciar sesión."
                   : error.error === "account_disabled"
                   ? "Tu cuenta está desactivada."
+                  : error.error === "Completa la verificación de seguridad."
+                  ? "Completa la verificación de seguridad."
+                  : error.error === "Verificación de seguridad fallida. Intenta de nuevo."
+                  ? "Verificación de seguridad fallida. Intenta de nuevo."
                   : "Credenciales inválidas."}
               </p>
             )}

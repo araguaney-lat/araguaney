@@ -10,6 +10,13 @@ const nextConfig: NextConfig = {
         pathname: "/dtvdqlxtd/**",
       },
     ],
+    // Cache optimized images for 30 days at the edge — reduces re-optimization under load
+    minimumCacheTTL: 60 * 60 * 24 * 30,
+    // Restrict to common breakpoints only — fewer cache key combinations = smaller attack surface
+    deviceSizes: [640, 828, 1080, 1280, 1920],
+    imageSizes: [16, 32, 64, 128, 256],
+    // Single format — halves the number of cache variants
+    formats: ["image/webp"],
   },
 }
 
