@@ -1,4 +1,4 @@
-### Fase 5 — Studio (panel de administración nacional) ✅
+### Fase 5 — Studio (panel de administración nacional) ✅ — 22/22
 
 > Panel exclusivo para `national_admin`: gestión unificada de usuarios, campañas, centros y trazas de auditoría.
 > Criterios de aceptación: el `national_admin` puede crear/editar/desactivar usuarios y campañas desde `/studio`; toda acción relevante queda registrada en el log de auditoría; los eventos se purgan automáticamente a los 90 días.
@@ -26,9 +26,9 @@
 |---|-------|-------------|-------------|--------|
 | 1 | Migración `008_audit_and_requests` | Tabla `audit_log(id, user_id FK, action, entity_type, entity_id, metadata JSONB, ip, created_at)`; índices en `(entity_type, entity_id)`, `(user_id)`, `(created_at)` | 🟡 | ✅ Hecho |
 | 2 | Modelo + repository `AuditLog` | Modelo SQLAlchemy; `AuditRepository.log(user, action, entity)` helper; sin lógica de negocio, solo escritura | 🟢 | ✅ Hecho |
-| 3 | Middleware / decorator de auditoría | Decorator `@audit("INTAKE_CREATED")` aplicable a cualquier endpoint; captura `user_id`, IP y payload mínimo; nunca bloquea la respuesta (fire-and-forget con `BackgroundTasks`) | 🟠 | ⬜ Pendiente |
-| 4 | Cobertura de eventos críticos | Aplicar auditoría a: login/logout, intake, sellado de caja, paletizado, cierre/despacho de envío, creación/edición de usuario, cambio de campaña | 🟠 | ⬜ Pendiente |
-| 5 | Job de purga automática (ARQ) | Tarea ARQ periódica (`purge_old_audit_logs`) que borra registros con `created_at < now() - 90 days`; se ejecuta diariamente; sin interacción con el request cycle | 🟡 | ⬜ Pendiente |
+| 3 | Middleware / decorator de auditoría | Utility `fire_audit(background_tasks, action, entity_type, ...)` — fire-and-forget via `BackgroundTasks`; abre sesión propia, no bloquea la respuesta | 🟠 | ✅ Hecho |
+| 4 | Cobertura de eventos críticos | `INTAKE_CREATED`, `BOX_SEALED`, `PALLET_CLOSED`, `SHIPMENT_CLOSED`, `SHIPMENT_SHIPPED`; user create/patch ya cubierto en studio.py | 🟠 | ✅ Hecho |
+| 5 | Job de purga automática (ARQ) | Cron ARQ `purge_audit_logs_cron` diario 03:00 UTC; borra `created_at < now() - AUDIT_RETENTION_DAYS(90)`; registrado en `WorkerSettings.cron_jobs` | 🟡 | ✅ Hecho |
 | 6 | Endpoint de consulta de auditoría | `GET /v1/studio/audit` — solo `national_admin`; filtros: `entity_type`, `user_id`, `from_date`, `to_date`; paginado (limit/offset); rate-limited | 🟡 | ✅ Hecho |
 
 ---
@@ -92,7 +92,7 @@
 | 19 | Botón "Nueva solicitud" en dashboard | En `/dashboard/requests` con formulario de título + descripción | 🟢 | ✅ Hecho |
 | 20 | Vista de mis solicitudes (`/dashboard/requests`) | Lista propia con estado, hilo de mensajes, respuesta de seguimiento | 🟡 | ✅ Hecho |
 | 21 | Bandeja de solicitudes en Studio (`/studio/requests`) | Vista completa con filtros; hilo por solicitud; cambio de estado | 🟡 | ✅ Hecho |
-| 22 | Notificación por email al responder | Cuando el admin responde, el autor recibe email; vía Resend | 🟡 | ⬜ Pendiente |
+| 22 | Notificación por email al responder | Email vía Resend al autor cuando `national_admin` responde; template `request_reply.html`; fire-and-forget con `BackgroundTasks` | 🟡 | ✅ Hecho |
 
 > **Nota de diseño:** el hilo es simple e intencional — sin attachments, sin markdown, sin menciones. El objetivo es dar un canal rápido de "me falta X, ¿puedes agregarlo?" sin convertirse en un Slack interno. Los mensajes no se purgan (son evidencia operativa); solo el `audit_log` tiene TTL de 90 días.
 

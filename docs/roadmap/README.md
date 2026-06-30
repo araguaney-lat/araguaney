@@ -4,8 +4,8 @@
 
 ```mermaid
 pie title Tareas completadas (109 tareas)
-    "Listas" : 81
-    "Pendientes" : 28
+    "Listas" : 85
+    "Pendientes" : 24
 ```
 
 | Fase | Nombre | Listas | Pendientes | Progreso |
@@ -15,9 +15,9 @@ pie title Tareas completadas (109 tareas)
 | 2 | [Caja homogénea, QR y etiqueta](phase-02-box-qr-label.md) | 6 | 0 | ✅ 100% |
 | 3 | [Tarima, envío y manifiesto](phase-03-pallet-shipment-manifest.md) | 9 | 0 | ✅ 100% |
 | 4 | [Panel agregado nacional + endurecimiento + OTP + scanning móvil](phase-04-national-dashboard-hardening.md) | 23 | 2 | ✅ 92% |
-| 5 | [Studio — panel de administración + solicitudes](phase-05-studio.md) | 18 | 4 | 🟡 82% |
+| 5 | [Studio — panel de administración + solicitudes](phase-05-studio.md) | 22 | 0 | ✅ 100% |
 | 6 | [Integración de catálogos externos y estándares humanitarios](phase-06-catalog-integrations.md) | 0 | 12 | ⬜ 0% |
-| **Total** | | **81** | **28** | **🟡 74%** |
+| **Total** | | **85** | **24** | **🟡 78%** |
 
 > Las tareas 1 y 2 de Fase 0 (Envs + aplicar migración) requieren acción manual con DB activa.
 

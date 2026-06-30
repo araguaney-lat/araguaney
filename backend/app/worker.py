@@ -21,8 +21,10 @@ To add a task:
 import asyncio
 import logging
 import os
+from datetime import datetime, timedelta, timezone
 
 from arq.connections import RedisSettings
+from arq.cron import cron
 
 logger = logging.getLogger(__name__)
 
@@ -44,18 +46,20 @@ async def send_password_reset_email_task(ctx, to: str, token: str) -> None:
     await asyncio.to_thread(send_password_reset_email, to, token)
 
 
-# ── Example cron (uncomment to enable a scheduled job) ─────────────────────────
-#
-# from arq.cron import cron
-#
-# async def daily_cleanup_cron(ctx) -> None:
-#     """Runs daily at 3 AM UTC."""
-#     from app.database import SessionLocal
-#     with SessionLocal() as db:
-#         ...  # purge expired tokens, send digests, etc.
-#
-# Then add to WorkerSettings.cron_jobs:
-#     cron(daily_cleanup_cron, hour=3, minute=0)
+async def send_request_reply_email_task(ctx, to: str, request_title: str, reply_body: str, request_url: str) -> None:
+    from app.email import send_request_reply_email
+    await asyncio.to_thread(send_request_reply_email, to, request_title, reply_body, request_url)
+
+
+async def purge_audit_logs_cron(ctx) -> None:
+    retention_days = int(os.environ.get("AUDIT_RETENTION_DAYS", "90"))
+    cutoff = datetime.now(tz=timezone.utc) - timedelta(days=retention_days)
+    from app.database import SessionLocal
+    from app.repositories.audit_repository import AuditRepository
+    with SessionLocal() as db:
+        deleted = AuditRepository(db).purge_older_than(cutoff)
+        db.commit()
+    logger.info("Audit log purge: deleted %d rows older than %s days", deleted, retention_days)
 
 
 # ── Fallbacks (called directly when Redis is unavailable) ──────────────────────
@@ -63,12 +67,13 @@ async def send_password_reset_email_task(ctx, to: str, token: str) -> None:
 
 def _build_fallbacks() -> dict:
     from app.utils.slack import notify_slack
-    from app.email import send_verification_email, send_password_reset_email
+    from app.email import send_verification_email, send_password_reset_email, send_request_reply_email
 
     return {
         "notify_slack_task": notify_slack,
         "send_verification_email_task": send_verification_email,
         "send_password_reset_email_task": send_password_reset_email,
+        "send_request_reply_email_task": send_request_reply_email,
     }
 
 
@@ -95,8 +100,11 @@ class WorkerSettings:
         notify_slack_task,
         send_verification_email_task,
         send_password_reset_email_task,
+        send_request_reply_email_task,
     ]
-    cron_jobs: list = []
+    cron_jobs = [
+        cron(purge_audit_logs_cron, hour=3, minute=0),
+    ]
     redis_settings = RedisSettings.from_dsn(os.environ.get("REDIS_URL", "redis://localhost:6379"))
     max_jobs = 10
     job_timeout = 60

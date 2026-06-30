@@ -1,7 +1,7 @@
 import io
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, BackgroundTasks, Depends, Request
 from fastapi.responses import Response, StreamingResponse
 from sqlalchemy.orm import Session
 
@@ -14,6 +14,8 @@ from app.repositories.product_type_repository import ProductTypeRepository
 from app.repositories.center_repository import CenterRepository
 from app.schemas.box import BoxOut, BoxPublicOut
 from app.services.box_service import BoxService
+from app.utils.audit import fire_audit
+from app.utils.cloudflare import get_client_ip
 from app.utils.pdf_labels import LabelData, generate_labels_pdf
 from app.utils.qr import box_qr_png
 from app.utils.rate_limit import limiter
@@ -89,12 +91,16 @@ def get_box(
 @limiter.limit("60/minute")
 def seal_box(
     request: Request,
+    background_tasks: BackgroundTasks,
     box_id: UUID,
     db: Session = Depends(get_db),
     current_user: User = Depends(require_center_role),
     scope: UUID | None = Depends(tenant_scope),
 ):
-    return BoxService(db).seal(box_id, center_id=scope, user_id=current_user.id)
+    box = BoxService(db).seal(box_id, center_id=scope, user_id=current_user.id)
+    fire_audit(background_tasks, "BOX_SEALED", "box",
+               user_id=current_user.id, entity_id=str(box_id), ip=get_client_ip(request))
+    return box
 
 
 @router.get("/v1/boxes/{box_id}/qr.png")

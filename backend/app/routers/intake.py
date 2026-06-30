@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, BackgroundTasks, Depends, Request
 from sqlalchemy.orm import Session
 
 from app.database import get_db
@@ -8,6 +8,8 @@ from app.dependencies import require_center_role, tenant_scope
 from app.models.user import User
 from app.schemas.intake import IntakeCreate, IntakeOut
 from app.services.intake_service import IntakeService
+from app.utils.audit import fire_audit
+from app.utils.cloudflare import get_client_ip
 from app.utils.rate_limit import limiter
 
 router = APIRouter(prefix="/intakes", tags=["intakes"])
@@ -17,6 +19,7 @@ router = APIRouter(prefix="/intakes", tags=["intakes"])
 @limiter.limit("60/minute")
 def create_intake(
     request: Request,
+    background_tasks: BackgroundTasks,
     data: IntakeCreate,
     db: Session = Depends(get_db),
     current_user: User = Depends(require_center_role),
@@ -26,7 +29,10 @@ def create_intake(
     if not center_id:
         from app.utils.errors import api_error
         raise api_error("NO_CENTER", "User has no center assigned", status_code=400)
-    return IntakeService(db).create(data, center_id=center_id, user_id=current_user.id)
+    intake = IntakeService(db).create(data, center_id=center_id, user_id=current_user.id)
+    fire_audit(background_tasks, "INTAKE_CREATED", "intake",
+               user_id=current_user.id, entity_id=str(intake.id), ip=get_client_ip(request))
+    return intake
 
 
 @router.get("", response_model=list[IntakeOut])

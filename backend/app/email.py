@@ -64,3 +64,16 @@ def send_password_reset_email(to: str, token: str) -> None:
         subject="Reset your password",
         html=_render("password_reset.html", reset_url=f"{site_url}/reset-password?token={token}"),
     )
+
+
+def send_request_reply_email(to: str, request_title: str, reply_body: str, request_url: str) -> None:
+    _send(
+        to=to,
+        subject=f"Nueva respuesta: {request_title}",
+        html=_render(
+            "request_reply.html",
+            request_title=request_title,
+            reply_body=reply_body,
+            request_url=request_url,
+        ),
+    )
