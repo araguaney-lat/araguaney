@@ -3,9 +3,9 @@
 ## Progreso general
 
 ```mermaid
-pie title Tareas completadas (175 tareas)
+pie title Tareas completadas (197 tareas)
     "Listas" : 85
-    "Pendientes" : 90
+    "Pendientes" : 112
 ```
 
 | Fase | Nombre | Listas | Pendientes | Progreso |
@@ -18,8 +18,9 @@ pie title Tareas completadas (175 tareas)
 | 5 | [Studio — panel de administración + solicitudes](phase-05-studio.md) | 22 | 16 | 🟡 58% |
 | 6 | [Catálogos de referencia + lookups en tiempo real](phase-06-catalog-integrations.md) | 0 | 34 | ⬜ 0% |
 | 7 | [Transferencias entre centros](phase-07-transfers.md) | 0 | 21 | ⬜ 0% |
-| 8 | Reportes (TBD) | 0 | — | ⬜ por definir |
-| **Total** | | **85** | **90** | **🟡 49%** |
+| 8 | [Mensajería entre usuarios](phase-08-messaging.md) | 0 | 22 | ⬜ 0% |
+| 9 | Reportes (TBD) | 0 | — | ⬜ por definir |
+| **Total** | | **85** | **112** | **🟡 43%** |
 
 > Las tareas 1 y 2 de Fase 0 (Envs + aplicar migración) requieren acción manual con DB activa.
 
@@ -37,6 +38,7 @@ Fase 0 ─► Fase 1 ─► Fase 2 ─► Fase 3 ─► Fase 4
 - Fase 4 (endurecimiento + scanning móvil) puede solaparse con 2–3 según prioridad mediática.
 - Fase 5 (Studio) depende de Fase 0 (usuarios/roles) pero es independiente de 1–4; puede arrancarse en paralelo.
 - Fase 7 (Transferencias) depende de Fases 1–3 (Box/Pallet/Shipment ya deben existir) y de Fase 6 (campaign_id en intakes, scoping de ProductType).
+- Fase 8 (Mensajería) depende de Fase 6 (user_campaigns ya debe existir para validar el scope de campaña).
 
 ---
 
