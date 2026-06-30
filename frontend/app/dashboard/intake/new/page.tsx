@@ -4,6 +4,7 @@ import { useState, useCallback, useRef, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import type { Campaign, ProductType } from "@/types"
 import { createIntakeAction, type BoxDraft } from "@/lib/actions"
+import { CameraScanner } from "@/components/CameraScanner"
 
 const CATEGORY_LABELS: Record<string, string> = {
   MEDICINE: "Medicamento",
@@ -91,6 +92,7 @@ function BoxRowInput({
   const [showDropdown, setShowDropdown] = useState(false)
   const [barcodeInput, setBarcodeInput] = useState("")
   const [barcodeError, setBarcodeError] = useState<string | null>(null)
+  const [scanning, setScanning] = useState(false)
 
   const set = (field: keyof BoxRow) => (e: React.ChangeEvent<HTMLInputElement>) =>
     onChange({ ...row, [field]: e.target.value })
@@ -100,6 +102,18 @@ function BoxRowInput({
     setShowDropdown(false)
     setBarcodeInput("")
   }
+
+  const handleCameraScan = useCallback(async (text: string) => {
+    setScanning(false)
+    setBarcodeError(null)
+    setBarcodeInput(text)
+    const pt = await lookupBarcode(text)
+    if (pt) {
+      selectProduct(pt)
+    } else {
+      setBarcodeError("No se encontró el producto. Búscalo por nombre.")
+    }
+  }, [lookupBarcode, selectProduct])
 
   const handleBarcodeKeyDown = async (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key !== "Enter") return
@@ -124,16 +138,33 @@ function BoxRowInput({
         <label className="block text-xs font-medium text-zinc-600 mb-1">
           Código de barras (GTIN) — escanea o escribe
         </label>
-        <input
-          type="text"
-          inputMode="numeric"
-          value={barcodeInput}
-          placeholder="8501234567890 ↵"
-          className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-900"
-          onChange={(e) => setBarcodeInput(e.target.value)}
-          onKeyDown={handleBarcodeKeyDown}
-        />
+        <div className="flex gap-2">
+          <input
+            type="text"
+            inputMode="numeric"
+            value={barcodeInput}
+            placeholder="8501234567890 ↵"
+            className="flex-1 rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-900"
+            onChange={(e) => setBarcodeInput(e.target.value)}
+            onKeyDown={handleBarcodeKeyDown}
+          />
+          <button
+            type="button"
+            onClick={() => setScanning(true)}
+            className="rounded-lg border border-zinc-300 px-3 py-2 text-lg hover:bg-zinc-50"
+            title="Escanear con cámara"
+          >
+            📷
+          </button>
+        </div>
         {barcodeError && <p className="mt-1 text-xs text-red-600">{barcodeError}</p>}
+        {scanning && (
+          <CameraScanner
+            onResult={handleCameraScan}
+            onClose={() => setScanning(false)}
+            label="Apunta al código de barras del producto"
+          />
+        )}
       </div>
 
       {/* Product search */}

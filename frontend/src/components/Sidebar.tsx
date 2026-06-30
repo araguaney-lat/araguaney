@@ -18,6 +18,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: "/dashboard/boxes", label: "Cajas", roles: ["coordinator", "volunteer"] },
   { href: "/dashboard/pallets", label: "Tarimas", roles: ["coordinator"] },
   { href: "/dashboard/shipments", label: "Envíos", roles: ["coordinator"] },
+  { href: "/dashboard/scan", label: "Escanear QR", roles: ["national_admin", "coordinator", "volunteer"] },
   { href: "/dashboard/campaigns", label: "Campañas", roles: ["national_admin", "coordinator", "volunteer"] },
   { href: "/dashboard/centers", label: "Centros", roles: ["national_admin"] },
 ]
