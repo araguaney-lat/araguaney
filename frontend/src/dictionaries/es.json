@@ -1,0 +1,106 @@
+{
+  "nav": {
+    "home": "Inicio",
+    "why": "Por qué Araguaney",
+    "standards": "Estándares",
+    "contact": "Contacto",
+    "login": "Iniciar sesión"
+  },
+  "hero": {
+    "eyebrow_desktop": "Coordinación de centros de acopio",
+    "eyebrow_mobile": "Centros de acopio",
+    "title": "Que cada donación llegue ordenada.",
+    "desc_mobile": "Un mismo estándar para registrar, empacar en cajas homogéneas con QR y enviar con manifiesto.",
+    "desc_desktop": "Araguaney conecta a los centros de acopio en un mismo estándar: registra los insumos a nivel de ítem, los empaca en cajas homogéneas con QR y los consolida en envíos con manifiesto exportable.",
+    "cta_login": "Iniciar sesión",
+    "cta_why": "Por qué Araguaney",
+    "standards_label_desktop": "Construido sobre estándares globales",
+    "standards_label_mobile": "Estándares globales"
+  },
+  "steps": {
+    "heading": "Del acopio al envío",
+    "heading_suffix": ", en orden",
+    "subtitle": "Tres pasos, un mismo lenguaje entre centros",
+    "items": [
+      {
+        "n": "01",
+        "title": "Registrar",
+        "desc": "Cada donación en especie se captura a nivel de ítem con su categoría, lote y caducidad.",
+        "desc_short": "Cada ítem con categoría, lote y caducidad."
+      },
+      {
+        "n": "02",
+        "title": "Empacar",
+        "desc": "Cajas homogéneas —un solo producto, lote y caducidad— selladas con su QR y etiqueta.",
+        "desc_short": "Cajas homogéneas selladas con QR."
+      },
+      {
+        "n": "03",
+        "title": "Enviar",
+        "desc": "Las cajas se consolidan en tarimas y envíos con manifiesto exportable, listo para aduana.",
+        "desc_short": "Tarimas y envíos con manifiesto."
+      }
+    ]
+  },
+  "why": {
+    "heading": "Por qué Araguaney",
+    "subtitle": "Decenas de centros de acopio en México reciben y envían suministros humanitarios a Venezuela de forma independiente. Sin un estándar común es imposible saber qué hay disponible ni preparar carga que cumpla los requisitos de envío internacional.",
+    "items": [
+      {
+        "icon": "📦",
+        "title": "Cajas homogéneas",
+        "desc": "Cada caja tiene un solo tipo de producto, un lote y una caducidad. Sin mezclas. QR impreso en la etiqueta."
+      },
+      {
+        "icon": "📋",
+        "title": "Manifiesto exportable",
+        "desc": "Cada envío genera un packing list con todas las cajas y tarimas, listo para trámite aduanal."
+      },
+      {
+        "icon": "🗺️",
+        "title": "Vista nacional agregada",
+        "desc": "Un panel nacional muestra el stock total por categoría de todos los centros en tiempo real."
+      },
+      {
+        "icon": "🔒",
+        "title": "Sin datos personales",
+        "desc": "No se almacenan datos personales de donantes ni beneficiarios. Solo inventario, trazable de la caja al envío."
+      }
+    ]
+  },
+  "standards": {
+    "heading": "Estándares que respaldamos",
+    "subtitle": "Araguaney está construido sobre estándares humanitarios reconocidos internacionalmente para garantizar la calidad del inventario, la trazabilidad y la compatibilidad con otros sistemas de ayuda humanitaria.",
+    "items": [
+      {
+        "name": "WHO",
+        "full": "Organización Mundial de la Salud",
+        "desc": "Guías de donación de medicamentos: vida útil mínima de 12 meses, nombre INN, lote y caducidad obligatorios."
+      },
+      {
+        "name": "IFRC / ICRC",
+        "full": "Cruz Roja / Media Luna Roja",
+        "desc": "Catálogo de artículos no alimentarios y códigos de material para clasificar insumos."
+      },
+      {
+        "name": "IOM",
+        "full": "Organización Internacional para las Migraciones",
+        "desc": "Catálogo de artículos de asistencia de emergencia con especificaciones técnicas."
+      },
+      {
+        "name": "UNSPSC",
+        "full": "Naciones Unidas — Código de Productos y Servicios",
+        "desc": "Taxonomía universal de productos para categorizar todos los tipos de insumos."
+      },
+      {
+        "name": "GS1",
+        "full": "Global Standards One",
+        "desc": "Estándares de código de barras y GTIN para identificación y trazabilidad de artículos."
+      }
+    ]
+  },
+  "footer": {
+    "tagline": "El estándar común para centros de acopio",
+    "privacy": "Sin datos personales de donantes ni beneficiarios. Solo inventario, trazable de la caja al envío."
+  }
+}
