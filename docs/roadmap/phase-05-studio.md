@@ -1,4 +1,4 @@
-### Fase 5 — Studio (panel de administración nacional) 🟡 — 22/30
+### Fase 5 — Studio (panel de administración nacional) 🟡 — 22/38
 
 > Panel exclusivo para `national_admin`: gestión unificada de usuarios, campañas, centros y trazas de auditoría.
 > Criterios de aceptación: el `national_admin` puede crear/editar/desactivar usuarios y campañas desde `/studio`; toda acción relevante queda registrada en el log de auditoría; los eventos se purgan automáticamente a los 90 días.
@@ -106,8 +106,27 @@
 
 ---
 
+---
+
+#### Refactor arquitectural — `/studio` → `/dashboard` + nuevo `/studio` para superadmin
+
+> **Decisión de diseño (post-Fase 5):** `/studio` es para el `superadmin` de plataforma, no para el `national_admin`. Todo lo construido en `/studio` para national_admin debe moverse a `/dashboard` con guards por `center_role`. El `/studio` real tendrá contenido diferente para el dueño de la aplicación.
+
+| # | Tarea | Descripción | Complejidad | Estado |
+|---|-------|-------------|-------------|--------|
+| 31 | Mover rutas de national_admin a `/dashboard` | Renombrar `/studio/users` → `/dashboard/users`; `/studio/audit` → `/dashboard/audit`; `/studio/requests` (bandeja admin) → `/dashboard/requests/admin` o integrado en `/dashboard/requests`; actualizar todos los hrefs del sidebar | 🟠 | ⬜ Pendiente |
+| 32 | Sidebar del dashboard — sección Administración | En `Sidebar.tsx` agregar sección "Administración" visible solo para `national_admin`: enlaces a Usuarios, Solicitudes (bandeja), Auditoría | 🟡 | ⬜ Pendiente |
+| 33 | Eliminar `StudioSidebar.tsx` y layout `/studio` actual | El layout y sidebar actuales de `/studio` son para national_admin — reemplazar por el nuevo `/studio` de superadmin | 🟡 | ⬜ Pendiente |
+| 34 | Nuevo layout `/studio` para superadmin | Guard `users.role = superadmin`; sidebar propio: Métricas, Usuarios, Auditoría, Configuración | 🟡 | ⬜ Pendiente |
+| 35 | `/studio` hub — métricas de plataforma | Contadores: centros activos, campañas, usuarios totales, cajas selladas, envíos despachados; visión global sin filtro de centro | 🟡 | ⬜ Pendiente |
+| 36 | `/studio/users` — gestión de plataforma | Lista todos los usuarios; puede bloquear/desbloquear (`is_active`); puede crear national_admins; botón "Reiniciar contraseña" para cualquier usuario | 🟠 | ⬜ Pendiente |
+| 37 | `/studio/audit` — auditoría de plataforma | Igual que la auditoría de national_admin pero sin filtro de centro — ve todos los eventos de todos los centros | 🟡 | ⬜ Pendiente |
+| 38 | `/studio/settings` — configuración del sistema | Variables operativas: `AUDIT_RETENTION_DAYS`, `MIN_SHELF_LIFE_MEDICINE`, `MIN_SHELF_LIFE_FOOD`; no edita `.env`, escribe en tabla `system_settings(key, value, updated_by, updated_at)` | 🟠 | ⬜ Pendiente |
+
+---
+
 > **Decisiones de diseño:**
 > - `audit_log.metadata` usa JSONB para capturar contexto variable sin alterar el esquema (ej. `{"from_status": "OPEN", "to_status": "CLOSED"}`).
-> - La purga a 90 días se elige como balance entre valor de auditoría y costo de almacenamiento; configurable vía env `AUDIT_RETENTION_DAYS`.
-> - El `/studio` es intencionalmente independiente del dashboard operativo para que coordinadores y voluntarios nunca vean rutas de admin.
-> - La creación de usuarios por `national_admin` complementa (no reemplaza) la creación por `coordinator` del boilerplate; ambos flujos coexisten.
+> - La purga a 90 días se elige como balance entre valor de auditoría y costo de almacenamiento; configurable vía env `AUDIT_RETENTION_DAYS` o tabla `system_settings`.
+> - `/studio` = superadmin de plataforma. `/dashboard` con sección "Administración" = national_admin. Coordinadores y volunteers nunca ven rutas admin.
+> - "Reiniciar contraseña" (superadmin, national_admin, coordinator) es el mismo mecanismo que "Reinvitar" — genera clave temporal y envía email. El botón se llama igual en todos los user managers.
