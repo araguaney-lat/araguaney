@@ -1,5 +1,6 @@
 import { auth } from "@/auth"
 import { redirect } from "next/navigation"
+import { SessionProvider } from "next-auth/react"
 import { Sidebar } from "@/components/Sidebar"
 import { CenterSelector } from "@/components/CenterSelector"
 import { getLocale, getDictionary } from "@/lib/i18n"
@@ -35,21 +36,23 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const userEmail = me?.email ?? null
 
   return (
-    <div className="flex h-screen overflow-hidden bg-zinc-50">
-      <div className="flex h-full flex-col">
-        {centerRole === "national_admin" && (
-          <CenterSelector token={session.accessToken} />
-        )}
-        <Sidebar
-          centerRole={centerRole}
-          platformRole={platformRole}
-          nav={dict.dashboard.nav}
-          roleLabels={dict.dashboard.role}
-          userName={userName}
-          userEmail={userEmail}
-        />
+    <SessionProvider session={session}>
+      <div className="flex h-screen overflow-hidden bg-zinc-50">
+        <div className="flex h-full flex-col">
+          {centerRole === "national_admin" && (
+            <CenterSelector token={session.accessToken} />
+          )}
+          <Sidebar
+            centerRole={centerRole}
+            platformRole={platformRole}
+            nav={dict.dashboard.nav}
+            roleLabels={dict.dashboard.role}
+            userName={userName}
+            userEmail={userEmail}
+          />
+        </div>
+        <main className="flex-1 overflow-y-auto p-6">{children}</main>
       </div>
-      <main className="flex-1 overflow-y-auto p-6">{children}</main>
-    </div>
+    </SessionProvider>
   )
 }
