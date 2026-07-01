@@ -45,6 +45,7 @@ export type ProductCategory =
 export interface Campaign {
   id: string
   name: string
+  slug: string | null
   destination_country: string | null
   description: string | null
   start_date: string | null
@@ -52,6 +53,22 @@ export interface Campaign {
   is_active: boolean
   is_general: boolean
   created_at: string
+}
+
+export interface PublicCampaignListItem {
+  slug: string
+  name: string
+  destination_country: string | null
+}
+
+export interface PublicCampaign {
+  slug: string
+  name: string
+  description: string | null
+  destination_country: string | null
+  start_date: string | null
+  end_date: string | null
+  by_category: { category: string; total_units: number; box_count: number }[]
 }
 
 export interface BarcodePrefill {

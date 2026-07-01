@@ -503,6 +503,34 @@ export default async function HomePage() {
         </div>
       </div>
 
+      {/* ── Guías (solo ES — contenido sin traducir) ── */}
+      {locale === "es" && (
+        <div
+          className="px-5 md:px-[46px] py-10 md:py-12"
+          style={{ background: "#FBF7EE", borderTop: "1px solid #EFE7D6" }}
+        >
+          <div className="max-w-[760px] mx-auto">
+            <h2
+              className="text-[18px] md:text-[22px] mb-4"
+              style={{ fontFamily: "var(--font-source-serif)", fontWeight: 600, margin: "0 0 16px" }}
+            >
+              Guías
+            </h2>
+            <div className="flex flex-col gap-2 text-[13.5px]" style={{ fontWeight: 600 }}>
+              <Link href="/guias/como-organizar-un-centro-de-acopio" style={{ color: "#1F5E8C" }}>
+                Cómo organizar un centro de acopio →
+              </Link>
+              <Link href="/guias/que-se-puede-donar" style={{ color: "#1F5E8C" }}>
+                Qué se puede donar en un centro de acopio →
+              </Link>
+              <Link href="/guias/como-preparar-carga-humanitaria-para-aduana" style={{ color: "#1F5E8C" }}>
+                Cómo preparar carga humanitaria para aduana →
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
+
       <HomeFooter dict={dict.footer} />
     </div>
     </>

@@ -4,8 +4,8 @@
 
 ```mermaid
 pie title Tareas completadas (290 tareas)
-    "Listas" : 221
-    "Pendientes" : 69
+    "Listas" : 229
+    "Pendientes" : 61
 ```
 
 | Fase | Nombre | Listas | Pendientes | Progreso |
@@ -21,10 +21,10 @@ pie title Tareas completadas (290 tareas)
 | 8 | [Mensajería entre usuarios](phase-08-messaging.md) | 22 | 0 | ✅ 100% |
 | 9 | [Reportes de campaña](phase-09-reports.md) | 8 | 0 | ✅ 100% |
 | 10 | [Endurecimiento de seguridad (post-auditoría)](phase-10-security-hardening.md) | 22 | 0 | ✅ 100% |
-| 11 | [SEO y reposicionamiento genérico](phase-11-seo-positioning.md) | 9 | 14 | 🟡 39% |
+| 11 | [SEO y reposicionamiento genérico](phase-11-seo-positioning.md) | 17 | 6 | 🟡 74% |
 | 12 | [Optimización y rendimiento](phase-12-optimization.md) | 0 | 21 | ⬜ 0% |
 | 13 | [Compliance y legal](phase-13-compliance-legal.md) | 0 | 18 | ⬜ 0% |
-| **Total** | | **221** | **69** | **🟡 76%** |
+| **Total** | | **229** | **61** | **🟡 79%** |
 
 > Envs opcionales (Sentry, Slack, Google Safe Browsing, Encryption Key) se pueden agregar en cualquier momento sin cambios de código.
 

@@ -5,6 +5,7 @@ from app.repositories.campaign_repository import CampaignRepository
 from app.schemas.campaign import CampaignCreate, CampaignUpdate
 from app.services.base import BaseService
 from app.utils.errors import api_error
+from app.utils.slug import slugify
 
 
 class CampaignService(BaseService):
@@ -18,10 +19,20 @@ class CampaignService(BaseService):
             raise api_error("CAMPAIGN_NOT_FOUND", "Campaign not found", status_code=404)
         return campaign
 
+    def _unique_slug(self, repo: CampaignRepository, name: str) -> str:
+        base = slugify(name) or "campana"
+        slug = base
+        suffix = 1
+        while repo.slug_exists(slug):
+            suffix += 1
+            slug = f"{base}-{suffix}"
+        return slug
+
     def create(self, data: CampaignCreate) -> Campaign:
         repo = CampaignRepository(self.db)
         campaign = Campaign(
             name=data.name,
+            slug=self._unique_slug(repo, data.name),
             destination_country=data.destination_country,
             description=data.description,
             start_date=data.start_date,

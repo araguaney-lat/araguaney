@@ -165,10 +165,19 @@ export default async function AyudaHumanitariaPage() {
         >
           Empezar ahora
         </Link>
-        <p className="text-[13.5px]" style={{ color: "#8A8073" }}>
+        <p className="text-[13.5px] mb-2" style={{ color: "#8A8073" }}>
           ¿Coordinas específicamente un centro de acopio?{" "}
           <Link href="/centro-de-acopio" style={{ color: "#1F5E8C", fontWeight: 600 }}>
             Conoce el estándar completo →
+          </Link>
+        </p>
+        <p className="text-[13.5px]" style={{ color: "#8A8073" }}>
+          <Link href="/guias/que-se-puede-donar" style={{ color: "#1F5E8C", fontWeight: 600 }}>
+            Qué se puede donar
+          </Link>
+          {" · "}
+          <Link href="/guias/como-preparar-carga-humanitaria-para-aduana" style={{ color: "#1F5E8C", fontWeight: 600 }}>
+            Cómo preparar carga para aduana
           </Link>
         </p>
       </div>

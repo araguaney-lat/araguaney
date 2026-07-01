@@ -1,3 +1,5 @@
+from datetime import date
+
 from app.schemas._base import StrictModel
 
 
@@ -54,4 +56,22 @@ class WeightDashboardOut(StrictModel):
 
 
 class PublicNeedsOut(StrictModel):
+    by_category: list[CategoryStockOut]
+
+
+class PublicCampaignListItemOut(StrictModel):
+    """Safe for public listing: no PII, just what's needed to build a link/card."""
+    slug: str
+    name: str
+    destination_country: str | None
+
+
+class PublicCampaignOut(StrictModel):
+    """Public event-landing payload — campaign context + what's needed for it."""
+    slug: str
+    name: str
+    description: str | None
+    destination_country: str | None
+    start_date: date | None
+    end_date: date | None
     by_category: list[CategoryStockOut]

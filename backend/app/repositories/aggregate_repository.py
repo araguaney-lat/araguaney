@@ -27,7 +27,11 @@ class AggregateRepository:
 
     # ── Stock by category ──────────────────────────────────────────────────────
 
-    def stock_by_category(self, center_id: Optional[uuid.UUID] = None) -> list[dict]:
+    def stock_by_category(
+        self,
+        center_id: Optional[uuid.UUID] = None,
+        campaign_id: Optional[uuid.UUID] = None,
+    ) -> list[dict]:
         """Total sealed units grouped by product category."""
         q = (
             self.db.query(
@@ -40,6 +44,8 @@ class AggregateRepository:
         )
         if center_id is not None:
             q = q.filter(Box.center_id == center_id)
+        if campaign_id is not None:
+            q = q.join(Intake, Box.intake_id == Intake.id).filter(Intake.campaign_id == campaign_id)
         rows = q.group_by(ProductType.category).order_by(ProductType.category).all()
         return [
             {"category": r.category, "total_units": int(r.total_units or 0), "box_count": int(r.box_count or 0)}
@@ -196,10 +202,11 @@ class AggregateRepository:
 
     # ── Public "what's needed" view ────────────────────────────────────────────
 
-    def needed_by_category(self) -> list[dict]:
+    def needed_by_category(self, campaign_id: Optional[uuid.UUID] = None) -> list[dict]:
         """For the public page: categories present (sealed stock) sorted by volume.
 
         This is a read-only, unauthenticated snapshot — no PII, no center names.
+        Optional campaign_id scopes it to a single event landing (/eventos/{slug}).
         """
-        rows = self.stock_by_category(center_id=None)
+        rows = self.stock_by_category(center_id=None, campaign_id=campaign_id)
         return sorted(rows, key=lambda r: r["total_units"], reverse=True)

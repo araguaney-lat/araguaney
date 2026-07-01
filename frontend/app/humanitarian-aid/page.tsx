@@ -165,11 +165,21 @@ export default async function HumanitarianAidPage() {
         >
           Get started
         </Link>
-        <p className="text-[13.5px]" style={{ color: "#8A8073" }}>
+        <p className="text-[13.5px] mb-2" style={{ color: "#8A8073" }}>
           Coordinating a donation center specifically?{" "}
           <Link href="/centro-de-acopio" style={{ color: "#1F5E8C", fontWeight: 600 }}>
             See the full standard (Spanish) →
           </Link>
+        </p>
+        <p className="text-[13.5px]" style={{ color: "#8A8073" }}>
+          <Link href="/guias/que-se-puede-donar" style={{ color: "#1F5E8C", fontWeight: 600 }}>
+            What can be donated
+          </Link>
+          {" · "}
+          <Link href="/guias/como-preparar-carga-humanitaria-para-aduana" style={{ color: "#1F5E8C", fontWeight: 600 }}>
+            Preparing cargo for customs
+          </Link>
+          {" (Spanish)"}
         </p>
       </div>
 
