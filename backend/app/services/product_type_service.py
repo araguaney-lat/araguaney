@@ -26,12 +26,16 @@ class ProductTypeService(BaseService):
         return pt
 
     def create(self, data: ProductTypeCreate) -> ProductType:
+        from app.utils.gtin import validate as validate_gtin
         if data.category not in PRODUCT_CATEGORIES:
             raise api_error("INVALID_CATEGORY", f"Category must be one of: {', '.join(PRODUCT_CATEGORIES)}", field="category")
+        if data.gtin and not validate_gtin(data.gtin):
+            raise api_error("INVALID_GTIN", "GTIN must be a valid EAN-8, UPC-A, or EAN-13", field="gtin")
         pt = ProductType(**data.model_dump())
         return ProductTypeRepository(self.db).save(pt)
 
     def update(self, pt_id: UUID, data: ProductTypeUpdate) -> ProductType:
+        from app.utils.gtin import validate as validate_gtin
         repo = ProductTypeRepository(self.db)
         pt = repo.find_by_id(pt_id)
         if not pt:
@@ -39,6 +43,8 @@ class ProductTypeService(BaseService):
         updates = data.model_dump(exclude_none=True)
         if "category" in updates and updates["category"] not in PRODUCT_CATEGORIES:
             raise api_error("INVALID_CATEGORY", f"Category must be one of: {', '.join(PRODUCT_CATEGORIES)}", field="category")
+        if "gtin" in updates and updates["gtin"] and not validate_gtin(updates["gtin"]):
+            raise api_error("INVALID_GTIN", "GTIN must be a valid EAN-8, UPC-A, or EAN-13", field="gtin")
         for field, value in updates.items():
             setattr(pt, field, value)
         repo.commit()
