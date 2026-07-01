@@ -77,3 +77,45 @@ def send_request_reply_email(to: str, request_title: str, reply_body: str, reque
             request_url=request_url,
         ),
     )
+
+
+def send_message_private_email(to: str, sender_name: str, title: str) -> None:
+    site_url = settings.frontend_url.split(",")[0].strip()
+    _send(
+        to=to,
+        subject=f"Nuevo mensaje de {sender_name}: {title}",
+        html=_render(
+            "message_private.html",
+            sender_name=sender_name,
+            title=title,
+            messages_url=f"{site_url}/dashboard/messages",
+        ),
+    )
+
+
+def send_message_public_email(to: str, title: str, campaign_id: str) -> None:
+    site_url = settings.frontend_url.split(",")[0].strip()
+    _send(
+        to=to,
+        subject=f"Nuevo mensaje en campaña: {title}",
+        html=_render(
+            "message_public.html",
+            title=title,
+            messages_url=f"{site_url}/dashboard/messages",
+        ),
+    )
+
+
+def send_message_reply_email(to: str, thread_title: str, reply_preview: str, sender_name: str) -> None:
+    site_url = settings.frontend_url.split(",")[0].strip()
+    _send(
+        to=to,
+        subject=f"Nueva respuesta en: {thread_title}",
+        html=_render(
+            "message_reply.html",
+            thread_title=thread_title,
+            reply_preview=reply_preview,
+            sender_name=sender_name,
+            messages_url=f"{site_url}/dashboard/messages",
+        ),
+    )

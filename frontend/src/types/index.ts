@@ -222,6 +222,49 @@ export interface TransferDetailOut extends TransferOut {
   events: TransferEventOut[]
 }
 
+// ── Messaging ─────────────────────────────────────────────────────────────────
+
+export type ThreadType = "PRIVATE" | "PUBLIC"
+
+export interface AttachmentOut {
+  id: string
+  filename: string
+  content_type: string
+  size_bytes: number
+  created_at: string
+}
+
+export interface ThreadReplyOut {
+  id: string
+  thread_id: string
+  sender_id: string | null
+  body: string
+  created_at: string
+  attachments: AttachmentOut[]
+}
+
+export interface ThreadOut {
+  id: string
+  title: string
+  body: string
+  sender_id: string | null
+  campaign_id: string
+  thread_type: ThreadType
+  created_at: string
+  updated_at: string
+}
+
+export interface ThreadDetailOut extends ThreadOut {
+  replies: ThreadReplyOut[]
+  attachments: AttachmentOut[]
+  participant_ids: string[]
+}
+
+export interface UploadUrlOut {
+  upload_url: string
+  r2_key: string
+}
+
 // ── Aggregate / Dashboard ──────────────────────────────────────────────────────
 
 export interface CategoryStockOut {
