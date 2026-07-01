@@ -2,6 +2,7 @@ import { auth } from "@/auth"
 import { redirect } from "next/navigation"
 import { apiFetch } from "@/lib/api"
 import type { NationalDashboardOut, ProductCategory } from "@/types"
+import { WeightCards } from "@/components/WeightCards"
 
 const CATEGORY_LABELS: Record<string, string> = {
   MEDICINE: "Medicamentos",
@@ -157,6 +158,8 @@ export default async function NationalDashboardPage() {
           </div>
         </section>
       )}
+
+      <WeightCards />
     </div>
   )
 }

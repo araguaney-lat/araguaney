@@ -1,6 +1,7 @@
 import { auth } from "@/auth"
 import { redirect } from "next/navigation"
 import Link from "next/link"
+import { WeightCards } from "@/components/WeightCards"
 
 export default async function DashboardPage() {
   const session = await auth()
@@ -44,6 +45,7 @@ export default async function DashboardPage() {
           </>
         )}
       </div>
+      <WeightCards />
     </div>
   )
 }

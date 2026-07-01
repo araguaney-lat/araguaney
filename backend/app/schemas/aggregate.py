@@ -40,5 +40,18 @@ class NationalDashboardOut(StrictModel):
     by_inn: list[InnStockOut]
 
 
+class CampaignWeightOut(StrictModel):
+    campaign_id: str
+    campaign_name: str
+    total_kg: float
+    goal_kg: float | None
+    progress_pct: float | None
+
+
+class WeightDashboardOut(StrictModel):
+    campaigns: list[CampaignWeightOut]
+    center_kg: float | None
+
+
 class PublicNeedsOut(StrictModel):
     by_category: list[CategoryStockOut]

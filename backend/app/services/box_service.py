@@ -48,6 +48,9 @@ class BoxService(BaseService):
             if not box.expiry_date:
                 raise api_error("MISSING_EXPIRY", "Expiry date is required to seal a medicine box", status_code=422)
 
+        if pt and pt.unit_weight_kg is not None and box.weight_kg is None:
+            box.weight_kg = pt.unit_weight_kg * box.quantity
+
         now = datetime.now(tz=timezone.utc)
         box.status = "SEALED"
         box.sealed_at = now
