@@ -12,6 +12,18 @@ class UploadUrlRequest(StrictModel):
     content_type: str
     size_bytes: int
 
+    @field_validator("filename")
+    @classmethod
+    def sanitize_filename(cls, v: str) -> str:
+        import re
+        name = v.strip()
+        if not name or len(name) > 255:
+            raise ValueError("Filename must be 1–255 characters")
+        if ".." in name or name.startswith("/") or name.startswith("."):
+            raise ValueError("Invalid filename")
+        name = re.sub(r"[^\w\-\. ]", "_", name)
+        return name
+
     @field_validator("content_type")
     @classmethod
     def validate_content_type(cls, v: str) -> str:

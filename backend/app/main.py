@@ -16,7 +16,7 @@ from starlette.middleware.gzip import GZipMiddleware
 from uvicorn.middleware.proxy_headers import ProxyHeadersMiddleware
 
 from app.config import settings
-from app.utils.cloudflare import get_client_ip
+from app.utils.cloudflare import get_client_ip, is_cloudflare_ip
 from app.utils.rate_limit import limiter
 
 # ── Routers ────────────────────────────────────────────────────────────────────
@@ -51,6 +51,8 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         response.headers["X-Frame-Options"] = "SAMEORIGIN"
         response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
         response.headers["X-XSS-Protection"] = "1; mode=block"
+        response.headers["Strict-Transport-Security"] = "max-age=63072000; includeSubDomains"
+        response.headers["Permissions-Policy"] = "geolocation=(), camera=(), microphone=()"
         return response
 
 
@@ -80,16 +82,17 @@ class CloudflareOnlyMiddleware(BaseHTTPMiddleware):
     """Block requests that did not pass through Cloudflare.
 
     Only active when CLOUDFLARE_ONLY=true. The /health endpoint is always allowed.
-    Detection: Cloudflare always injects CF-Connecting-IP on proxied requests.
+    Runs BEFORE ProxyHeadersMiddleware so request.client.host is the raw TCP IP
+    (the actual connecting peer), which is validated against Cloudflare's published ranges.
     """
 
     async def dispatch(self, request: Request, call_next) -> Response:
         if not settings.cloudflare_only or request.url.path == "/health":
             return await call_next(request)
 
-        if not request.headers.get("CF-Connecting-IP"):
-            client = request.client.host if request.client else "unknown"
-            logger.warning("Blocked request without CF-Connecting-IP from %s", client)
+        tcp_ip = request.client.host if request.client else None
+        if not tcp_ip or not is_cloudflare_ip(tcp_ip):
+            logger.warning("Blocked non-Cloudflare TCP IP %s on %s", tcp_ip, request.url.path)
             return Response(content="Forbidden", status_code=403)
 
         return await call_next(request)
@@ -118,6 +121,12 @@ if settings.debug:
     logger.warning(
         "FastAPI DEBUG mode is ON — full stack traces exposed in responses. "
         "Set DEBUG=false in production."
+    )
+
+if not getattr(settings, "encryption_key", None):
+    logger.warning(
+        "ENCRYPTION_KEY not configured — falling back to SECRET_KEY for column encryption. "
+        "Set a dedicated ENCRYPTION_KEY in production for key separation."
     )
 
 # ── Lifespan ─────────────────────────────────────────────────────────────────
@@ -222,8 +231,10 @@ _admin_allowed_ips = {ip.strip() for ip in settings.admin_allowed_ips.split(",")
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 app.add_middleware(SecurityHeadersMiddleware)
 app.add_middleware(AdminIPAllowlistMiddleware, allowed_ips=_admin_allowed_ips)
-app.add_middleware(CloudflareOnlyMiddleware)
+# ProxyHeaders added before CloudflareOnly so that in LIFO order CloudflareOnly
+# executes first (on raw TCP IP), then ProxyHeaders rewrites request.client.host.
 app.add_middleware(ProxyHeadersMiddleware, trusted_hosts=settings.trusted_proxy_ips)
+app.add_middleware(CloudflareOnlyMiddleware)
 
 _allowed_origins = [o.strip().rstrip("/") for o in settings.frontend_url.split(",") if o.strip()]
 

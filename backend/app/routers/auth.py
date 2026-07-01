@@ -21,6 +21,7 @@ from app.schemas.auth import (
 )
 from app.schemas.user_domain import UserOut
 from app.services.auth_service import AuthService
+from app.utils.cloudflare import get_client_ip
 from app.utils.rate_limit import limiter
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -73,7 +74,8 @@ def logout(
 
 
 @router.get("/verify-email")
-def verify_email(token: str, db: Session = Depends(get_db)):
+@limiter.limit("10/hour")
+def verify_email(request: Request, token: str, db: Session = Depends(get_db)):
     return AuthService(db).verify_email(token)
 
 
@@ -119,6 +121,7 @@ def change_password(
         "user",
         user_id=current_user.id,
         entity_id=str(current_user.id),
+        ip=get_client_ip(request),
     )
     db.commit()
     return result
