@@ -116,15 +116,17 @@ class Settings(BaseSettings):
     # Download GeoLite2-City.mmdb from maxmind.com (free account required)
     # geoip_db_path: str = "/data/GeoLite2-City.mmdb"
 
-    # ── ElevenLabs + R2 (optional — AI voice generation + storage) ────────────
-    # pip install elevenlabs==1.9.0 boto3==1.35.95
+    # ── Cloudflare R2 (messaging attachments) ────────────────────────────────
+    r2_account_id: str = ""
+    r2_access_key_id: str = ""
+    r2_secret_access_key: str = ""
+    r2_bucket_name: str = ""
+    r2_public_url: str = ""   # e.g. https://pub-xxx.r2.dev
+
+    # ── ElevenLabs (optional — AI voice generation) ────────────────────────────
+    # pip install elevenlabs==1.9.0
     # elevenlabs_api_key: str = ""
     # elevenlabs_voice_id: str = ""
-    # r2_account_id: str = ""
-    # r2_access_key_id: str = ""
-    # r2_secret_access_key: str = ""
-    # r2_bucket_name: str = ""
-    # r2_public_url: str = ""   # e.g. https://pub-xxx.r2.dev
 
     class Config:
         env_file = ".env"

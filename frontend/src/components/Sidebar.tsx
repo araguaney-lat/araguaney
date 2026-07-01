@@ -18,6 +18,7 @@ import {
   Flag,
   Building2,
   MessageSquare,
+  MessageCircle,
   Users,
   UserCog,
   ScrollText,
@@ -45,6 +46,7 @@ type DashboardNav = {
   pallets: string
   shipments: string
   transfers: string
+  messages: string
   scan: string
   campaigns: string
   centers: string
@@ -70,6 +72,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: "/dashboard/pallets", labelKey: "pallets", roles: ["coordinator"], icon: Layers },
   { href: "/dashboard/shipments", labelKey: "shipments", roles: ["coordinator"], icon: Truck },
   { href: "/dashboard/transfers", labelKey: "transfers", roles: ["national_admin", "coordinator"], icon: ArrowLeftRight },
+  { href: "/dashboard/messages", labelKey: "messages", roles: ["national_admin", "coordinator", "volunteer"], icon: MessageCircle },
   { href: "/dashboard/scan", labelKey: "scan", roles: ["national_admin", "coordinator", "volunteer"], icon: ScanLine },
   { href: "/dashboard/campaigns", labelKey: "campaigns", roles: ["national_admin", "coordinator", "volunteer"], icon: Flag },
   { href: "/dashboard/centers", labelKey: "centers", roles: ["national_admin"], icon: Building2 },

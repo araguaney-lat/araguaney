@@ -51,6 +51,29 @@ async def send_request_reply_email_task(ctx, to: str, request_title: str, reply_
     await asyncio.to_thread(send_request_reply_email, to, request_title, reply_body, request_url)
 
 
+async def send_message_private_email_task(ctx, to: str, sender_name: str, title: str) -> None:
+    from app.email import send_message_private_email
+    await asyncio.to_thread(send_message_private_email, to, sender_name, title)
+
+
+async def send_message_public_email_task(ctx, to: str, title: str, campaign_id: str) -> None:
+    from app.email import send_message_public_email
+    await asyncio.to_thread(send_message_public_email, to, title, campaign_id)
+
+
+async def send_message_reply_email_task(ctx, to: str, thread_title: str, reply_preview: str, sender_name: str) -> None:
+    from app.email import send_message_reply_email
+    await asyncio.to_thread(send_message_reply_email, to, thread_title, reply_preview, sender_name)
+
+
+async def purge_attachments_cron(ctx) -> None:
+    from app.database import SessionLocal
+    from app.services.thread_service import ThreadService
+    with SessionLocal() as db:
+        count = ThreadService.purge_expired(db)
+    logger.info("Attachment purge: deleted %d expired attachments", count)
+
+
 async def purge_audit_logs_cron(ctx) -> None:
     retention_days = int(os.environ.get("AUDIT_RETENTION_DAYS", "90"))
     cutoff = datetime.now(tz=timezone.utc) - timedelta(days=retention_days)
@@ -67,13 +90,23 @@ async def purge_audit_logs_cron(ctx) -> None:
 
 def _build_fallbacks() -> dict:
     from app.utils.slack import notify_slack
-    from app.email import send_verification_email, send_password_reset_email, send_request_reply_email
+    from app.email import (
+        send_verification_email,
+        send_password_reset_email,
+        send_request_reply_email,
+        send_message_private_email,
+        send_message_public_email,
+        send_message_reply_email,
+    )
 
     return {
         "notify_slack_task": notify_slack,
         "send_verification_email_task": send_verification_email,
         "send_password_reset_email_task": send_password_reset_email,
         "send_request_reply_email_task": send_request_reply_email,
+        "send_message_private_email_task": send_message_private_email,
+        "send_message_public_email_task": send_message_public_email,
+        "send_message_reply_email_task": send_message_reply_email,
     }
 
 
@@ -101,9 +134,13 @@ class WorkerSettings:
         send_verification_email_task,
         send_password_reset_email_task,
         send_request_reply_email_task,
+        send_message_private_email_task,
+        send_message_public_email_task,
+        send_message_reply_email_task,
     ]
     cron_jobs = [
         cron(purge_audit_logs_cron, hour=3, minute=0),
+        cron(purge_attachments_cron, hour=4, minute=0),
     ]
     redis_settings = RedisSettings.from_dsn(os.environ.get("REDIS_URL", "redis://localhost:6379"))
     max_jobs = 10

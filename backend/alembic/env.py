@@ -22,6 +22,7 @@ import app.models.audit_log       # noqa: F401
 import app.models.request         # noqa: F401
 import app.models.user_campaign   # noqa: F401
 import app.models.transfer        # noqa: F401
+import app.models.messaging       # noqa: F401
 
 config = context.config
 # Use the direct (non-PgBouncer) URL for migrations when available — PgBouncer
