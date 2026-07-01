@@ -10,9 +10,12 @@
 ## Objetivos
 
 1. Cerrar los 2 hallazgos críticos (bypass de middleware Cloudflare, bypass de TOTP vía OAuth)
-2. Corregir los 6 hallazgos HIGH (open redirect, rate limit faltante, R2, filename, TOTP parcial, middleware /studio)
-3. Mejorar los hallazgos MEDIUM (studio role guard, audit count, audit atomicidad, is_active ordering, warning de ENCRYPTION_KEY)
-4. Aplicar mejoras LOW (headers de seguridad, cap CSV, doc lockout por IP)
+2. Corregir los 7 hallazgos HIGH (open redirect, rate limit faltante, R2, filename, TOTP parcial, middleware /studio, headers de seguridad en frontend)
+3. Mejorar los 7 hallazgos MEDIUM (studio role guard, audit count, audit atomicidad, is_active ordering, warning de ENCRYPTION_KEY, timing oracle en login, extra="forbid")
+4. Aplicar mejoras LOW (headers backend, cap CSV, doc lockout por IP, fuerza de contraseña en registro)
+
+> 20 tareas totales: 2 CRITICAL, 7 HIGH, 7 MEDIUM, 4 LOW. Hallazgos de la primera pasada (C/H/M/L)
+> y de la segunda pasada (N-1 a N-4) consolidados en los grupos A-D.
 
 ---
 
@@ -38,6 +41,17 @@
 | L-3 | 🟢 LOW | Sin bloqueo por IP (solo por cuenta); credential stuffing posible | `backend/app/services/auth_service.py` |
 | L-4 | 🟢 LOW | PostCSS < 8.5.10 (GHSA-qx2v-qp2m-jg93, build-time) | `frontend/package.json` (transitive) |
 
+### Segunda pasada (2026-07-01) — hallazgos adicionales
+
+| ID | Severidad | Área | Archivos afectados |
+|----|-----------|------|--------------------|
+| N-1 | 🟠 HIGH | Frontend sin headers de seguridad (no CSP, X-Frame-Options, HSTS, X-Content-Type-Options, Referrer-Policy) — superficie de defacement/clickjacking | `frontend/next.config.ts` |
+| N-2 | 🟡 MEDIUM | User enumeration por timing oracle en login (bcrypt solo corre para usuarios existentes) | `backend/app/services/auth_service.py:86-100` |
+| N-3 | 🟡 MEDIUM | `StrictModel` usa `strict=True` pero no `extra="forbid"` — sin protección anti mass-assignment a nivel de schema | `backend/app/schemas/_base.py` |
+| N-4 | 🟢 LOW | Registro sin validación de fuerza de contraseña (change/reset exigen 8-128, register no valida) | `backend/app/schemas/auth.py` (`UserCreate`) |
+
+> **Verificado OK en 2ª pasada** (sin hallazgo): `UserCreate` no expone `role`/`center_role`/`center_id` (sin escalación de privilegios en registro); autz de transferencias correcta (coordinator scoped + guard de centro destino); dependencias del backend pinneadas; Turnstile verificado server-side y fail-closed; guards de máquina de estado presentes (`box.status != "DRAFT"` en sellado); sin logging de tokens/contraseñas; token de reset con `secrets.token_urlsafe(32)` + expiración 1h; usuarios OAuth (sin contraseña) no pueden resetear.
+
 ---
 
 ## Tareas
@@ -59,6 +73,7 @@
 | 6 | Fix H-1: R2 ownership validation | En `thread_service.confirm_attachment()`, verificar que `req.r2_key` empiece con `attachments/{user.id}/`. Rechazar 403 si no. | 🟠 | ⬜ Pendiente |
 | 7 | Fix H-2: Filename sanitization | Agregar `@field_validator("filename")` en `UploadUrlRequest` que remueva caracteres peligrosos (regex `[^\w.\-]` → `_`, máx 255 chars). Aplicar misma sanitización al `status` query param usado en headers `Content-Disposition` de PDFs. | 🟠 | ⬜ Pendiente |
 | 8 | Fix H-4: JTI en token TOTP parcial | Agregar `jti = str(uuid.uuid4())` en `_create_partial_token()`. En `totp_challenge()`, tras autenticación exitosa, agregar el `jti` parcial al `TokenDenylist` para invalidarlo. | 🟠 | ⬜ Pendiente |
+| 17 | Fix N-1: Headers de seguridad en frontend | Agregar `headers()` en `frontend/next.config.ts` con `Content-Security-Policy`, `X-Frame-Options: DENY`, `Strict-Transport-Security`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy`. Ajustar CSP para permitir Cloudinary, Turnstile y Sentry. | 🟠 | ⬜ Pendiente |
 
 ### Grupo C — Medium
 
@@ -69,6 +84,8 @@
 | 11 | Fix M-2: Audit count con `SELECT COUNT(*)` | En `audit_repository.py`, reemplazar `.all().__len__()` por `select(func.count()).select_from(base.with_only_columns(AuditLog.id).subquery())`. | 🟡 | ⬜ Pendiente |
 | 12 | Fix M-5: Warning de ENCRYPTION_KEY faltante | En `main.py` startup, loguear un `WARNING` si `settings.encryption_key` no está configurado, advirtiendo que rotar `SECRET_KEY` invalidará todos los secretos TOTP. | 🟡 | ⬜ Pendiente |
 | 13 | Doc M-3: Audit atomicidad | Documentar en `utils/audit.py` cuáles eventos son best-effort (fire_audit con BackgroundTask) y cuáles deben ir en la misma transacción. Migrar los eventos de cambio de estado crítico (sellado de caja, cierre de envío, cambio de rol) a audit síncrono en la misma sesión. | 🟡 | ⬜ Pendiente |
+| 18 | Fix N-2: Timing oracle en login | En `auth_service.login()`, cuando `user is None`, ejecutar un `verify_password` dummy contra un hash bcrypt fijo para igualar la latencia y evitar user enumeration. | 🟡 | ⬜ Pendiente |
+| 19 | Fix N-3: `extra="forbid"` en StrictModel | Agregar `extra="forbid"` a `ConfigDict` en `StrictModel` (schemas/_base.py). Verificar que ningún endpoint rompa por campos extra legítimos; corregir schemas afectados. Protección anti mass-assignment a nivel de boundary. | 🟡 | ⬜ Pendiente |
 
 ### Grupo D — Low
 
@@ -77,6 +94,7 @@
 | 14 | Fix L-1: HSTS y Permissions-Policy | Agregar `Strict-Transport-Security: max-age=63072000; includeSubDomains; preload` y `Permissions-Policy: geolocation=(), microphone=(), camera=()` en `SecurityHeadersMiddleware` de `main.py`. | 🟢 | ⬜ Pendiente |
 | 15 | Fix L-2: Cap de rango en CSV export | En `report.py._resolve_dates()`, limitar a máximo 366 días. Si `(end - start).days > 366`, truncar `start = end - timedelta(days=366)`. | 🟢 | ⬜ Pendiente |
 | 16 | Doc L-3: Bloqueo por IP (roadmap futuro) | Documentar la estrategia de IP-level soft block: rastrear fallos cross-cuenta por IP en Redis, bloqueo suave tras 50 fallos en 1 hora. Implementar en Phase 11 o como feature flag. | 🟢 | ⬜ Pendiente |
+| 20 | Fix N-4: Fuerza de contraseña en registro | Agregar `@field_validator("password")` en `UserCreate` que exija 8-128 caracteres (mismo criterio que change/reset). Considerar extraer la validación a un helper compartido. | 🟢 | ⬜ Pendiente |
 
 ---
 
@@ -91,6 +109,10 @@
 - [ ] `confirm_attachment` con `r2_key` de otro usuario → retorna 403
 - [ ] Filename con `../../../etc/passwd` en upload → sanitizado a `______etc_passwd`
 - [ ] `GET /v1/studio/users` con token de `national_admin` (role=user) → retorna 403
+- [ ] Respuesta HTTP del frontend incluye `Content-Security-Policy`, `X-Frame-Options`, `Strict-Transport-Security`
+- [ ] Login con usuario inexistente vs existente → latencia comparable (sin timing oracle)
+- [ ] Request body con campo extra no declarado → retorna 422 (extra="forbid")
+- [ ] Registro con contraseña de 3 caracteres → retorna 422
 
 ---
 
