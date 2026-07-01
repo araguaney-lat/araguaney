@@ -38,7 +38,7 @@ class BoxOut(StrictORMModel):
 class IntakeOut(StrictORMModel):
     id: UUID
     center_id: UUID
-    campaign_id: UUID | None
+    campaign_id: UUID
     donante_libre: str | None
     notes: str | None
     created_at: datetime

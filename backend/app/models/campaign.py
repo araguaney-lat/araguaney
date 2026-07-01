@@ -15,5 +15,6 @@ class Campaign(Base):
     start_date = Column(Date, nullable=True)
     end_date = Column(Date, nullable=True)
     is_active = Column(Boolean, nullable=False, server_default="true")
+    is_general = Column(Boolean, nullable=False, server_default="false")
     created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
     updated_at = Column(DateTime(timezone=True), nullable=True, onupdate=func.now())

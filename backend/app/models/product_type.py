@@ -1,5 +1,5 @@
 import uuid
-from sqlalchemy import Boolean, Column, Integer, String, DateTime
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, DateTime
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
 from app.database import Base
@@ -25,5 +25,6 @@ class ProductType(Base):
     default_unit = Column(String, nullable=True)
     is_controlled = Column(Boolean, nullable=False, server_default="false")
     min_shelf_life_days = Column(Integer, nullable=True)
+    campaign_id = Column(UUID(as_uuid=True), ForeignKey("campaigns.id", ondelete="SET NULL"), nullable=True, index=True)
     created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
     updated_at = Column(DateTime(timezone=True), nullable=True, onupdate=func.now())

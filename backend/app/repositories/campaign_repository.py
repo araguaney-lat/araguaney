@@ -22,6 +22,12 @@ class CampaignRepository(BaseRepository[Campaign]):
             self._select().where(Campaign.id == campaign_id)
         ).scalar_one_or_none()
 
+    def find_general(self) -> Campaign | None:
+        from sqlalchemy import select as _select
+        return self.db.execute(
+            _select(Campaign).where(Campaign.is_general.is_(True))
+        ).scalar_one_or_none()
+
     def save(self, campaign: Campaign) -> Campaign:
         self.db.add(campaign)
         self.db.flush()

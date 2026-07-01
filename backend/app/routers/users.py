@@ -8,6 +8,8 @@ from app.database import get_db
 from app.dependencies import require_coordinator
 from app.models.user import User
 from app.repositories.audit_repository import AuditRepository
+from app.repositories.campaign_repository import CampaignRepository
+from app.repositories.user_campaign_repository import UserCampaignRepository
 from app.repositories.user_repository import UserRepository
 from app.schemas.user_domain import CENTER_ROLES, UserInvite, UserOut
 from app.services.auth_service import AuthService
@@ -49,6 +51,11 @@ def invite_user(
         center_id=center_id,
         center_role=data.center_role,
     ))
+
+    # Auto-assign to Donaciones Generales
+    general = CampaignRepository(db).find_general()
+    if general:
+        UserCampaignRepository(db).assign(user.id, general.id, assigned_by_id=current_user.id)
 
     AuditRepository(db).log(
         "USER_INVITED",
