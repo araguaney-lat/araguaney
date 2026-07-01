@@ -17,6 +17,7 @@ from app.schemas.studio import (
     RequestMessageOut,
     RequestStatusPatch,
 )
+from app.utils.cloudflare import get_client_ip
 from app.utils.errors import api_error
 from app.utils.rate_limit import limiter
 
@@ -40,6 +41,7 @@ def create_request(
     AuditRepository(db).log(
         "REQUEST_CREATED", "request",
         user_id=current_user.id, entity_id=str(req.id),
+        ip=get_client_ip(request),
     )
     db.commit()
     db.refresh(req)
@@ -142,6 +144,7 @@ def update_status(
         "REQUEST_STATUS_CHANGED", "request",
         user_id=admin.id, entity_id=str(req.id),
         extra={"status": data.status},
+        ip=get_client_ip(request),
     )
     db.commit()
     db.refresh(req)
