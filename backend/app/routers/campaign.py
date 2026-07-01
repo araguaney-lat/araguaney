@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, Request
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.dependencies import get_current_user, require_coordinator, require_national_admin
+from app.dependencies import get_current_user, require_center_role, require_coordinator, require_national_admin
 from app.models.user import User
 from app.repositories.campaign_repository import CampaignRepository
 from app.repositories.user_campaign_repository import UserCampaignRepository
@@ -15,6 +15,18 @@ from app.utils.errors import api_error
 from app.utils.rate_limit import limiter
 
 router = APIRouter(prefix="/v1/campaigns", tags=["campaigns"])
+
+
+@router.get("/mine", response_model=list[CampaignOut])
+@limiter.limit("120/minute")
+def list_my_campaigns(
+    request: Request,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_center_role),
+):
+    """Campaigns the current user belongs to. Donaciones Generales always first."""
+    campaigns = UserCampaignRepository(db).list_campaigns_for_user(current_user.id)
+    return sorted(campaigns, key=lambda c: (not c.is_general, c.name))
 
 
 @router.get("", response_model=list[CampaignOut])

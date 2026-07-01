@@ -2,9 +2,10 @@
 
 import { useState, useCallback, useRef, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import type { Campaign, ProductType } from "@/types"
+import type { Campaign, ProductType, BarcodeResult } from "@/types"
 import { createIntakeAction, type BoxDraft } from "@/lib/actions"
 import { CameraScanner } from "@/components/CameraScanner"
+import { useOnlineStatus } from "@/components/ConnectivityBanner"
 
 const CATEGORY_LABELS: Record<string, string> = {
   MEDICINE: "Medicamento",
@@ -25,6 +26,7 @@ interface BoxRow {
   batch: string
   expiry_date: string
   weight_kg: string
+  offlineBlocked: boolean
 }
 
 function newRow(): BoxRow {
@@ -36,12 +38,13 @@ function newRow(): BoxRow {
     batch: "",
     expiry_date: "",
     weight_kg: "",
+    offlineBlocked: false,
   }
 }
 
 // ── Product search / barcode ──────────────────────────────────────────────────
 
-function useProductSearch() {
+function useProductSearch(campaignId: string) {
   const [query, setQuery] = useState("")
   const [results, setResults] = useState<ProductType[]>([])
   const [loading, setLoading] = useState(false)
@@ -54,21 +57,40 @@ function useProductSearch() {
     debounce.current = setTimeout(async () => {
       setLoading(true)
       try {
-        const res = await fetch(`/api/product-types/search?q=${encodeURIComponent(q)}`)
+        const params = new URLSearchParams({ q })
+        if (campaignId) params.set("campaign_id", campaignId)
+        const res = await fetch(`/api/catalog/search?${params}`)
         if (res.ok) setResults(await res.json())
       } finally {
         setLoading(false)
       }
     }, 300)
-  }, [])
+  }, [campaignId])
 
-  const lookupBarcode = useCallback(async (gtin: string) => {
+  // Returns { product, offlineBlocked, notFound }
+  const lookupBarcode = useCallback(async (gtin: string): Promise<{
+    product: ProductType | null
+    offlineBlocked: boolean
+    notFound: boolean
+  }> => {
     setLoading(true)
     try {
-      const res = await fetch(`/api/product-types/barcode/${encodeURIComponent(gtin)}`)
-      if (!res.ok) return null
-      const data = await res.json()
-      return data.product_type as ProductType | null ?? null
+      const res = await fetch(`/api/catalog/barcode/${encodeURIComponent(gtin)}`)
+      if (res.status === 503) {
+        return { product: null, offlineBlocked: true, notFound: false }
+      }
+      if (res.status === 422) {
+        return { product: null, offlineBlocked: false, notFound: true }
+      }
+      if (!res.ok) {
+        return { product: null, offlineBlocked: false, notFound: true }
+      }
+      const data: BarcodeResult = await res.json()
+      if (data.source === "local" && data.product_type) {
+        return { product: data.product_type, offlineBlocked: false, notFound: false }
+      }
+      // open_food_facts hit — product not yet in local catalog
+      return { product: null, offlineBlocked: false, notFound: true }
     } finally {
       setLoading(false)
     }
@@ -81,14 +103,16 @@ function useProductSearch() {
 
 function BoxRowInput({
   row,
+  campaignId,
   onChange,
   onRemove,
 }: {
   row: BoxRow
+  campaignId: string
   onChange: (updated: BoxRow) => void
   onRemove: () => void
 }) {
-  const { query, results, loading, search, lookupBarcode } = useProductSearch()
+  const { query, results, loading, search, lookupBarcode } = useProductSearch(campaignId)
   const [showDropdown, setShowDropdown] = useState(false)
   const [barcodeInput, setBarcodeInput] = useState("")
   const [barcodeError, setBarcodeError] = useState<string | null>(null)
@@ -98,38 +122,41 @@ function BoxRowInput({
     onChange({ ...row, [field]: e.target.value })
 
   const selectProduct = (pt: ProductType) => {
-    onChange({ ...row, product_type: pt, unit: pt.default_unit ?? row.unit })
+    onChange({ ...row, product_type: pt, unit: pt.default_unit ?? row.unit, offlineBlocked: false })
     setShowDropdown(false)
     setBarcodeInput("")
+    setBarcodeError(null)
   }
+
+  const handleBarcode = useCallback(async (gtin: string) => {
+    setBarcodeError(null)
+    const { product, offlineBlocked, notFound } = await lookupBarcode(gtin)
+    if (product) {
+      selectProduct(product)
+    } else if (offlineBlocked) {
+      onChange({ ...row, offlineBlocked: true })
+      setBarcodeError("Sin conexión — no se puede registrar el producto. Restablece la conexión e intenta de nuevo.")
+    } else if (notFound) {
+      onChange({ ...row, offlineBlocked: false })
+      setBarcodeError("Producto no encontrado en el catálogo local. Búscalo por nombre o créalo primero.")
+    }
+  }, [lookupBarcode, row, onChange])
 
   const handleCameraScan = useCallback(async (text: string) => {
     setScanning(false)
-    setBarcodeError(null)
     setBarcodeInput(text)
-    const pt = await lookupBarcode(text)
-    if (pt) {
-      selectProduct(pt)
-    } else {
-      setBarcodeError("No se encontró el producto. Búscalo por nombre.")
-    }
-  }, [lookupBarcode, selectProduct])
+    await handleBarcode(text)
+  }, [handleBarcode])
 
   const handleBarcodeKeyDown = async (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key !== "Enter") return
     e.preventDefault()
-    setBarcodeError(null)
     const gtin = barcodeInput.trim()
     if (!gtin) return
-    const pt = await lookupBarcode(gtin)
-    if (pt) {
-      selectProduct(pt)
-    } else {
-      setBarcodeError("No se encontró el producto. Búscalo por nombre.")
-    }
+    await handleBarcode(gtin)
   }
 
-  const isRejected = row.product_type?.is_controlled
+  const isControlled = row.product_type?.is_controlled
 
   return (
     <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-4 space-y-3">
@@ -157,7 +184,11 @@ function BoxRowInput({
             📷
           </button>
         </div>
-        {barcodeError && <p className="mt-1 text-xs text-red-600">{barcodeError}</p>}
+        {barcodeError && (
+          <p className={`mt-1 text-xs ${row.offlineBlocked ? "text-amber-700" : "text-red-600"}`}>
+            {barcodeError}
+          </p>
+        )}
         {scanning && (
           <CameraScanner
             onResult={handleCameraScan}
@@ -185,7 +216,7 @@ function BoxRowInput({
             </div>
             <button
               type="button"
-              onClick={() => onChange({ ...row, product_type: null })}
+              onClick={() => onChange({ ...row, product_type: null, offlineBlocked: false })}
               className="text-xs text-zinc-400 hover:text-zinc-700"
             >
               Cambiar
@@ -230,7 +261,7 @@ function BoxRowInput({
         )}
       </div>
 
-      {isRejected && (
+      {isControlled && (
         <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
           Este producto está clasificado como controlado y no puede recibirse en el centro.
         </div>
@@ -311,6 +342,7 @@ function BoxRowInput({
 
 export default function NewIntakePage() {
   const router = useRouter()
+  const online = useOnlineStatus()
   const [rows, setRows] = useState<BoxRow[]>([newRow()])
   const [campaignId, setCampaignId] = useState("")
   const [campaigns, setCampaigns] = useState<Campaign[]>([])
@@ -320,9 +352,15 @@ export default function NewIntakePage() {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    fetch("/api/campaigns?active_only=true")
+    fetch("/api/campaigns/mine")
       .then((r) => r.ok ? r.json() : [])
-      .then(setCampaigns)
+      .then((data: Campaign[]) => {
+        setCampaigns(data)
+        // Auto-select Donaciones Generales (first item, sorted by backend)
+        if (data.length > 0 && !campaignId) {
+          setCampaignId(data[0].id)
+        }
+      })
       .catch(() => setCampaigns([]))
   }, [])
 
@@ -338,7 +376,13 @@ export default function NewIntakePage() {
     e.preventDefault()
     setError(null)
 
+    if (!campaignId) { setError("Selecciona una campaña."); return }
+
     for (const row of rows) {
+      if (row.offlineBlocked) {
+        setError("Hay cajas bloqueadas por falta de conexión. Restablece la conexión o elimínalas.")
+        return
+      }
       if (!row.product_type) { setError("Selecciona un producto para cada caja."); return }
       if (row.product_type.is_controlled) { setError("Elimina productos controlados antes de guardar."); return }
       if (!row.unit.trim()) { setError("Indica la unidad para cada caja."); return }
@@ -355,7 +399,7 @@ export default function NewIntakePage() {
 
     setSubmitting(true)
     const result = await createIntakeAction({
-      campaign_id: campaignId || undefined,
+      campaign_id: campaignId,
       donante_libre: donante.trim() || undefined,
       notes: notes.trim() || undefined,
       boxes,
@@ -378,30 +422,41 @@ export default function NewIntakePage() {
         </p>
       </div>
 
+      {/* Connectivity indicator */}
+      <div className="mb-4">
+        <div className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-xs ${
+          online
+            ? "border-green-200 bg-green-50 text-green-700"
+            : "border-amber-200 bg-amber-50 text-amber-700"
+        }`}>
+          <span className={`h-2 w-2 rounded-full ${online ? "bg-green-500" : "bg-amber-500"}`} />
+          {online
+            ? "Con conexión — búsqueda de barcodes activa"
+            : "Sin conexión — solo productos del catálogo local"}
+        </div>
+      </div>
+
       <form onSubmit={handleSubmit} className="space-y-5">
         {/* Campaign selector */}
         <div>
           <label className="block text-xs font-medium text-zinc-600 mb-1">
-            Campaña / Operación
+            Campaña / Operación *
           </label>
           <select
             value={campaignId}
             onChange={(e) => setCampaignId(e.target.value)}
+            required
             className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-900"
           >
-            <option value="">— Sin campaña —</option>
+            {campaigns.length === 0 && (
+              <option value="">Cargando campañas…</option>
+            )}
             {campaigns.map((c) => (
               <option key={c.id} value={c.id}>
-                {c.name}{c.destination_country ? ` (${c.destination_country})` : ""}
+                {c.is_general ? "★ " : ""}{c.name}{c.destination_country ? ` (${c.destination_country})` : ""}
               </option>
             ))}
           </select>
-          {campaigns.length === 0 && (
-            <p className="mt-1 text-xs text-zinc-400">
-              No hay campañas activas. El admin nacional puede crear una en{" "}
-              <a href="/dashboard/campaigns" className="underline">Campañas</a>.
-            </p>
-          )}
         </div>
 
         {/* Header fields */}
@@ -439,6 +494,7 @@ export default function NewIntakePage() {
             <BoxRowInput
               key={row.key}
               row={row}
+              campaignId={campaignId}
               onChange={updateRow(row.key)}
               onRemove={() => removeRow(row.key)}
             />
@@ -461,7 +517,7 @@ export default function NewIntakePage() {
         <div className="flex gap-3 pt-2">
           <button
             type="submit"
-            disabled={submitting}
+            disabled={submitting || rows.some((r) => r.offlineBlocked)}
             className="flex-1 rounded-lg bg-zinc-900 py-3 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-60"
           >
             {submitting ? "Guardando…" : "Guardar recepción"}
