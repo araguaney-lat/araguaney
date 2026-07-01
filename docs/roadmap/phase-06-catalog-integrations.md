@@ -121,7 +121,7 @@ Todos vía `fire_audit(background_tasks, ...)` en los routers:
 | 15 | Autocomplete en intake (catálogo local) | Campo tipo-ahead que consulta `/v1/catalog/search?campaign_id=X`; offline-OK; seleccionar prellenea INN, forma, concentración, categoría | 🟠 | ✅ Listo |
 | 16 | Indicador de conectividad + bloqueo | Banner en formulario de nuevo ProductType: "● Con conexión — lookups activos" / "● Sin conexión — solo puedes usar productos del catálogo existente"; botón de crear deshabilitado sin conexión | 🟡 | ✅ Listo |
 | 17 | Barcode → prellenado + bloqueo offline | Al escanear/ingresar GTIN: llama `/v1/catalog/barcode/{gtin}`; prellenado si hay match; `503` → "Sin conexión — no se puede registrar el producto"; no permite continuar | 🟡 | ✅ Listo |
-| 18 | INN autocomplete con RxNorm | Campo `inn_name` con sugerencias de `/v1/catalog/rxnorm?q=`; `503` → aviso visible; guard de dedup sigue activo | 🟡 | ⬜ Pendiente |
+| 18 | INN autocomplete con RxNorm | Campo `inn_name` con sugerencias de `/v1/catalog/rxnorm?q=`; `503` → aviso visible; guard de dedup sigue activo | 🟡 | ✅ Listo |
 | 19 | Vista "Catálogo de la campaña" en Studio | `/studio/catalog` — lista ProductTypes de cada campaña con estado (campaña / global); botón "Promover al catálogo global" para national_admin | 🟡 | ⬜ Pendiente |
 | 20 | Gestión de miembros de campaña en Studio | `/studio/campaigns/{id}/members` — lista de usuarios asignados; botón para agregar (selector de usuarios del centro para coordinador, cualquier usuario para admin); botón para remover | 🟡 | ⬜ Pendiente |
 | 21 | Auto-asignación a "Donaciones Generales" | Al crear un usuario desde `/studio/users`, el sistema lo asigna automáticamente a la campaña "Donaciones Generales"; visible en la vista de miembros | 🟢 | ⬜ Pendiente |
