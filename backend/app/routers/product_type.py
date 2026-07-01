@@ -86,3 +86,15 @@ def update_product_type(
     _: User = Depends(require_national_admin),
 ):
     return ProductTypeService(db).update(pt_id, data)
+
+
+@router.post("/{pt_id}/promote", response_model=ProductTypeOut)
+@limiter.limit("30/minute")
+def promote_product_type(
+    request: Request,
+    pt_id: UUID,
+    db: Session = Depends(get_db),
+    _: User = Depends(require_national_admin),
+):
+    """Promote a campaign-scoped ProductType to the global catalog (campaign_id → NULL)."""
+    return ProductTypeService(db).promote(pt_id)
