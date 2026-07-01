@@ -1,5 +1,6 @@
 "use client"
 
+import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useEffect, useState } from "react"
@@ -85,6 +86,7 @@ const ADMIN_ITEMS: AdminNavItem[] = [
   { href: "/dashboard/admin/audit", labelKey: "audit", roles: ["national_admin"], icon: ScrollText },
 ]
 
+const LOGO = "https://res.cloudinary.com/dtvdqlxtd/image/upload/v1782794310/image_degkq9.png"
 const STORAGE_KEY = "sidebar_collapsed"
 
 interface SidebarProps {
@@ -127,23 +129,37 @@ export function Sidebar({ centerRole, platformRole, centerName, nav, roleLabels,
       className={`flex h-full flex-col border-r border-amber-200 bg-amber-50 transition-all duration-200 ${width} flex-shrink-0`}
     >
       {/* Header */}
-      <div className={`flex items-center border-b border-amber-100 px-3 py-3 ${collapsed ? "justify-center" : "justify-between"}`}>
-        {!collapsed && (
-          <div className="min-w-0">
-            <span className="text-sm font-semibold text-amber-900 truncate block">Araguaney</span>
-            {centerName && (
-              <p className="text-xs text-amber-700/70 truncate">{centerName}</p>
-            )}
+      {collapsed ? (
+        <div className="flex flex-col items-center gap-1 border-b border-amber-100 px-2 py-3">
+          <Image src={LOGO} alt="Araguaney" width={28} height={28} className="rounded-full object-contain" />
+          <button
+            onClick={toggle}
+            className="rounded-lg p-1 text-amber-600 hover:bg-amber-100 hover:text-amber-800 transition-colors"
+            title="Expandir menú"
+          >
+            <PanelLeftOpen size={16} />
+          </button>
+        </div>
+      ) : (
+        <div className="flex items-center justify-between border-b border-amber-100 px-3 py-3">
+          <div className="flex items-center gap-2 min-w-0">
+            <Image src={LOGO} alt="Araguaney" width={28} height={28} className="rounded-full object-contain flex-shrink-0" />
+            <div className="min-w-0">
+              <span className="text-sm font-semibold text-amber-900 truncate block">Araguaney</span>
+              {centerName && (
+                <p className="text-xs text-amber-700/70 truncate">{centerName}</p>
+              )}
+            </div>
           </div>
-        )}
-        <button
-          onClick={toggle}
-          className="flex-shrink-0 rounded-lg p-1.5 text-amber-600 hover:bg-amber-100 hover:text-amber-800 transition-colors"
-          title={collapsed ? "Expandir menú" : "Colapsar menú"}
-        >
-          {collapsed ? <PanelLeftOpen size={18} /> : <PanelLeftClose size={18} />}
-        </button>
-      </div>
+          <button
+            onClick={toggle}
+            className="flex-shrink-0 rounded-lg p-1.5 text-amber-600 hover:bg-amber-100 hover:text-amber-800 transition-colors"
+            title="Colapsar menú"
+          >
+            <PanelLeftClose size={18} />
+          </button>
+        </div>
+      )}
 
       {/* Main nav */}
       <nav className="flex-1 overflow-y-auto px-2 py-2 space-y-0.5">
