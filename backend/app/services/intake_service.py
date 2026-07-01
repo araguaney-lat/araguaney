@@ -5,6 +5,7 @@ from uuid import UUID
 from app.models.box import Box
 from app.models.events import BoxEvent
 from app.models.intake import Intake
+from app.repositories.campaign_repository import CampaignRepository
 from app.repositories.intake_repository import IntakeRepository
 from app.repositories.product_type_repository import ProductTypeRepository
 from app.schemas.intake import BoxDraft, IntakeCreate, IntakeOut, BoxOut
@@ -22,6 +23,14 @@ class IntakeService(BaseService):
     def create(self, data: IntakeCreate, center_id: UUID, user_id: UUID) -> IntakeOut:
         if not data.boxes:
             raise api_error("NO_BOXES", "At least one box is required")
+
+        # Resolve campaign — default to Donaciones Generales if not provided
+        campaign_id = data.campaign_id
+        if campaign_id is None:
+            general = CampaignRepository(self.db).find_general()
+            if general is None:
+                raise api_error("NO_GENERAL_CAMPAIGN", "Default campaign not configured", status_code=500)
+            campaign_id = general.id
 
         pt_repo = ProductTypeRepository(self.db)
         intake_repo = IntakeRepository(self.db)
@@ -42,7 +51,7 @@ class IntakeService(BaseService):
 
         intake = intake_repo.save_intake(Intake(
             center_id=center_id,
-            campaign_id=data.campaign_id,
+            campaign_id=campaign_id,
             received_by_user_id=user_id,
             donante_libre=data.donante_libre,
             notes=data.notes,
@@ -88,7 +97,7 @@ class IntakeService(BaseService):
         return IntakeOut(
             id=intake.id,
             center_id=intake.center_id,
-            campaign_id=intake.campaign_id,
+            campaign_id=campaign_id,
             donante_libre=intake.donante_libre,
             notes=intake.notes,
             created_at=intake.created_at,
