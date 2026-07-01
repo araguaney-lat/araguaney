@@ -13,6 +13,7 @@ import {
   Package,
   Layers,
   Truck,
+  ArrowLeftRight,
   ScanLine,
   Flag,
   Building2,
@@ -43,6 +44,7 @@ type DashboardNav = {
   boxes: string
   pallets: string
   shipments: string
+  transfers: string
   scan: string
   campaigns: string
   centers: string
@@ -67,6 +69,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: "/dashboard/boxes", labelKey: "boxes", roles: ["coordinator", "volunteer"], icon: Package },
   { href: "/dashboard/pallets", labelKey: "pallets", roles: ["coordinator"], icon: Layers },
   { href: "/dashboard/shipments", labelKey: "shipments", roles: ["coordinator"], icon: Truck },
+  { href: "/dashboard/transfers", labelKey: "transfers", roles: ["national_admin", "coordinator"], icon: ArrowLeftRight },
   { href: "/dashboard/scan", labelKey: "scan", roles: ["national_admin", "coordinator", "volunteer"], icon: ScanLine },
   { href: "/dashboard/campaigns", labelKey: "campaigns", roles: ["national_admin", "coordinator", "volunteer"], icon: Flag },
   { href: "/dashboard/centers", labelKey: "centers", roles: ["national_admin"], icon: Building2 },
