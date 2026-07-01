@@ -24,6 +24,7 @@ type DashboardNav = {
   requests: string
   users: string
   audit: string
+  team: string
   settings: string
   logout: string
 }
@@ -45,6 +46,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: "/dashboard/campaigns", labelKey: "campaigns", roles: ["national_admin", "coordinator", "volunteer"] },
   { href: "/dashboard/centers", labelKey: "centers", roles: ["national_admin"] },
   { href: "/dashboard/requests", labelKey: "requests", roles: ["national_admin", "coordinator", "volunteer"] },
+  { href: "/dashboard/team", labelKey: "team", roles: ["coordinator"] },
 ]
 
 const ADMIN_ITEMS: NavItem[] = [

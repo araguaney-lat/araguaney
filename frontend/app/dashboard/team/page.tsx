@@ -1,0 +1,205 @@
+"use client"
+
+import { useEffect, useState } from "react"
+import { useSession } from "next-auth/react"
+import { apiFetch } from "@/lib/api"
+import type { UserOut } from "@/types"
+
+const ROLES = ["volunteer", "coordinator"]
+const EMPTY_FORM = { email: "", username: "", full_name: "", center_role: "volunteer" }
+
+export default function TeamPage() {
+  const { data: session } = useSession()
+  const centerId = session?.centerId
+  const token = session?.accessToken ?? ""
+
+  const [users, setUsers] = useState<UserOut[]>([])
+  const [loading, setLoading] = useState(true)
+  const [showForm, setShowForm] = useState(false)
+  const [form, setForm] = useState(EMPTY_FORM)
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [reinviting, setReinviting] = useState<string | null>(null)
+  const [success, setSuccess] = useState<string | null>(null)
+
+  async function load() {
+    if (!centerId || !token) return
+    setLoading(true)
+    try {
+      const data = await apiFetch<UserOut[]>(`/v1/centers/${centerId}/users`, { token })
+      setUsers(data)
+    } catch {
+      setError("Error al cargar usuarios")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => { load() }, [centerId, token]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const field = (k: keyof typeof EMPTY_FORM) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
+    setForm((f) => ({ ...f, [k]: e.target.value }))
+
+  async function handleCreate(e: React.FormEvent) {
+    e.preventDefault()
+    if (!centerId) return
+    setSaving(true)
+    setError(null)
+    setSuccess(null)
+    try {
+      const user = await apiFetch<UserOut>(`/v1/centers/${centerId}/users`, {
+        method: "POST",
+        body: JSON.stringify({
+          email: form.email.trim(),
+          username: form.username.trim(),
+          full_name: form.full_name.trim() || undefined,
+          center_role: form.center_role,
+        }),
+        token,
+      })
+      setUsers((u) => [user, ...u])
+      setForm(EMPTY_FORM)
+      setShowForm(false)
+      setSuccess("Usuario invitado. Recibirá sus credenciales por email.")
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Error al crear usuario")
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  async function handleReinvite(userId: string) {
+    if (!centerId) return
+    setReinviting(userId)
+    setError(null)
+    setSuccess(null)
+    try {
+      await apiFetch(`/v1/centers/${centerId}/users/${userId}/reinvite`, {
+        method: "POST",
+        token,
+      })
+      setSuccess("Invitación reenviada.")
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Error al reinvitar")
+    } finally {
+      setReinviting(null)
+    }
+  }
+
+  const roleBadge = (role: string) => {
+    const colors: Record<string, string> = {
+      coordinator: "bg-amber-100 text-amber-700",
+      volunteer: "bg-zinc-100 text-zinc-600",
+    }
+    return colors[role] ?? "bg-zinc-100 text-zinc-600"
+  }
+
+  return (
+    <div className="max-w-3xl">
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-2xl font-semibold text-zinc-900">Equipo</h1>
+          <p className="text-sm text-zinc-500 mt-0.5">{users.length} miembros en tu centro</p>
+        </div>
+        <button
+          onClick={() => { setShowForm((v) => !v); setError(null); setSuccess(null) }}
+          className="rounded-lg bg-zinc-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-zinc-700"
+        >
+          {showForm ? "Cancelar" : "+ Invitar voluntario"}
+        </button>
+      </div>
+
+      {error && (
+        <p className="mb-4 rounded-lg bg-red-50 border border-red-200 px-3 py-2 text-xs text-red-700">{error}</p>
+      )}
+      {success && (
+        <p className="mb-4 rounded-lg bg-green-50 border border-green-200 px-3 py-2 text-xs text-green-700">{success}</p>
+      )}
+
+      {showForm && (
+        <form onSubmit={handleCreate} className="mb-6 rounded-xl border border-zinc-200 bg-white p-5 space-y-3">
+          <p className="text-sm font-medium text-zinc-700">Nuevo miembro</p>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div>
+              <label className="text-xs text-zinc-500">Email *</label>
+              <input required type="email" value={form.email} onChange={field("email")} placeholder="usuario@centro.org"
+                className="mt-1 w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-400" />
+            </div>
+            <div>
+              <label className="text-xs text-zinc-500">Username *</label>
+              <input required value={form.username} onChange={field("username")} placeholder="usuario123"
+                className="mt-1 w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-400" />
+            </div>
+            <div>
+              <label className="text-xs text-zinc-500">Nombre completo</label>
+              <input value={form.full_name} onChange={field("full_name")} placeholder="Nombre Apellido"
+                className="mt-1 w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-400" />
+            </div>
+            <div>
+              <label className="text-xs text-zinc-500">Rol</label>
+              <select value={form.center_role} onChange={field("center_role")}
+                className="mt-1 w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-400">
+                {ROLES.map((r) => <option key={r} value={r}>{r}</option>)}
+              </select>
+            </div>
+          </div>
+          <div className="flex justify-end pt-1">
+            <button type="submit" disabled={saving}
+              className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-50">
+              {saving ? "Invitando..." : "Invitar"}
+            </button>
+          </div>
+        </form>
+      )}
+
+      {loading ? (
+        <div className="text-sm text-zinc-400 py-8 text-center">Cargando...</div>
+      ) : (
+        <div className="rounded-xl border border-zinc-200 bg-white overflow-hidden">
+          <table className="w-full text-sm">
+            <thead className="bg-zinc-50 border-b border-zinc-200">
+              <tr>
+                <th className="text-left px-4 py-2.5 text-xs font-medium text-zinc-500">Miembro</th>
+                <th className="text-left px-4 py-2.5 text-xs font-medium text-zinc-500">Rol</th>
+                <th className="text-left px-4 py-2.5 text-xs font-medium text-zinc-500 hidden sm:table-cell">Estado</th>
+                <th className="px-4 py-2.5" />
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-zinc-100">
+              {users.map((u) => (
+                <tr key={u.id} className="hover:bg-zinc-50/50">
+                  <td className="px-4 py-3">
+                    <p className="font-medium text-zinc-900">{u.full_name ?? u.username}</p>
+                    <p className="text-xs text-zinc-500">{u.email}</p>
+                  </td>
+                  <td className="px-4 py-3">
+                    <span className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${roleBadge(u.center_role ?? "")}`}>
+                      {u.center_role ?? "—"}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 hidden sm:table-cell">
+                    <span className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${u.is_active ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
+                      {u.is_active ? "Activo" : "Inactivo"}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 text-right">
+                    <button
+                      onClick={() => handleReinvite(u.id)}
+                      disabled={reinviting === u.id || !u.is_active}
+                      className="rounded px-2 py-1 text-xs text-amber-600 hover:bg-amber-50 disabled:opacity-40"
+                    >
+                      {reinviting === u.id ? "..." : "Reinvitar"}
+                    </button>
+                  </td>
+                </tr>
+              ))}
+              {users.length === 0 && (
+                <tr><td colSpan={4} className="px-4 py-8 text-center text-zinc-400 text-sm">No hay miembros en este centro.</td></tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  )
+}

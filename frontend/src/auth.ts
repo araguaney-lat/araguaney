@@ -28,6 +28,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             centerRole: me.center_role ?? null,
             centerId: me.center_id ?? null,
             userId: me.id,
+            mustChangePassword: false,
           }
         }
 
@@ -58,6 +59,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           centerRole: data.center_role ?? null,
           centerId: data.center_id ?? null,
           userId: _extractSub(data.access_token),
+          mustChangePassword: data.must_change_password ?? false,
         }
       },
     }),
@@ -70,6 +72,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token.centerRole = user.centerRole
         token.centerId = user.centerId
         token.userId = user.userId
+        token.mustChangePassword = user.mustChangePassword
       }
       return token
     },
@@ -79,6 +82,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       session.centerRole = token.centerRole
       session.centerId = token.centerId
       session.userId = token.userId
+      session.mustChangePassword = token.mustChangePassword
       return session
     },
   },

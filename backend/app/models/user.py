@@ -39,6 +39,9 @@ class User(Base):
     center_id = Column(UUID(as_uuid=True), ForeignKey("centers.id", ondelete="SET NULL"), nullable=True, index=True)
     center_role = Column(String, nullable=True)  # national_admin | coordinator | volunteer
 
+    # Invitation / forced password change
+    must_change_password = Column(Boolean, nullable=False, server_default="false")
+
     # 2FA / TOTP
     totp_secret = Column(String, nullable=True)        # Fernet-encrypted base32 secret
     totp_enabled = Column(Boolean, nullable=False, server_default="false")

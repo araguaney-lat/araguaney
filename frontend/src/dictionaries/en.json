@@ -114,7 +114,8 @@
       "logout": "Sign out",
       "requests": "Requests",
       "users": "Users",
-      "audit": "Audit"
+      "audit": "Audit",
+      "team": "Team"
     },
     "role": {
       "national_admin": "National Admin",

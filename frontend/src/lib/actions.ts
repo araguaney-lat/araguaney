@@ -104,6 +104,40 @@ export async function revalidateDashboardAction(): Promise<void> {
   revalidatePath("/dashboard", "layout")
 }
 
+export async function changePasswordAction(_: unknown, formData: FormData) {
+  const session = await auth()
+  if (!session?.accessToken) return { error: "No autenticado" }
+
+  const current_password = formData.get("current_password") as string
+  const new_password = formData.get("new_password") as string
+  const confirm_password = formData.get("confirm_password") as string
+
+  if (new_password !== confirm_password) return { error: "Las contraseñas no coinciden" }
+  if (new_password.length < 8) return { error: "La nueva contraseña debe tener al menos 8 caracteres" }
+
+  const res = await fetch(`${API_URL}/v1/auth/me/password`, {
+    method: "PATCH",
+    body: JSON.stringify({ current_password, new_password }),
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${session.accessToken}`,
+    },
+  })
+
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}))
+    return { error: extractError(data, "Error al cambiar contraseña") }
+  }
+
+  const data = await res.json()
+  try {
+    await signIn("credentials", { accessToken: data.access_token, redirectTo: "/dashboard" })
+  } catch (error) {
+    if (error instanceof AuthError) return { error: "Error al actualizar sesión" }
+    throw error
+  }
+}
+
 // ── Intake ────────────────────────────────────────────────────────────────────
 
 export interface BoxDraft {

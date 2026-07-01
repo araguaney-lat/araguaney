@@ -59,6 +59,15 @@ export async function patchStudioUserAction(userId: string, data: StudioUserPatc
   })
 }
 
+export async function reinviteStudioUserAction(userId: string): Promise<void> {
+  const session = await auth()
+  if (!session?.accessToken) throw new Error("No autenticado")
+  await apiFetch(`/v1/studio/users/${userId}/reinvite`, {
+    method: "POST",
+    token: session.accessToken,
+  })
+}
+
 export interface AuditEntry {
   id: string
   user_id: string | null
