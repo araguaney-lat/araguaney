@@ -2,18 +2,28 @@
 
 import json
 import logging
+from decimal import Decimal
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import JSONResponse
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.dependencies import require_center_role, tenant_scope
+from app.models.campaign import Campaign
+from app.models.center import Center
+from app.models.events import BoxEvent, PalletEvent
+from app.models.intake import Intake
 from app.models.user import User
 from app.repositories.aggregate_repository import AggregateRepository
+from app.repositories.box_repository import BoxRepository
+from app.repositories.pallet_repository import PalletRepository
 from app.schemas.aggregate import NationalDashboardOut, PublicNeedsOut, WeightDashboardOut
+from app.schemas.qr_ficha import QrBoxFicha, QrEventOut, QrPalletBoxRow, QrPalletFicha
 from app.utils import cache
+from app.utils.errors import api_error
 from app.utils.rate_limit import limiter
 
 logger = logging.getLogger(__name__)
@@ -81,6 +91,133 @@ def weight_dashboard(
     )
     center_kg = repo.weight_by_center(effective_center) if effective_center else None
     return WeightDashboardOut(campaigns=campaigns, center_kg=center_kg)
+
+
+# ── Public QR ficha ───────────────────────────────────────────────────────────
+
+_QR_TTL = 60  # 1 minute; edge can extend with stale-while-revalidate
+
+
+@router.get("/public/qr/{code}")
+@limiter.limit("120/minute")
+def qr_ficha(
+    request: Request,
+    code: str,
+    db: Session = Depends(get_db),
+):
+    """Public QR lookup — no auth required.
+
+    Tries boxes first (prefix BOX-), then pallets (prefix PAL-).
+    Response is safe to cache at Cloudflare edge: no PII, no center-specific secrets.
+    """
+    cache_key = f"qr:{code}"
+    cached = cache.get(cache_key)
+    if cached:
+        return JSONResponse(
+            content=json.loads(cached),
+            headers={"Cache-Control": f"public, max-age={_QR_TTL}, stale-while-revalidate=300"},
+        )
+
+    # ── Try box ──
+    box = BoxRepository(db).find_by_code(code)
+    if box:
+        center = db.get(Center, box.center_id)
+        intake = db.get(Intake, box.intake_id) if box.intake_id else None
+        campaign = db.get(Campaign, intake.campaign_id) if intake else None
+        from app.models.product_type import ProductType
+        pt = db.get(ProductType, box.product_type_id)
+
+        events = list(
+            db.execute(
+                select(BoxEvent)
+                .where(BoxEvent.box_id == box.id)
+                .order_by(BoxEvent.ts.asc())
+            ).scalars()
+        )
+
+        ficha = QrBoxFicha(
+            code=box.code,
+            status=box.status,
+            display_name=pt.display_name if pt else "Desconocido",
+            category=pt.category if pt else "OTHER",
+            inn_name=pt.inn_name if pt else None,
+            strength=pt.strength if pt else None,
+            form=pt.form if pt else None,
+            batch=box.batch,
+            expiry_date=box.expiry_date,
+            quantity=box.quantity,
+            unit=box.unit,
+            weight_kg=box.weight_kg,
+            center_name=center.name if center else "Desconocido",
+            campaign_name=campaign.name if campaign else None,
+            sealed_at=box.sealed_at,
+            created_at=box.created_at,
+            events=[QrEventOut(from_status=e.from_status, to_status=e.to_status, note=e.note, ts=e.ts) for e in events],
+        )
+        serialized = ficha.model_dump_json()
+        cache.set(cache_key, serialized, ttl=_QR_TTL)
+        return JSONResponse(
+            content=json.loads(serialized),
+            headers={"Cache-Control": f"public, max-age={_QR_TTL}, stale-while-revalidate=300"},
+        )
+
+    # ── Try pallet ──
+    pallet = PalletRepository(db).find_by_code(code)
+    if pallet:
+        center = db.get(Center, pallet.center_id)
+
+        from app.models.box import Box
+        from app.models.product_type import ProductType
+        box_rows = list(
+            db.execute(
+                select(Box, ProductType)
+                .join(ProductType, Box.product_type_id == ProductType.id)
+                .where(Box.pallet_id == pallet.id)
+                .order_by(Box.created_at.asc())
+            ).all()
+        )
+
+        events = list(
+            db.execute(
+                select(PalletEvent)
+                .where(PalletEvent.pallet_id == pallet.id)
+                .order_by(PalletEvent.ts.asc())
+            ).scalars()
+        )
+
+        total_weight: Decimal | None = None
+        for b, _ in box_rows:
+            if b.weight_kg is not None:
+                total_weight = (total_weight or Decimal(0)) + b.weight_kg
+
+        ficha = QrPalletFicha(
+            code=pallet.code,
+            status=pallet.status,
+            center_name=center.name if center else "Desconocido",
+            box_count=len(box_rows),
+            total_weight_kg=total_weight,
+            closed_at=pallet.closed_at,
+            created_at=pallet.created_at,
+            boxes=[
+                QrPalletBoxRow(
+                    display_name=pt.display_name,
+                    category=pt.category,
+                    quantity=b.quantity,
+                    unit=b.unit,
+                    weight_kg=b.weight_kg,
+                )
+                for b, pt in box_rows
+            ],
+            events=[QrEventOut(from_status=e.from_status, to_status=e.to_status, note=e.note, ts=e.ts) for e in events],
+        )
+        serialized = ficha.model_dump_json()
+        cache.set(cache_key, serialized, ttl=_QR_TTL)
+        return JSONResponse(
+            content=json.loads(serialized),
+            headers={"Cache-Control": f"public, max-age={_QR_TTL}, stale-while-revalidate=300"},
+        )
+
+    raise api_error("NOT_FOUND", "QR code not found", status_code=404)
 
 
 # ── Public needs endpoint (no auth) ───────────────────────────────────────────

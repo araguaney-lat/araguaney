@@ -169,9 +169,9 @@ Todos vía `fire_audit(background_tasks, ...)` en los routers:
 
 | # | Tarea | Descripción | Complejidad | Estado |
 |---|-------|-------------|-------------|--------|
-| 27 | Endpoint de ficha enriquecida | `GET /v1/public/qr/{code}` — retorna datos completos de caja o tarima según el `code`; cacheable en el edge (Cloudflare); sin login | 🟡 | ⬜ Pendiente |
-| 28 | Página QR mobile-first `/qr/[code]` | Layout vertical optimizado para celular; para **caja**: nombre del producto, categoría, INN/forma/concentración, lote, caducidad, cantidad, peso, status (badge), centro de origen, campaña, historial de eventos (timeline); para **tarima**: lista de productos con cantidades y peso total, status, número de cajas; tipografía grande, contraste alto | 🟠 | ⬜ Pendiente |
-| 29 | Estado visual del historial | Timeline al pie de la ficha QR: "Creada", "Sellada", "Transferida desde [Centro X]" (si aplica), "En envío", etc.; fechas en formato local | 🟡 | ⬜ Pendiente |
+| 27 | Endpoint de ficha enriquecida | `GET /v1/public/qr/{code}` — retorna datos completos de caja o tarima según el `code`; cacheable en el edge (Cloudflare); sin login | 🟡 | ✅ Listo |
+| 28 | Página QR mobile-first `/qr/[code]` | Layout vertical optimizado para celular; para **caja**: nombre del producto, categoría, INN/forma/concentración, lote, caducidad, cantidad, peso, status (badge), centro de origen, campaña, historial de eventos (timeline); para **tarima**: lista de productos con cantidades y peso total, status, número de cajas; tipografía grande, contraste alto | 🟠 | ✅ Listo |
+| 29 | Estado visual del historial | Timeline al pie de la ficha QR: "Creada", "Sellada", "Transferida desde [Centro X]" (si aplica), "En envío", etc.; fechas en formato local | 🟡 | ✅ Listo |
 
 ---
 
