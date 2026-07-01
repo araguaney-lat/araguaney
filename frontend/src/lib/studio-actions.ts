@@ -74,7 +74,7 @@ export interface AuditEntry {
   action: string
   entity_type: string
   entity_id: string | null
-  metadata: Record<string, unknown> | null
+  extra: Record<string, unknown> | null
   ip: string | null
   created_at: string
 }

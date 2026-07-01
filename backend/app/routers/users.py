@@ -55,7 +55,7 @@ def invite_user(
         "user",
         user_id=current_user.id,
         entity_id=str(user.id),
-        metadata={"email": user.email, "center_role": user.center_role, "center_id": str(center_id)},
+        extra={"email": user.email, "center_role": user.center_role, "center_id": str(center_id)},
     )
     db.commit()
     # TODO: enqueue send_invitation_email_task(user.email, raw_password)
@@ -90,7 +90,7 @@ def reinvite_center_user(
         "user",
         user_id=current_user.id,
         entity_id=str(user.id),
-        metadata={"email": user.email, "center_id": str(center_id)},
+        extra={"email": user.email, "center_id": str(center_id)},
     )
     db.commit()
     # TODO: enqueue send_invitation_email_task(user.email, raw_password)

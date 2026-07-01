@@ -65,7 +65,7 @@ export default function StudioAuditPage() {
             <button onClick={() => setSelected(null)} className="text-xs text-zinc-400 hover:text-zinc-600">Cerrar</button>
           </div>
           <pre className="text-xs text-zinc-600 overflow-auto bg-zinc-50 rounded p-3 max-h-48">
-            {JSON.stringify(selected.metadata, null, 2)}
+            {JSON.stringify(selected.extra, null, 2)}
           </pre>
         </div>
       )}
@@ -102,7 +102,7 @@ export default function StudioAuditPage() {
                     </td>
                     <td className="px-4 py-3 hidden md:table-cell text-xs text-zinc-400">{entry.ip ?? "—"}</td>
                     <td className="px-4 py-3 text-right">
-                      {entry.metadata && Object.keys(entry.metadata).length > 0 && (
+                      {entry.extra && Object.keys(entry.extra).length > 0 && (
                         <button
                           onClick={() => setSelected(entry)}
                           className="rounded px-2 py-1 text-xs text-zinc-500 hover:bg-zinc-100"
