@@ -130,14 +130,9 @@ export function Sidebar({ centerRole, platformRole, centerName, nav, roleLabels,
       <div className={`flex items-center border-b border-amber-100 px-3 py-3 ${collapsed ? "justify-center" : "justify-between"}`}>
         {!collapsed && (
           <div className="min-w-0">
-            <span className="text-sm font-semibold text-zinc-900 truncate block">Acopio</span>
+            <span className="text-sm font-semibold text-amber-900 truncate block">Araguaney</span>
             {centerName && (
-              <p className="text-xs text-zinc-500 truncate">{centerName}</p>
-            )}
-            {centerRole === "national_admin" && (
-              <span className="mt-0.5 inline-block rounded bg-blue-100 px-1.5 py-0.5 text-xs font-medium text-blue-700">
-                {roleLabels.national_admin}
-              </span>
+              <p className="text-xs text-amber-700/70 truncate">{centerName}</p>
             )}
           </div>
         )}
