@@ -1,4 +1,4 @@
-### Fase 7 — Transferencias entre centros ⬜
+### Fase 7 — Transferencias entre centros ✅
 
 ---
 
@@ -47,11 +47,11 @@ REQUESTED ──► APPROVED ──► IN_TRANSIT ──► RECEIVED
 
 | # | Tarea | Descripción | Complejidad | Estado |
 |---|-------|-------------|-------------|--------|
-| 1 | Migración `0NN_transfers` | Tabla `transfers(id, from_center_id FK, to_center_id FK, status, initiated_by FK, notes, created_at, updated_at)`; tabla `transfer_items(id, transfer_id FK, box_id FK)`; tabla `transfer_events(id, transfer_id FK, from_status, to_status, user_id FK, created_at)`; índices en `(from_center_id)`, `(to_center_id)`, `(status)` | 🟠 | ⬜ Pendiente |
-| 2 | Modelos SQLAlchemy | `Transfer`, `TransferItem`, `TransferEvent`; importar en `alembic/env.py` | 🟡 | ⬜ Pendiente |
-| 3 | `TransferRepository` | Extiende `TenantRepository`; `list_by_center(center_id)` retorna transfers donde `from_center_id = center_id OR to_center_id = center_id`; `national_admin` ve todos; `find_with_items(transfer_id)` carga cajas incluidas | 🟠 | ⬜ Pendiente |
-| 4 | `TransferService` — crear | Valida que todas las cajas sean `SEALED` y sin tarima activa; valida que pertenezcan al centro origen; no permite duplicar cajas en transfers concurrentes; escribe `TransferEvent REQUESTED` | 🟠 | ⬜ Pendiente |
-| 5 | `TransferService` — máquina de estados | Métodos `approve`, `reject`, `dispatch`, `receive`; cada uno valida el rol y el centro del usuario; `receive` muta `Box.center_id` + escribe `BoxEvent TRANSFERRED`; todos escriben `TransferEvent` | 🟠 | ⬜ Pendiente |
+| 1 | Migración `0NN_transfers` | Tabla `transfers(id, from_center_id FK, to_center_id FK, status, initiated_by FK, notes, created_at, updated_at)`; tabla `transfer_items(id, transfer_id FK, box_id FK)`; tabla `transfer_events(id, transfer_id FK, from_status, to_status, user_id FK, created_at)`; índices en `(from_center_id)`, `(to_center_id)`, `(status)` | 🟠 | ✅ Completado |
+| 2 | Modelos SQLAlchemy | `Transfer`, `TransferItem`, `TransferEvent`; importar en `alembic/env.py` | 🟡 | ✅ Completado |
+| 3 | `TransferRepository` | Extiende `TenantRepository`; `list_by_center(center_id)` retorna transfers donde `from_center_id = center_id OR to_center_id = center_id`; `national_admin` ve todos; `find_with_items(transfer_id)` carga cajas incluidas | 🟠 | ✅ Completado |
+| 4 | `TransferService` — crear | Valida que todas las cajas sean `SEALED` y sin tarima activa; valida que pertenezcan al centro origen; no permite duplicar cajas en transfers concurrentes; escribe `TransferEvent REQUESTED` | 🟠 | ✅ Completado |
+| 5 | `TransferService` — máquina de estados | Métodos `approve`, `reject`, `dispatch`, `receive`; cada uno valida el rol y el centro del usuario; `receive` muta `Box.center_id` + escribe `BoxEvent TRANSFERRED`; todos escriben `TransferEvent` | 🟠 | ✅ Completado |
 
 ---
 
@@ -76,13 +76,13 @@ Las transferencias tienen su propia tabla `transfer_events` (estado a estado + u
 
 | # | Tarea | Descripción | Complejidad | Estado |
 |---|-------|-------------|-------------|--------|
-| 6 | `POST /v1/transfers` | Crear transferencia; body: `{from_center_id, to_center_id, box_ids[], notes}`; coordinator solo puede crear si su `center_id` es origen o destino; national_admin puede crear cualquiera | 🟡 | ⬜ Pendiente |
-| 7 | `GET /v1/transfers` | Listar; coordinator ve solo las de su centro (origen o destino); national_admin ve todas; filtros: `status`, `from_center_id`, `to_center_id`, `from_date` | 🟡 | ⬜ Pendiente |
-| 8 | `GET /v1/transfers/{id}` | Detalle con items (cajas) y eventos de estado | 🟢 | ⬜ Pendiente |
-| 9 | `POST /v1/transfers/{id}/approve` | `REQUESTED → APPROVED`; solo coordinator del centro origen o national_admin | 🟡 | ⬜ Pendiente |
-| 10 | `POST /v1/transfers/{id}/reject` | `REQUESTED → REJECTED`; mismos permisos que approve; body: `{reason}` opcional | 🟡 | ⬜ Pendiente |
-| 11 | `POST /v1/transfers/{id}/dispatch` | `APPROVED → IN_TRANSIT`; solo coordinator del centro origen o national_admin; confirma que las cajas físicamente salieron | 🟡 | ⬜ Pendiente |
-| 12 | `POST /v1/transfers/{id}/receive` | `IN_TRANSIT → RECEIVED`; solo coordinator del centro destino o national_admin; muta `Box.center_id`; escribe `BoxEvent TRANSFERRED` por cada caja | 🟠 | ⬜ Pendiente |
+| 6 | `POST /v1/transfers` | Crear transferencia; body: `{from_center_id, to_center_id, box_ids[], notes}`; coordinator solo puede crear si su `center_id` es origen o destino; national_admin puede crear cualquiera | 🟡 | ✅ Completado |
+| 7 | `GET /v1/transfers` | Listar; coordinator ve solo las de su centro (origen o destino); national_admin ve todas; filtros: `status`, `from_center_id`, `to_center_id`, `from_date` | 🟡 | ✅ Completado |
+| 8 | `GET /v1/transfers/{id}` | Detalle con items (cajas) y eventos de estado | 🟢 | ✅ Completado |
+| 9 | `POST /v1/transfers/{id}/approve` | `REQUESTED → APPROVED`; solo coordinator del centro origen o national_admin | 🟡 | ✅ Completado |
+| 10 | `POST /v1/transfers/{id}/reject` | `REQUESTED → REJECTED`; mismos permisos que approve; body: `{reason}` opcional | 🟡 | ✅ Completado |
+| 11 | `POST /v1/transfers/{id}/dispatch` | `APPROVED → IN_TRANSIT`; solo coordinator del centro origen o national_admin; confirma que las cajas físicamente salieron | 🟡 | ✅ Completado |
+| 12 | `POST /v1/transfers/{id}/receive` | `IN_TRANSIT → RECEIVED`; solo coordinator del centro destino o national_admin; muta `Box.center_id`; escribe `BoxEvent TRANSFERRED` por cada caja | 🟠 | ✅ Completado |
 | 13 | `GET /v1/transfers/{id}/manifest` — PDF | Manifiesto PDF de la transferencia: origen, destino, lista de cajas (producto, lote, cantidad, QR), fecha; encolado en ARQ; autenticado + rate-limited | 🟠 | ⬜ Pendiente |
 
 ---
@@ -101,9 +101,9 @@ Las transferencias tienen su propia tabla `transfer_events` (estado a estado + u
 
 | # | Tarea | Descripción | Complejidad | Estado |
 |---|-------|-------------|-------------|--------|
-| 17 | Lista de transferencias `/dashboard/transfers` | Dos pestañas: "Enviando" (from_center = mi centro) y "Recibiendo" (to_center = mi centro); estado visual con badge de color; acceso rápido a la acción pendiente (aprobar / despachar / confirmar recepción) | 🟠 | ⬜ Pendiente |
-| 18 | Crear transferencia — selección de cajas | Formulario: seleccionar centro destino + filtrar/seleccionar cajas selladas disponibles (búsqueda por producto, cantidad); preview de lo que se enviará | 🟠 | ⬜ Pendiente |
-| 19 | Panel de detalle de transferencia | Vista de estado, lista de cajas incluidas, historial de eventos, botones de acción según rol y estado actual | 🟡 | ⬜ Pendiente |
+| 17 | Lista de transferencias `/dashboard/transfers` | Dos pestañas: "Enviando" (from_center = mi centro) y "Recibiendo" (to_center = mi centro); estado visual con badge de color; acceso rápido a la acción pendiente (aprobar / despachar / confirmar recepción) | 🟠 | ✅ Completado |
+| 18 | Crear transferencia — selección de cajas | Formulario: seleccionar centro destino + filtrar/seleccionar cajas selladas disponibles (búsqueda por producto, cantidad); preview de lo que se enviará | 🟠 | ✅ Completado |
+| 19 | Panel de detalle de transferencia | Vista de estado, lista de cajas incluidas, historial de eventos, botones de acción según rol y estado actual | 🟡 | ✅ Completado |
 | 20 | Enlace a manifiesto PDF | Botón "Descargar manifiesto" disponible desde `APPROVED` en adelante | 🟢 | ⬜ Pendiente |
 
 ---
