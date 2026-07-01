@@ -858,5 +858,15 @@
   "footer": {
     "tagline": "The common standard for aid centers",
     "privacy": "No personal data of donors or recipients. Just inventory, traceable from box to shipment."
+  },
+  "seo": {
+    "site_title": "Araguaney — Donation Center & Humanitarian Aid Software",
+    "site_description": "In-kind donation management for aid centers: item-level intake, homogeneous boxes with QR codes, pallets and shipments with an exportable manifest.",
+    "home_title": "Araguaney — Donation Center & Humanitarian Aid Software",
+    "home_description": "In-kind donation management for aid centers: item-level intake, homogeneous boxes with QR codes, pallets and shipments with an exportable manifest. Full traceability for humanitarian aid.",
+    "necesidades_title": "What's needed — Real-time humanitarian aid inventory",
+    "necesidades_description": "Check available inventory across active aid centers: categories, quantities, and stock updated every 5 minutes.",
+    "contacto_title": "Contact",
+    "contacto_description": "Get in touch to add your aid center to the national humanitarian coordination network."
   }
 }

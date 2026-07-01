@@ -1,0 +1,27 @@
+# Araguaney
+
+> Software para centros de acopio y ayuda humanitaria. Un mismo estándar para
+> registrar donaciones en especie, empacarlas en cajas homogéneas con QR,
+> consolidarlas en tarimas y envíos con manifiesto exportable, y ver el stock
+> agregado de todos los centros en tiempo real.
+
+Araguaney conecta centros de acopio bajo un mismo estándar: registro de
+donaciones por ítem (categoría, lote, caducidad), cajas homogéneas con QR y
+etiqueta, tarimas y envíos con manifiesto/packing list exportable, y un panel
+nacional agregado. Sin datos personales de donantes ni beneficiarios — solo
+inventario, trazable de la caja al envío. Compatible con escenarios de ayuda
+humanitaria en general (sismos, inundaciones, crisis migratorias, incendios),
+no solo un evento específico.
+
+## Páginas públicas
+
+- [Inicio](https://araguaney.lat/): presentación del producto, cómo funciona y estándares que respalda.
+- [Qué falta](https://araguaney.lat/necesidades): inventario disponible en los centros de acopio activos, actualizado cada 5 minutos.
+- [Contacto](https://araguaney.lat/contacto): sumar un centro de acopio a la coordinación nacional.
+
+## Estándares
+
+Araguaney se apoya en estándares abiertos y reconocidos internacionalmente:
+WHO (donación de medicamentos), IFRC/ICRC (catálogo de materiales), IOM
+(Emergency Relief Items Catalogue), UNSPSC (taxonomía de categorías) y GS1
+(códigos de barras / GTIN).

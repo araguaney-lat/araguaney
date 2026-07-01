@@ -858,5 +858,15 @@
   "footer": {
     "tagline": "El estándar común para centros de acopio",
     "privacy": "Sin datos personales de donantes ni beneficiarios. Solo inventario, trazable de la caja al envío."
+  },
+  "seo": {
+    "site_title": "Araguaney — Software para centros de acopio y ayuda humanitaria",
+    "site_description": "Gestión de donaciones en especie para centros de acopio: registro por ítem, cajas homogéneas con QR, tarimas y envíos con manifiesto exportable.",
+    "home_title": "Araguaney — Software para centros de acopio y ayuda humanitaria",
+    "home_description": "Gestión de donaciones en especie para centros de acopio: registro por ítem, cajas homogéneas con QR, tarimas y envíos con manifiesto exportable. Trazabilidad completa para ayuda humanitaria.",
+    "necesidades_title": "Qué falta — Inventario de ayuda humanitaria en tiempo real",
+    "necesidades_description": "Consulta el inventario disponible en los centros de acopio activos: categorías, cantidades y stock actualizado cada 5 minutos.",
+    "contacto_title": "Contacto",
+    "contacto_description": "Contáctanos para sumar tu centro de acopio a la coordinación nacional de ayuda humanitaria."
   }
 }
