@@ -1,4 +1,5 @@
 from datetime import datetime
+from decimal import Decimal
 from uuid import UUID
 
 from app.schemas._base import StrictModel, StrictORMModel
@@ -7,6 +8,7 @@ from app.schemas.box import BoxOut
 
 class PalletCreate(StrictModel):
     notes: str | None = None
+    tare_weight_kg: Decimal | None = None
 
 
 class PalletOut(StrictORMModel):
@@ -16,6 +18,7 @@ class PalletOut(StrictORMModel):
     shipment_id: UUID | None
     status: str
     notes: str | None
+    tare_weight_kg: Decimal | None
     closed_at: datetime | None
     created_at: datetime
 
@@ -27,6 +30,7 @@ class PalletDetailOut(StrictModel):
     shipment_id: UUID | None
     status: str
     notes: str | None
+    tare_weight_kg: Decimal | None = None
     closed_at: datetime | None
     created_at: datetime
     boxes: list[BoxOut]

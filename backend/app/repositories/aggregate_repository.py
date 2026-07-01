@@ -14,6 +14,7 @@ from sqlalchemy import func, text
 from sqlalchemy.orm import Session
 
 from app.models.box import Box
+from app.models.campaign import Campaign
 from app.models.center import Center
 from app.models.intake import Intake
 from app.models.product_type import ProductType
@@ -145,6 +146,53 @@ class AggregateRepository:
             "total_shipments_sent": int(shipment_row.total_shipments or 0),
             "active_centers": int(active_centers or 0),
         }
+
+    # ── Weight metrics ─────────────────────────────────────────────────────────
+
+    def weight_by_campaign(
+        self,
+        center_id: Optional[uuid.UUID] = None,
+        campaign_id: Optional[uuid.UUID] = None,
+    ) -> list[dict]:
+        """Sealed box weight grouped by campaign, with optional campaign/center filter."""
+        q = (
+            self.db.query(
+                Campaign.id.label("campaign_id"),
+                Campaign.name.label("campaign_name"),
+                Campaign.weight_goal_kg,
+                func.coalesce(func.sum(Box.weight_kg), 0).label("total_kg"),
+            )
+            .outerjoin(Intake, Intake.campaign_id == Campaign.id)
+            .outerjoin(Box, (Box.intake_id == Intake.id) & (Box.status == "SEALED"))
+        )
+        if center_id is not None:
+            q = q.filter((Box.center_id == center_id) | (Box.id.is_(None)))
+        if campaign_id is not None:
+            q = q.filter(Campaign.id == campaign_id)
+        q = q.group_by(Campaign.id, Campaign.name, Campaign.weight_goal_kg)
+        rows = q.all()
+        result = []
+        for r in rows:
+            total = float(r.total_kg or 0)
+            goal = float(r.weight_goal_kg) if r.weight_goal_kg is not None else None
+            pct = round(total / goal * 100, 1) if goal else None
+            result.append({
+                "campaign_id": str(r.campaign_id),
+                "campaign_name": r.campaign_name,
+                "total_kg": total,
+                "goal_kg": goal,
+                "progress_pct": pct,
+            })
+        return result
+
+    def weight_by_center(self, center_id: uuid.UUID) -> float:
+        """Total sealed kg for a single center."""
+        val = (
+            self.db.query(func.sum(Box.weight_kg))
+            .filter(Box.status == "SEALED", Box.center_id == center_id)
+            .scalar()
+        )
+        return float(val or 0)
 
     # ── Public "what's needed" view ────────────────────────────────────────────
 

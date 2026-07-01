@@ -12,7 +12,7 @@ from app.database import get_db
 from app.dependencies import require_center_role, tenant_scope
 from app.models.user import User
 from app.repositories.aggregate_repository import AggregateRepository
-from app.schemas.aggregate import NationalDashboardOut, PublicNeedsOut
+from app.schemas.aggregate import NationalDashboardOut, PublicNeedsOut, WeightDashboardOut
 from app.utils import cache
 from app.utils.rate_limit import limiter
 
@@ -54,6 +54,33 @@ def national_dashboard(
     serialized = payload.model_dump_json()
     cache.set(cache_key, serialized, ttl=_DASHBOARD_TTL)
     return JSONResponse(content=json.loads(serialized))
+
+
+# ── Weight metrics ────────────────────────────────────────────────────────────
+
+@router.get("/dashboard/weight", response_model=WeightDashboardOut)
+@limiter.limit("60/minute")
+def weight_dashboard(
+    request: Request,
+    campaign_id: UUID | None = None,
+    center_id: UUID | None = None,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_center_role),
+    scope: UUID | None = Depends(tenant_scope),
+):
+    """Weight metrics per campaign + per center.
+
+    national_admin: can query any campaign_id / center_id.
+    coordinator/volunteer: scoped to their center; campaign_id ignored outside their campaigns.
+    """
+    effective_center = center_id if scope is None else scope
+    repo = AggregateRepository(db)
+    campaigns = repo.weight_by_campaign(
+        center_id=effective_center,
+        campaign_id=campaign_id,
+    )
+    center_kg = repo.weight_by_center(effective_center) if effective_center else None
+    return WeightDashboardOut(campaigns=campaigns, center_kg=center_kg)
 
 
 # ── Public needs endpoint (no auth) ───────────────────────────────────────────

@@ -1,4 +1,5 @@
 from datetime import datetime
+from decimal import Decimal
 from typing import Literal
 from uuid import UUID
 
@@ -17,6 +18,7 @@ class ProductTypeCreate(StrictModel):
     default_unit: str | None = None
     is_controlled: bool = False
     min_shelf_life_days: int | None = None
+    unit_weight_kg: Decimal | None = None
 
 
 class ProductTypeUpdate(StrictModel):
@@ -31,6 +33,7 @@ class ProductTypeUpdate(StrictModel):
     default_unit: str | None = None
     is_controlled: bool | None = None
     min_shelf_life_days: int | None = None
+    unit_weight_kg: Decimal | None = None
 
 
 class RxNormSuggestion(StrictModel):
@@ -65,4 +68,5 @@ class ProductTypeOut(StrictORMModel):
     default_unit: str | None
     is_controlled: bool
     min_shelf_life_days: int | None
+    unit_weight_kg: Decimal | None
     created_at: datetime
