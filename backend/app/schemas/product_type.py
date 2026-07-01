@@ -36,6 +36,7 @@ class ProductTypeOut(StrictORMModel):
     id: UUID
     category: str
     display_name: str
+    campaign_id: UUID | None
     unspsc_code: str | None
     inn_name: str | None
     brand: str | None
