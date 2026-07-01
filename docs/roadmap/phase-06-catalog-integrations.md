@@ -108,7 +108,7 @@ Todos vía `fire_audit(background_tasks, ...)` en los routers:
 |---|-------|-------------|-------------|--------|
 | 10 | Búsqueda en catálogo local | `GET /v1/catalog/search?q=&campaign_id=` → retorna globales + los de la campaña; sin internet requerido; base del autocomplete en intake | 🟢 | ✅ Listo |
 | 11 | Barcode lookup vía Open Food Facts | `GET /v1/catalog/barcode/{gtin}` → Open Food Facts API; caché Redis 24 h; `503` claro si sin internet | 🟡 | ✅ Listo |
-| 12 | INN autocomplete vía RxNorm | `GET /v1/catalog/rxnorm?q=` → NLM RxNorm REST API; `503` si sin internet; rate-limit 60/min (API pública sin key) | 🟡 | ⬜ Pendiente |
+| 12 | INN autocomplete vía RxNorm | `GET /v1/catalog/rxnorm?q=` → NLM RxNorm REST API; `503` si sin internet; rate-limit 60/min (API pública sin key) | 🟡 | ✅ Listo |
 | 13 | Validación GTIN | Dígito de control EAN-8/13/UPC-A en backend sin API key; lookup GS1 como enriquecimiento opcional | 🟢 | ⬜ Pendiente |
 
 ---

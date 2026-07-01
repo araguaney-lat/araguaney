@@ -33,6 +33,11 @@ class ProductTypeUpdate(StrictModel):
     min_shelf_life_days: int | None = None
 
 
+class RxNormSuggestion(StrictModel):
+    rxcui: str
+    name: str
+
+
 class BarcodePrefill(StrictModel):
     gtin: str
     display_name: str

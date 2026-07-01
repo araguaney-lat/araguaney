@@ -9,7 +9,7 @@ from app.dependencies import require_center_role
 from app.models.user import User
 from app.repositories.product_type_repository import ProductTypeRepository
 from app.repositories.user_campaign_repository import UserCampaignRepository
-from app.schemas.product_type import BarcodePrefill, BarcodeResult, ProductTypeOut
+from app.schemas.product_type import BarcodePrefill, BarcodeResult, ProductTypeOut, RxNormSuggestion
 from app.utils import cache
 from app.utils.errors import api_error
 from app.utils.rate_limit import limiter
@@ -17,6 +17,7 @@ from app.utils.rate_limit import limiter
 router = APIRouter(prefix="/v1/catalog", tags=["catalog"])
 
 _BARCODE_TTL = 86_400  # 24 h
+_RXNORM_TTL = 3_600   # 1 h
 
 
 @router.get("/search", response_model=list[ProductTypeOut])
@@ -91,3 +92,35 @@ async def barcode_lookup(
         raise api_error("BARCODE_NOT_FOUND", "Barcode not found in local catalog or Open Food Facts", status_code=404)
 
     return BarcodeResult(source="open_food_facts", prefill=BarcodePrefill(**result))
+
+
+@router.get("/rxnorm", response_model=list[RxNormSuggestion])
+@limiter.limit("60/minute")
+async def rxnorm_search(
+    request: Request,
+    q: str,
+    _: User = Depends(require_center_role),
+):
+    """INN autocomplete via NLM RxNorm (no API key). Cached 1 h in Redis."""
+    if len(q.strip()) < 2:
+        raise api_error("QUERY_TOO_SHORT", "Query must be at least 2 characters", field="q", status_code=422)
+
+    cache_key = f"catalog:rxnorm:{q.lower().strip()}"
+    cached = cache.get(cache_key)
+    if cached is not None:
+        return json.loads(cached)
+
+    import httpx
+    from app.utils.rxnorm import search_inn
+
+    try:
+        results = await search_inn(q.strip())
+    except httpx.HTTPError as exc:
+        raise api_error(
+            "EXTERNAL_SERVICE_UNAVAILABLE",
+            "RxNorm is unreachable — try again later",
+            status_code=503,
+        ) from exc
+
+    cache.set(cache_key, json.dumps(results), ttl=_RXNORM_TTL)
+    return results
