@@ -12,16 +12,26 @@ const LOGO =
 interface Props {
   dict: Dictionary["nav"]
   locale: Locale
+  /**
+   * For fixed-language pages (e.g. /ayuda-humanitaria, /humanitarian-aid) whose
+   * content does not follow the cookie-based locale — the switcher navigates to
+   * the given URL instead of flipping the locale cookie. If the other locale has
+   * no equivalent page (e.g. /centro-de-acopio has no English version), omit its
+   * entry and the switcher is hidden.
+   */
+  localeLinks?: Partial<Record<Locale, string>>
 }
 
 const FLAG: Record<Locale, string> = { es: "🇲🇽", en: "🇺🇸" }
 const OTHER_LOCALE: Record<Locale, Locale> = { es: "en", en: "es" }
 
-export default function HomeNav({ dict, locale }: Props) {
+export default function HomeNav({ dict, locale, localeLinks }: Props) {
   const [open, setOpen] = useState(false)
   const [, startTransition] = useTransition()
 
   const other = OTHER_LOCALE[locale]
+  const otherHref = localeLinks?.[other]
+  const showSwitcher = !localeLinks || otherHref !== undefined
 
   function switchLocale() {
     startTransition(async () => {
@@ -31,8 +41,8 @@ export default function HomeNav({ dict, locale }: Props) {
 
   const links = [
     { href: "/", label: dict.home },
-    { href: "#por-que", label: dict.why },
-    { href: "#estandares", label: dict.standards },
+    { href: "/#por-que", label: dict.why },
+    { href: "/#estandares", label: dict.standards },
     { href: "/contacto", label: dict.contact },
   ]
 
@@ -83,15 +93,27 @@ export default function HomeNav({ dict, locale }: Props) {
             ))}
 
             {/* Language switcher */}
-            <button
-              onClick={switchLocale}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[13px] font-semibold transition-colors"
-              style={{ border: "1.5px solid #EAD9B0", color: "#52493D" }}
-              aria-label={`Switch to ${other === "en" ? "English" : "Español"}`}
-            >
-              <span>{FLAG[other]}</span>
-              <span>{other === "en" ? "EN" : "ES"}</span>
-            </button>
+            {showSwitcher && (otherHref ? (
+              <Link
+                href={otherHref}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[13px] font-semibold transition-colors"
+                style={{ border: "1.5px solid #EAD9B0", color: "#52493D" }}
+                aria-label={`Switch to ${other === "en" ? "English" : "Español"}`}
+              >
+                <span>{FLAG[other]}</span>
+                <span>{other === "en" ? "EN" : "ES"}</span>
+              </Link>
+            ) : (
+              <button
+                onClick={switchLocale}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[13px] font-semibold transition-colors"
+                style={{ border: "1.5px solid #EAD9B0", color: "#52493D" }}
+                aria-label={`Switch to ${other === "en" ? "English" : "Español"}`}
+              >
+                <span>{FLAG[other]}</span>
+                <span>{other === "en" ? "EN" : "ES"}</span>
+              </button>
+            ))}
 
             <Link
               href="/login"
@@ -108,15 +130,27 @@ export default function HomeNav({ dict, locale }: Props) {
 
           {/* Mobile right side */}
           <div className="md:hidden flex items-center gap-3">
-            <button
-              onClick={switchLocale}
-              className="flex items-center gap-1 px-2.5 py-1 rounded-full text-[12px] font-semibold"
-              style={{ border: "1.5px solid #EAD9B0", color: "#52493D" }}
-              aria-label={`Switch to ${other === "en" ? "English" : "Español"}`}
-            >
-              <span>{FLAG[other]}</span>
-              <span>{other === "en" ? "EN" : "ES"}</span>
-            </button>
+            {showSwitcher && (otherHref ? (
+              <Link
+                href={otherHref}
+                className="flex items-center gap-1 px-2.5 py-1 rounded-full text-[12px] font-semibold"
+                style={{ border: "1.5px solid #EAD9B0", color: "#52493D" }}
+                aria-label={`Switch to ${other === "en" ? "English" : "Español"}`}
+              >
+                <span>{FLAG[other]}</span>
+                <span>{other === "en" ? "EN" : "ES"}</span>
+              </Link>
+            ) : (
+              <button
+                onClick={switchLocale}
+                className="flex items-center gap-1 px-2.5 py-1 rounded-full text-[12px] font-semibold"
+                style={{ border: "1.5px solid #EAD9B0", color: "#52493D" }}
+                aria-label={`Switch to ${other === "en" ? "English" : "Español"}`}
+              >
+                <span>{FLAG[other]}</span>
+                <span>{other === "en" ? "EN" : "ES"}</span>
+              </button>
+            ))}
 
             <button
               onClick={() => setOpen(true)}

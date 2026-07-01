@@ -44,7 +44,7 @@
   },
   "why": {
     "heading": "Por qué Araguaney",
-    "subtitle": "Decenas de centros de acopio en México reciben y envían suministros humanitarios a Venezuela de forma independiente. Sin un estándar común es imposible saber qué hay disponible ni preparar carga que cumpla los requisitos de envío internacional.",
+    "subtitle": "Decenas de centros de acopio reciben y envían suministros humanitarios de forma independiente tras sismos, inundaciones y otras emergencias. Sin un estándar común es imposible saber qué hay disponible ni preparar carga que cumpla los requisitos de envío internacional.",
     "items": [
       {
         "icon": "📦",
@@ -66,7 +66,9 @@
         "title": "Sin datos personales",
         "desc": "No se almacenan datos personales de donantes ni beneficiarios. Solo inventario, trazable de la caja al envío."
       }
-    ]
+    ],
+    "link_centro": "Ver el estándar para centros de acopio →",
+    "link_ayuda": "Ver cómo funciona para cualquier emergencia →"
   },
   "standards": {
     "heading": "Estándares que respaldamos",

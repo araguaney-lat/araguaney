@@ -2,6 +2,7 @@ import Image from "next/image"
 import Link from "next/link"
 import type { Metadata } from "next"
 import HomeNav from "@/components/HomeNav"
+import HomeFooter from "@/components/HomeFooter"
 import { getLocale, getDictionary } from "@/lib/i18n"
 import { SITE_URL } from "@/lib/seo"
 
@@ -406,6 +407,17 @@ export default async function HomePage() {
               </div>
             ))}
           </div>
+
+          <div className="mt-6 flex flex-col md:flex-row gap-2 md:gap-6 text-[13.5px]" style={{ fontWeight: 600 }}>
+            {locale === "es" && (
+              <Link href="/centro-de-acopio" style={{ color: "#1F5E8C" }}>
+                {dict.why.link_centro}
+              </Link>
+            )}
+            <Link href={locale === "es" ? "/ayuda-humanitaria" : "/humanitarian-aid"} style={{ color: "#1F5E8C" }}>
+              {dict.why.link_ayuda}
+            </Link>
+          </div>
         </div>
       </div>
 
@@ -491,47 +503,7 @@ export default async function HomePage() {
         </div>
       </div>
 
-      {/* ── Footer ── */}
-      <footer
-        className="px-5 md:px-[46px] py-6 md:py-10 flex items-start md:items-center justify-between gap-4 flex-wrap"
-        style={{ background: "#2B2723", color: "#E9E2D5" }}
-      >
-        <div className="flex items-center gap-3">
-          <span
-            className="flex items-center justify-center overflow-hidden flex-none"
-            style={{ width: 38, height: 38, borderRadius: "50%", background: "#fff" }}
-          >
-            <Image
-              src={LOGO}
-              alt="Araguaney"
-              width={34}
-              height={34}
-              className="object-contain"
-            />
-          </span>
-          <div>
-            <div
-              style={{
-                fontFamily: "var(--font-source-serif)",
-                fontSize: 18,
-                fontWeight: 600,
-                color: "#fff",
-              }}
-            >
-              Araguaney
-            </div>
-            <div
-              className="hidden md:block"
-              style={{ fontSize: 12, color: "#A89E8C", marginTop: 2 }}
-            >
-              {dict.footer.tagline}
-            </div>
-          </div>
-        </div>
-        <div style={{ fontSize: 12, color: "#A89E8C", lineHeight: 1.55 }}>
-          {dict.footer.privacy}
-        </div>
-      </footer>
+      <HomeFooter dict={dict.footer} />
     </div>
     </>
   )
