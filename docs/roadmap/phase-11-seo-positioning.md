@@ -91,15 +91,16 @@ No quemar el dominio en "ayuda Venezuela". Venezuela = entrada de tráfico, no i
 
 | # | Tarea | Descripción | Prioridad | Estado |
 |---|-------|-------------|-----------|--------|
-| 6 | Metadata dinámica (App Router) | Implementar `generateMetadata()` en páginas públicas: title, description, keywords por ruta. Sin duplicados. | 🟠 | ⬜ Pendiente |
-| 7 | Open Graph + Twitter Cards | Tags OG/Twitter en todas las páginas públicas (imagen, título, descripción) para compartir en redes. Imagen OG por defecto + dinámica en `/necesidades`. | 🟡 | ⬜ Pendiente |
-| 8 | `sitemap.xml` dinámico | `app/sitemap.ts` que incluya rutas estáticas + `/necesidades` + campañas públicas + fichas QR indexables. Regenerar en ISR. | 🟠 | ⬜ Pendiente |
-| 9 | `robots.txt` | `app/robots.ts` — permitir rutas públicas, bloquear `/dashboard`, `/studio`, `/api`. Referenciar sitemap. | 🟠 | ⬜ Pendiente |
-| 10 | Canonical URLs | Canonical tag en todas las páginas para evitar contenido duplicado (especialmente entre ES/EN y parámetros de campaña). | 🟡 | ⬜ Pendiente |
-| 11 | `hreflang` ES/EN | Tags `hreflang` para señalar versiones de idioma a buscadores. | 🟢 | ⬜ Pendiente |
-| 12 | Schema.org structured data | JSON-LD: `SoftwareApplication` (home/pilar), `NGO`/`Organization`, `FAQPage` (guías). Mejora rich snippets. | 🟡 | ⬜ Pendiente |
-| 13 | Core Web Vitals / performance | Auditar LCP/CLS/INP con Lighthouse. Optimizar imágenes (ya hay config en `next.config.ts`), lazy-load, reducir JS del cliente en páginas públicas. Ranking factor. | 🟡 | ⬜ Pendiente |
-| 14 | Accesibilidad / alt text | Alt text descriptivo en imágenes, jerarquía semántica de headings, contraste. SEO + a11y. | 🟢 | ⬜ Pendiente |
+| 6 | Metadata dinámica (App Router) | Implementar `generateMetadata()` en páginas públicas: title, description, keywords por ruta. Sin duplicados. | 🟠 | ✅ Done |
+| 7 | Open Graph + Twitter Cards | Tags OG/Twitter en todas las páginas públicas (imagen, título, descripción) para compartir en redes. Imagen OG por defecto + dinámica en `/necesidades`. | 🟡 | 🟡 Parcial — OG/Twitter dinámicos por página (home, necesidades, contacto, qr/[code]) reutilizando la imagen OG estática. Falta generar una imagen OG dinámica (`opengraph-image.tsx`) para `/necesidades`. |
+| 8 | `sitemap.xml` dinámico | `app/sitemap.ts` que incluya rutas estáticas + `/necesidades` + campañas públicas + fichas QR indexables. Regenerar en ISR. | 🟠 | 🟡 Parcial — `app/sitemap.ts` con rutas estáticas (`/`, `/necesidades`, `/contacto`). Campañas públicas y fichas QR pendientes: no existe endpoint público de listado (`backend/app/routers/dashboard.py` solo expone lookup por código/campaña, no enumeración). |
+| 9 | `robots.txt` | `app/robots.ts` — permitir rutas públicas, bloquear `/dashboard`, `/studio`, `/api`. Referenciar sitemap. | 🟠 | ✅ Done |
+| 10 | Canonical URLs | Canonical tag en todas las páginas para evitar contenido duplicado (especialmente entre ES/EN y parámetros de campaña). | 🟡 | ✅ Done — `alternates.canonical` en home, necesidades, contacto y qr/[code]. |
+| 11 | `hreflang` ES/EN | Tags `hreflang` para señalar versiones de idioma a buscadores. | 🟢 | ⬜ Bloqueada — el sitio usa locale por cookie (mismo URL para ES/EN), no locale por URL. `hreflang` solo tiene valor SEO real con URLs distintas por idioma; agregarlo ahora sería cosmético y probablemente ignorado por Google. Requiere decisión de arquitectura (routing por subpath `/en/...`) fuera de alcance de esta tarea. |
+| 12 | Schema.org structured data | JSON-LD: `SoftwareApplication` (home/pilar), `NGO`/`Organization`, `FAQPage` (guías). Mejora rich snippets. | 🟡 | 🟡 Parcial — `SoftwareApplication` + `Organization` en home. `FAQPage` pendiente hasta que existan las guías de contenido (Grupo C, tareas 15-17). |
+| 13 | Core Web Vitals / performance | Auditar LCP/CLS/INP con Lighthouse. Optimizar imágenes (ya hay config en `next.config.ts`), lazy-load, reducir JS del cliente en páginas públicas. Ranking factor. | 🟡 | 🟡 Parcial — `priority` agregado a la imagen hero de home (candidata a LCP). Auditoría completa de Lighthouse pendiente de correr contra el deploy en producción. |
+| 14 | Accesibilidad / alt text | Alt text descriptivo en imágenes, jerarquía semántica de headings, contraste. SEO + a11y. | 🟢 | ✅ Done — auditado: alt text correcto (incl. `alt=""` en decorativas), un solo `<h1>` por página pública. Fix adicional: `<html lang>` ahora dinámico según locale (antes fijo en `es`, rompía a11y/SEO al cambiar idioma). |
+| 14b | `llms.txt` (no listada originalmente) | `public/llms.txt` — resumen del producto y links a páginas públicas para crawlers de IA (ChatGPT, Claude, Perplexity), siguiendo la convención llmstxt.org. Agregada a petición explícita, complementa `robots.txt`. | 🟢 | ✅ Done |
 
 ### Grupo C — Contenido y captura por evento
 

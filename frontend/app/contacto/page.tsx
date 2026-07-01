@@ -1,8 +1,16 @@
 import Image from "next/image"
 import Link from "next/link"
+import type { Metadata } from "next"
 import ContactForm from "@/components/ContactForm"
 
 const LOGO = "https://res.cloudinary.com/dtvdqlxtd/image/upload/v1782794310/image_degkq9.png"
+
+export const metadata: Metadata = {
+  title: "Contacto",
+  description:
+    "Contáctanos para sumar tu centro de acopio a la coordinación nacional de ayuda humanitaria.",
+  alternates: { canonical: "/contacto" },
+}
 
 export default function ContactoPage() {
   return (

@@ -1,16 +1,60 @@
 import Image from "next/image"
 import Link from "next/link"
+import type { Metadata } from "next"
 import HomeNav from "@/components/HomeNav"
 import { getLocale, getDictionary } from "@/lib/i18n"
+import { SITE_URL } from "@/lib/seo"
 
 const LOGO =
   "https://res.cloudinary.com/dtvdqlxtd/image/upload/v1782794310/image_degkq9.png"
+
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale()
+  const dict = await getDictionary(locale)
+  const { home_title, home_description } = dict.seo
+
+  return {
+    title: home_title,
+    description: home_description,
+    alternates: { canonical: "/" },
+    openGraph: { title: home_title, description: home_description },
+    twitter: { title: home_title, description: home_description },
+  }
+}
+
+const STRUCTURED_DATA = [
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    name: "Araguaney",
+    applicationCategory: "BusinessApplication",
+    operatingSystem: "Web",
+    description:
+      "In-kind donation management for aid centers: item-level intake, homogeneous boxes with QR codes, pallets and shipments with an exportable manifest.",
+    url: SITE_URL,
+    offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "Araguaney",
+    url: SITE_URL,
+    description:
+      "The common standard for donation center coordination and humanitarian aid logistics.",
+  },
+]
 
 export default async function HomePage() {
   const locale = await getLocale()
   const dict = await getDictionary(locale)
 
   return (
+    <>
+    <script
+      type="application/ld+json"
+      // eslint-disable-next-line react/no-danger
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(STRUCTURED_DATA) }}
+    />
     <div
       style={{
         background: "#FBF7EE",
@@ -168,6 +212,7 @@ export default async function HomePage() {
             alt="Araguaney"
             width={400}
             height={400}
+            priority
             className="w-[240px] md:w-[400px] max-w-full"
             style={{
               position: "relative",
@@ -488,5 +533,6 @@ export default async function HomePage() {
         </div>
       </footer>
     </div>
+    </>
   )
 }

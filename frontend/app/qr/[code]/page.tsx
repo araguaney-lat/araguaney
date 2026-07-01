@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation"
+import type { Metadata } from "next"
 import { StatusTimeline } from "@/components/StatusTimeline"
 
 const API_URL = process.env.API_URL ?? "http://localhost:8000"
@@ -98,6 +99,34 @@ async function fetchFicha(code: string): Promise<Ficha | null> {
     return res.json()
   } catch {
     return null
+  }
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ code: string }>
+}): Promise<Metadata> {
+  const { code } = await params
+  const ficha = await fetchFicha(code)
+
+  if (!ficha) {
+    return { title: "Ficha no encontrada", robots: { index: false, follow: false } }
+  }
+
+  const title =
+    ficha.kind === "box" ? `${ficha.display_name} — Ficha QR` : `Tarima ${ficha.code} — Ficha QR`
+  const description =
+    ficha.kind === "box"
+      ? `Caja ${ficha.code} · ${ficha.center_name} · ${ficha.quantity} ${ficha.unit}`
+      : `Tarima ${ficha.code} · ${ficha.center_name} · ${ficha.box_count} cajas`
+
+  return {
+    title,
+    description,
+    alternates: { canonical: `/qr/${ficha.code}` },
+    openGraph: { title, description },
+    twitter: { title, description },
   }
 }
 

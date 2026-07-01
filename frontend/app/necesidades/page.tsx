@@ -1,7 +1,23 @@
+import type { Metadata } from "next"
 import { apiFetch } from "@/lib/api"
+import { getLocale, getDictionary } from "@/lib/i18n"
 import type { PublicNeedsOut } from "@/types"
 
 export const revalidate = 300
+
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale()
+  const dict = await getDictionary(locale)
+  const { necesidades_title, necesidades_description } = dict.seo
+
+  return {
+    title: necesidades_title,
+    description: necesidades_description,
+    alternates: { canonical: "/necesidades" },
+    openGraph: { title: necesidades_title, description: necesidades_description },
+    twitter: { title: necesidades_title, description: necesidades_description },
+  }
+}
 
 const CATEGORY_LABELS: Record<string, string> = {
   MEDICINE: "Medicamentos",
