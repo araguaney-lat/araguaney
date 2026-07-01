@@ -43,9 +43,9 @@ export default async function StudioHubPage() {
             { label: "Cajas registradas", value: stats.total_boxes },
             { label: "Categorías activas", value: Object.keys(stats.boxes_by_category ?? {}).length },
           ].map((s) => (
-            <div key={s.label} className="rounded-xl border border-zinc-200 bg-white p-4">
-              <p className="text-2xl font-bold text-zinc-900">{s.value}</p>
-              <p className="text-xs text-zinc-500 mt-0.5">{s.label}</p>
+            <div key={s.label} className="rounded-xl border border-blue-200 bg-blue-50 p-4">
+              <p className="text-2xl font-bold text-blue-900">{s.value}</p>
+              <p className="text-xs text-blue-600/80 mt-0.5">{s.label}</p>
             </div>
           ))}
         </div>
