@@ -15,15 +15,15 @@ export function StudioSidebar() {
   const pathname = usePathname()
 
   return (
-    <aside className="flex h-full w-56 flex-col border-r border-zinc-200 bg-white px-3 py-4">
+    <aside className="flex h-full w-56 flex-col border-r border-blue-200 bg-blue-50 px-3 py-4">
       <div className="mb-6 px-2">
         <Link href="/studio" className="block">
-          <span className="text-base font-semibold text-zinc-900">Studio</span>
-          <span className="mt-0.5 block text-xs text-zinc-500">Administración de plataforma</span>
+          <span className="text-base font-semibold text-blue-900">Studio</span>
+          <span className="mt-0.5 block text-xs text-blue-600/70">Administración de plataforma</span>
         </Link>
         <Link
           href="/dashboard"
-          className="mt-2 inline-block rounded bg-zinc-100 px-2 py-0.5 text-xs text-zinc-500 hover:bg-zinc-200 transition-colors"
+          className="mt-2 inline-block rounded bg-blue-100 px-2 py-0.5 text-xs text-blue-600 hover:bg-blue-200 transition-colors"
         >
           ← Dashboard
         </Link>
@@ -38,8 +38,8 @@ export function StudioSidebar() {
               href={item.href}
               className={`block rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
                 isActive
-                  ? "bg-zinc-100 text-zinc-900"
-                  : "text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900"
+                  ? "bg-blue-200/70 text-blue-900"
+                  : "text-blue-800 hover:bg-blue-100 hover:text-blue-900"
               }`}
             >
               {item.label}
@@ -48,11 +48,11 @@ export function StudioSidebar() {
         })}
       </nav>
 
-      <div className="mt-4 border-t border-zinc-100 pt-3">
+      <div className="mt-4 border-t border-blue-100 pt-3">
         <form action={logoutAction}>
           <button
             type="submit"
-            className="w-full rounded-lg px-3 py-2 text-left text-sm text-zinc-500 hover:bg-zinc-50 hover:text-zinc-900"
+            className="w-full rounded-lg px-3 py-2 text-left text-sm text-blue-700 hover:bg-blue-100 hover:text-blue-900"
           >
             Cerrar sesión
           </button>
