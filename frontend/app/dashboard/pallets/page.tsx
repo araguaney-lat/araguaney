@@ -1,7 +1,8 @@
 "use client"
 
 import { useState, useEffect, useTransition } from "react"
-import type { PalletOut, PalletDetailOut, PalletStatus } from "@/types"
+import type { PalletOut, PalletDetailOut, PalletStatus, EventOut } from "@/types"
+import { StatusTimeline } from "@/components/StatusTimeline"
 import {
   createPalletAction,
   addBoxToPalletAction,
@@ -27,6 +28,7 @@ export default function PalletsPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [activePallet, setActivePallet] = useState<PalletDetailOut | null>(null)
+  const [palletEvents, setPalletEvents] = useState<EventOut[]>([])
   const [boxCodeInput, setBoxCodeInput] = useState("")
   const [actionLoading, setActionLoading] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
@@ -47,8 +49,13 @@ export default function PalletsPage() {
   }
 
   const fetchPalletDetail = async (id: string) => {
-    const res = await fetch(`/api/pallets/${id}`)
-    if (res.ok) setActivePallet(await res.json())
+    const [detailRes, eventsRes] = await Promise.all([
+      fetch(`/api/pallets/${id}`),
+      fetch(`/api/pallets/${id}/events`),
+    ])
+    if (detailRes.ok) setActivePallet(await detailRes.json())
+    if (eventsRes.ok) setPalletEvents(await eventsRes.json())
+    else setPalletEvents([])
   }
 
   useEffect(() => { fetchPallets() }, [filter])
@@ -186,7 +193,7 @@ export default function PalletsPage() {
           <div className="rounded-xl border border-zinc-200 bg-white p-5 space-y-4">
             <div className="flex items-center justify-between">
               <h2 className="font-mono font-bold text-lg">{activePallet.code}</h2>
-              <button onClick={() => setActivePallet(null)} className="text-zinc-400 hover:text-zinc-700 text-sm">✕</button>
+              <button onClick={() => { setActivePallet(null); setPalletEvents([]) }} className="text-zinc-400 hover:text-zinc-700 text-sm">✕</button>
             </div>
 
             {activePallet.status === "OPEN" && (
@@ -226,6 +233,13 @@ export default function PalletsPage() {
                 </ul>
               )}
             </div>
+
+            {palletEvents.length > 0 && (
+              <div className="border-t border-zinc-100 pt-4">
+                <p className="text-xs font-semibold text-zinc-500 mb-3">Historial</p>
+                <StatusTimeline events={palletEvents} />
+              </div>
+            )}
           </div>
         )}
       </div>

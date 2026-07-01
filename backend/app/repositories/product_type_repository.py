@@ -85,6 +85,16 @@ class ProductTypeRepository(BaseRepository):
         stmt = self._visible_scope(stmt, campaign_ids)
         return self.db.execute(stmt.limit(1)).scalar_one_or_none() is not None
 
+    def promote(self, pt_id: UUID) -> ProductType | None:
+        """Move a campaign-scoped product type to global (campaign_id → None)."""
+        pt = self.find_by_id(pt_id)
+        if pt is None:
+            return None
+        pt.campaign_id = None
+        self.db.flush()
+        self.db.refresh(pt)
+        return pt
+
     def save(self, pt: ProductType) -> ProductType:
         self.db.add(pt)
         self.db.flush()

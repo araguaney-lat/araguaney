@@ -3,6 +3,7 @@ from uuid import UUID
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from app.models.events import ShipmentEvent
 from app.models.pallet import Pallet
 from app.models.shipment import Shipment
 from app.repositories.base import TenantRepository
@@ -27,6 +28,11 @@ class ShipmentRepository(TenantRepository[Shipment]):
     def find_pallets(self, shipment_id: UUID) -> list[Pallet]:
         stmt = select(Pallet).where(Pallet.shipment_id == shipment_id).order_by(Pallet.created_at)
         return list(self.db.execute(stmt).scalars())
+
+    def list_events(self, shipment_id: UUID) -> list[ShipmentEvent]:
+        return list(self.db.execute(
+            select(ShipmentEvent).where(ShipmentEvent.shipment_id == shipment_id).order_by(ShipmentEvent.ts)
+        ).scalars())
 
     def save(self, shipment: Shipment) -> Shipment:
         self.db.add(shipment)

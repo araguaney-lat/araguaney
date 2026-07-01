@@ -4,6 +4,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.models.box import Box
+from app.models.events import PalletEvent
 from app.models.pallet import Pallet
 from app.repositories.base import TenantRepository
 
@@ -31,6 +32,11 @@ class PalletRepository(TenantRepository[Pallet]):
     def find_boxes(self, pallet_id: UUID) -> list[Box]:
         stmt = select(Box).where(Box.pallet_id == pallet_id).order_by(Box.created_at)
         return list(self.db.execute(stmt).scalars())
+
+    def list_events(self, pallet_id: UUID) -> list[PalletEvent]:
+        return list(self.db.execute(
+            select(PalletEvent).where(PalletEvent.pallet_id == pallet_id).order_by(PalletEvent.ts)
+        ).scalars())
 
     def save(self, pallet: Pallet) -> Pallet:
         self.db.add(pallet)

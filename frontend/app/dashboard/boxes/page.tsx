@@ -1,7 +1,8 @@
 "use client"
 
 import { useState, useEffect, useTransition } from "react"
-import type { BoxOut, BoxStatus } from "@/types"
+import type { BoxOut, BoxStatus, EventOut } from "@/types"
+import { StatusTimeline } from "@/components/StatusTimeline"
 import { sealBoxAction, downloadLabelsPdfAction } from "@/lib/box-actions"
 
 const STATUS_LABELS: Record<BoxStatus, string> = {
@@ -24,6 +25,8 @@ export default function BoxesPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [sealing, setSealing] = useState<string | null>(null)
+  const [expandedBoxId, setExpandedBoxId] = useState<string | null>(null)
+  const [boxEvents, setBoxEvents] = useState<Record<string, EventOut[]>>({})
   const [isPending, startTransition] = useTransition()
 
   const fetchBoxes = async () => {
@@ -72,6 +75,21 @@ export default function BoxesPage() {
         URL.revokeObjectURL(url)
       }
     })
+  }
+
+  const toggleBoxDetail = async (boxId: string) => {
+    if (expandedBoxId === boxId) {
+      setExpandedBoxId(null)
+      return
+    }
+    setExpandedBoxId(boxId)
+    if (!boxEvents[boxId]) {
+      const res = await fetch(`/api/boxes/${boxId}/events`)
+      if (res.ok) {
+        const events: EventOut[] = await res.json()
+        setBoxEvents((prev) => ({ ...prev, [boxId]: events }))
+      }
+    }
   }
 
   const draftCount = boxes.filter((b) => b.status === "DRAFT").length
@@ -124,46 +142,60 @@ export default function BoxesPage() {
           {boxes.map((box) => (
             <div
               key={box.id}
-              className="flex flex-wrap items-start gap-3 rounded-xl border border-zinc-200 bg-white p-4"
+              className="rounded-xl border border-zinc-200 bg-white"
             >
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="font-mono text-sm font-semibold text-zinc-900">{box.code}</span>
-                  <span className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_COLORS[box.status as BoxStatus]}`}>
-                    {STATUS_LABELS[box.status as BoxStatus]}
-                  </span>
+              <div
+                className="flex flex-wrap items-start gap-3 p-4 cursor-pointer"
+                onClick={() => toggleBoxDetail(box.id)}
+              >
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="font-mono text-sm font-semibold text-zinc-900">{box.code}</span>
+                    <span className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_COLORS[box.status as BoxStatus]}`}>
+                      {STATUS_LABELS[box.status as BoxStatus]}
+                    </span>
+                  </div>
+                  <p className="mt-1 text-xs text-zinc-500">
+                    {box.quantity} {box.unit}
+                    {box.batch && ` · Lote: ${box.batch}`}
+                    {box.expiry_date && ` · Cad: ${new Date(box.expiry_date + "T00:00:00").toLocaleDateString("es-MX")}`}
+                  </p>
+                  {box.reject_reason && (
+                    <p className="mt-1 text-xs text-red-600 font-medium">⊘ {box.reject_reason}</p>
+                  )}
                 </div>
-                <p className="mt-1 text-xs text-zinc-500">
-                  {box.quantity} {box.unit}
-                  {box.batch && ` · Lote: ${box.batch}`}
-                  {box.expiry_date && ` · Cad: ${new Date(box.expiry_date + "T00:00:00").toLocaleDateString("es-MX")}`}
-                </p>
-                {box.reject_reason && (
-                  <p className="mt-1 text-xs text-red-600 font-medium">⊘ {box.reject_reason}</p>
-                )}
+
+                <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                  <a
+                    href={`/b/${box.code}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="rounded border border-zinc-200 px-2 py-1 text-xs text-zinc-600 hover:bg-zinc-50"
+                  >
+                    Ver ficha
+                  </a>
+                  {box.status === "DRAFT" && (
+                    <button
+                      onClick={() => handleSeal(box.id)}
+                      disabled={sealing === box.id}
+                      className="rounded-lg bg-zinc-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-zinc-700 disabled:opacity-60"
+                    >
+                      {sealing === box.id ? "Sellando…" : "Sellar caja"}
+                    </button>
+                  )}
+                </div>
               </div>
 
-              <div className="flex items-center gap-2">
-                {/* QR preview link */}
-                <a
-                  href={`/b/${box.code}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="rounded border border-zinc-200 px-2 py-1 text-xs text-zinc-600 hover:bg-zinc-50"
-                >
-                  Ver ficha
-                </a>
-                {/* Seal button — only for DRAFT boxes */}
-                {box.status === "DRAFT" && (
-                  <button
-                    onClick={() => handleSeal(box.id)}
-                    disabled={sealing === box.id}
-                    className="rounded-lg bg-zinc-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-zinc-700 disabled:opacity-60"
-                  >
-                    {sealing === box.id ? "Sellando…" : "Sellar caja"}
-                  </button>
-                )}
-              </div>
+              {expandedBoxId === box.id && (
+                <div className="border-t border-zinc-100 px-4 pb-4 pt-3">
+                  <p className="text-xs font-semibold text-zinc-500 mb-3">Historial</p>
+                  {boxEvents[box.id] && boxEvents[box.id].length > 0 ? (
+                    <StatusTimeline events={boxEvents[box.id]} />
+                  ) : (
+                    <p className="text-xs text-zinc-400">Sin eventos registrados.</p>
+                  )}
+                </div>
+              )}
             </div>
           ))}
         </div>

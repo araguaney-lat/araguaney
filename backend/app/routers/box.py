@@ -13,6 +13,7 @@ from app.repositories.box_repository import BoxRepository
 from app.repositories.product_type_repository import ProductTypeRepository
 from app.repositories.center_repository import CenterRepository
 from app.schemas.box import BoxOut, BoxPublicOut
+from app.schemas.qr_ficha import QrEventOut
 from app.services.box_service import BoxService
 from app.utils.audit import fire_audit
 from app.utils.cloudflare import get_client_ip
@@ -168,3 +169,16 @@ def download_labels_pdf(
         media_type="application/pdf",
         headers={"Content-Disposition": f'attachment; filename="etiquetas-{status.lower()}.pdf"'},
     )
+
+
+@router.get("/v1/boxes/{box_id}/events", response_model=list[QrEventOut])
+@limiter.limit("120/minute")
+def list_box_events(
+    request: Request,
+    box_id: UUID,
+    db: Session = Depends(get_db),
+    _: User = Depends(require_center_role),
+    scope: UUID | None = Depends(tenant_scope),
+):
+    box = BoxService(db).get(box_id, center_id=scope)  # validates tenant
+    return BoxRepository(db).list_events(box.id)

@@ -2,7 +2,7 @@ import secrets
 from datetime import datetime
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Query, Request
+from fastapi import APIRouter, BackgroundTasks, Depends, Query, Request
 from sqlalchemy.orm import Session
 
 from app.database import get_db
@@ -10,8 +10,10 @@ from app.dependencies import require_national_admin, get_current_user
 from app.models.user import User
 from app.repositories.audit_repository import AuditRepository
 from app.repositories.campaign_repository import CampaignRepository
+from app.repositories.product_type_repository import ProductTypeRepository
 from app.repositories.user_campaign_repository import UserCampaignRepository
 from app.repositories.user_repository import UserRepository
+from app.schemas.product_type import ProductTypeOut
 from app.schemas.studio import (
     AuditListOut,
     AuditLogOut,
@@ -20,6 +22,8 @@ from app.schemas.studio import (
 )
 from app.schemas.user_domain import UserOut, CENTER_ROLES
 from app.services.auth_service import AuthService
+from app.utils.audit import fire_audit
+from app.utils.cloudflare import get_client_ip
 from app.utils.errors import api_error
 from app.utils.rate_limit import limiter
 
@@ -190,3 +194,32 @@ def list_audit(
         offset=offset,
     )
     return AuditListOut(items=items, total=total, limit=limit, offset=offset)
+
+
+# ── Product type promotion ─────────────────────────────────────────────────────
+
+@router.post("/product-types/{pt_id}/promote", response_model=ProductTypeOut)
+@limiter.limit("20/minute")
+def promote_product_type(
+    request: Request,
+    background_tasks: BackgroundTasks,
+    pt_id: UUID,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_national_admin),
+):
+    """Promote a campaign-scoped product type to global (campaign_id → NULL)."""
+    pt_repo = ProductTypeRepository(db)
+    pt = pt_repo.find_by_id(pt_id)
+    if not pt:
+        raise api_error("PRODUCT_TYPE_NOT_FOUND", "Product type not found", status_code=404)
+    if pt.campaign_id is None:
+        raise api_error("ALREADY_GLOBAL", "Product type is already in the global catalog", status_code=409)
+    from_campaign_id = str(pt.campaign_id)
+    pt_repo.promote(pt_id)
+    pt_repo.commit()
+    fire_audit(
+        background_tasks, "PRODUCT_TYPE_PROMOTED", "product_type",
+        user_id=current_user.id, entity_id=str(pt_id), ip=get_client_ip(request),
+        metadata={"from_campaign_id": from_campaign_id, "promoted_by": str(current_user.id)},
+    )
+    return pt_repo.find_by_id(pt_id)

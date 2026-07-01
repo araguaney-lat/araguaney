@@ -1,7 +1,8 @@
 "use client"
 
 import { useState, useEffect, useTransition } from "react"
-import type { Campaign, ShipmentOut, ShipmentDetailOut, ShipmentStatus, PalletOut } from "@/types"
+import type { Campaign, ShipmentOut, ShipmentDetailOut, ShipmentStatus, PalletOut, EventOut } from "@/types"
+import { StatusTimeline } from "@/components/StatusTimeline"
 import {
   createShipmentAction,
   addPalletToShipmentAction,
@@ -28,6 +29,7 @@ export default function ShipmentsPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [activeShipment, setActiveShipment] = useState<ShipmentDetailOut | null>(null)
+  const [shipmentEvents, setShipmentEvents] = useState<EventOut[]>([])
   const [closedPallets, setClosedPallets] = useState<PalletOut[]>([])
   const [campaigns, setCampaigns] = useState<Campaign[]>([])
   const [selectedPalletId, setSelectedPalletId] = useState("")
@@ -52,8 +54,13 @@ export default function ShipmentsPage() {
   }
 
   const fetchShipmentDetail = async (id: string) => {
-    const res = await fetch(`/api/shipments/${id}`)
-    if (res.ok) setActiveShipment(await res.json())
+    const [detailRes, eventsRes] = await Promise.all([
+      fetch(`/api/shipments/${id}`),
+      fetch(`/api/shipments/${id}/events`),
+    ])
+    if (detailRes.ok) setActiveShipment(await detailRes.json())
+    if (eventsRes.ok) setShipmentEvents(await eventsRes.json())
+    else setShipmentEvents([])
   }
 
   const fetchClosedPallets = async () => {
@@ -275,7 +282,7 @@ export default function ShipmentsPage() {
                 {activeShipment.destination}
                 {activeShipment.reference && <span className="ml-2 font-mono text-xs text-zinc-400">{activeShipment.reference}</span>}
               </h2>
-              <button onClick={() => setActiveShipment(null)} className="text-zinc-400 hover:text-zinc-700 text-sm">✕</button>
+              <button onClick={() => { setActiveShipment(null); setShipmentEvents([]) }} className="text-zinc-400 hover:text-zinc-700 text-sm">✕</button>
             </div>
 
             {activeShipment.status === "OPEN" && (
@@ -315,6 +322,13 @@ export default function ShipmentsPage() {
                 </ul>
               )}
             </div>
+
+            {shipmentEvents.length > 0 && (
+              <div className="border-t border-zinc-100 pt-4">
+                <p className="text-xs font-semibold text-zinc-500 mb-3">Historial</p>
+                <StatusTimeline events={shipmentEvents} />
+              </div>
+            )}
           </div>
         )}
       </div>
