@@ -93,9 +93,11 @@ interface SidebarProps {
   centerName?: string | null
   nav: DashboardNav
   roleLabels: DashboardRoleLabels
+  userName?: string | null
+  userEmail?: string | null
 }
 
-export function Sidebar({ centerRole, platformRole, centerName, nav, roleLabels }: SidebarProps) {
+export function Sidebar({ centerRole, platformRole, centerName, nav, roleLabels, userName, userEmail }: SidebarProps) {
   const pathname = usePathname()
   const [collapsed, setCollapsed] = useState(false)
   const [mounted, setMounted] = useState(false)
@@ -210,6 +212,28 @@ export function Sidebar({ centerRole, platformRole, centerName, nav, roleLabels 
           isActive={pathname.startsWith("/dashboard/settings")}
           collapsed={collapsed}
         />
+
+        {/* User info */}
+        {(userName || userEmail) && (
+          <div className={`flex items-center gap-2.5 rounded-lg px-2.5 py-2 ${collapsed ? "justify-center" : ""}`}
+            title={collapsed ? `${userName ?? userEmail}${centerRole ? ` · ${roleLabels[centerRole as keyof DashboardRoleLabels] ?? centerRole}` : ""}` : undefined}
+          >
+            <span className="flex-shrink-0 flex h-7 w-7 items-center justify-center rounded-full bg-amber-300 text-xs font-bold text-amber-900">
+              {(userName ?? userEmail ?? "?")[0].toUpperCase()}
+            </span>
+            {!collapsed && (
+              <div className="min-w-0">
+                <p className="text-xs font-semibold text-amber-900 truncate">{userName ?? userEmail}</p>
+                {centerRole && (
+                  <p className="text-xs text-amber-700/80 truncate">
+                    {roleLabels[centerRole as keyof DashboardRoleLabels] ?? centerRole}
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+
         <form action={logoutAction}>
           <button
             type="submit"
