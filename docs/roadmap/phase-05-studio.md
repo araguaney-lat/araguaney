@@ -1,4 +1,4 @@
-### Fase 5 — Studio (panel de administración nacional) 🟡 — 38/39
+### Fase 5 — Studio (panel de administración nacional) ✅ — 39/39
 
 > Panel exclusivo para `national_admin`: gestión unificada de usuarios, campañas, centros y trazas de auditoría.
 > Criterios de aceptación: el `national_admin` puede crear/editar/desactivar usuarios y campañas desde `/studio`; toda acción relevante queda registrada en el log de auditoría; los eventos se purgan automáticamente a los 90 días.
@@ -66,7 +66,7 @@
 | 27 | Página `/change-password` | Página standalone (sin nav) que aparece tras login con `must_change_password`; formulario: contraseña actual + nueva + confirmación; redirige a dashboard al completar | 🟡 | ✅ Hecho |
 | 28 | Sección de contraseña en perfil | En `/dashboard/settings`: componente `ChangePasswordForm`; disponible para todos los roles | 🟡 | ✅ Hecho |
 | 29 | User manager para coordinador | `/dashboard/team` — coordinador ve usuarios de su centro; botón crear volunteer; botón "Reinvitar" por fila | 🟡 | ✅ Hecho |
-| 39 | Sidebar colapsable | Botón de toggle con ícono `PanelLeftClose` / `PanelLeftOpen` (Lucide) — el mismo que usa Claude AI — que alterna entre modo expandido (ícono + etiqueta) y modo colapsado (solo íconos con tooltip al hover); estado persistido en `localStorage`; en móvil el comportamiento no cambia (sigue siendo drawer) | 🟡 | ⬜ Pendiente |
+| 39 | Sidebar colapsable | `PanelLeftClose`/`PanelLeftOpen` (Lucide); iconos en cada ítem de nav; modo colapsado (w-14, solo iconos + tooltip); modo expandido (w-56, icono + etiqueta); estado persistido en `localStorage`; `lucide-react` instalado | 🟡 | ✅ Hecho |
 
 ---
 
