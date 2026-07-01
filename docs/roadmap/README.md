@@ -4,8 +4,8 @@
 
 ```mermaid
 pie title Tareas completadas (198 tareas)
-    "Listas" : 181
-    "Pendientes" : 17
+    "Listas" : 182
+    "Pendientes" : 16
 ```
 
 | Fase | Nombre | Listas | Pendientes | Progreso |
@@ -18,9 +18,9 @@ pie title Tareas completadas (198 tareas)
 | 5 | [Studio — panel de administración + solicitudes](phase-05-studio.md) | 39 | 0 | ✅ 100% |
 | 6 | [Catálogos de referencia + lookups en tiempo real](phase-06-catalog-integrations.md) | 35 | 0 | ✅ 100% |
 | 7 | [Transferencias entre centros](phase-07-transfers.md) | 21 | 0 | ✅ 100% |
-| 8 | [Mensajería entre usuarios](phase-08-messaging.md) | 21 | 1 | ✅ 95% |
+| 8 | [Mensajería entre usuarios](phase-08-messaging.md) | 22 | 0 | ✅ 100% |
 | 9 | Reportes (TBD) | 0 | — | ⬜ por definir |
-| **Total** | | **181** | **17** | **🟡 91%** |
+| **Total** | | **182** | **16** | **🟡 92%** |
 
 > Envs opcionales (Sentry, Slack, Google Safe Browsing, Encryption Key) se pueden agregar en cualquier momento sin cambios de código.
 

@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 from uuid import UUID
 
-from sqlalchemy import select, or_
+from sqlalchemy import func, select, or_
 from sqlalchemy.orm import Session
 
 from app.models.messaging import Thread, ThreadAttachment, ThreadParticipant, ThreadReply
@@ -121,6 +121,22 @@ class ThreadRepository(BaseRepository):
         if thread:
             thread.updated_at = datetime.now(timezone.utc)
             self.db.flush()
+
+    def count_unread_private(self, user_id: UUID) -> int:
+        stmt = (
+            select(func.count())
+            .select_from(Thread)
+            .join(ThreadParticipant, ThreadParticipant.thread_id == Thread.id)
+            .where(
+                ThreadParticipant.user_id == user_id,
+                Thread.thread_type == "PRIVATE",
+                or_(
+                    ThreadParticipant.last_read_at.is_(None),
+                    Thread.updated_at > ThreadParticipant.last_read_at,
+                ),
+            )
+        )
+        return self.db.execute(stmt).scalar_one()
 
     def commit(self) -> None:
         self.db.commit()

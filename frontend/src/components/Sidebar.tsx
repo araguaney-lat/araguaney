@@ -3,7 +3,7 @@
 import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { logoutAction } from "@/lib/actions"
 import type { CenterRole } from "@/types"
 import {
@@ -36,6 +36,7 @@ interface NavItem {
   labelKey: keyof DashboardNav
   roles: CenterRole[]
   icon: IconComponent
+  badgeKey?: string
 }
 
 type DashboardNav = {
@@ -72,7 +73,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: "/dashboard/pallets", labelKey: "pallets", roles: ["coordinator"], icon: Layers },
   { href: "/dashboard/shipments", labelKey: "shipments", roles: ["coordinator"], icon: Truck },
   { href: "/dashboard/transfers", labelKey: "transfers", roles: ["national_admin", "coordinator"], icon: ArrowLeftRight },
-  { href: "/dashboard/messages", labelKey: "messages", roles: ["national_admin", "coordinator", "volunteer"], icon: MessageCircle },
+  { href: "/dashboard/messages", labelKey: "messages", roles: ["national_admin", "coordinator", "volunteer"], icon: MessageCircle, badgeKey: "messages" },
   { href: "/dashboard/scan", labelKey: "scan", roles: ["national_admin", "coordinator", "volunteer"], icon: ScanLine },
   { href: "/dashboard/campaigns", labelKey: "campaigns", roles: ["national_admin", "coordinator", "volunteer"], icon: Flag },
   { href: "/dashboard/centers", labelKey: "centers", roles: ["national_admin"], icon: Building2 },
@@ -109,11 +110,25 @@ export function Sidebar({ centerRole, platformRole, centerName, nav, roleLabels,
   const pathname = usePathname()
   const [collapsed, setCollapsed] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const [unreadMessages, setUnreadMessages] = useState(0)
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   useEffect(() => {
     const stored = localStorage.getItem(STORAGE_KEY)
     if (stored === "true") setCollapsed(true)
     setMounted(true)
+  }, [])
+
+  useEffect(() => {
+    const fetchUnread = () => {
+      fetch("/api/messages/unread-count")
+        .then((r) => r.ok ? r.json() : { unread: 0 })
+        .then((d) => setUnreadMessages(d.unread ?? 0))
+        .catch(() => {})
+    }
+    fetchUnread()
+    intervalRef.current = setInterval(fetchUnread, 30_000)
+    return () => { if (intervalRef.current) clearInterval(intervalRef.current) }
   }, [])
 
   function toggle() {
@@ -172,6 +187,7 @@ export function Sidebar({ centerRole, platformRole, centerName, nav, roleLabels,
         {visibleItems.map((item) => {
           const isActive = pathname === item.href
           const Icon = item.icon
+          const badge = item.badgeKey === "messages" ? unreadMessages : 0
           return (
             <NavLink
               key={item.href}
@@ -180,6 +196,7 @@ export function Sidebar({ centerRole, platformRole, centerName, nav, roleLabels,
               icon={<Icon size={17} />}
               isActive={isActive}
               collapsed={collapsed}
+              badge={badge}
             />
           )
         })}
@@ -273,9 +290,10 @@ interface NavLinkProps {
   isActive: boolean
   collapsed: boolean
   className?: string
+  badge?: number
 }
 
-function NavLink({ href, label, icon, isActive, collapsed, className }: NavLinkProps) {
+function NavLink({ href, label, icon, isActive, collapsed, className, badge = 0 }: NavLinkProps) {
   const base =
     "flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm font-medium transition-colors"
   const active = "bg-amber-200/70 text-amber-900"
@@ -288,8 +306,18 @@ function NavLink({ href, label, icon, isActive, collapsed, className }: NavLinkP
       data-active={isActive}
       className={`${base} ${isActive ? active : inactive} ${collapsed ? "justify-center" : ""} ${className ?? ""}`}
     >
-      <span className="flex-shrink-0">{icon}</span>
-      {!collapsed && <span className="truncate">{label}</span>}
+      <span className="relative flex-shrink-0">
+        {icon}
+        {badge > 0 && collapsed && (
+          <span className="absolute -top-1 -right-1 flex h-2 w-2 rounded-full bg-red-500" />
+        )}
+      </span>
+      {!collapsed && <span className="flex-1 truncate">{label}</span>}
+      {!collapsed && badge > 0 && (
+        <span className="ml-auto flex-shrink-0 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white leading-none">
+          {badge > 99 ? "99+" : badge}
+        </span>
+      )}
     </Link>
   )
 }

@@ -17,6 +17,7 @@ from app.schemas.messaging import (
     UploadUrlOut,
     UploadUrlRequest,
 )
+from app.repositories.thread_repository import ThreadRepository
 from app.services.thread_service import ThreadService
 from app.utils.audit import fire_audit
 from app.utils.cloudflare import get_client_ip
@@ -91,6 +92,17 @@ def list_threads(
     current_user: User = Depends(get_current_user),
 ):
     return ThreadService(db).list(current_user, thread_type, campaign_id)
+
+
+@router.get("/unread-count")
+@limiter.limit("60/minute")
+def get_unread_count(
+    request: Request,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    count = ThreadRepository(db).count_unread_private(current_user.id)
+    return {"unread": count}
 
 
 @router.get("/{thread_id}", response_model=ThreadDetailOut)
