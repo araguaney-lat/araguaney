@@ -19,7 +19,7 @@ class AuditRepository:
         *,
         user_id: uuid.UUID | None = None,
         entity_id: str | None = None,
-        metadata: dict[str, Any] | None = None,
+        extra: dict[str, Any] | None = None,
         ip: str | None = None,
     ) -> None:
         entry = AuditLog(
@@ -28,7 +28,7 @@ class AuditRepository:
             action=action,
             entity_type=entity_type,
             entity_id=entity_id,
-            metadata=metadata,
+            extra=extra,
             ip=ip,
         )
         self._db.add(entry)

@@ -84,7 +84,7 @@ def create_user(
         "user",
         user_id=admin.id,
         entity_id=str(user.id),
-        metadata={"email": user.email, "center_role": user.center_role},
+        extra={"email": user.email, "center_role": user.center_role},
     )
     db.commit()
     return user
@@ -114,7 +114,7 @@ def reinvite_user(
         "user",
         user_id=admin.id,
         entity_id=str(user.id),
-        metadata={"email": user.email},
+        extra={"email": user.email},
     )
     db.commit()
     # TODO: enqueue send_invitation_email_task(user.email, raw_password)
@@ -152,7 +152,7 @@ def patch_user(
         "user",
         user_id=admin.id,
         entity_id=str(user.id),
-        metadata={"before": before, "after": {"center_role": user.center_role, "is_active": user.is_active}},
+        extra={"before": before, "after": {"center_role": user.center_role, "is_active": user.is_active}},
     )
     db.commit()
     db.refresh(user)

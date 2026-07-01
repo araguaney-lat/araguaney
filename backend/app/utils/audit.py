@@ -26,7 +26,7 @@ def fire_audit(
     *,
     user_id: uuid.UUID | None = None,
     entity_id: str | None = None,
-    metadata: dict[str, Any] | None = None,
+    extra: dict[str, Any] | None = None,
     ip: str | None = None,
 ) -> None:
     def _write() -> None:
@@ -37,7 +37,7 @@ def fire_audit(
                 action, entity_type,
                 user_id=user_id,
                 entity_id=entity_id,
-                metadata=metadata,
+                extra=extra,
                 ip=ip,
             )
             db.commit()

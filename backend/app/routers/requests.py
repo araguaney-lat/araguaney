@@ -141,7 +141,7 @@ def update_status(
     AuditRepository(db).log(
         "REQUEST_STATUS_CHANGED", "request",
         user_id=admin.id, entity_id=str(req.id),
-        metadata={"status": data.status},
+        extra={"status": data.status},
     )
     db.commit()
     db.refresh(req)

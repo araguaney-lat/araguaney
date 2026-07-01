@@ -13,6 +13,6 @@ class AuditLog(Base):
     action = Column(String, nullable=False)
     entity_type = Column(String, nullable=False)
     entity_id = Column(String, nullable=True)
-    metadata = Column(JSONB, nullable=True)
+    extra = Column("metadata", JSONB, nullable=True)
     ip = Column(String, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)

@@ -13,7 +13,7 @@ class AuditLogOut(StrictORMModel):
     action: str
     entity_type: str
     entity_id: str | None
-    metadata: dict[str, Any] | None
+    extra: dict[str, Any] | None
     ip: str | None
     created_at: datetime
 
