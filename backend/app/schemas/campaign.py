@@ -50,4 +50,19 @@ class CampaignOut(StrictORMModel):
     start_date: date | None
     end_date: date | None
     is_active: bool
+    is_general: bool
     created_at: datetime
+
+
+class CampaignMemberAdd(StrictModel):
+    user_id: UUID
+
+
+class CampaignMemberOut(StrictORMModel):
+    id: UUID
+    email: str
+    username: str
+    full_name: str | None
+    center_role: str | None
+    center_id: UUID | None
+    is_active: bool
