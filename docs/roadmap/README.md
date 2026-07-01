@@ -3,8 +3,8 @@
 ## Progreso general
 
 ```mermaid
-pie title Tareas completadas (198 tareas)
-    "Listas" : 182
+pie title Tareas completadas (206 tareas)
+    "Listas" : 190
     "Pendientes" : 16
 ```
 
@@ -19,8 +19,8 @@ pie title Tareas completadas (198 tareas)
 | 6 | [Catálogos de referencia + lookups en tiempo real](phase-06-catalog-integrations.md) | 35 | 0 | ✅ 100% |
 | 7 | [Transferencias entre centros](phase-07-transfers.md) | 21 | 0 | ✅ 100% |
 | 8 | [Mensajería entre usuarios](phase-08-messaging.md) | 22 | 0 | ✅ 100% |
-| 9 | Reportes (TBD) | 0 | — | ⬜ por definir |
-| **Total** | | **182** | **16** | **🟡 92%** |
+| 9 | [Reportes de campaña](phase-09-reports.md) | 8 | 0 | ✅ 100% |
+| **Total** | | **190** | **16** | **🟡 92%** |
 
 > Envs opcionales (Sentry, Slack, Google Safe Browsing, Encryption Key) se pueden agregar en cualquier momento sin cambios de código.
 

@@ -22,6 +22,7 @@ import {
   Users,
   UserCog,
   ScrollText,
+  BarChart2,
   Settings,
   LogOut,
   PanelLeftClose,
@@ -52,6 +53,7 @@ type DashboardNav = {
   campaigns: string
   centers: string
   requests: string
+  reports: string
   users: string
   audit: string
   team: string
@@ -78,6 +80,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: "/dashboard/campaigns", labelKey: "campaigns", roles: ["national_admin", "coordinator", "volunteer"], icon: Flag },
   { href: "/dashboard/centers", labelKey: "centers", roles: ["national_admin"], icon: Building2 },
   { href: "/dashboard/requests", labelKey: "requests", roles: ["national_admin", "coordinator", "volunteer"], icon: MessageSquare },
+  { href: "/dashboard/reports", labelKey: "reports", roles: ["national_admin", "coordinator", "volunteer"], icon: BarChart2 },
   { href: "/dashboard/team", labelKey: "team", roles: ["coordinator"], icon: Users },
 ]
 
