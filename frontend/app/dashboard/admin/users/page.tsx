@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { listStudioUsersAction, createStudioUserAction, patchStudioUserAction } from "@/lib/studio-actions"
+import { listStudioUsersAction, createStudioUserAction, patchStudioUserAction, reinviteStudioUserAction } from "@/lib/studio-actions"
 import type { UserOut } from "@/types"
 
 const ROLES = ["volunteer", "coordinator", "national_admin"]
@@ -17,6 +17,7 @@ export default function StudioUsersPage() {
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editForm, setEditForm] = useState<{ center_role: string; is_active: boolean }>({ center_role: "", is_active: true })
   const [filterRole, setFilterRole] = useState("")
+  const [reinviting, setReinviting] = useState<string | null>(null)
 
   async function load() {
     setLoading(true)
@@ -50,6 +51,18 @@ export default function StudioUsersPage() {
       setError(err instanceof Error ? err.message : "Error al crear usuario")
     } finally {
       setSaving(false)
+    }
+  }
+
+  async function handleReinvite(userId: string) {
+    setReinviting(userId)
+    setError(null)
+    try {
+      await reinviteStudioUserAction(userId)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Error al reinvitar")
+    } finally {
+      setReinviting(null)
     }
   }
 
@@ -206,12 +219,22 @@ export default function StudioUsersPage() {
                         </button>
                       </div>
                     ) : (
-                      <button
-                        onClick={() => { setEditingId(u.id); setEditForm({ center_role: u.center_role ?? "volunteer", is_active: u.is_active }) }}
-                        className="rounded px-2 py-1 text-xs text-zinc-500 hover:bg-zinc-100"
-                      >
-                        Editar
-                      </button>
+                      <div className="flex items-center gap-2 justify-end">
+                        <button
+                          onClick={() => handleReinvite(u.id)}
+                          disabled={reinviting === u.id || !u.is_active}
+                          className="rounded px-2 py-1 text-xs text-amber-600 hover:bg-amber-50 disabled:opacity-40"
+                          title="Reenviar invitación"
+                        >
+                          {reinviting === u.id ? "..." : "Reinvitar"}
+                        </button>
+                        <button
+                          onClick={() => { setEditingId(u.id); setEditForm({ center_role: u.center_role ?? "volunteer", is_active: u.is_active }) }}
+                          className="rounded px-2 py-1 text-xs text-zinc-500 hover:bg-zinc-100"
+                        >
+                          Editar
+                        </button>
+                      </div>
                     )}
                   </td>
                 </tr>

@@ -14,6 +14,12 @@ class Token(StrictModel):
     role: str | None = None
     center_role: str | None = None
     center_id: str | None = None
+    must_change_password: bool = False
+
+
+class ChangePasswordRequest(StrictModel):
+    current_password: str
+    new_password: str
 
 
 class ResendRequest(StrictModel):

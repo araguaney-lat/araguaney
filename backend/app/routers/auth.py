@@ -7,6 +7,7 @@ from app.database import get_db
 from app.dependencies import get_current_user
 from app.models.user import User
 from app.schemas.auth import (
+    ChangePasswordRequest,
     ForgotPasswordRequest,
     OAuthLogin,
     ResendRequest,
@@ -101,6 +102,26 @@ async def forgot_password(
 @router.get("/me", response_model=UserOut)
 def get_me(current_user: User = Depends(get_current_user)):
     return current_user
+
+
+@router.patch("/me/password", response_model=Token)
+@limiter.limit("10/hour")
+def change_password(
+    request: Request,
+    data: ChangePasswordRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    from app.repositories.audit_repository import AuditRepository
+    result = AuthService(db).change_password(current_user, data.current_password, data.new_password)
+    AuditRepository(db).log(
+        "USER_PASSWORD_CHANGED",
+        "user",
+        user_id=current_user.id,
+        entity_id=str(current_user.id),
+    )
+    db.commit()
+    return result
 
 
 @router.post("/reset-password")

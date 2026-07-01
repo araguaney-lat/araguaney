@@ -1,5 +1,6 @@
 import { auth } from "@/auth"
 import Link from "next/link"
+import { ChangePasswordForm } from "@/components/ChangePasswordForm"
 
 export default async function SettingsPage() {
   const session = await auth()
@@ -25,6 +26,13 @@ export default async function SettingsPage() {
               {session?.centerRole?.replace("_", " ") ?? "—"}
             </p>
           </div>
+        </div>
+      </div>
+
+      <div>
+        <h2 className="text-sm font-semibold text-zinc-700 mb-3">Contraseña</h2>
+        <div className="rounded-xl border border-zinc-200 bg-white px-5 py-5">
+          <ChangePasswordForm />
         </div>
       </div>
 

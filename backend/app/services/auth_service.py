@@ -136,6 +136,7 @@ class AuthService(BaseService):
             "role": user.role,
             "center_role": user.center_role,
             "center_id": str(user.center_id) if user.center_id else None,
+            "must_change_password": bool(user.must_change_password),
         }
 
     @staticmethod
@@ -224,6 +225,32 @@ class AuthService(BaseService):
             repo.commit()
             # TODO: enqueue send_password_reset_email_task
         return {"message": "If that email is registered, a reset link is on its way."}
+
+    def change_password(self, user: User, current_password: str, new_password: str) -> dict:
+        if not user.hashed_password or not self.verify_password(current_password, user.hashed_password):
+            raise api_error("INVALID_CREDENTIALS", "Current password is incorrect", status_code=401)
+        if len(new_password) < 8:
+            raise api_error("PASSWORD_TOO_SHORT", "Password must be at least 8 characters.", field="new_password")
+        if len(new_password) > 128:
+            raise api_error("PASSWORD_TOO_LONG", "Password must be at most 128 characters.", field="new_password")
+
+        user.hashed_password = self.hash_password(new_password)
+        user.must_change_password = False
+        self.db.commit()
+
+        token = self.create_access_token(
+            str(user.id),
+            center_id=str(user.center_id) if user.center_id else None,
+            center_role=user.center_role,
+        )
+        return {
+            "access_token": token,
+            "token_type": "bearer",
+            "role": user.role,
+            "center_role": user.center_role,
+            "center_id": str(user.center_id) if user.center_id else None,
+            "must_change_password": False,
+        }
 
     def reset_password(self, token: str, new_password: str, background_tasks: BackgroundTasks) -> dict:
         if len(new_password) < 8:
@@ -348,4 +375,5 @@ class AuthService(BaseService):
             "role": user.role,
             "center_role": user.center_role,
             "center_id": str(user.center_id) if user.center_id else None,
+            "must_change_password": bool(user.must_change_password),
         }

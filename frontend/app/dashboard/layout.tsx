@@ -8,6 +8,7 @@ import type { CenterRole } from "@/types"
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const session = await auth()
   if (!session) redirect("/login")
+  if (session.mustChangePassword) redirect("/change-password")
 
   const centerRole = (session.centerRole as CenterRole | null) ?? null
   const platformRole = session.platformRole ?? null

@@ -74,12 +74,13 @@ def create_user(
         full_name=data.full_name,
         hashed_password=AuthService.hash_password(raw_password),
         is_verified=True,
+        must_change_password=True,
         center_id=data.center_id,
         center_role=data.center_role,
     ))
 
     AuditRepository(db).log(
-        "USER_CREATED",
+        "USER_INVITED",
         "user",
         user_id=admin.id,
         entity_id=str(user.id),
@@ -87,6 +88,37 @@ def create_user(
     )
     db.commit()
     return user
+
+
+@router.post("/users/{user_id}/reinvite", status_code=200)
+@limiter.limit("10/hour")
+def reinvite_user(
+    request: Request,
+    user_id: UUID,
+    db: Session = Depends(get_db),
+    admin: User = Depends(require_national_admin),
+):
+    repo = UserRepository(db)
+    user = repo.find_by_id(str(user_id))
+    if not user:
+        raise api_error("NOT_FOUND", "User not found", status_code=404)
+    if not user.is_active:
+        raise api_error("ACCOUNT_DISABLED", "Cannot reinvite a disabled account", status_code=400)
+
+    raw_password = secrets.token_urlsafe(12)
+    user.hashed_password = AuthService.hash_password(raw_password)
+    user.must_change_password = True
+
+    AuditRepository(db).log(
+        "USER_REINVITED",
+        "user",
+        user_id=admin.id,
+        entity_id=str(user.id),
+        metadata={"email": user.email},
+    )
+    db.commit()
+    # TODO: enqueue send_invitation_email_task(user.email, raw_password)
+    return {"message": "Invitation sent"}
 
 
 @router.patch("/users/{user_id}", response_model=UserOut)

@@ -8,6 +8,7 @@ declare module "next-auth" {
     platformRole: string | null
     centerRole: string | null
     centerId: string | null
+    mustChangePassword: boolean
   }
 
   interface User {
@@ -16,6 +17,7 @@ declare module "next-auth" {
     platformRole: string | null
     centerRole: string | null
     centerId: string | null
+    mustChangePassword: boolean
   }
 }
 
@@ -26,5 +28,6 @@ declare module "next-auth/jwt" {
     platformRole: string | null
     centerRole: string | null
     centerId: string | null
+    mustChangePassword: boolean
   }
 }
