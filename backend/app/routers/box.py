@@ -1,7 +1,7 @@
 import io
 from uuid import UUID
 
-from fastapi import APIRouter, BackgroundTasks, Depends, Request
+from fastapi import APIRouter, Depends, Request
 from fastapi.responses import Response, StreamingResponse
 from sqlalchemy.orm import Session
 
@@ -15,7 +15,7 @@ from app.repositories.center_repository import CenterRepository
 from app.schemas.box import BoxOut, BoxPublicOut
 from app.schemas.qr_ficha import QrEventOut
 from app.services.box_service import BoxService
-from app.utils.audit import fire_audit
+from app.repositories.audit_repository import AuditRepository
 from app.utils.cloudflare import get_client_ip
 from app.utils.pdf_labels import LabelData, generate_labels_pdf
 from app.utils.qr import box_qr_png
@@ -92,15 +92,15 @@ def get_box(
 @limiter.limit("60/minute")
 def seal_box(
     request: Request,
-    background_tasks: BackgroundTasks,
     box_id: UUID,
     db: Session = Depends(get_db),
     current_user: User = Depends(require_center_role),
     scope: UUID | None = Depends(tenant_scope),
 ):
     box = BoxService(db).seal(box_id, center_id=scope, user_id=current_user.id)
-    fire_audit(background_tasks, "BOX_SEALED", "box",
-               user_id=current_user.id, entity_id=str(box_id), ip=get_client_ip(request))
+    AuditRepository(db).log("BOX_SEALED", "box",
+        user_id=current_user.id, entity_id=str(box_id), ip=get_client_ip(request))
+    db.commit()
     return box
 
 

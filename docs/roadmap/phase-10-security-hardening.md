@@ -85,10 +85,10 @@
 | 10 | Fix M-4: is_active antes de verificar contraseña | En `auth_service.login()`, mover el check `is_active` **antes** de `verify_password()`. Cuentas desactivadas deben retornar `INVALID_CREDENTIALS` sin resetear el contador de intentos. | 🟡 | ✅ Hecho |
 | 11 | Fix M-2: Audit count con `SELECT COUNT(*)` | En `audit_repository.py`, reemplazar `.all().__len__()` por `select(func.count()).select_from(base.with_only_columns(AuditLog.id).subquery())`. | 🟡 | ✅ Hecho |
 | 12 | Fix M-5: Warning de ENCRYPTION_KEY faltante | En `main.py` startup, loguear un `WARNING` si `settings.encryption_key` no está configurado, advirtiendo que rotar `SECRET_KEY` invalidará todos los secretos TOTP. | 🟡 | ✅ Hecho |
-| 13 | Doc M-3: Audit atomicidad | Documentar en `utils/audit.py` cuáles eventos son best-effort (fire_audit con BackgroundTask) y cuáles deben ir en la misma transacción. Migrar los eventos de cambio de estado crítico (sellado de caja, cierre de envío, cambio de rol) a audit síncrono en la misma sesión. | 🟡 | ⬜ Pendiente |
+| 13 | Doc M-3: Audit atomicidad | Documentar en `utils/audit.py` cuáles eventos son best-effort (fire_audit con BackgroundTask) y cuáles deben ir en la misma transacción. Migrar los eventos de cambio de estado crítico (sellado de caja, cierre de envío, cambio de rol) a audit síncrono en la misma sesión. | 🟡 | ✅ Hecho |
 | 18 | Fix N-2: Timing oracle en login | En `auth_service.login()`, cuando `user is None`, ejecutar un `verify_password` dummy contra un hash bcrypt fijo para igualar la latencia y evitar user enumeration. | 🟡 | ✅ Hecho |
 | 19 | Fix N-3: `extra="forbid"` en StrictModel | Agregar `extra="forbid"` a `ConfigDict` en `StrictModel` (schemas/_base.py). Verificar que ningún endpoint rompa por campos extra legítimos; corregir schemas afectados. Protección anti mass-assignment a nivel de boundary. | 🟡 | ✅ Hecho |
-| 21 | Fix N-5: Row-Level Security (RLS) en DB | Migración que active `ENABLE ROW LEVEL SECURITY` + `CREATE POLICY` en tablas con `center_id` (boxes, pallets, shipments, intakes, product_types...). Hook en `get_db` que ejecute `SET LOCAL app.current_center_id = ...` por transacción (compatible con PgBouncer transaction mode). Policy que lea `current_setting('app.current_center_id', true)`; bypass para `national_admin` (center_id NULL → policy USING clause que permita NULL, o rol con BYPASSRLS). No reemplaza `.scoped()`, lo respalda (defense-in-depth). Tests de aislamiento con `.scoped()` omitido a propósito. | 🟡 | ⬜ Pendiente |
+| 21 | Fix N-5: Row-Level Security (RLS) en DB | Migración que active `ENABLE ROW LEVEL SECURITY` + `CREATE POLICY` en tablas con `center_id` (boxes, pallets, shipments, intakes, product_types...). Hook en `get_db` que ejecute `SET LOCAL app.current_center_id = ...` por transacción (compatible con PgBouncer transaction mode). Policy que lea `current_setting('app.current_center_id', true)`; bypass para `national_admin` (center_id NULL → policy USING clause que permita NULL, o rol con BYPASSRLS). No reemplaza `.scoped()`, lo respalda (defense-in-depth). Tests de aislamiento con `.scoped()` omitido a propósito. | 🟡 | ✅ Hecho |
 | 22 | Fix N-6: Traza de IP completa en auditoría | Pasar `ip=get_client_ip(request)` en todas las llamadas `AuditRepository(db).log(...)` de `studio.py`, `users.py`, `auth.py`, `requests.py`. Agregar `request: Request` a los handlers que aún no lo tengan. Confirmar que las 15 llamadas `fire_audit` también pasan ip (1 pendiente). Opcional: agregar `user_agent` a `AuditLog` para forense más rico. | 🟡 | ✅ Hecho |
 
 ### Grupo D — Low
@@ -97,7 +97,7 @@
 |---|-------|-------------|-----------|--------|
 | 14 | Fix L-1: HSTS y Permissions-Policy | Agregar `Strict-Transport-Security: max-age=63072000; includeSubDomains; preload` y `Permissions-Policy: geolocation=(), microphone=(), camera=()` en `SecurityHeadersMiddleware` de `main.py`. | 🟢 | ✅ Hecho |
 | 15 | Fix L-2: Cap de rango en CSV export | En `report.py._resolve_dates()`, limitar a máximo 366 días. Si `(end - start).days > 366`, truncar `start = end - timedelta(days=366)`. | 🟢 | ✅ Hecho |
-| 16 | Doc L-3: Bloqueo por IP (roadmap futuro) | Documentar la estrategia de IP-level soft block: rastrear fallos cross-cuenta por IP en Redis, bloqueo suave tras 50 fallos en 1 hora. Implementar en Phase 11 o como feature flag. | 🟢 | ⬜ Pendiente |
+| 16 | Doc L-3: Bloqueo por IP (roadmap futuro) | Documentar la estrategia de IP-level soft block: rastrear fallos cross-cuenta por IP en Redis, bloqueo suave tras 50 fallos en 1 hora. Implementar en Phase 11 o como feature flag. | 🟢 | ✅ Hecho |
 | 20 | Fix N-4: Fuerza de contraseña en registro | Agregar `@field_validator("password")` en `UserCreate` que exija 8-128 caracteres (mismo criterio que change/reset). Considerar extraer la validación a un helper compartido. | 🟢 | ✅ Hecho |
 
 ---
@@ -170,6 +170,29 @@ CREATE POLICY tenant_isolation ON boxes
 - Aplicar a todas las tablas con `center_id`: boxes, pallets, shipments, intakes, product_types (scoped), etc.
 - El rol de la app NO debe tener `BYPASSRLS`; el owner de las tablas sí puede bypasear en migraciones/seeds.
 - **No reemplaza `.scoped()`** — es defense-in-depth. El scoping de app sigue siendo la primera línea.
+
+### L-3 — Bloqueo por IP (estrategia documentada, implementar en Phase 11)
+
+Bloqueo suave cross-cuenta por IP: detecta credential-stuffing aunque use cuentas distintas.
+
+**Algoritmo**:
+```python
+# En auth_service.login() tras verificar password incorrecta:
+key = f"ip_fail:{client_ip}"
+fails = redis.incr(key)
+redis.expire(key, 3600)  # ventana de 1 hora
+if fails >= 50:
+    raise api_error("RATE_LIMITED", "Demasiados intentos desde tu red. Espera 1 hora.", status_code=429)
+```
+
+**Consideraciones**:
+- Llave en Redis: `ip_fail:{ip}` con TTL de 3600s (ventana deslizante simple)
+- Umbral: 50 fallos/hora por IP (ajustable como env var `IP_FAIL_THRESHOLD`)
+- No bloquear IPs de proxies conocidos (Cloudflare ranges ya se validan en el frontend)
+- CGNAT: un bloque de IP podría afectar múltiples usuarios legítimos → umbral generoso (50+)
+- Resetear contador en login exitoso desde esa IP
+
+**Dependencia**: requiere Redis (ya en stack via ARQ). Solo activar cuando `REDIS_URL` esté configurado; si no hay Redis, el check es no-op.
 
 ### N-6 — Traza de IP como auditoría interna
 
