@@ -78,11 +78,11 @@ Todos vía `fire_audit(background_tasks, ...)` en los routers:
 
 | # | Tarea | Descripción | Complejidad | Estado |
 |---|-------|-------------|-------------|--------|
-| 1 | `012_user_campaigns` | Tabla `user_campaigns(user_id FK, campaign_id FK, assigned_by FK, assigned_at)`; PK compuesta `(user_id, campaign_id)`; índices en ambas FK; la campaña "Donaciones Generales" se asigna automáticamente al crear un usuario (trigger en service, no en DB) | 🟠 | ⬜ Pendiente |
-| 2 | `013_intake_campaign_required` | Agregar `campaign_id UUID NOT NULL FK → campaigns(id)` a `intakes`; la migración primero crea la campaña "Donaciones Generales" (si no existe) y asigna ese `campaign_id` a todos los intakes históricos antes de poner el `NOT NULL`; índice en `(campaign_id)` | 🟠 | ⬜ Pendiente |
-| 3 | `014_product_type_scope` | Agregar `campaign_id UUID NULLABLE FK → campaigns(id)` a `product_types`; `NULL` = global; índice en `(campaign_id)` | 🟡 | ⬜ Pendiente |
-| 4 | `UserCampaignRepository` | `assign(user_id, campaign_id, assigned_by)`, `list_by_user(user_id)`, `list_by_campaign(campaign_id)`, `remove(user_id, campaign_id)`; guard: coordinator solo puede asignar usuarios de su propio `center_id` | 🟡 | ⬜ Pendiente |
-| 5 | Actualizar `ProductTypeRepository` | `list(user_id)` resuelve las campañas del usuario y retorna globales + los de esas campañas; guard de dedup `(inn_name, form, strength)` con `unaccent + lower` dentro del scope visible; `create()` exige `campaign_id` salvo `national_admin` | 🟠 | ⬜ Pendiente |
+| 1 | `012_user_campaigns` | Tabla `user_campaigns(user_id FK, campaign_id FK, assigned_by FK, assigned_at)`; PK compuesta `(user_id, campaign_id)`; índices en ambas FK; la campaña "Donaciones Generales" se asigna automáticamente al crear un usuario (trigger en service, no en DB) | 🟠 | ✅ Hecho |
+| 2 | `013_intake_campaign_required` | Agregar `campaign_id UUID NOT NULL FK → campaigns(id)` a `intakes`; la migración primero crea la campaña "Donaciones Generales" (si no existe) y asigna ese `campaign_id` a todos los intakes históricos antes de poner el `NOT NULL`; índice en `(campaign_id)` | 🟠 | ✅ Hecho |
+| 3 | `014_product_type_scope` | Agregar `campaign_id UUID NULLABLE FK → campaigns(id)` a `product_types`; `NULL` = global; índice en `(campaign_id)` | 🟡 | ✅ Hecho |
+| 4 | `UserCampaignRepository` | `assign(user_id, campaign_id, assigned_by)`, `list_by_user(user_id)`, `list_by_campaign(campaign_id)`, `remove(user_id, campaign_id)`; guard: coordinator solo puede asignar usuarios de su propio `center_id` | 🟡 | ✅ Hecho |
+| 5 | Actualizar `ProductTypeRepository` | `list(user_id)` resuelve las campañas del usuario y retorna globales + los de esas campañas; guard de dedup `(inn_name, form, strength)` con `unaccent + lower` dentro del scope visible; `create()` exige `campaign_id` salvo `national_admin` | 🟠 | ✅ Hecho |
 | 6 | Endpoint de promoción (admin) | `POST /v1/studio/product-types/{id}/promote` — `national_admin` mueve `campaign_id → NULL`; log en auditoría | 🟡 | ⬜ Pendiente |
 | 7 | Endpoints de asignación de campañas | `POST /v1/campaigns/{id}/members` y `DELETE /v1/campaigns/{id}/members/{user_id}` — coordinator (solo su centro) y national_admin; `GET /v1/campaigns/{id}/members` — lista de asignados | 🟡 | ⬜ Pendiente |
 | 8 | Actualizar `IntakeService` y schemas | `IntakeCreate` incluye `campaign_id` requerido; validar que campaña está activa y el usuario tiene acceso a ella; `IntakeOut` expone `campaign_id` | 🟡 | ⬜ Pendiente |
@@ -93,7 +93,7 @@ Todos vía `fire_audit(background_tasks, ...)` en los routers:
 
 | # | Tarea | Descripción | Complejidad | Estado |
 |---|-------|-------------|-------------|--------|
-| 6 | Seed campaña "Donaciones Generales" | Incluida en migración `012`; `is_active=true`, `destination_country=NULL`; sirve como campaña fallback permanente; no se puede desactivar desde el UI (guard en service) | 🟢 | ⬜ Pendiente |
+| 6 | Seed campaña "Donaciones Generales" | Incluida en migración `012`; `is_active=true`, `destination_country=NULL`; sirve como campaña fallback permanente; no se puede desactivar desde el UI (guard en service) | 🟢 | ✅ Hecho |
 | 7 | Seed WHO Essential Medicines | Migración `014_seed_who_medicines` idempotente: ~500 medicamentos con `inn_name`, `form`, `strength`, `category=MEDICINE`, `is_controlled`, `min_shelf_life_days=365`, `campaign_id=NULL` | 🟠 | ⬜ Pendiente |
 | 8 | Seed IOM/IFRC no-food items | Migración `015_seed_iom_nonfood`: ~300 artículos; `campaign_id=NULL` | 🟠 | ⬜ Pendiente |
 | 9 | Seed alimentos frecuentes | Migración `016_seed_common_food`: ~50 alimentos básicos; `category=FOOD`, `min_shelf_life_days=180`, `campaign_id=NULL` | 🟡 | ⬜ Pendiente |
