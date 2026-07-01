@@ -135,7 +135,7 @@ ThreadAttachment
 | 19 | Vista de hilo y replies | Timeline de mensajes con sender, timestamp y adjuntos; caja de reply al pie; botón de adjuntar archivos | 🟠 | ✅ Completado |
 | 20 | Upload de adjuntos | Drag & drop o picker; muestra preview de imagen / nombre de archivo; valida tipo y tamaño en cliente antes de pedir URL prefirmada; barra de progreso por archivo | 🟠 | ✅ Completado |
 | 21 | Descarga de adjuntos | Botón de descarga por adjunto; llama al endpoint de URL prefirmada y abre en nueva pestaña | 🟢 | ✅ Completado |
-| 22 | Indicador de no leídos en sidebar | Badge numérico en "Mensajes" en el sidebar del dashboard; refleja hilos PRIVATE con replies después de `last_read_at` | 🟡 | ⬜ Pendiente |
+| 22 | Indicador de no leídos en sidebar | Badge numérico en "Mensajes" en el sidebar del dashboard; refleja hilos PRIVATE con replies después de `last_read_at` | 🟡 | ✅ Completado |
 
 ---
 
