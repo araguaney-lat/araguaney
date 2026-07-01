@@ -34,6 +34,15 @@ class ProductTypeService(BaseService):
         pt = ProductType(**data.model_dump())
         return ProductTypeRepository(self.db).save(pt)
 
+    def promote(self, pt_id: UUID) -> ProductType:
+        repo = ProductTypeRepository(self.db)
+        pt = repo.find_by_id(pt_id)
+        if not pt:
+            raise api_error("PRODUCT_TYPE_NOT_FOUND", "Product type not found", status_code=404)
+        pt.campaign_id = None
+        repo.commit()
+        return pt
+
     def update(self, pt_id: UUID, data: ProductTypeUpdate) -> ProductType:
         from app.utils.gtin import validate as validate_gtin
         repo = ProductTypeRepository(self.db)

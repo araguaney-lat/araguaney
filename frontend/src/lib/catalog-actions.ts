@@ -35,3 +35,20 @@ export async function createProductTypeAction(
     return { error: "Error al crear el tipo de producto" }
   }
 }
+
+export async function promoteProductTypeAction(
+  id: string
+): Promise<{ data?: ProductType; error?: string }> {
+  const session = await auth()
+  try {
+    const pt = await apiFetch<ProductType>(`/v1/product-types/${id}/promote`, {
+      method: "POST",
+      token: session?.accessToken,
+    })
+    revalidatePath("/dashboard/catalog")
+    return { data: pt }
+  } catch (err: unknown) {
+    if (err instanceof Error) return { error: err.message }
+    return { error: "Error al promover el tipo de producto" }
+  }
+}
