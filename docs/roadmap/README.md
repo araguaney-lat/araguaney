@@ -4,13 +4,13 @@
 
 ```mermaid
 pie title Tareas completadas (198 tareas)
-    "Listas" : 179
-    "Pendientes" : 19
+    "Listas" : 181
+    "Pendientes" : 17
 ```
 
 | Fase | Nombre | Listas | Pendientes | Progreso |
 |------|--------|-------:|-----------:|----------|
-| 0 | [Scaffolding + multi-tenant + roles](phase-00-scaffolding.md) | 16 | 2 | 🟡 89% |
+| 0 | [Scaffolding + multi-tenant + roles](phase-00-scaffolding.md) | 18 | 0 | ✅ 100% |
 | 1 | [Catálogo e intake con validaciones](phase-01-catalog-intake.md) | 8 | 0 | ✅ 100% |
 | 2 | [Caja homogénea, QR y etiqueta](phase-02-box-qr-label.md) | 6 | 0 | ✅ 100% |
 | 3 | [Tarima, envío y manifiesto](phase-03-pallet-shipment-manifest.md) | 9 | 0 | ✅ 100% |
@@ -20,9 +20,9 @@ pie title Tareas completadas (198 tareas)
 | 7 | [Transferencias entre centros](phase-07-transfers.md) | 21 | 0 | ✅ 100% |
 | 8 | [Mensajería entre usuarios](phase-08-messaging.md) | 21 | 1 | ✅ 95% |
 | 9 | Reportes (TBD) | 0 | — | ⬜ por definir |
-| **Total** | | **179** | **19** | **🟡 90%** |
+| **Total** | | **181** | **17** | **🟡 91%** |
 
-> Las tareas 1 y 2 de Fase 0 (Envs + aplicar migración) requieren acción manual con DB activa.
+> Envs opcionales (Sentry, Slack, Google Safe Browsing, Encryption Key) se pueden agregar en cualquier momento sin cambios de código.
 
 ---
 

@@ -7,8 +7,8 @@
 
 | # | Tarea | Descripción | Complejidad | Estado |
 |---|-------|-------------|-------------|--------|
-| 1 | Envs Railway + Vercel | Configurar variables de entorno: Railway (backend, Postgres, Redis) y Vercel (front) | 🟢 | ⬜ Pendiente |
-| 2 | Migración `002_acopio_core_schema` | Aplicar `alembic upgrade head` con el esquema base de dominio | 🟢 | ⬜ Pendiente |
+| 1 | Envs Railway + Vercel | Configurar variables de entorno: Railway (backend, Postgres, Redis) y Vercel (front) | 🟢 | ✅ Done |
+| 2 | Migración `002_acopio_core_schema` | Aplicar `alembic upgrade head` con el esquema base de dominio | 🟢 | ✅ Done |
 
 #### Backend
 
