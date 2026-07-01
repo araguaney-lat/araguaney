@@ -50,7 +50,21 @@ export interface Campaign {
   start_date: string | null
   end_date: string | null
   is_active: boolean
+  is_general: boolean
   created_at: string
+}
+
+export interface BarcodePrefill {
+  gtin: string
+  display_name: string
+  brand: string | null
+  category: string
+}
+
+export interface BarcodeResult {
+  source: "local" | "open_food_facts"
+  product_type: ProductType | null
+  prefill: BarcodePrefill | null
 }
 
 export interface Center {
