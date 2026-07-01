@@ -55,6 +55,12 @@ async def barcode_lookup(
     _: User = Depends(require_center_role),
 ):
     """Look up a barcode: local DB first, then Open Food Facts with 24-hour Redis cache."""
+    from app.utils.gtin import validate as validate_gtin, normalize as normalize_gtin
+
+    gtin = normalize_gtin(gtin)
+    if not validate_gtin(gtin):
+        raise api_error("INVALID_GTIN", "GTIN must be a valid EAN-8, UPC-A, or EAN-13", field="gtin", status_code=422)
+
     # 1. Local match — no internet needed
     local = ProductTypeRepository(db).find_by_gtin(gtin)
     if local:
