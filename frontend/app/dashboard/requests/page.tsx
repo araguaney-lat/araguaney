@@ -8,13 +8,7 @@ import {
   addRequestMessageAction,
   type RequestOut,
 } from "@/lib/request-actions"
-
-const STATUS_LABELS: Record<string, string> = {
-  OPEN: "Abierta",
-  IN_PROGRESS: "En progreso",
-  RESOLVED: "Resuelta",
-  CLOSED: "Cerrada",
-}
+import { useDict } from "@/context/DictionaryContext"
 
 const STATUS_COLORS: Record<string, string> = {
   OPEN: "bg-amber-100 text-amber-700",
@@ -30,6 +24,9 @@ function fmt(iso: string) {
 }
 
 export default function DashboardRequestsPage() {
+  const dict = useDict()
+  const t = dict.dashboard.requests
+
   const { status } = useSession()
   const [requests, setRequests] = useState<RequestOut[]>([])
   const [loading, setLoading] = useState(true)
@@ -67,7 +64,7 @@ export default function DashboardRequestsPage() {
       setForm(EMPTY_FORM)
       setShowForm(false)
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Error al crear la solicitud")
+      setError(err instanceof Error ? err.message : dict.dashboard.common.error_unknown)
     } finally {
       setSaving(false)
     }
@@ -89,21 +86,21 @@ export default function DashboardRequestsPage() {
   }
 
   if (status === "loading" || loading) {
-    return <div className="text-sm text-zinc-400 py-8 text-center">Cargando...</div>
+    return <div className="text-sm text-zinc-400 py-8 text-center">{dict.dashboard.common.loading}</div>
   }
 
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-semibold text-zinc-900">Mis solicitudes</h1>
-          <p className="text-sm text-zinc-500 mt-0.5">Comunicación con el equipo nacional</p>
+          <h1 className="text-2xl font-semibold text-zinc-900">{t.title}</h1>
+          <p className="text-sm text-zinc-500 mt-0.5">{t.subtitle}</p>
         </div>
         <button
           onClick={() => setShowForm((v) => !v)}
           className="rounded-lg bg-zinc-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-zinc-700"
         >
-          {showForm ? "Cancelar" : "+ Nueva solicitud"}
+          {showForm ? t.cancel : t.new}
         </button>
       </div>
 
@@ -113,24 +110,24 @@ export default function DashboardRequestsPage() {
 
       {showForm && (
         <form onSubmit={handleCreate} className="mb-6 rounded-xl border border-zinc-200 bg-white p-5 space-y-3">
-          <p className="text-sm font-medium text-zinc-700">Nueva solicitud</p>
+          <p className="text-sm font-medium text-zinc-700">{t.form_title}</p>
           <div>
-            <label className="text-xs text-zinc-500">Asunto *</label>
+            <label className="text-xs text-zinc-500">{t.field_subject}</label>
             <input
               required
               value={form.title}
               onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
-              placeholder="Resumen breve del tema"
+              placeholder={t.subject_placeholder}
               className="mt-1 w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-400"
             />
           </div>
           <div>
-            <label className="text-xs text-zinc-500">Descripción</label>
+            <label className="text-xs text-zinc-500">{t.field_description}</label>
             <textarea
               value={form.description}
               onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
               rows={3}
-              placeholder="Detalla tu solicitud, necesidad o pregunta..."
+              placeholder={t.description_placeholder}
               className="mt-1 w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-400 resize-none"
             />
           </div>
@@ -140,7 +137,7 @@ export default function DashboardRequestsPage() {
               disabled={saving}
               className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-50"
             >
-              {saving ? "Enviando..." : "Enviar solicitud"}
+              {saving ? t.submitting : t.submit}
             </button>
           </div>
         </form>
@@ -150,7 +147,7 @@ export default function DashboardRequestsPage() {
         <div className="space-y-2">
           {requests.length === 0 ? (
             <div className="rounded-xl border border-zinc-200 bg-white p-8 text-center text-sm text-zinc-500">
-              No tienes solicitudes. Crea una para comunicarte con el equipo nacional.
+              {t.empty}
             </div>
           ) : (
             requests.map((req) => (
@@ -166,12 +163,14 @@ export default function DashboardRequestsPage() {
                 <div className="flex items-start justify-between gap-2">
                   <p className="font-medium text-zinc-900 leading-snug">{req.title}</p>
                   <span className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_COLORS[req.status]}`}>
-                    {STATUS_LABELS[req.status]}
+                    {t.status[req.status as keyof typeof t.status]}
                   </span>
                 </div>
                 <p className="mt-1 text-xs text-zinc-500 line-clamp-2">{req.description}</p>
                 <p className="mt-2 text-xs text-zinc-400">
-                  {fmt(req.created_at)} · {req.messages.length} mensaje{req.messages.length !== 1 ? "s" : ""}
+                  {fmt(req.created_at)} · {req.messages.length === 1
+                    ? t.messages_count_one
+                    : t.messages_count_other.replace("{count}", String(req.messages.length))}
                 </p>
               </button>
             ))
@@ -188,7 +187,7 @@ export default function DashboardRequestsPage() {
                 </div>
                 <div className="flex items-center gap-2">
                   <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_COLORS[selected.status]}`}>
-                    {STATUS_LABELS[selected.status]}
+                    {t.status[selected.status as keyof typeof t.status]}
                   </span>
                   <button onClick={() => setSelected(null)} className="text-xs text-zinc-400 hover:text-zinc-600">✕</button>
                 </div>
@@ -198,7 +197,7 @@ export default function DashboardRequestsPage() {
 
             <div className="flex-1 overflow-y-auto p-4 space-y-3">
               {selected.messages.length === 0 && (
-                <p className="text-xs text-zinc-400 text-center py-4">Sin respuestas aún.</p>
+                <p className="text-xs text-zinc-400 text-center py-4">{t.no_replies}</p>
               )}
               {selected.messages.map((m) => (
                 <div key={m.id} className="rounded-lg bg-zinc-50 border border-zinc-100 px-3 py-2">
@@ -213,7 +212,7 @@ export default function DashboardRequestsPage() {
                 <input
                   value={reply}
                   onChange={(e) => setReply(e.target.value)}
-                  placeholder="Agregar mensaje..."
+                  placeholder={t.reply_placeholder}
                   className="flex-1 rounded-lg border border-zinc-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-400"
                 />
                 <button
@@ -221,7 +220,7 @@ export default function DashboardRequestsPage() {
                   disabled={sending || !reply.trim()}
                   className="rounded-lg bg-zinc-900 px-3 py-2 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-50"
                 >
-                  {sending ? "..." : "Enviar"}
+                  {sending ? "..." : t.send}
                 </button>
               </form>
             )}

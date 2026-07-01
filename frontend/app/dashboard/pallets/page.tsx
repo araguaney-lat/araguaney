@@ -9,12 +9,7 @@ import {
   closePalletAction,
   downloadPalletLabelAction,
 } from "@/lib/pallet-actions"
-
-const STATUS_LABELS: Record<PalletStatus, string> = {
-  OPEN: "Abierta",
-  CLOSED: "Cerrada",
-  SHIPPED: "Enviada",
-}
+import { useDict } from "@/context/DictionaryContext"
 
 const STATUS_COLORS: Record<PalletStatus, string> = {
   OPEN: "bg-yellow-100 text-yellow-800",
@@ -23,6 +18,9 @@ const STATUS_COLORS: Record<PalletStatus, string> = {
 }
 
 export default function PalletsPage() {
+  const dict = useDict()
+  const t = dict.dashboard.pallets
+
   const [pallets, setPallets] = useState<PalletOut[]>([])
   const [filter, setFilter] = useState<PalletStatus | "">("")
   const [loading, setLoading] = useState(true)
@@ -39,10 +37,10 @@ export default function PalletsPage() {
     try {
       const params = filter ? `?status=${filter}` : ""
       const res = await fetch(`/api/pallets${params}`)
-      if (!res.ok) throw new Error("Error al cargar tarimas")
+      if (!res.ok) throw new Error(dict.dashboard.common.error_unknown)
       setPallets(await res.json())
     } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : "Error desconocido")
+      setError(e instanceof Error ? e.message : dict.dashboard.common.error_unknown)
     } finally {
       setLoading(false)
     }
@@ -58,7 +56,7 @@ export default function PalletsPage() {
     else setPalletEvents([])
   }
 
-  useEffect(() => { fetchPallets() }, [filter])
+  useEffect(() => { fetchPallets() }, [filter]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleCreate = async () => {
     setActionLoading("create")
@@ -118,20 +116,20 @@ export default function PalletsPage() {
   return (
     <div className="p-6 max-w-6xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-zinc-900">Tarimas</h1>
+        <h1 className="text-2xl font-bold text-zinc-900">{t.title}</h1>
         <button
           onClick={handleCreate}
           disabled={actionLoading === "create"}
           className="px-4 py-2 bg-zinc-900 text-white rounded-lg text-sm font-medium hover:bg-zinc-700 disabled:opacity-50"
         >
-          {actionLoading === "create" ? "Creando..." : "+ Nueva tarima"}
+          {actionLoading === "create" ? t.creating : t.new}
         </button>
       </div>
 
       {error && (
         <div className="rounded-lg bg-red-50 border border-red-200 p-3 text-sm text-red-700">
           {error}
-          <button className="ml-2 underline" onClick={() => setError(null)}>Cerrar</button>
+          <button className="ml-2 underline" onClick={() => setError(null)}>{dict.dashboard.common.close}</button>
         </div>
       )}
 
@@ -142,7 +140,7 @@ export default function PalletsPage() {
             onClick={() => setFilter(s)}
             className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${filter === s ? "bg-zinc-900 text-white border-zinc-900" : "bg-white text-zinc-600 border-zinc-300 hover:border-zinc-500"}`}
           >
-            {s === "" ? "Todas" : STATUS_LABELS[s as PalletStatus]}
+            {s === "" ? t.filter_all : t.status[s as PalletStatus]}
           </button>
         ))}
       </div>
@@ -151,9 +149,9 @@ export default function PalletsPage() {
         {/* Pallet list */}
         <div className="space-y-2">
           {loading ? (
-            <p className="text-sm text-zinc-400">Cargando...</p>
+            <p className="text-sm text-zinc-400">{dict.dashboard.common.loading}</p>
           ) : pallets.length === 0 ? (
-            <p className="text-sm text-zinc-400">No hay tarimas.</p>
+            <p className="text-sm text-zinc-400">{t.empty}</p>
           ) : pallets.map((pallet) => (
             <div
               key={pallet.id}
@@ -163,7 +161,7 @@ export default function PalletsPage() {
               <div className="flex items-center justify-between">
                 <span className="font-mono font-bold text-sm text-zinc-900">{pallet.code}</span>
                 <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${STATUS_COLORS[pallet.status]}`}>
-                  {STATUS_LABELS[pallet.status]}
+                  {t.status[pallet.status]}
                 </span>
               </div>
               <div className="mt-2 flex gap-2">
@@ -173,7 +171,7 @@ export default function PalletsPage() {
                     disabled={actionLoading === pallet.id}
                     className="text-xs px-2 py-1 rounded border border-green-300 text-green-700 hover:bg-green-50 disabled:opacity-50"
                   >
-                    {actionLoading === pallet.id ? "Cerrando..." : "Cerrar tarima"}
+                    {actionLoading === pallet.id ? t.closing : t.close}
                   </button>
                 )}
                 <button
@@ -181,7 +179,7 @@ export default function PalletsPage() {
                   disabled={isPending}
                   className="text-xs px-2 py-1 rounded border border-zinc-300 text-zinc-700 hover:bg-zinc-50 disabled:opacity-50"
                 >
-                  Etiqueta PDF
+                  {t.label_pdf}
                 </button>
               </div>
             </div>
@@ -200,7 +198,7 @@ export default function PalletsPage() {
               <div className="flex gap-2">
                 <input
                   type="text"
-                  placeholder="Código de caja (BX-...)"
+                  placeholder={t.add_box_placeholder}
                   value={boxCodeInput}
                   onChange={(e) => setBoxCodeInput(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleAddBox()}
@@ -211,17 +209,19 @@ export default function PalletsPage() {
                   disabled={!boxCodeInput.trim() || actionLoading === "add-box"}
                   className="px-3 py-2 bg-zinc-900 text-white rounded-lg text-sm hover:bg-zinc-700 disabled:opacity-50"
                 >
-                  {actionLoading === "add-box" ? "..." : "Agregar"}
+                  {actionLoading === "add-box" ? "..." : t.add}
                 </button>
               </div>
             )}
 
             <div>
               <p className="text-xs font-semibold text-zinc-500 mb-2">
-                {activePallet.boxes.length} caja{activePallet.boxes.length !== 1 ? "s" : ""}
+                {activePallet.boxes.length === 1
+                  ? t.box_count_one
+                  : t.box_count_other.replace("{count}", String(activePallet.boxes.length))}
               </p>
               {activePallet.boxes.length === 0 ? (
-                <p className="text-sm text-zinc-400">Sin cajas. Escanea o ingresa el código.</p>
+                <p className="text-sm text-zinc-400">{t.no_boxes}</p>
               ) : (
                 <ul className="space-y-1">
                   {activePallet.boxes.map((box) => (
@@ -236,7 +236,7 @@ export default function PalletsPage() {
 
             {palletEvents.length > 0 && (
               <div className="border-t border-zinc-100 pt-4">
-                <p className="text-xs font-semibold text-zinc-500 mb-3">Historial</p>
+                <p className="text-xs font-semibold text-zinc-500 mb-3">{dict.dashboard.common.history}</p>
                 <StatusTimeline events={palletEvents} />
               </div>
             )}

@@ -5,21 +5,13 @@ import Link from "next/link"
 import { useSession } from "next-auth/react"
 import type { ProductType, Campaign } from "@/types"
 import { promoteProductTypeAction } from "@/lib/catalog-actions"
-
-const CATEGORY_LABELS: Record<string, string> = {
-  MEDICINE: "Medicamento",
-  MEDICAL_SUPPLY: "Insumo médico",
-  FOOD: "Alimento",
-  WATER: "Agua",
-  HYGIENE: "Higiene",
-  TOOL: "Herramienta",
-  RESCUE_GEAR: "Equipo de rescate",
-  OTHER: "Otro",
-}
+import { useDict } from "@/context/DictionaryContext"
 
 type ProductTypeWithCampaign = ProductType & { campaign_id: string | null }
 
 export default function CatalogPage() {
+  const dict = useDict()
+  const t = dict.dashboard.catalog
   const { data: session } = useSession()
   const isAdmin = session?.centerRole === "national_admin"
 
@@ -40,7 +32,7 @@ export default function CatalogPage() {
         setProducts(pts)
         setCampaigns(camps)
       })
-      .catch(() => setError("Error al cargar el catálogo"))
+      .catch(() => setError(t.error_load))
       .finally(() => setLoading(false))
   }, [])
 
@@ -75,9 +67,9 @@ export default function CatalogPage() {
       {/* Header */}
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-semibold text-zinc-900">Catálogo de productos</h1>
+          <h1 className="text-xl font-semibold text-zinc-900">{t.title}</h1>
           <p className="text-sm text-zinc-500 mt-1">
-            Tipos de producto — globales y de campaña.
+            {t.subtitle}
           </p>
         </div>
         {isAdmin && (
@@ -85,7 +77,7 @@ export default function CatalogPage() {
             href="/dashboard/catalog/new"
             className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700"
           >
-            + Nuevo tipo
+            {t.new}
           </Link>
         )}
       </div>
@@ -97,8 +89,8 @@ export default function CatalogPage() {
           onChange={(e) => setCategoryFilter(e.target.value)}
           className="rounded-lg border border-zinc-300 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-900"
         >
-          <option value="">Todas las categorías</option>
-          {Object.entries(CATEGORY_LABELS).map(([v, l]) => (
+          <option value="">{t.filter_all_categories}</option>
+          {Object.entries(t.category).map(([v, l]) => (
             <option key={v} value={v}>{l}</option>
           ))}
         </select>
@@ -111,13 +103,13 @@ export default function CatalogPage() {
               onClick={() => setScopeFilter(v)}
               className={`px-3 py-1.5 ${scopeFilter === v ? "bg-zinc-900 text-white" : "bg-white text-zinc-600 hover:bg-zinc-50"}`}
             >
-              {v === "all" ? "Todos" : v === "global" ? "Globales" : "De campaña"}
+              {v === "all" ? t.filter_all : v === "global" ? t.filter_global : t.filter_campaign}
             </button>
           ))}
         </div>
 
         <span className="ml-auto self-center text-xs text-zinc-400">
-          {filtered.length} resultado{filtered.length !== 1 ? "s" : ""}
+          {filtered.length === 1 ? t.result_one : t.result_other.replace("{count}", String(filtered.length))}
         </span>
       </div>
 
@@ -130,22 +122,22 @@ export default function CatalogPage() {
       {/* Table */}
       {loading ? (
         <div className="rounded-xl border border-zinc-200 bg-white p-8 text-center">
-          <p className="text-sm text-zinc-400">Cargando catálogo…</p>
+          <p className="text-sm text-zinc-400">{t.loading}</p>
         </div>
       ) : filtered.length === 0 ? (
         <div className="rounded-xl border border-zinc-200 bg-white p-8 text-center">
-          <p className="text-sm text-zinc-400">Sin resultados para los filtros aplicados.</p>
+          <p className="text-sm text-zinc-400">{t.empty}</p>
         </div>
       ) : (
         <div className="rounded-xl border border-zinc-200 bg-white overflow-hidden">
           <table className="w-full text-sm">
             <thead className="border-b border-zinc-100 bg-zinc-50">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-zinc-500 uppercase tracking-wide">Producto</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-zinc-500 uppercase tracking-wide">Categoría</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-zinc-500 uppercase tracking-wide">Alcance</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-zinc-500 uppercase tracking-wide">{t.col_product}</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-zinc-500 uppercase tracking-wide">{t.col_category}</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-zinc-500 uppercase tracking-wide">{t.col_scope}</th>
                 {isAdmin && (
-                  <th className="px-4 py-3 text-right text-xs font-medium text-zinc-500 uppercase tracking-wide">Acciones</th>
+                  <th className="px-4 py-3 text-right text-xs font-medium text-zinc-500 uppercase tracking-wide">{t.col_actions}</th>
                 )}
               </tr>
             </thead>
@@ -160,22 +152,22 @@ export default function CatalogPage() {
                       {pt.form}
                       {pt.is_controlled && (
                         <span className="ml-1 rounded bg-red-100 px-1 py-0.5 text-xs font-medium text-red-700">
-                          Controlado
+                          {t.controlled_badge}
                         </span>
                       )}
                     </p>
                   </td>
                   <td className="px-4 py-3 text-zinc-600">
-                    {CATEGORY_LABELS[pt.category] ?? pt.category}
+                    {t.category[pt.category as keyof typeof t.category] ?? pt.category}
                   </td>
                   <td className="px-4 py-3">
                     {pt.campaign_id === null ? (
                       <span className="inline-flex items-center rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-medium text-blue-700">
-                        Global
+                        {t.scope_global}
                       </span>
                     ) : (
                       <span className="inline-flex items-center rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-700">
-                        {campaignName(pt.campaign_id) ?? "Campaña"}
+                        {campaignName(pt.campaign_id) ?? t.scope_campaign_fallback}
                       </span>
                     )}
                   </td>
@@ -188,7 +180,7 @@ export default function CatalogPage() {
                           onClick={() => handlePromote(pt)}
                           className="text-xs text-blue-600 hover:text-blue-800 disabled:opacity-50"
                         >
-                          Promover al catálogo global
+                          {t.promote_action}
                         </button>
                       )}
                     </td>

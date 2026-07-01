@@ -15,6 +15,7 @@ import {
 } from "recharts"
 import { ComposableMap, Geographies, Geography, ZoomableGroup } from "react-simple-maps"
 import { Download } from "lucide-react"
+import { useDict } from "@/context/DictionaryContext"
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -56,22 +57,10 @@ interface Props {
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
-const CATEGORY_LABELS: Record<string, string> = {
-  MEDICINE: "Medicamentos",
-  MEDICAL_SUPPLY: "Insumos médicos",
-  FOOD: "Alimentos",
-  WATER: "Agua",
-  HYGIENE: "Higiene",
-  TOOL: "Herramientas",
-  RESCUE_GEAR: "Rescate",
-  OTHER: "Otros",
-}
-
 const COLORS = ["#1F5E8C", "#F3C033", "#22c55e", "#f97316", "#a855f7", "#14b8a6", "#ec4899", "#64748b"]
 
 const GEO_URL = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json"
 
-// ISO alpha-2 → alpha-3 mapping (subset used in world-atlas)
 const ALPHA2_TO_ALPHA3: Record<string, string> = {
   AF: "AFG", AL: "ALB", DZ: "DZA", AO: "AGO", AR: "ARG", AU: "AUS", AT: "AUT",
   AZ: "AZE", BS: "BHS", BH: "BHR", BD: "BGD", BE: "BEL", BZ: "BLZ", BJ: "BEN",
@@ -132,6 +121,9 @@ function KpiCard({ label, value, sub, accent }: { label: string; value: string |
 // ── Main component ────────────────────────────────────────────────────────────
 
 export default function ReportsDashboard({ campaigns, defaultCampaignId, centerRole }: Props) {
+  const dict = useDict()
+  const t = dict.dashboard.reports
+
   const [campaignId, setCampaignId] = useState(defaultCampaignId ?? "")
   const [preset, setPreset] = useState<Preset>("30d")
   const [customStart, setCustomStart] = useState("")
@@ -194,10 +186,12 @@ export default function ReportsDashboard({ campaigns, defaultCampaignId, centerR
   const countryBoxes = Object.fromEntries(countries.map((c) => [ALPHA2_TO_ALPHA3[c.country_code] ?? "", c.box_count]))
   const maxBoxes = Math.max(1, ...countries.map((c) => c.box_count))
 
+  const categoryLabels = dict.dashboard.national.categories
+
   if (!campaignId) {
     return (
       <div className="rounded-xl border border-zinc-200 bg-white p-8 text-center text-zinc-400 text-sm">
-        No estás asignado a ninguna campaña aún.
+        {t.no_campaign}
       </div>
     )
   }
@@ -229,7 +223,7 @@ export default function ReportsDashboard({ campaigns, defaultCampaignId, centerR
                   : "bg-white text-zinc-600 hover:bg-zinc-50"
               }`}
             >
-              {p === "range" ? "Rango" : p}
+              {p === "range" ? t.preset_range : p}
             </button>
           ))}
         </div>
@@ -257,32 +251,34 @@ export default function ReportsDashboard({ campaigns, defaultCampaignId, centerR
           className="ml-auto flex items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-xs font-semibold text-zinc-700 hover:bg-zinc-50 transition-colors"
         >
           <Download size={13} />
-          Exportar CSV
+          {t.export_csv}
         </button>
       </div>
 
       {loading && (
-        <div className="text-center text-xs text-zinc-400 py-4">Cargando datos…</div>
+        <div className="text-center text-xs text-zinc-400 py-4">{t.loading_data}</div>
       )}
 
       {/* KPI Cards */}
       {summary && (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-          <KpiCard label="Cajas totales" value={summary.total_boxes} />
-          <KpiCard label="Selladas" value={summary.sealed_boxes} accent="text-green-600" />
-          <KpiCard label="Enviadas" value={summary.shipped_boxes} accent="text-blue-600" />
-          <KpiCard label="Rechazadas" value={summary.rejected_boxes} sub={`${summary.rejection_rate}% rechazo`} accent="text-red-500" />
-          <KpiCard label="Unidades" value={summary.total_units} />
-          <KpiCard label="Intakes" value={summary.total_intakes} />
-          <KpiCard label="Envíos" value={summary.total_shipments} />
-          {isNational && <KpiCard label="Centros activos" value={summary.active_centers} />}
+          <KpiCard label={t.kpi_total_boxes} value={summary.total_boxes} />
+          <KpiCard label={t.kpi_sealed} value={summary.sealed_boxes} accent="text-green-600" />
+          <KpiCard label={t.kpi_shipped} value={summary.shipped_boxes} accent="text-blue-600" />
+          <KpiCard label={t.kpi_rejected} value={summary.rejected_boxes}
+            sub={t.rejection_rate_sub.replace("{rate}", String(summary.rejection_rate))}
+            accent="text-red-500" />
+          <KpiCard label={t.kpi_units} value={summary.total_units} />
+          <KpiCard label={t.kpi_intakes} value={summary.total_intakes} />
+          <KpiCard label={t.kpi_shipments} value={summary.total_shipments} />
+          {isNational && <KpiCard label={t.kpi_active_centers} value={summary.active_centers} />}
         </div>
       )}
 
       {/* Activity line chart */}
       {activity.length > 0 && (
         <div className="rounded-xl border border-zinc-200 bg-white p-5">
-          <p className="text-sm font-semibold text-zinc-800 mb-4">Actividad diaria</p>
+          <p className="text-sm font-semibold text-zinc-800 mb-4">{t.chart_daily_activity}</p>
           <ResponsiveContainer width="100%" height={220}>
             <LineChart data={activity} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
@@ -290,10 +286,10 @@ export default function ReportsDashboard({ campaigns, defaultCampaignId, centerR
               <YAxis tick={{ fontSize: 10 }} tickLine={false} axisLine={false} />
               <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8 }} />
               <Legend wrapperStyle={{ fontSize: 11 }} />
-              <Line type="monotone" dataKey="sealed" name="Selladas" stroke="#22c55e" strokeWidth={2} dot={false} />
-              <Line type="monotone" dataKey="shipped" name="Enviadas" stroke="#1F5E8C" strokeWidth={2} dot={false} />
-              <Line type="monotone" dataKey="rejected" name="Rechazadas" stroke="#ef4444" strokeWidth={2} dot={false} />
-              <Line type="monotone" dataKey="draft" name="Borrador" stroke="#d4d4d8" strokeWidth={1.5} dot={false} />
+              <Line type="monotone" dataKey="sealed" name={t.line_sealed} stroke="#22c55e" strokeWidth={2} dot={false} />
+              <Line type="monotone" dataKey="shipped" name={t.line_shipped} stroke="#1F5E8C" strokeWidth={2} dot={false} />
+              <Line type="monotone" dataKey="rejected" name={t.line_rejected} stroke="#ef4444" strokeWidth={2} dot={false} />
+              <Line type="monotone" dataKey="draft" name={t.line_draft} stroke="#d4d4d8" strokeWidth={1.5} dot={false} />
             </LineChart>
           </ResponsiveContainer>
         </div>
@@ -303,23 +299,27 @@ export default function ReportsDashboard({ campaigns, defaultCampaignId, centerR
         {/* By category bar chart */}
         {byCategory.length > 0 && (
           <div className="rounded-xl border border-zinc-200 bg-white p-5">
-            <p className="text-sm font-semibold text-zinc-800 mb-4">Cajas por categoría</p>
+            <p className="text-sm font-semibold text-zinc-800 mb-4">{t.chart_by_category}</p>
             <ResponsiveContainer width="100%" height={220}>
-              <BarChart data={byCategory.map((r) => ({ ...r, label: CATEGORY_LABELS[r.category] ?? r.category }))} layout="vertical" margin={{ top: 0, right: 16, left: 0, bottom: 0 }}>
+              <BarChart
+                data={byCategory.map((r) => ({ ...r, label: categoryLabels[r.category as keyof typeof categoryLabels] ?? r.category }))}
+                layout="vertical"
+                margin={{ top: 0, right: 16, left: 0, bottom: 0 }}
+              >
                 <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" horizontal={false} />
                 <XAxis type="number" tick={{ fontSize: 10 }} tickLine={false} axisLine={false} />
                 <YAxis dataKey="label" type="category" tick={{ fontSize: 10 }} tickLine={false} width={90} />
                 <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8 }} />
-                <Bar dataKey="box_count" name="Cajas" fill="#1F5E8C" radius={[0, 4, 4, 0]} />
+                <Bar dataKey="box_count" name={t.bar_boxes} fill="#1F5E8C" radius={[0, 4, 4, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
         )}
 
-        {/* By center bar chart (national_admin or multi-center coordinators) */}
+        {/* By center bar chart */}
         {byCenter.length > 1 && (
           <div className="rounded-xl border border-zinc-200 bg-white p-5">
-            <p className="text-sm font-semibold text-zinc-800 mb-4">Cajas por centro</p>
+            <p className="text-sm font-semibold text-zinc-800 mb-4">{t.chart_by_center}</p>
             <ResponsiveContainer width="100%" height={220}>
               <BarChart
                 data={byCenter.slice(0, 10).map((r) => ({ ...r, short: r.center_name.slice(0, 20) }))}
@@ -329,8 +329,14 @@ export default function ReportsDashboard({ campaigns, defaultCampaignId, centerR
                 <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" horizontal={false} />
                 <XAxis type="number" tick={{ fontSize: 10 }} tickLine={false} axisLine={false} />
                 <YAxis dataKey="short" type="category" tick={{ fontSize: 10 }} tickLine={false} width={110} />
-                <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8 }} formatter={(v, _n, p) => [`${fmt(Number(v))} cajas`, p.payload.center_name]} />
-                <Bar dataKey="box_count" name="Cajas" fill="#F3C033" radius={[0, 4, 4, 0]} />
+                <Tooltip
+                  contentStyle={{ fontSize: 12, borderRadius: 8 }}
+                  formatter={(v, _n, p) => [
+                    t.tooltip_boxes.replace("{count}", fmt(Number(v))),
+                    p.payload.center_name,
+                  ]}
+                />
+                <Bar dataKey="box_count" name={t.bar_boxes} fill="#F3C033" radius={[0, 4, 4, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -340,8 +346,12 @@ export default function ReportsDashboard({ campaigns, defaultCampaignId, centerR
       {/* World map */}
       {countries.length > 0 && (
         <div className="rounded-xl border border-zinc-200 bg-white p-5">
-          <p className="text-sm font-semibold text-zinc-800 mb-1">Países involucrados</p>
-          <p className="text-xs text-zinc-400 mb-3">{countries.length} {countries.length === 1 ? "país" : "países"} con centros activos en el período</p>
+          <p className="text-sm font-semibold text-zinc-800 mb-1">{t.map_title}</p>
+          <p className="text-xs text-zinc-400 mb-3">
+            {countries.length === 1
+              ? t.map_subtitle_one
+              : t.map_subtitle_other.replace("{count}", String(countries.length))}
+          </p>
           <div className="overflow-hidden rounded-lg bg-zinc-50 border border-zinc-100" style={{ height: 340 }}>
             <ComposableMap
               projectionConfig={{ scale: 147 }}
@@ -378,7 +388,7 @@ export default function ReportsDashboard({ campaigns, defaultCampaignId, centerR
           <div className="mt-3 flex flex-wrap gap-2">
             {countries.map((c) => (
               <span key={c.country_code} className="inline-flex items-center gap-1 rounded-full bg-blue-50 border border-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800">
-                {c.country_code} · {fmt(c.box_count)} cajas
+                {c.country_code} · {fmt(c.box_count)} {t.country_boxes}
               </span>
             ))}
           </div>
@@ -389,16 +399,16 @@ export default function ReportsDashboard({ campaigns, defaultCampaignId, centerR
       {byCenter.length > 0 && (
         <div className="rounded-xl border border-zinc-200 bg-white overflow-hidden">
           <div className="px-5 py-3 border-b border-zinc-100">
-            <p className="text-sm font-semibold text-zinc-800">Detalle por centro</p>
+            <p className="text-sm font-semibold text-zinc-800">{t.center_breakdown_title}</p>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-zinc-50 text-xs text-zinc-500 uppercase tracking-wide">
                 <tr>
-                  <th className="text-left px-5 py-2.5 font-medium">Centro</th>
-                  <th className="text-left px-4 py-2.5 font-medium">País</th>
-                  <th className="text-right px-4 py-2.5 font-medium">Cajas</th>
-                  <th className="text-right px-5 py-2.5 font-medium">Unidades</th>
+                  <th className="text-left px-5 py-2.5 font-medium">{t.col_center}</th>
+                  <th className="text-left px-4 py-2.5 font-medium">{t.col_country}</th>
+                  <th className="text-right px-4 py-2.5 font-medium">{t.col_boxes}</th>
+                  <th className="text-right px-5 py-2.5 font-medium">{t.col_units}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-100">
@@ -419,7 +429,7 @@ export default function ReportsDashboard({ campaigns, defaultCampaignId, centerR
       {/* Empty state */}
       {!loading && !summary && (
         <div className="rounded-xl border border-zinc-200 bg-white p-8 text-center text-zinc-400 text-sm">
-          Sin datos para el período seleccionado.
+          {t.no_data}
         </div>
       )}
     </div>

@@ -5,12 +5,7 @@ import { useParams } from "next/navigation"
 import Link from "next/link"
 import { useSession } from "next-auth/react"
 import type { CampaignMember, Campaign, Center, UserOut } from "@/types"
-
-const ROLE_LABELS: Record<string, string> = {
-  national_admin: "Admin nacional",
-  coordinator: "Coordinador",
-  volunteer: "Voluntario",
-}
+import { useDict } from "@/context/DictionaryContext"
 
 const ROLE_COLORS: Record<string, string> = {
   national_admin: "bg-purple-100 text-purple-700",
@@ -21,6 +16,9 @@ const ROLE_COLORS: Record<string, string> = {
 export default function CampaignMembersPage() {
   const { id } = useParams<{ id: string }>()
   const { data: session } = useSession()
+  const dict = useDict()
+  const t = dict.dashboard.campaign_members
+
   const isAdmin = session?.centerRole === "national_admin"
   const userCenterId = session?.centerId ?? null
 
@@ -29,7 +27,6 @@ export default function CampaignMembersPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  // Add-member panel state
   const [addOpen, setAddOpen] = useState(false)
   const [centers, setCenters] = useState<Center[]>([])
   const [selectedCenterId, setSelectedCenterId] = useState<string>("")
@@ -38,9 +35,13 @@ export default function CampaignMembersPage() {
   const [selectedUserId, setSelectedUserId] = useState<string>("")
   const [adding, setAdding] = useState(false)
   const [addError, setAddError] = useState<string | null>(null)
-
-  // Removing state: userId being removed
   const [removing, setRemoving] = useState<string | null>(null)
+
+  const ROLE_LABELS: Record<string, string> = {
+    national_admin: t.role_national_admin,
+    coordinator: t.role_coordinator,
+    volunteer: t.role_volunteer,
+  }
 
   const fetchMembers = useCallback(async () => {
     const [campRes, membRes] = await Promise.all([
@@ -56,7 +57,6 @@ export default function CampaignMembersPage() {
     fetchMembers().finally(() => setLoading(false))
   }, [fetchMembers])
 
-  // When add panel opens, load center list (admin) or set coordinator's center
   useEffect(() => {
     if (!addOpen) return
     setSelectedUserId("")
@@ -67,26 +67,18 @@ export default function CampaignMembersPage() {
       fetch("/api/centers")
         .then((r) => r.ok ? r.json() : [])
         .then(setCenters)
-    } else {
-      // Coordinator: pre-set their own center
-      if (userCenterId) {
-        setSelectedCenterId(userCenterId)
-      }
+    } else if (userCenterId) {
+      setSelectedCenterId(userCenterId)
     }
   }, [addOpen, isAdmin, userCenterId])
 
-  // When center selected, fetch its users
   useEffect(() => {
-    if (!selectedCenterId) {
-      setCenterUsers([])
-      return
-    }
+    if (!selectedCenterId) { setCenterUsers([]); return }
     setLoadingUsers(true)
     setSelectedUserId("")
     fetch(`/api/centers/${selectedCenterId}/users`)
       .then((r) => r.ok ? r.json() : [])
       .then((users: UserOut[]) => {
-        // Filter out users already in the campaign
         const memberIds = new Set(members.map((m) => m.id))
         setCenterUsers(users.filter((u) => !memberIds.has(u.id)))
       })
@@ -105,7 +97,7 @@ export default function CampaignMembersPage() {
       })
       if (!res.ok) {
         const data = await res.json()
-        setAddError(data?.detail ?? "Error al agregar el miembro")
+        setAddError(data?.detail ?? dict.dashboard.common.error_unknown)
         return
       }
       await fetchMembers()
@@ -113,7 +105,7 @@ export default function CampaignMembersPage() {
       setSelectedCenterId("")
       setSelectedUserId("")
     } catch {
-      setAddError("Error de red")
+      setAddError(dict.dashboard.common.error_unknown)
     } finally {
       setAdding(false)
     }
@@ -126,57 +118,53 @@ export default function CampaignMembersPage() {
       const res = await fetch(`/api/campaigns/${id}/members/${userId}`, { method: "DELETE" })
       if (!res.ok && res.status !== 204) {
         const data = await res.json()
-        setError(data?.detail ?? "Error al remover el miembro")
+        setError(data?.detail ?? dict.dashboard.common.error_unknown)
         return
       }
       setMembers((prev) => prev.filter((m) => m.id !== userId))
     } catch {
-      setError("Error de red")
+      setError(dict.dashboard.common.error_unknown)
     } finally {
       setRemoving(null)
     }
   }
 
   if (loading) {
-    return <div className="py-8 text-center text-sm text-zinc-400">Cargando...</div>
+    return <div className="py-8 text-center text-sm text-zinc-400">{dict.dashboard.common.loading}</div>
   }
 
   const isGeneral = campaign?.is_general ?? false
+  const memberCount = members.length === 1 ? t.members_count_one : t.members_count_other.replace("{count}", String(members.length))
 
   return (
     <div className="max-w-4xl">
-      {/* Header */}
       <div className="mb-6">
         <Link
           href="/dashboard/campaigns"
           className="text-sm text-zinc-500 hover:text-zinc-800 flex items-center gap-1 mb-3"
         >
-          ← Campañas
+          {t.back}
         </Link>
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-xl font-semibold text-zinc-900">
-              {campaign?.name ?? "Campaña"}
-            </h1>
-            <p className="text-sm text-zinc-500 mt-0.5">
-              {members.length} miembro{members.length !== 1 ? "s" : ""}
-            </p>
+            <h1 className="text-xl font-semibold text-zinc-900">{campaign?.name ?? t.fallback_name}</h1>
+            <p className="text-sm text-zinc-500 mt-0.5">{memberCount}</p>
           </div>
           <button
             type="button"
             onClick={() => setAddOpen((v) => !v)}
             className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700"
           >
-            {addOpen ? "Cancelar" : "+ Agregar miembro"}
+            {addOpen ? t.cancel : t.add_btn}
           </button>
         </div>
       </div>
 
       {isGeneral && (
-        <div className="mb-4 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-700">
-          Los usuarios se asignan automáticamente a <strong>Donaciones Generales</strong> al ser
-          creados. No es posible removerlos de esta campaña.
-        </div>
+        <div
+          className="mb-4 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-700"
+          dangerouslySetInnerHTML={{ __html: t.general_notice }}
+        />
       )}
 
       {error && (
@@ -185,39 +173,34 @@ export default function CampaignMembersPage() {
         </div>
       )}
 
-      {/* Add-member panel */}
       {addOpen && (
         <div className="mb-5 rounded-xl border border-zinc-200 bg-white p-4 space-y-3">
-          <p className="text-sm font-medium text-zinc-700">Agregar miembro</p>
+          <p className="text-sm font-medium text-zinc-700">{t.add_panel_title}</p>
 
           {addError && (
-            <p className="rounded-lg bg-red-50 border border-red-200 px-3 py-2 text-xs text-red-700">
-              {addError}
-            </p>
+            <p className="rounded-lg bg-red-50 border border-red-200 px-3 py-2 text-xs text-red-700">{addError}</p>
           )}
 
           {isAdmin && (
             <div>
-              <label className="text-xs text-zinc-500">Centro</label>
+              <label className="text-xs text-zinc-500">{t.select_center_label}</label>
               <select
                 value={selectedCenterId}
                 onChange={(e) => setSelectedCenterId(e.target.value)}
                 className="mt-1 w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-400"
               >
-                <option value="">— Seleccionar centro —</option>
+                <option value="">{t.select_center_placeholder}</option>
                 {centers.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.name}
-                  </option>
+                  <option key={c.id} value={c.id}>{c.name}</option>
                 ))}
               </select>
             </div>
           )}
 
           <div>
-            <label className="text-xs text-zinc-500">Usuario</label>
+            <label className="text-xs text-zinc-500">{t.select_user_label}</label>
             {loadingUsers ? (
-              <p className="text-xs text-zinc-400 mt-1">Cargando usuarios...</p>
+              <p className="text-xs text-zinc-400 mt-1">{t.loading_users}</p>
             ) : (
               <select
                 value={selectedUserId}
@@ -227,10 +210,10 @@ export default function CampaignMembersPage() {
               >
                 <option value="">
                   {!selectedCenterId && isAdmin
-                    ? "Selecciona un centro primero"
+                    ? t.center_select_first
                     : centerUsers.length === 0
-                    ? "Sin usuarios disponibles"
-                    : "— Seleccionar usuario —"}
+                    ? t.no_users_available
+                    : t.select_user_placeholder}
                 </option>
                 {centerUsers.map((u) => (
                   <option key={u.id} value={u.id}>
@@ -249,35 +232,26 @@ export default function CampaignMembersPage() {
               disabled={adding || !selectedUserId}
               className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-50"
             >
-              {adding ? "Agregando..." : "Agregar"}
+              {adding ? t.adding : t.add_action}
             </button>
           </div>
         </div>
       )}
 
-      {/* Members table */}
       {members.length === 0 ? (
         <div className="rounded-xl border border-zinc-200 bg-white p-8 text-center text-sm text-zinc-500">
-          Sin miembros registrados.
+          {t.empty}
         </div>
       ) : (
         <div className="rounded-xl border border-zinc-200 bg-white overflow-hidden">
           <table className="w-full text-sm">
             <thead className="border-b border-zinc-100 bg-zinc-50">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-zinc-500 uppercase tracking-wide">
-                  Usuario
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-zinc-500 uppercase tracking-wide">
-                  Rol
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-zinc-500 uppercase tracking-wide">
-                  Estado
-                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-zinc-500 uppercase tracking-wide">{t.col_user}</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-zinc-500 uppercase tracking-wide">{t.col_role}</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-zinc-500 uppercase tracking-wide">{t.col_status}</th>
                 {!isGeneral && (
-                  <th className="px-4 py-3 text-right text-xs font-medium text-zinc-500 uppercase tracking-wide">
-                    Acciones
-                  </th>
+                  <th className="px-4 py-3 text-right text-xs font-medium text-zinc-500 uppercase tracking-wide">{t.col_actions}</th>
                 )}
               </tr>
             </thead>
@@ -287,17 +261,11 @@ export default function CampaignMembersPage() {
                   <td className="px-4 py-3">
                     <p className="font-medium text-zinc-900">{m.username}</p>
                     <p className="text-xs text-zinc-400">{m.email}</p>
-                    {m.full_name && (
-                      <p className="text-xs text-zinc-400">{m.full_name}</p>
-                    )}
+                    {m.full_name && <p className="text-xs text-zinc-400">{m.full_name}</p>}
                   </td>
                   <td className="px-4 py-3">
                     {m.center_role ? (
-                      <span
-                        className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                          ROLE_COLORS[m.center_role] ?? "bg-zinc-100 text-zinc-600"
-                        }`}
-                      >
+                      <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${ROLE_COLORS[m.center_role] ?? "bg-zinc-100 text-zinc-600"}`}>
                         {ROLE_LABELS[m.center_role] ?? m.center_role}
                       </span>
                     ) : (
@@ -305,14 +273,8 @@ export default function CampaignMembersPage() {
                     )}
                   </td>
                   <td className="px-4 py-3">
-                    <span
-                      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                        m.is_active
-                          ? "bg-green-100 text-green-700"
-                          : "bg-zinc-100 text-zinc-500"
-                      }`}
-                    >
-                      {m.is_active ? "Activo" : "Inactivo"}
+                    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${m.is_active ? "bg-green-100 text-green-700" : "bg-zinc-100 text-zinc-500"}`}>
+                      {m.is_active ? t.status_active : t.status_inactive}
                     </span>
                   </td>
                   {!isGeneral && (
@@ -323,7 +285,7 @@ export default function CampaignMembersPage() {
                         disabled={removing === m.id}
                         className="text-xs text-red-500 hover:text-red-700 disabled:opacity-50"
                       >
-                        {removing === m.id ? "Removiendo..." : "Remover"}
+                        {removing === m.id ? t.removing : t.remove_btn}
                       </button>
                     </td>
                   )}

@@ -14,23 +14,40 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
 } from "lucide-react"
+import { LanguageSwitcher } from "@/components/LanguageSwitcher"
+import type { Locale } from "@/lib/i18n"
 
 const LOGO = "https://res.cloudinary.com/dtvdqlxtd/image/upload/v1782794310/image_degkq9.png"
 const STORAGE_KEY = "studio_sidebar_collapsed"
 
-const NAV = [
-  { href: "/studio", label: "Métricas", exact: true, icon: BarChart2 },
-  { href: "/studio/users", label: "Usuarios", icon: Users },
-  { href: "/studio/audit", label: "Auditoría", icon: ScrollText },
-  { href: "/studio/settings", label: "Configuración", icon: Settings },
+type StudioNavItem = { href: string; labelKey: keyof StudioNav; exact?: boolean; icon: React.ComponentType<{ size?: number; className?: string }> }
+
+const NAV_ITEMS: StudioNavItem[] = [
+  { href: "/studio", labelKey: "metrics", exact: true, icon: BarChart2 },
+  { href: "/studio/users", labelKey: "users", icon: Users },
+  { href: "/studio/audit", labelKey: "audit", icon: ScrollText },
+  { href: "/studio/settings", labelKey: "settings", icon: Settings },
 ]
+
+export type StudioNav = {
+  metrics: string
+  users: string
+  audit: string
+  settings: string
+  logout: string
+  back_to_dashboard: string
+  superadmin: string
+  platform_admin: string
+}
 
 interface StudioSidebarProps {
   userName?: string | null
   userEmail?: string | null
+  nav: StudioNav
+  locale: Locale
 }
 
-export function StudioSidebar({ userName, userEmail }: StudioSidebarProps) {
+export function StudioSidebar({ userName, userEmail, nav, locale }: StudioSidebarProps) {
   const pathname = usePathname()
   const [collapsed, setCollapsed] = useState(false)
   const [mounted, setMounted] = useState(false)
@@ -72,6 +89,7 @@ export function StudioSidebar({ userName, userEmail }: StudioSidebarProps) {
           >
             <PanelLeftOpen size={16} />
           </button>
+          <LanguageSwitcher locale={locale} collapsed />
         </div>
       ) : (
         <div className="flex items-center justify-between border-b border-blue-100 px-3 py-3">
@@ -85,16 +103,19 @@ export function StudioSidebar({ userName, userEmail }: StudioSidebarProps) {
             />
             <div className="min-w-0">
               <span className="text-sm font-semibold text-blue-900 truncate block">Studio</span>
-              <p className="text-xs text-blue-600/70 truncate">Administración de plataforma</p>
+              <p className="text-xs text-blue-600/70 truncate">{nav.platform_admin}</p>
             </div>
           </div>
-          <button
-            onClick={toggle}
-            className="flex-shrink-0 rounded-lg p-1.5 text-blue-600 hover:bg-blue-100 hover:text-blue-800 transition-colors"
-            title="Colapsar menú"
-          >
-            <PanelLeftClose size={18} />
-          </button>
+          <div className="flex items-center gap-1 flex-shrink-0">
+            <LanguageSwitcher locale={locale} />
+            <button
+              onClick={toggle}
+              className="rounded-lg p-1.5 text-blue-600 hover:bg-blue-100 hover:text-blue-800 transition-colors"
+              title="Colapsar menú"
+            >
+              <PanelLeftClose size={18} />
+            </button>
+          </div>
         </div>
       )}
 
@@ -105,21 +126,22 @@ export function StudioSidebar({ userName, userEmail }: StudioSidebarProps) {
             href="/dashboard"
             className="inline-block rounded bg-blue-100 px-2 py-0.5 text-xs text-blue-600 hover:bg-blue-200 transition-colors"
           >
-            ← Dashboard
+            ← {nav.back_to_dashboard}
           </Link>
         </div>
       )}
 
       {/* Nav */}
       <nav className="flex-1 overflow-y-auto px-2 py-2 space-y-0.5">
-        {NAV.map((item) => {
+        {NAV_ITEMS.map((item) => {
           const isActive = item.exact ? pathname === item.href : pathname.startsWith(item.href)
           const Icon = item.icon
+          const label = nav[item.labelKey]
           return (
             <Link
               key={item.href}
               href={item.href}
-              title={collapsed ? item.label : undefined}
+              title={collapsed ? label : undefined}
               className={`flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm font-medium transition-colors ${
                 collapsed ? "justify-center" : ""
               } ${
@@ -129,7 +151,7 @@ export function StudioSidebar({ userName, userEmail }: StudioSidebarProps) {
               }`}
             >
               <Icon size={17} className="flex-shrink-0" />
-              {!collapsed && <span className="truncate">{item.label}</span>}
+              {!collapsed && <span className="truncate">{label}</span>}
             </Link>
           )
         })}
@@ -148,7 +170,7 @@ export function StudioSidebar({ userName, userEmail }: StudioSidebarProps) {
             {!collapsed && (
               <div className="min-w-0">
                 <p className="text-xs font-semibold text-blue-900 truncate">{userName ?? userEmail}</p>
-                <p className="text-xs text-blue-700/80 truncate">Superadmin</p>
+                <p className="text-xs text-blue-700/80 truncate">{nav.superadmin}</p>
               </div>
             )}
           </div>
@@ -157,11 +179,11 @@ export function StudioSidebar({ userName, userEmail }: StudioSidebarProps) {
         <form action={logoutAction}>
           <button
             type="submit"
-            title={collapsed ? "Cerrar sesión" : undefined}
+            title={collapsed ? nav.logout : undefined}
             className={`flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm text-blue-700 hover:bg-blue-100 hover:text-blue-900 transition-colors ${collapsed ? "justify-center" : ""}`}
           >
             <LogOut size={17} className="flex-shrink-0" />
-            {!collapsed && <span>Cerrar sesión</span>}
+            {!collapsed && <span>{nav.logout}</span>}
           </button>
         </form>
       </div>

@@ -5,19 +5,12 @@ import { useRouter } from "next/navigation"
 import { ConnectivityBanner, useOnlineStatus } from "@/components/ConnectivityBanner"
 import { InnAutocomplete } from "@/components/InnAutocomplete"
 import { createProductTypeAction, type ProductTypeFormData } from "@/lib/catalog-actions"
-
-const CATEGORIES = [
-  { value: "MEDICINE", label: "Medicamento" },
-  { value: "MEDICAL_SUPPLY", label: "Insumo médico" },
-  { value: "FOOD", label: "Alimento" },
-  { value: "WATER", label: "Agua" },
-  { value: "HYGIENE", label: "Higiene" },
-  { value: "TOOL", label: "Herramienta" },
-  { value: "RESCUE_GEAR", label: "Equipo de rescate" },
-  { value: "OTHER", label: "Otro" },
-]
+import { useDict } from "@/context/DictionaryContext"
 
 export default function NewProductTypePage() {
+  const dict = useDict()
+  const t = dict.dashboard.catalog_new
+  const categories = dict.dashboard.catalog.category
   const router = useRouter()
   const online = useOnlineStatus()
 
@@ -67,9 +60,9 @@ export default function NewProductTypePage() {
   return (
     <div className="max-w-2xl mx-auto pb-12">
       <div className="mb-6">
-        <h1 className="text-xl font-semibold text-zinc-900">Nuevo tipo de producto</h1>
+        <h1 className="text-xl font-semibold text-zinc-900">{t.title}</h1>
         <p className="text-sm text-zinc-500 mt-1">
-          Define el SKU que usarán las cajas de este centro.
+          {t.subtitle}
         </p>
       </div>
 
@@ -81,28 +74,28 @@ export default function NewProductTypePage() {
       <form onSubmit={handleSubmit} className="space-y-5">
         {/* Category */}
         <div>
-          <label className="block text-xs font-medium text-zinc-600 mb-1">Categoría *</label>
+          <label className="block text-xs font-medium text-zinc-600 mb-1">{t.category_label}</label>
           <select
             value={form.category}
             onChange={(e) => setField("category", e.target.value)}
             required
             className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-900"
           >
-            {CATEGORIES.map((c) => (
-              <option key={c.value} value={c.value}>{c.label}</option>
+            {Object.entries(categories).map(([v, l]) => (
+              <option key={v} value={v}>{l}</option>
             ))}
           </select>
         </div>
 
         {/* Display name */}
         <div>
-          <label className="block text-xs font-medium text-zinc-600 mb-1">Nombre *</label>
+          <label className="block text-xs font-medium text-zinc-600 mb-1">{t.name_label}</label>
           <input
             type="text"
             value={form.display_name}
             onChange={(e) => setField("display_name", e.target.value)}
             required
-            placeholder="Ibuprofeno 400mg tabletas"
+            placeholder={t.name_placeholder}
             className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-900"
           />
         </div>
@@ -111,7 +104,7 @@ export default function NewProductTypePage() {
         {isMedicine && (
           <div>
             <label className="block text-xs font-medium text-zinc-600 mb-1">
-              INN (Denominación Común Internacional)
+              {t.inn_label}
               {isMedicine && <span className="text-red-500 ml-0.5">*</span>}
             </label>
             <InnAutocomplete
@@ -119,7 +112,7 @@ export default function NewProductTypePage() {
               onChange={(v) => setField("inn_name", v)}
             />
             <p className="mt-1 text-xs text-zinc-400">
-              Nombre genérico normalizado por OMS — con conexión se sugiere vía RxNorm.
+              {t.inn_hint}
             </p>
           </div>
         )}
@@ -128,12 +121,12 @@ export default function NewProductTypePage() {
           {/* Strength */}
           {isMedicine && (
             <div>
-              <label className="block text-xs font-medium text-zinc-600 mb-1">Concentración</label>
+              <label className="block text-xs font-medium text-zinc-600 mb-1">{t.strength_label}</label>
               <input
                 type="text"
                 value={form.strength ?? ""}
                 onChange={(e) => setField("strength", e.target.value)}
-                placeholder="400mg"
+                placeholder={t.strength_placeholder}
                 className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-900"
               />
             </div>
@@ -142,12 +135,12 @@ export default function NewProductTypePage() {
           {/* Form */}
           {isMedicine && (
             <div>
-              <label className="block text-xs font-medium text-zinc-600 mb-1">Forma farmacéutica</label>
+              <label className="block text-xs font-medium text-zinc-600 mb-1">{t.form_label}</label>
               <input
                 type="text"
                 value={form.form ?? ""}
                 onChange={(e) => setField("form", e.target.value)}
-                placeholder="tableta, jarabe, inyectable…"
+                placeholder={t.form_placeholder}
                 className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-900"
               />
             </div>
@@ -155,37 +148,37 @@ export default function NewProductTypePage() {
 
           {/* Brand */}
           <div>
-            <label className="block text-xs font-medium text-zinc-600 mb-1">Marca</label>
+            <label className="block text-xs font-medium text-zinc-600 mb-1">{t.brand_label}</label>
             <input
               type="text"
               value={form.brand ?? ""}
               onChange={(e) => setField("brand", e.target.value)}
-              placeholder="Advil, genérico…"
+              placeholder={t.brand_placeholder}
               className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-900"
             />
           </div>
 
           {/* Default unit */}
           <div>
-            <label className="block text-xs font-medium text-zinc-600 mb-1">Unidad por defecto</label>
+            <label className="block text-xs font-medium text-zinc-600 mb-1">{t.unit_label}</label>
             <input
               type="text"
               value={form.default_unit ?? ""}
               onChange={(e) => setField("default_unit", e.target.value)}
-              placeholder="tabletas, latas, litros…"
+              placeholder={t.unit_placeholder}
               className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-900"
             />
           </div>
 
           {/* GTIN */}
           <div>
-            <label className="block text-xs font-medium text-zinc-600 mb-1">GTIN / Código de barras</label>
+            <label className="block text-xs font-medium text-zinc-600 mb-1">{t.gtin_label}</label>
             <input
               type="text"
               inputMode="numeric"
               value={form.gtin ?? ""}
               onChange={(e) => setField("gtin", e.target.value)}
-              placeholder="EAN-8, UPC-A o EAN-13"
+              placeholder={t.gtin_placeholder}
               className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-900"
             />
           </div>
@@ -193,7 +186,7 @@ export default function NewProductTypePage() {
           {/* Min shelf life */}
           <div>
             <label className="block text-xs font-medium text-zinc-600 mb-1">
-              Vida útil mínima (días)
+              {t.min_shelf_life_label}
             </label>
             <input
               type="number"
@@ -217,7 +210,7 @@ export default function NewProductTypePage() {
             className="h-4 w-4 rounded border-zinc-300 text-zinc-900"
           />
           <label htmlFor="is_controlled" className="text-sm text-zinc-700">
-            Sustancia controlada — bloqueado en intake
+            {t.controlled_label}
           </label>
         </div>
 
@@ -231,23 +224,23 @@ export default function NewProductTypePage() {
           <button
             type="submit"
             disabled={submitting || !online}
-            title={!online ? "Requiere conexión para crear un nuevo tipo de producto" : undefined}
+            title={!online ? t.offline_tooltip : undefined}
             className="flex-1 rounded-lg bg-zinc-900 py-3 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-60"
           >
-            {submitting ? "Guardando…" : "Crear tipo de producto"}
+            {submitting ? t.submitting : t.submit}
           </button>
           <button
             type="button"
             onClick={() => router.back()}
             className="rounded-lg border border-zinc-300 px-4 py-3 text-sm font-medium text-zinc-600 hover:bg-zinc-50"
           >
-            Cancelar
+            {t.cancel}
           </button>
         </div>
 
         {!online && (
           <p className="text-xs text-center text-amber-600">
-            Sin conexión — no se pueden crear nuevos tipos de producto.
+            {t.offline_notice}
           </p>
         )}
       </form>

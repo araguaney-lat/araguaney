@@ -4,11 +4,15 @@ import { useEffect, useState } from "react"
 import { useSession } from "next-auth/react"
 import { apiFetch } from "@/lib/api"
 import type { UserOut } from "@/types"
+import { useDict } from "@/context/DictionaryContext"
 
 const ROLES = ["volunteer", "coordinator"]
 const EMPTY_FORM = { email: "", username: "", full_name: "", center_role: "volunteer" }
 
 export default function TeamPage() {
+  const dict = useDict()
+  const t = dict.dashboard.team
+
   const { data: session } = useSession()
   const centerId = session?.centerId
   const token = session?.accessToken ?? ""
@@ -29,7 +33,7 @@ export default function TeamPage() {
       const data = await apiFetch<UserOut[]>(`/v1/centers/${centerId}/users`, { token })
       setUsers(data)
     } catch {
-      setError("Error al cargar usuarios")
+      setError(dict.dashboard.common.error_unknown)
     } finally {
       setLoading(false)
     }
@@ -60,9 +64,9 @@ export default function TeamPage() {
       setUsers((u) => [user, ...u])
       setForm(EMPTY_FORM)
       setShowForm(false)
-      setSuccess("Usuario invitado. Recibirá sus credenciales por email.")
+      setSuccess(t.invite_success)
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Error al crear usuario")
+      setError(err instanceof Error ? err.message : dict.dashboard.common.error_unknown)
     } finally {
       setSaving(false)
     }
@@ -78,9 +82,9 @@ export default function TeamPage() {
         method: "POST",
         token,
       })
-      setSuccess("Invitación reenviada.")
+      setSuccess(t.reinvite_success)
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Error al reinvitar")
+      setError(err instanceof Error ? err.message : dict.dashboard.common.error_unknown)
     } finally {
       setReinviting(null)
     }
@@ -98,14 +102,16 @@ export default function TeamPage() {
     <div className="max-w-3xl">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-semibold text-zinc-900">Equipo</h1>
-          <p className="text-sm text-zinc-500 mt-0.5">{users.length} miembros en tu centro</p>
+          <h1 className="text-2xl font-semibold text-zinc-900">{t.title}</h1>
+          <p className="text-sm text-zinc-500 mt-0.5">
+            {users.length === 1 ? t.members_count_one : t.members_count_other.replace("{count}", String(users.length))}
+          </p>
         </div>
         <button
           onClick={() => { setShowForm((v) => !v); setError(null); setSuccess(null) }}
           className="rounded-lg bg-zinc-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-zinc-700"
         >
-          {showForm ? "Cancelar" : "+ Invitar voluntario"}
+          {showForm ? t.cancel : t.invite_btn}
         </button>
       </div>
 
@@ -118,25 +124,25 @@ export default function TeamPage() {
 
       {showForm && (
         <form onSubmit={handleCreate} className="mb-6 rounded-xl border border-zinc-200 bg-white p-5 space-y-3">
-          <p className="text-sm font-medium text-zinc-700">Nuevo miembro</p>
+          <p className="text-sm font-medium text-zinc-700">{t.form_title}</p>
           <div className="grid gap-3 sm:grid-cols-2">
             <div>
-              <label className="text-xs text-zinc-500">Email *</label>
+              <label className="text-xs text-zinc-500">{t.field_email}</label>
               <input required type="email" value={form.email} onChange={field("email")} placeholder="usuario@centro.org"
                 className="mt-1 w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-400" />
             </div>
             <div>
-              <label className="text-xs text-zinc-500">Username *</label>
+              <label className="text-xs text-zinc-500">{t.field_username}</label>
               <input required value={form.username} onChange={field("username")} placeholder="usuario123"
                 className="mt-1 w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-400" />
             </div>
             <div>
-              <label className="text-xs text-zinc-500">Nombre completo</label>
-              <input value={form.full_name} onChange={field("full_name")} placeholder="Nombre Apellido"
+              <label className="text-xs text-zinc-500">{t.field_full_name}</label>
+              <input value={form.full_name} onChange={field("full_name")}
                 className="mt-1 w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-400" />
             </div>
             <div>
-              <label className="text-xs text-zinc-500">Rol</label>
+              <label className="text-xs text-zinc-500">{t.field_role}</label>
               <select value={form.center_role} onChange={field("center_role")}
                 className="mt-1 w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-400">
                 {ROLES.map((r) => <option key={r} value={r}>{r}</option>)}
@@ -146,22 +152,22 @@ export default function TeamPage() {
           <div className="flex justify-end pt-1">
             <button type="submit" disabled={saving}
               className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-50">
-              {saving ? "Invitando..." : "Invitar"}
+              {saving ? t.inviting : t.invite_action}
             </button>
           </div>
         </form>
       )}
 
       {loading ? (
-        <div className="text-sm text-zinc-400 py-8 text-center">Cargando...</div>
+        <div className="text-sm text-zinc-400 py-8 text-center">{dict.dashboard.common.loading}</div>
       ) : (
         <div className="rounded-xl border border-zinc-200 bg-white overflow-hidden">
           <table className="w-full text-sm">
             <thead className="bg-zinc-50 border-b border-zinc-200">
               <tr>
-                <th className="text-left px-4 py-2.5 text-xs font-medium text-zinc-500">Miembro</th>
-                <th className="text-left px-4 py-2.5 text-xs font-medium text-zinc-500">Rol</th>
-                <th className="text-left px-4 py-2.5 text-xs font-medium text-zinc-500 hidden sm:table-cell">Estado</th>
+                <th className="text-left px-4 py-2.5 text-xs font-medium text-zinc-500">{t.col_member}</th>
+                <th className="text-left px-4 py-2.5 text-xs font-medium text-zinc-500">{t.col_role}</th>
+                <th className="text-left px-4 py-2.5 text-xs font-medium text-zinc-500 hidden sm:table-cell">{t.col_status}</th>
                 <th className="px-4 py-2.5" />
               </tr>
             </thead>
@@ -179,7 +185,7 @@ export default function TeamPage() {
                   </td>
                   <td className="px-4 py-3 hidden sm:table-cell">
                     <span className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${u.is_active ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
-                      {u.is_active ? "Activo" : "Inactivo"}
+                      {u.is_active ? t.status_active : t.status_inactive}
                     </span>
                   </td>
                   <td className="px-4 py-3 text-right">
@@ -188,13 +194,13 @@ export default function TeamPage() {
                       disabled={reinviting === u.id || !u.is_active}
                       className="rounded px-2 py-1 text-xs text-amber-600 hover:bg-amber-50 disabled:opacity-40"
                     >
-                      {reinviting === u.id ? "..." : "Reinvitar"}
+                      {reinviting === u.id ? "..." : t.reinvite}
                     </button>
                   </td>
                 </tr>
               ))}
               {users.length === 0 && (
-                <tr><td colSpan={4} className="px-4 py-8 text-center text-zinc-400 text-sm">No hay miembros en este centro.</td></tr>
+                <tr><td colSpan={4} className="px-4 py-8 text-center text-zinc-400 text-sm">{t.empty}</td></tr>
               )}
             </tbody>
           </table>
