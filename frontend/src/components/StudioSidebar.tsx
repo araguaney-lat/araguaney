@@ -1,60 +1,167 @@
 "use client"
 
+import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { useEffect, useState } from "react"
 import { logoutAction } from "@/lib/actions"
+import {
+  BarChart2,
+  Users,
+  ScrollText,
+  Settings,
+  LogOut,
+  PanelLeftClose,
+  PanelLeftOpen,
+} from "lucide-react"
+
+const LOGO = "https://res.cloudinary.com/dtvdqlxtd/image/upload/v1782794310/image_degkq9.png"
+const STORAGE_KEY = "studio_sidebar_collapsed"
 
 const NAV = [
-  { href: "/studio", label: "Métricas", exact: true },
-  { href: "/studio/users", label: "Usuarios" },
-  { href: "/studio/audit", label: "Auditoría" },
-  { href: "/studio/settings", label: "Configuración" },
+  { href: "/studio", label: "Métricas", exact: true, icon: BarChart2 },
+  { href: "/studio/users", label: "Usuarios", icon: Users },
+  { href: "/studio/audit", label: "Auditoría", icon: ScrollText },
+  { href: "/studio/settings", label: "Configuración", icon: Settings },
 ]
 
-export function StudioSidebar() {
+interface StudioSidebarProps {
+  userName?: string | null
+  userEmail?: string | null
+}
+
+export function StudioSidebar({ userName, userEmail }: StudioSidebarProps) {
   const pathname = usePathname()
+  const [collapsed, setCollapsed] = useState(false)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    const stored = localStorage.getItem(STORAGE_KEY)
+    if (stored === "true") setCollapsed(true)
+    setMounted(true)
+  }, [])
+
+  function toggle() {
+    setCollapsed((c) => {
+      const next = !c
+      localStorage.setItem(STORAGE_KEY, String(next))
+      return next
+    })
+  }
+
+  const width = !mounted ? "w-56" : collapsed ? "w-14" : "w-56"
 
   return (
-    <aside className="flex h-full w-56 flex-col border-r border-blue-200 bg-blue-50 px-3 py-4">
-      <div className="mb-6 px-2">
-        <Link href="/studio" className="block">
-          <span className="text-base font-semibold text-blue-900">Studio</span>
-          <span className="mt-0.5 block text-xs text-blue-600/70">Administración de plataforma</span>
-        </Link>
-        <Link
-          href="/dashboard"
-          className="mt-2 inline-block rounded bg-blue-100 px-2 py-0.5 text-xs text-blue-600 hover:bg-blue-200 transition-colors"
-        >
-          ← Dashboard
-        </Link>
-      </div>
+    <aside
+      className={`flex h-full flex-col border-r border-blue-200 bg-blue-50 transition-all duration-200 ${width} flex-shrink-0`}
+    >
+      {/* Header */}
+      {collapsed ? (
+        <div className="flex flex-col items-center gap-1 border-b border-blue-100 px-2 py-3">
+          <Image
+            src={LOGO}
+            alt="Araguaney"
+            width={28}
+            height={28}
+            className="rounded-full object-contain"
+          />
+          <button
+            onClick={toggle}
+            className="rounded-lg p-1 text-blue-600 hover:bg-blue-100 hover:text-blue-800 transition-colors"
+            title="Expandir menú"
+          >
+            <PanelLeftOpen size={16} />
+          </button>
+        </div>
+      ) : (
+        <div className="flex items-center justify-between border-b border-blue-100 px-3 py-3">
+          <div className="flex items-center gap-2 min-w-0">
+            <Image
+              src={LOGO}
+              alt="Araguaney"
+              width={28}
+              height={28}
+              className="rounded-full object-contain flex-shrink-0"
+            />
+            <div className="min-w-0">
+              <span className="text-sm font-semibold text-blue-900 truncate block">Studio</span>
+              <p className="text-xs text-blue-600/70 truncate">Administración de plataforma</p>
+            </div>
+          </div>
+          <button
+            onClick={toggle}
+            className="flex-shrink-0 rounded-lg p-1.5 text-blue-600 hover:bg-blue-100 hover:text-blue-800 transition-colors"
+            title="Colapsar menú"
+          >
+            <PanelLeftClose size={18} />
+          </button>
+        </div>
+      )}
 
-      <nav className="flex-1 space-y-0.5">
+      {/* Back to dashboard */}
+      {!collapsed && (
+        <div className="px-3 pt-3 pb-1">
+          <Link
+            href="/dashboard"
+            className="inline-block rounded bg-blue-100 px-2 py-0.5 text-xs text-blue-600 hover:bg-blue-200 transition-colors"
+          >
+            ← Dashboard
+          </Link>
+        </div>
+      )}
+
+      {/* Nav */}
+      <nav className="flex-1 overflow-y-auto px-2 py-2 space-y-0.5">
         {NAV.map((item) => {
           const isActive = item.exact ? pathname === item.href : pathname.startsWith(item.href)
+          const Icon = item.icon
           return (
             <Link
               key={item.href}
               href={item.href}
-              className={`block rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+              title={collapsed ? item.label : undefined}
+              className={`flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm font-medium transition-colors ${
+                collapsed ? "justify-center" : ""
+              } ${
                 isActive
                   ? "bg-blue-200/70 text-blue-900"
                   : "text-blue-800 hover:bg-blue-100 hover:text-blue-900"
               }`}
             >
-              {item.label}
+              <Icon size={17} className="flex-shrink-0" />
+              {!collapsed && <span className="truncate">{item.label}</span>}
             </Link>
           )
         })}
       </nav>
 
-      <div className="mt-4 border-t border-blue-100 pt-3">
+      {/* Footer */}
+      <div className="border-t border-blue-100 px-2 py-2 space-y-0.5">
+        {(userName || userEmail) && (
+          <div
+            className={`flex items-center gap-2.5 rounded-lg px-2.5 py-2 ${collapsed ? "justify-center" : ""}`}
+            title={collapsed ? (userName ?? userEmail ?? undefined) : undefined}
+          >
+            <span className="flex-shrink-0 flex h-7 w-7 items-center justify-center rounded-full bg-blue-300 text-xs font-bold text-blue-900">
+              {(userName ?? userEmail ?? "?")[0].toUpperCase()}
+            </span>
+            {!collapsed && (
+              <div className="min-w-0">
+                <p className="text-xs font-semibold text-blue-900 truncate">{userName ?? userEmail}</p>
+                <p className="text-xs text-blue-700/80 truncate">Superadmin</p>
+              </div>
+            )}
+          </div>
+        )}
+
         <form action={logoutAction}>
           <button
             type="submit"
-            className="w-full rounded-lg px-3 py-2 text-left text-sm text-blue-700 hover:bg-blue-100 hover:text-blue-900"
+            title={collapsed ? "Cerrar sesión" : undefined}
+            className={`flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm text-blue-700 hover:bg-blue-100 hover:text-blue-900 transition-colors ${collapsed ? "justify-center" : ""}`}
           >
-            Cerrar sesión
+            <LogOut size={17} className="flex-shrink-0" />
+            {!collapsed && <span>Cerrar sesión</span>}
           </button>
         </form>
       </div>
