@@ -2,6 +2,7 @@ import logging
 import sys
 from contextlib import asynccontextmanager
 
+import jwt
 import sentry_sdk
 from sentry_sdk.integrations.fastapi import FastApiIntegration
 from sentry_sdk.integrations.sqlalchemy import SqlalchemyIntegration
@@ -75,6 +76,30 @@ class AdminIPAllowlistMiddleware(BaseHTTPMiddleware):
             logger.warning("Admin access denied for IP %s on %s", client_ip, request.url.path)
             return Response(content="Forbidden", status_code=403)
 
+        return await call_next(request)
+
+
+class RLSContextMiddleware(BaseHTTPMiddleware):
+    """Decode JWT from Authorization header and store center_id in request.state.
+
+    This allows get_db() to call SET LOCAL app.current_center_id per transaction,
+    activating Row-Level Security for tenant isolation in Postgres.
+    national_admin (center_id NULL in token) → stores '' → RLS USING sees all rows.
+    """
+
+    async def dispatch(self, request: Request, call_next) -> Response:
+        center_id = ""
+        auth = request.headers.get("Authorization", "")
+        if auth.startswith("Bearer "):
+            token = auth[7:]
+            try:
+                payload = jwt.decode(
+                    token, settings.secret_key, algorithms=[settings.algorithm]
+                )
+                center_id = payload.get("center_id") or ""
+            except Exception:
+                pass
+        request.state.rls_center_id = center_id
         return await call_next(request)
 
 
@@ -231,6 +256,7 @@ _admin_allowed_ips = {ip.strip() for ip in settings.admin_allowed_ips.split(",")
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 app.add_middleware(SecurityHeadersMiddleware)
 app.add_middleware(AdminIPAllowlistMiddleware, allowed_ips=_admin_allowed_ips)
+app.add_middleware(RLSContextMiddleware)
 # ProxyHeaders added before CloudflareOnly so that in LIFO order CloudflareOnly
 # executes first (on raw TCP IP), then ProxyHeaders rewrites request.client.host.
 app.add_middleware(ProxyHeadersMiddleware, trusted_hosts=settings.trusted_proxy_ips)
