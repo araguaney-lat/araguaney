@@ -65,6 +65,8 @@ class ThreadService:
 
     def confirm_attachment(self, req: ConfirmAttachmentRequest, user: User) -> AttachmentOut:
         self._require_r2()
+        if not req.r2_key.startswith(f"attachments/{user.id}/"):
+            raise api_error("FORBIDDEN", "No puedes confirmar este archivo", status_code=403)
         if not object_exists(req.r2_key):
             raise api_error("ATTACHMENT_NOT_FOUND", "El archivo no existe en el storage. Sube primero.")
         expires_at = datetime.now(timezone.utc) + timedelta(days=_RETENTION_DAYS)

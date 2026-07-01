@@ -21,6 +21,8 @@ logger = logging.getLogger(__name__)
 
 _LOCKOUT_THRESHOLD = 10
 _LOCKOUT_MINUTES = 15
+# Pre-computed dummy hash used for constant-time rejection of unknown users
+_DUMMY_HASH = bcrypt.hashpw(b"__dummy_sentinel__", bcrypt.gensalt()).decode()
 
 
 class AuthService(BaseService):
@@ -86,7 +88,13 @@ class AuthService(BaseService):
         user = UserRepository(self.db).find_active_by_identifier(identifier)
 
         if not user or not user.hashed_password:
+            # Constant-time response: always run bcrypt to prevent timing oracle
+            bcrypt.checkpw(password.encode(), _DUMMY_HASH.encode())
             raise api_error("INVALID_CREDENTIALS", "Invalid credentials", status_code=401)
+
+        # Check account status before spending time on bcrypt
+        if not user.is_active:
+            raise api_error("ACCOUNT_DISABLED", "Account is disabled", status_code=403)
 
         now = datetime.now(timezone.utc)
         if user.lockout_until and user.lockout_until.replace(tzinfo=timezone.utc) > now:
@@ -116,8 +124,6 @@ class AuthService(BaseService):
         user.lockout_until = None
         self.db.commit()
 
-        if not user.is_active:
-            raise api_error("ACCOUNT_DISABLED", "Account is disabled", status_code=403)
         if not user.is_verified:
             raise api_error("EMAIL_NOT_VERIFIED", "Email address not verified", status_code=403)
 
@@ -142,7 +148,8 @@ class AuthService(BaseService):
     @staticmethod
     def _create_partial_token(user_id: str) -> str:
         expire = datetime.now(timezone.utc) + timedelta(minutes=5)
-        payload = {"sub": user_id, "exp": expire, "scope": "totp_pending"}
+        jti = str(uuid.uuid4())
+        payload = {"sub": user_id, "exp": expire, "scope": "totp_pending", "jti": jti}
         return jwt.encode(payload, settings.secret_key, algorithm=settings.algorithm)
 
     def logout(self, token: str) -> None:
@@ -208,6 +215,13 @@ class AuthService(BaseService):
                 is_verified=True,
                 registered_provider=data.provider,
             ))
+
+        if not user.is_active:
+            raise api_error("ACCOUNT_DISABLED", "Account is disabled", status_code=403)
+
+        if user.totp_enabled and user.totp_secret:
+            partial = self._create_partial_token(str(user.id))
+            return {"requires_totp": True, "partial_token": partial}
 
         return {"access_token": self.create_access_token(str(user.id)), "token_type": "bearer"}
 
@@ -346,6 +360,16 @@ class AuthService(BaseService):
         if payload.get("scope") != "totp_pending":
             raise api_error("INVALID_TOKEN", "Invalid token scope", status_code=401)
 
+        jti: str | None = payload.get("jti")
+        exp: int | None = payload.get("exp")
+        if not jti:
+            raise api_error("INVALID_TOKEN", "Invalid token", status_code=401)
+
+        # Prevent replay: reject already-used partial tokens
+        denylist_repo = TokenDenylistRepository(self.db)
+        if denylist_repo.is_denied(jti):
+            raise api_error("INVALID_TOKEN", "Token already used", status_code=401)
+
         user_id = payload.get("sub")
         from uuid import UUID
         user = UserRepository(self.db).find_by_id(UUID(user_id))
@@ -363,6 +387,12 @@ class AuthService(BaseService):
 
         if not valid:
             raise api_error("INVALID_TOTP_CODE", "Invalid or expired code", status_code=400)
+
+        # Consume the partial token so it cannot be replayed
+        if exp:
+            expires_at = datetime.fromtimestamp(exp, tz=timezone.utc)
+            denylist_repo.save(TokenDenylist(jti=jti, expires_at=expires_at))
+            self.db.flush()
 
         token = self.create_access_token(
             str(user.id),

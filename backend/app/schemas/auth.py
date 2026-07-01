@@ -1,3 +1,7 @@
+import re
+
+from pydantic import field_validator
+
 from app.schemas._base import StrictModel
 
 
@@ -6,6 +10,19 @@ class UserCreate(StrictModel):
     username: str
     password: str
     full_name: str | None = None
+
+    @field_validator("password")
+    @classmethod
+    def password_strength(cls, v: str) -> str:
+        if len(v) < 8:
+            raise ValueError("Password must be at least 8 characters")
+        if len(v) > 128:
+            raise ValueError("Password must be at most 128 characters")
+        if not any(c.isdigit() for c in v):
+            raise ValueError("Password must contain at least one digit")
+        if not any(c.isalpha() for c in v):
+            raise ValueError("Password must contain at least one letter")
+        return v
 
 
 class Token(StrictModel):

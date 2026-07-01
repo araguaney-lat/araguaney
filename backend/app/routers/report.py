@@ -25,6 +25,7 @@ from app.utils.rate_limit import limiter
 router = APIRouter(prefix="/v1/reports", tags=["reports"])
 
 _DEFAULT_DAYS = 30
+_MAX_RANGE_DAYS = 366
 
 
 def _resolve_dates(start: date | None, end: date | None) -> tuple[date, date]:
@@ -33,6 +34,8 @@ def _resolve_dates(start: date | None, end: date | None) -> tuple[date, date]:
     start = start or (today - timedelta(days=_DEFAULT_DAYS - 1))
     if start > end:
         start = end
+    if (end - start).days > _MAX_RANGE_DAYS:
+        start = end - timedelta(days=_MAX_RANGE_DAYS)
     return start, end
 
 

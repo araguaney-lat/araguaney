@@ -13,6 +13,7 @@ from app.repositories.user_campaign_repository import UserCampaignRepository
 from app.repositories.user_repository import UserRepository
 from app.schemas.user_domain import CENTER_ROLES, UserInvite, UserOut
 from app.services.auth_service import AuthService
+from app.utils.cloudflare import get_client_ip
 from app.utils.errors import api_error
 from app.utils.rate_limit import limiter
 
@@ -63,6 +64,7 @@ def invite_user(
         user_id=current_user.id,
         entity_id=str(user.id),
         extra={"email": user.email, "center_role": user.center_role, "center_id": str(center_id)},
+        ip=get_client_ip(request),
     )
     db.commit()
     # TODO: enqueue send_invitation_email_task(user.email, raw_password)
@@ -98,6 +100,7 @@ def reinvite_center_user(
         user_id=current_user.id,
         entity_id=str(user.id),
         extra={"email": user.email, "center_id": str(center_id)},
+        ip=get_client_ip(request),
     )
     db.commit()
     # TODO: enqueue send_invitation_email_task(user.email, raw_password)

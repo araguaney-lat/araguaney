@@ -6,7 +6,7 @@ from fastapi import APIRouter, BackgroundTasks, Depends, Query, Request
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.dependencies import require_national_admin, get_current_user
+from app.dependencies import get_current_superadmin, get_current_user
 from app.models.user import User
 from app.repositories.audit_repository import AuditRepository
 from app.repositories.campaign_repository import CampaignRepository
@@ -42,7 +42,7 @@ def list_users(
     limit: int = Query(50, ge=1, le=200),
     offset: int = Query(0, ge=0),
     db: Session = Depends(get_db),
-    _: User = Depends(require_national_admin),
+    _: User = Depends(get_current_superadmin),
 ):
     from sqlalchemy import select
     stmt = select(User)
@@ -62,7 +62,7 @@ def create_user(
     request: Request,
     data: StudioUserCreate,
     db: Session = Depends(get_db),
-    admin: User = Depends(require_national_admin),
+    admin: User = Depends(get_current_superadmin),
 ):
     if data.center_role not in CENTER_ROLES:
         raise api_error("INVALID_ROLE", "Invalid center role", field="center_role")
@@ -96,6 +96,7 @@ def create_user(
         user_id=admin.id,
         entity_id=str(user.id),
         extra={"email": user.email, "center_role": user.center_role},
+        ip=get_client_ip(request),
     )
     db.commit()
     return user
@@ -107,7 +108,7 @@ def reinvite_user(
     request: Request,
     user_id: UUID,
     db: Session = Depends(get_db),
-    admin: User = Depends(require_national_admin),
+    admin: User = Depends(get_current_superadmin),
 ):
     repo = UserRepository(db)
     user = repo.find_by_id(str(user_id))
@@ -126,6 +127,7 @@ def reinvite_user(
         user_id=admin.id,
         entity_id=str(user.id),
         extra={"email": user.email},
+        ip=get_client_ip(request),
     )
     db.commit()
     # TODO: enqueue send_invitation_email_task(user.email, raw_password)
@@ -139,7 +141,7 @@ def patch_user(
     user_id: UUID,
     data: StudioUserPatch,
     db: Session = Depends(get_db),
-    admin: User = Depends(require_national_admin),
+    admin: User = Depends(get_current_superadmin),
 ):
     repo = UserRepository(db)
     user = repo.find_by_id(str(user_id))
@@ -164,6 +166,7 @@ def patch_user(
         user_id=admin.id,
         entity_id=str(user.id),
         extra={"before": before, "after": {"center_role": user.center_role, "is_active": user.is_active}},
+        ip=get_client_ip(request),
     )
     db.commit()
     db.refresh(user)
@@ -183,7 +186,7 @@ def list_audit(
     limit: int = Query(50, ge=1, le=200),
     offset: int = Query(0, ge=0),
     db: Session = Depends(get_db),
-    _: User = Depends(require_national_admin),
+    _: User = Depends(get_current_superadmin),
 ):
     items, total = AuditRepository(db).list(
         entity_type=entity_type,
@@ -205,7 +208,7 @@ def promote_product_type(
     background_tasks: BackgroundTasks,
     pt_id: UUID,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_national_admin),
+    current_user: User = Depends(get_current_superadmin),
 ):
     """Promote a campaign-scoped product type to global (campaign_id → NULL)."""
     pt_repo = ProductTypeRepository(db)

@@ -23,7 +23,9 @@ function extractError(body: Record<string, unknown>, fallback = "Something went 
 // ── Auth ──────────────────────────────────────────────────────────────────────
 
 export async function loginAction(_: unknown, formData: FormData) {
-  const callbackUrl = (formData.get("callbackUrl") as string | null) || "/dashboard"
+  const rawCallback = (formData.get("callbackUrl") as string | null) ?? ""
+  const callbackUrl =
+    rawCallback.startsWith("/") && !rawCallback.startsWith("//") ? rawCallback : "/dashboard"
 
   try {
     await signIn("credentials", {

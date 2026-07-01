@@ -8,8 +8,8 @@ from pydantic import BaseModel, ConfigDict
 
 
 class StrictModel(BaseModel):
-    model_config = ConfigDict(strict=True)
+    model_config = ConfigDict(strict=True, extra="forbid")
 
 
 class StrictORMModel(BaseModel):
-    model_config = ConfigDict(strict=True, from_attributes=True)
+    model_config = ConfigDict(strict=True, extra="forbid", from_attributes=True)

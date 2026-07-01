@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime, timezone
 from typing import Any
 
-from sqlalchemy import select, and_
+from sqlalchemy import func, select, and_
 from sqlalchemy.orm import Session
 
 from app.models.audit_log import AuditLog
@@ -59,8 +59,8 @@ class AuditRepository:
             base = base.where(and_(*conditions))
 
         total = self._db.execute(
-            base.with_only_columns(AuditLog.id)
-        ).all().__len__()
+            base.with_only_columns(func.count(AuditLog.id))
+        ).scalar() or 0
         rows = list(
             self._db.execute(
                 base.order_by(AuditLog.created_at.desc()).limit(limit).offset(offset)
