@@ -1,4 +1,4 @@
-from typing import Generator, Optional
+from typing import Generator
 
 from fastapi import Request
 from sqlalchemy import create_engine, text
@@ -43,17 +43,15 @@ class Base(DeclarativeBase):
     pass
 
 
-def get_db(request: Optional[Request] = None) -> Generator[Session, None, None]:
+def get_db(request: Request) -> Generator[Session, None, None]:
     """Yield a DB session with Row-Level Security context set per transaction.
 
     RLSContextMiddleware stores center_id (from JWT) in request.state.rls_center_id.
     We pass it via SET LOCAL so Postgres tenant policies are activated automatically.
-    national_admin → '' → policy sees all rows.  No request (tests/jobs) → '' → same.
+    national_admin → '' → policy sees all rows.
     """
     db = SessionLocal()
-    center_id = ""
-    if request is not None:
-        center_id = getattr(request.state, "rls_center_id", "")
+    center_id = getattr(request.state, "rls_center_id", "")
     try:
         db.execute(text("SET LOCAL \"app.current_center_id\" = :cid"), {"cid": center_id})
         yield db
