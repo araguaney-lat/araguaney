@@ -3,11 +3,15 @@
 import { useEffect, useState } from "react"
 import { listStudioUsersAction, createStudioUserAction, patchStudioUserAction, reinviteStudioUserAction } from "@/lib/studio-actions"
 import type { UserOut } from "@/types"
+import { useDict } from "@/context/DictionaryContext"
 
 const ROLES = ["volunteer", "coordinator", "national_admin"]
 const EMPTY_FORM = { email: "", username: "", full_name: "", center_role: "volunteer", center_id: "", password: "" }
 
 export default function StudioUsersPage() {
+  const dict = useDict()
+  const t = dict.dashboard.admin_users
+
   const [users, setUsers] = useState<UserOut[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
@@ -48,7 +52,7 @@ export default function StudioUsersPage() {
       setForm(EMPTY_FORM)
       setShowForm(false)
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Error al crear usuario")
+      setError(err instanceof Error ? err.message : dict.dashboard.common.error_unknown)
     } finally {
       setSaving(false)
     }
@@ -60,7 +64,7 @@ export default function StudioUsersPage() {
     try {
       await reinviteStudioUserAction(userId)
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Error al reinvitar")
+      setError(err instanceof Error ? err.message : dict.dashboard.common.error_unknown)
     } finally {
       setReinviting(null)
     }
@@ -77,7 +81,7 @@ export default function StudioUsersPage() {
       setUsers((u) => u.map((x) => (x.id === updated.id ? updated : x)))
       setEditingId(null)
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Error al actualizar")
+      setError(err instanceof Error ? err.message : dict.dashboard.common.error_unknown)
     } finally {
       setSaving(false)
     }
@@ -96,8 +100,10 @@ export default function StudioUsersPage() {
     <div className="max-w-5xl">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-semibold text-zinc-900">Usuarios</h1>
-          <p className="text-sm text-zinc-500 mt-0.5">{users.length} usuarios</p>
+          <h1 className="text-2xl font-semibold text-zinc-900">{t.title}</h1>
+          <p className="text-sm text-zinc-500 mt-0.5">
+            {users.length === 1 ? t.count_one : t.count_other.replace("{count}", String(users.length))}
+          </p>
         </div>
         <div className="flex items-center gap-3">
           <select
@@ -105,14 +111,14 @@ export default function StudioUsersPage() {
             onChange={(e) => setFilterRole(e.target.value)}
             className="rounded-lg border border-zinc-200 px-3 py-1.5 text-sm focus:outline-none"
           >
-            <option value="">Todos los roles</option>
+            <option value="">{t.filter_all_roles}</option>
             {ROLES.map((r) => <option key={r} value={r}>{r}</option>)}
           </select>
           <button
             onClick={() => setShowForm((v) => !v)}
             className="rounded-lg bg-zinc-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-zinc-700"
           >
-            {showForm ? "Cancelar" : "+ Nuevo usuario"}
+            {showForm ? t.cancel : t.new_btn}
           </button>
         </div>
       </div>
@@ -123,60 +129,60 @@ export default function StudioUsersPage() {
 
       {showForm && (
         <form onSubmit={handleCreate} className="mb-6 rounded-xl border border-zinc-200 bg-white p-5 space-y-3">
-          <p className="text-sm font-medium text-zinc-700">Nuevo usuario</p>
+          <p className="text-sm font-medium text-zinc-700">{t.form_title}</p>
           <div className="grid gap-3 sm:grid-cols-2">
             <div>
-              <label className="text-xs text-zinc-500">Email *</label>
+              <label className="text-xs text-zinc-500">{t.field_email}</label>
               <input required type="email" value={form.email} onChange={field("email")} placeholder="usuario@centro.org"
                 className="mt-1 w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-400" />
             </div>
             <div>
-              <label className="text-xs text-zinc-500">Username *</label>
+              <label className="text-xs text-zinc-500">{t.field_username}</label>
               <input required value={form.username} onChange={field("username")} placeholder="usuario123"
                 className="mt-1 w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-400" />
             </div>
             <div>
-              <label className="text-xs text-zinc-500">Nombre completo</label>
-              <input value={form.full_name} onChange={field("full_name")} placeholder="Nombre Apellido"
+              <label className="text-xs text-zinc-500">{t.field_name}</label>
+              <input value={form.full_name} onChange={field("full_name")}
                 className="mt-1 w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-400" />
             </div>
             <div>
-              <label className="text-xs text-zinc-500">Rol</label>
+              <label className="text-xs text-zinc-500">{t.field_role}</label>
               <select value={form.center_role} onChange={field("center_role")}
                 className="mt-1 w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-400">
                 {ROLES.map((r) => <option key={r} value={r}>{r}</option>)}
               </select>
             </div>
             <div>
-              <label className="text-xs text-zinc-500">Centro ID (UUID)</label>
-              <input value={form.center_id} onChange={field("center_id")} placeholder="UUID del centro (opcional)"
+              <label className="text-xs text-zinc-500">{t.field_center_id}</label>
+              <input value={form.center_id} onChange={field("center_id")} placeholder={t.center_id_placeholder}
                 className="mt-1 w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-zinc-400" />
             </div>
             <div>
-              <label className="text-xs text-zinc-500">Contraseña temporal (opcional)</label>
-              <input type="password" value={form.password} onChange={field("password")} placeholder="Se genera automáticamente si se deja vacío"
+              <label className="text-xs text-zinc-500">{t.field_temp_password}</label>
+              <input type="password" value={form.password} onChange={field("password")} placeholder={t.temp_password_placeholder}
                 className="mt-1 w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-400" />
             </div>
           </div>
           <div className="flex justify-end pt-1">
             <button type="submit" disabled={saving}
               className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-50">
-              {saving ? "Creando..." : "Crear usuario"}
+              {saving ? t.creating : t.create_btn}
             </button>
           </div>
         </form>
       )}
 
       {loading ? (
-        <div className="text-sm text-zinc-400 py-8 text-center">Cargando...</div>
+        <div className="text-sm text-zinc-400 py-8 text-center">{dict.dashboard.common.loading}</div>
       ) : (
         <div className="rounded-xl border border-zinc-200 bg-white overflow-hidden">
           <table className="w-full text-sm">
             <thead className="bg-zinc-50 border-b border-zinc-200">
               <tr>
-                <th className="text-left px-4 py-2.5 text-xs font-medium text-zinc-500">Usuario</th>
-                <th className="text-left px-4 py-2.5 text-xs font-medium text-zinc-500">Rol</th>
-                <th className="text-left px-4 py-2.5 text-xs font-medium text-zinc-500 hidden sm:table-cell">Estado</th>
+                <th className="text-left px-4 py-2.5 text-xs font-medium text-zinc-500">{t.col_user}</th>
+                <th className="text-left px-4 py-2.5 text-xs font-medium text-zinc-500">{t.field_role}</th>
+                <th className="text-left px-4 py-2.5 text-xs font-medium text-zinc-500 hidden sm:table-cell">{t.col_status}</th>
                 <th className="px-4 py-2.5" />
               </tr>
             </thead>
@@ -194,7 +200,7 @@ export default function StudioUsersPage() {
                   </td>
                   <td className="px-4 py-3 hidden sm:table-cell">
                     <span className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${u.is_active ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
-                      {u.is_active ? "Activo" : "Inactivo"}
+                      {u.is_active ? t.status_active : t.status_inactive}
                     </span>
                   </td>
                   <td className="px-4 py-3 text-right">
@@ -206,16 +212,16 @@ export default function StudioUsersPage() {
                         </select>
                         <select value={String(editForm.is_active)} onChange={(e) => setEditForm((f) => ({ ...f, is_active: e.target.value === "true" }))}
                           className="rounded border border-zinc-200 px-2 py-1 text-xs focus:outline-none">
-                          <option value="true">Activo</option>
-                          <option value="false">Inactivo</option>
+                          <option value="true">{t.status_active}</option>
+                          <option value="false">{t.status_inactive}</option>
                         </select>
                         <button onClick={() => handlePatch(u.id)} disabled={saving}
                           className="rounded px-2 py-1 text-xs font-medium bg-zinc-900 text-white hover:bg-zinc-700 disabled:opacity-50">
-                          Guardar
+                          {t.save}
                         </button>
                         <button onClick={() => setEditingId(null)}
                           className="rounded px-2 py-1 text-xs text-zinc-500 hover:bg-zinc-100">
-                          Cancelar
+                          {t.cancel}
                         </button>
                       </div>
                     ) : (
@@ -224,15 +230,15 @@ export default function StudioUsersPage() {
                           onClick={() => handleReinvite(u.id)}
                           disabled={reinviting === u.id || !u.is_active}
                           className="rounded px-2 py-1 text-xs text-amber-600 hover:bg-amber-50 disabled:opacity-40"
-                          title="Reenviar invitación"
+                          title={t.reinvite_tooltip}
                         >
-                          {reinviting === u.id ? "..." : "Reinvitar"}
+                          {reinviting === u.id ? "..." : t.reinvite}
                         </button>
                         <button
                           onClick={() => { setEditingId(u.id); setEditForm({ center_role: u.center_role ?? "volunteer", is_active: u.is_active }) }}
                           className="rounded px-2 py-1 text-xs text-zinc-500 hover:bg-zinc-100"
                         >
-                          Editar
+                          {t.edit}
                         </button>
                       </div>
                     )}
@@ -240,7 +246,7 @@ export default function StudioUsersPage() {
                 </tr>
               ))}
               {users.length === 0 && (
-                <tr><td colSpan={4} className="px-4 py-8 text-center text-zinc-400 text-sm">No hay usuarios.</td></tr>
+                <tr><td colSpan={4} className="px-4 py-8 text-center text-zinc-400 text-sm">{t.empty}</td></tr>
               )}
             </tbody>
           </table>

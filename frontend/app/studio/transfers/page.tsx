@@ -2,14 +2,7 @@
 
 import { useState, useEffect } from "react"
 import type { TransferOut } from "@/types"
-
-const STATUS_LABELS: Record<string, string> = {
-  REQUESTED: "Solicitada",
-  APPROVED: "Aprobada",
-  IN_TRANSIT: "En tránsito",
-  RECEIVED: "Recibida",
-  REJECTED: "Rechazada",
-}
+import { useDict } from "@/context/DictionaryContext"
 
 const STATUS_COLORS: Record<string, string> = {
   REQUESTED: "bg-yellow-100 text-yellow-800",
@@ -22,6 +15,9 @@ const STATUS_COLORS: Record<string, string> = {
 const STATUS_FILTERS = ["", "REQUESTED", "APPROVED", "IN_TRANSIT", "RECEIVED", "REJECTED"]
 
 export default function StudioTransfersPage() {
+  const dict = useDict()
+  const t = dict.studio.transfers
+  const statusLabels = dict.dashboard.transfers.status
   const [transfers, setTransfers] = useState<TransferOut[]>([])
   const [loading, setLoading] = useState(true)
   const [statusFilter, setStatusFilter] = useState("")
@@ -39,8 +35,8 @@ export default function StudioTransfersPage() {
   return (
     <div className="max-w-5xl">
       <div className="mb-6">
-        <h1 className="text-2xl font-semibold text-zinc-900">Transferencias</h1>
-        <p className="text-sm text-zinc-500 mt-1">Todas las transferencias entre centros — sin filtro de tenant</p>
+        <h1 className="text-2xl font-semibold text-zinc-900">{t.title}</h1>
+        <p className="text-sm text-zinc-500 mt-1">{t.subtitle}</p>
       </div>
 
       <div className="flex gap-2 mb-4 flex-wrap">
@@ -50,41 +46,41 @@ export default function StudioTransfersPage() {
             onClick={() => setStatusFilter(s)}
             className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${statusFilter === s ? "bg-zinc-900 text-white border-zinc-900" : "bg-white text-zinc-600 border-zinc-300 hover:border-zinc-500"}`}
           >
-            {s ? STATUS_LABELS[s] : "Todas"}
+            {s ? statusLabels[s as keyof typeof statusLabels] : t.filter_all}
           </button>
         ))}
       </div>
 
       <div className="rounded-xl border border-zinc-200 bg-white overflow-hidden">
         {loading ? (
-          <div className="p-8 text-center text-sm text-zinc-400">Cargando…</div>
+          <div className="p-8 text-center text-sm text-zinc-400">{t.loading}</div>
         ) : transfers.length === 0 ? (
-          <div className="p-8 text-center text-sm text-zinc-400">Sin transferencias.</div>
+          <div className="p-8 text-center text-sm text-zinc-400">{t.empty}</div>
         ) : (
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-zinc-100 bg-zinc-50">
-                <th className="text-left px-4 py-3 text-xs font-semibold text-zinc-500 uppercase tracking-wide">Origen</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-zinc-500 uppercase tracking-wide">Destino</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-zinc-500 uppercase tracking-wide">Estado</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-zinc-500 uppercase tracking-wide">Fecha</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-zinc-500 uppercase tracking-wide">ID</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-zinc-500 uppercase tracking-wide">{t.col_origin}</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-zinc-500 uppercase tracking-wide">{t.col_destination}</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-zinc-500 uppercase tracking-wide">{t.col_status}</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-zinc-500 uppercase tracking-wide">{t.col_date}</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-zinc-500 uppercase tracking-wide">{t.col_id}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-100">
-              {transfers.map((t) => (
-                <tr key={t.id} className="hover:bg-zinc-50 transition-colors">
-                  <td className="px-4 py-3 font-mono text-xs text-zinc-600">{t.from_center_id.slice(0, 8)}…</td>
-                  <td className="px-4 py-3 font-mono text-xs text-zinc-600">{t.to_center_id.slice(0, 8)}…</td>
+              {transfers.map((tr) => (
+                <tr key={tr.id} className="hover:bg-zinc-50 transition-colors">
+                  <td className="px-4 py-3 font-mono text-xs text-zinc-600">{tr.from_center_id.slice(0, 8)}…</td>
+                  <td className="px-4 py-3 font-mono text-xs text-zinc-600">{tr.to_center_id.slice(0, 8)}…</td>
                   <td className="px-4 py-3">
-                    <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${STATUS_COLORS[t.status] ?? "bg-zinc-100 text-zinc-700"}`}>
-                      {STATUS_LABELS[t.status] ?? t.status}
+                    <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${STATUS_COLORS[tr.status] ?? "bg-zinc-100 text-zinc-700"}`}>
+                      {statusLabels[tr.status as keyof typeof statusLabels] ?? tr.status}
                     </span>
                   </td>
                   <td className="px-4 py-3 text-xs text-zinc-500">
-                    {new Date(t.created_at).toLocaleDateString("es-MX", { day: "2-digit", month: "short", year: "numeric" })}
+                    {new Date(tr.created_at).toLocaleDateString("es-MX", { day: "2-digit", month: "short", year: "numeric" })}
                   </td>
-                  <td className="px-4 py-3 font-mono text-xs text-zinc-400">{t.id.slice(0, 8)}</td>
+                  <td className="px-4 py-3 font-mono text-xs text-zinc-400">{tr.id.slice(0, 8)}</td>
                 </tr>
               ))}
             </tbody>

@@ -29,6 +29,8 @@ import {
   PanelLeftOpen,
   Wrench,
 } from "lucide-react"
+import { LanguageSwitcher } from "@/components/LanguageSwitcher"
+import type { Locale } from "@/lib/i18n"
 
 type IconComponent = React.ComponentType<{ size?: number; className?: string }>
 
@@ -59,6 +61,7 @@ type DashboardNav = {
   team: string
   settings: string
   logout: string
+  admin_section: string
 }
 
 type DashboardRoleLabels = {
@@ -107,9 +110,10 @@ interface SidebarProps {
   roleLabels: DashboardRoleLabels
   userName?: string | null
   userEmail?: string | null
+  locale: Locale
 }
 
-export function Sidebar({ centerRole, platformRole, centerName, nav, roleLabels, userName, userEmail }: SidebarProps) {
+export function Sidebar({ centerRole, platformRole, centerName, nav, roleLabels, userName, userEmail, locale }: SidebarProps) {
   const pathname = usePathname()
   const [collapsed, setCollapsed] = useState(false)
   const [mounted, setMounted] = useState(false)
@@ -163,6 +167,7 @@ export function Sidebar({ centerRole, platformRole, centerName, nav, roleLabels,
           >
             <PanelLeftOpen size={16} />
           </button>
+          <LanguageSwitcher locale={locale} collapsed />
         </div>
       ) : (
         <div className="flex items-center justify-between border-b border-amber-100 px-3 py-3">
@@ -175,13 +180,16 @@ export function Sidebar({ centerRole, platformRole, centerName, nav, roleLabels,
               )}
             </div>
           </div>
-          <button
-            onClick={toggle}
-            className="flex-shrink-0 rounded-lg p-1.5 text-amber-600 hover:bg-amber-100 hover:text-amber-800 transition-colors"
-            title="Colapsar menú"
-          >
-            <PanelLeftClose size={18} />
-          </button>
+          <div className="flex items-center gap-1 flex-shrink-0">
+            <LanguageSwitcher locale={locale} />
+            <button
+              onClick={toggle}
+              className="rounded-lg p-1.5 text-amber-600 hover:bg-amber-100 hover:text-amber-800 transition-colors"
+              title="Colapsar menú"
+            >
+              <PanelLeftClose size={18} />
+            </button>
+          </div>
         </div>
       )}
 
@@ -208,7 +216,7 @@ export function Sidebar({ centerRole, platformRole, centerName, nav, roleLabels,
           <div className="pt-2">
             {!collapsed && (
               <p className="px-2 pb-1 text-xs font-semibold uppercase tracking-wider text-amber-600/70">
-                Administración
+                {nav.admin_section}
               </p>
             )}
             {collapsed && <div className="my-1 border-t border-amber-100" />}

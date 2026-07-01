@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { listAuditAction } from "@/lib/studio-actions"
 import type { AuditEntry } from "@/lib/studio-actions"
+import { useDict } from "@/context/DictionaryContext"
 
 const ENTITY_TYPES = ["user", "box", "pallet", "shipment", "intake", "center", "campaign"]
 
@@ -11,6 +12,9 @@ function fmt(iso: string) {
 }
 
 export default function StudioAuditPage() {
+  const dict = useDict()
+  const t = dict.dashboard.admin_audit
+
   const [items, setItems] = useState<AuditEntry[]>([])
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(true)
@@ -45,24 +49,28 @@ export default function StudioAuditPage() {
     <div className="max-w-5xl">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-semibold text-zinc-900">Auditoría</h1>
-          <p className="text-sm text-zinc-500 mt-0.5">{total} registros</p>
+          <h1 className="text-2xl font-semibold text-zinc-900">{t.title}</h1>
+          <p className="text-sm text-zinc-500 mt-0.5">
+            {total === 1 ? t.records_count_one : t.records_count_other.replace("{count}", String(total))}
+          </p>
         </div>
         <select
           value={filterEntity}
           onChange={(e) => setFilterEntity(e.target.value)}
           className="rounded-lg border border-zinc-200 px-3 py-1.5 text-sm focus:outline-none"
         >
-          <option value="">Todas las entidades</option>
-          {ENTITY_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
+          <option value="">{t.filter_all}</option>
+          {ENTITY_TYPES.map((entity) => <option key={entity} value={entity}>{entity}</option>)}
         </select>
       </div>
 
       {selected && (
         <div className="mb-4 rounded-xl border border-zinc-200 bg-white p-4">
           <div className="flex items-center justify-between mb-2">
-            <p className="text-sm font-medium text-zinc-700">Metadata</p>
-            <button onClick={() => setSelected(null)} className="text-xs text-zinc-400 hover:text-zinc-600">Cerrar</button>
+            <p className="text-sm font-medium text-zinc-700">{t.metadata}</p>
+            <button onClick={() => setSelected(null)} className="text-xs text-zinc-400 hover:text-zinc-600">
+              {dict.dashboard.common.close}
+            </button>
           </div>
           <pre className="text-xs text-zinc-600 overflow-auto bg-zinc-50 rounded p-3 max-h-48">
             {JSON.stringify(selected.extra, null, 2)}
@@ -71,17 +79,17 @@ export default function StudioAuditPage() {
       )}
 
       {loading ? (
-        <div className="text-sm text-zinc-400 py-8 text-center">Cargando...</div>
+        <div className="text-sm text-zinc-400 py-8 text-center">{dict.dashboard.common.loading}</div>
       ) : (
         <>
           <div className="rounded-xl border border-zinc-200 bg-white overflow-hidden">
             <table className="w-full text-sm">
               <thead className="bg-zinc-50 border-b border-zinc-200">
                 <tr>
-                  <th className="text-left px-4 py-2.5 text-xs font-medium text-zinc-500">Fecha</th>
-                  <th className="text-left px-4 py-2.5 text-xs font-medium text-zinc-500">Acción</th>
-                  <th className="text-left px-4 py-2.5 text-xs font-medium text-zinc-500 hidden sm:table-cell">Entidad</th>
-                  <th className="text-left px-4 py-2.5 text-xs font-medium text-zinc-500 hidden md:table-cell">IP</th>
+                  <th className="text-left px-4 py-2.5 text-xs font-medium text-zinc-500">{t.col_date}</th>
+                  <th className="text-left px-4 py-2.5 text-xs font-medium text-zinc-500">{t.col_action}</th>
+                  <th className="text-left px-4 py-2.5 text-xs font-medium text-zinc-500 hidden sm:table-cell">{t.col_entity}</th>
+                  <th className="text-left px-4 py-2.5 text-xs font-medium text-zinc-500 hidden md:table-cell">{t.col_ip}</th>
                   <th className="px-4 py-2.5" />
                 </tr>
               </thead>
@@ -107,14 +115,14 @@ export default function StudioAuditPage() {
                           onClick={() => setSelected(entry)}
                           className="rounded px-2 py-1 text-xs text-zinc-500 hover:bg-zinc-100"
                         >
-                          Ver
+                          {t.view}
                         </button>
                       )}
                     </td>
                   </tr>
                 ))}
                 {items.length === 0 && (
-                  <tr><td colSpan={5} className="px-4 py-8 text-center text-zinc-400 text-sm">Sin registros.</td></tr>
+                  <tr><td colSpan={5} className="px-4 py-8 text-center text-zinc-400 text-sm">{t.empty}</td></tr>
                 )}
               </tbody>
             </table>
@@ -122,21 +130,26 @@ export default function StudioAuditPage() {
 
           {total > LIMIT && (
             <div className="mt-4 flex items-center justify-between text-sm text-zinc-500">
-              <span>{offset + 1}–{Math.min(offset + LIMIT, total)} de {total}</span>
+              <span>
+                {t.pagination
+                  .replace("{from}", String(offset + 1))
+                  .replace("{to}", String(Math.min(offset + LIMIT, total)))
+                  .replace("{total}", String(total))}
+              </span>
               <div className="flex gap-2">
                 <button
                   disabled={offset === 0}
                   onClick={() => changePage(Math.max(0, offset - LIMIT))}
                   className="rounded-lg border border-zinc-200 px-3 py-1.5 text-xs hover:bg-zinc-50 disabled:opacity-40"
                 >
-                  Anterior
+                  {t.prev}
                 </button>
                 <button
                   disabled={offset + LIMIT >= total}
                   onClick={() => changePage(offset + LIMIT)}
                   className="rounded-lg border border-zinc-200 px-3 py-1.5 text-xs hover:bg-zinc-50 disabled:opacity-40"
                 >
-                  Siguiente
+                  {t.next}
                 </button>
               </div>
             </div>

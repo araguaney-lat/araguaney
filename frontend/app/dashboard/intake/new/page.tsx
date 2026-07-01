@@ -6,17 +6,7 @@ import type { Campaign, ProductType, BarcodeResult } from "@/types"
 import { createIntakeAction, type BoxDraft } from "@/lib/actions"
 import { CameraScanner } from "@/components/CameraScanner"
 import { useOnlineStatus } from "@/components/ConnectivityBanner"
-
-const CATEGORY_LABELS: Record<string, string> = {
-  MEDICINE: "Medicamento",
-  MEDICAL_SUPPLY: "Insumo médico",
-  FOOD: "Alimento",
-  WATER: "Agua",
-  HYGIENE: "Higiene",
-  TOOL: "Herramienta",
-  RESCUE_GEAR: "Equipo de rescate",
-  OTHER: "Otro",
-}
+import { useDict } from "@/context/DictionaryContext"
 
 interface BoxRow {
   key: string
@@ -67,7 +57,6 @@ function useProductSearch(campaignId: string) {
     }, 300)
   }, [campaignId])
 
-  // Returns { product, offlineBlocked, notFound }
   const lookupBarcode = useCallback(async (gtin: string): Promise<{
     product: ProductType | null
     offlineBlocked: boolean
@@ -76,20 +65,12 @@ function useProductSearch(campaignId: string) {
     setLoading(true)
     try {
       const res = await fetch(`/api/catalog/barcode/${encodeURIComponent(gtin)}`)
-      if (res.status === 503) {
-        return { product: null, offlineBlocked: true, notFound: false }
-      }
-      if (res.status === 422) {
-        return { product: null, offlineBlocked: false, notFound: true }
-      }
-      if (!res.ok) {
-        return { product: null, offlineBlocked: false, notFound: true }
-      }
+      if (res.status === 503) return { product: null, offlineBlocked: true, notFound: false }
+      if (res.status === 422 || !res.ok) return { product: null, offlineBlocked: false, notFound: true }
       const data: BarcodeResult = await res.json()
       if (data.source === "local" && data.product_type) {
         return { product: data.product_type, offlineBlocked: false, notFound: false }
       }
-      // open_food_facts hit — product not yet in local catalog
       return { product: null, offlineBlocked: false, notFound: true }
     } finally {
       setLoading(false)
@@ -112,6 +93,9 @@ function BoxRowInput({
   onChange: (updated: BoxRow) => void
   onRemove: () => void
 }) {
+  const dict = useDict()
+  const t = dict.dashboard.intake_new
+
   const { query, results, loading, search, lookupBarcode } = useProductSearch(campaignId)
   const [showDropdown, setShowDropdown] = useState(false)
   const [barcodeInput, setBarcodeInput] = useState("")
@@ -135,12 +119,12 @@ function BoxRowInput({
       selectProduct(product)
     } else if (offlineBlocked) {
       onChange({ ...row, offlineBlocked: true })
-      setBarcodeError("Sin conexión — no se puede registrar el producto. Restablece la conexión e intenta de nuevo.")
+      setBarcodeError(t.barcode_offline)
     } else if (notFound) {
       onChange({ ...row, offlineBlocked: false })
-      setBarcodeError("Producto no encontrado en el catálogo local. Búscalo por nombre o créalo primero.")
+      setBarcodeError(t.barcode_not_found)
     }
-  }, [lookupBarcode, row, onChange])
+  }, [lookupBarcode, row, onChange, t]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleCameraScan = useCallback(async (text: string) => {
     setScanning(false)
@@ -156,21 +140,20 @@ function BoxRowInput({
     await handleBarcode(gtin)
   }
 
+  const categoryLabels = dict.dashboard.national.categories
   const isControlled = row.product_type?.is_controlled
 
   return (
     <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-4 space-y-3">
       {/* Barcode scanner */}
       <div>
-        <label className="block text-xs font-medium text-zinc-600 mb-1">
-          Código de barras (GTIN) — escanea o escribe
-        </label>
+        <label className="block text-xs font-medium text-zinc-600 mb-1">{t.label_barcode}</label>
         <div className="flex gap-2">
           <input
             type="text"
             inputMode="numeric"
             value={barcodeInput}
-            placeholder="8501234567890 ↵"
+            placeholder={t.barcode_placeholder}
             className="flex-1 rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-900"
             onChange={(e) => setBarcodeInput(e.target.value)}
             onKeyDown={handleBarcodeKeyDown}
@@ -179,7 +162,7 @@ function BoxRowInput({
             type="button"
             onClick={() => setScanning(true)}
             className="rounded-lg border border-zinc-300 px-3 py-2 text-lg hover:bg-zinc-50"
-            title="Escanear con cámara"
+            title={t.scan_camera}
           >
             📷
           </button>
@@ -193,23 +176,23 @@ function BoxRowInput({
           <CameraScanner
             onResult={handleCameraScan}
             onClose={() => setScanning(false)}
-            label="Apunta al código de barras del producto"
+            label={t.scan_label}
           />
         )}
       </div>
 
       {/* Product search */}
       <div className="relative">
-        <label className="block text-xs font-medium text-zinc-600 mb-1">Producto *</label>
+        <label className="block text-xs font-medium text-zinc-600 mb-1">{t.product_label}</label>
         {row.product_type ? (
           <div className="flex items-center justify-between rounded-lg border border-zinc-300 bg-white px-3 py-2">
             <div>
               <p className="text-sm font-medium text-zinc-900">{row.product_type.display_name}</p>
               <p className="text-xs text-zinc-500">
-                {CATEGORY_LABELS[row.product_type.category] ?? row.product_type.category}
+                {categoryLabels[row.product_type.category as keyof typeof categoryLabels] ?? row.product_type.category}
                 {row.product_type.is_controlled && (
                   <span className="ml-2 rounded bg-red-100 px-1 py-0.5 text-xs font-medium text-red-700">
-                    CONTROLADO
+                    {t.product_controlled_badge}
                   </span>
                 )}
               </p>
@@ -219,7 +202,7 @@ function BoxRowInput({
               onClick={() => onChange({ ...row, product_type: null, offlineBlocked: false })}
               className="text-xs text-zinc-400 hover:text-zinc-700"
             >
-              Cambiar
+              {t.product_change}
             </button>
           </div>
         ) : (
@@ -227,12 +210,12 @@ function BoxRowInput({
             <input
               type="text"
               value={query}
-              placeholder="Buscar por nombre, INN o categoría…"
+              placeholder={t.product_search_placeholder}
               className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-900"
               onChange={(e) => { search(e.target.value); setShowDropdown(true) }}
               onFocus={() => setShowDropdown(true)}
             />
-            {loading && <p className="mt-1 text-xs text-zinc-400">Buscando…</p>}
+            {loading && <p className="mt-1 text-xs text-zinc-400">{t.searching}</p>}
             {showDropdown && results.length > 0 && (
               <ul className="absolute z-10 mt-1 max-h-48 w-full overflow-y-auto rounded-lg border border-zinc-200 bg-white shadow-md">
                 {results.map((pt) => (
@@ -245,10 +228,10 @@ function BoxRowInput({
                       <div>
                         <p className="text-sm text-zinc-900">{pt.display_name}</p>
                         <p className="text-xs text-zinc-500">
-                          {CATEGORY_LABELS[pt.category] ?? pt.category}
+                          {categoryLabels[pt.category as keyof typeof categoryLabels] ?? pt.category}
                           {pt.inn_name && ` · ${pt.inn_name}`}
                           {pt.is_controlled && (
-                            <span className="ml-1 text-red-600">⚠ controlado</span>
+                            <span className="ml-1 text-red-600">{t.controlled_warning_emoji}</span>
                           )}
                         </p>
                       </div>
@@ -263,14 +246,14 @@ function BoxRowInput({
 
       {isControlled && (
         <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
-          Este producto está clasificado como controlado y no puede recibirse en el centro.
+          {t.product_controlled_warning}
         </div>
       )}
 
       {/* Fields */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
         <div>
-          <label className="block text-xs font-medium text-zinc-600 mb-1">Cantidad *</label>
+          <label className="block text-xs font-medium text-zinc-600 mb-1">{t.field_quantity}</label>
           <input
             type="number"
             inputMode="numeric"
@@ -281,28 +264,28 @@ function BoxRowInput({
           />
         </div>
         <div>
-          <label className="block text-xs font-medium text-zinc-600 mb-1">Unidad *</label>
+          <label className="block text-xs font-medium text-zinc-600 mb-1">{t.field_unit}</label>
           <input
             type="text"
             value={row.unit}
-            placeholder={row.product_type?.default_unit ?? "tabletas"}
+            placeholder={row.product_type?.default_unit ?? t.field_unit_placeholder}
             onChange={set("unit")}
             className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-900"
           />
         </div>
         <div>
-          <label className="block text-xs font-medium text-zinc-600 mb-1">Lote</label>
+          <label className="block text-xs font-medium text-zinc-600 mb-1">{t.field_batch}</label>
           <input
             type="text"
             value={row.batch}
-            placeholder="L001"
+            placeholder={t.field_batch_placeholder}
             onChange={set("batch")}
             className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-900"
           />
         </div>
         <div>
           <label className="block text-xs font-medium text-zinc-600 mb-1">
-            Fecha de caducidad
+            {t.field_expiry}
             {row.product_type?.category === "MEDICINE" && <span className="text-red-500 ml-0.5">*</span>}
           </label>
           <input
@@ -313,7 +296,7 @@ function BoxRowInput({
           />
         </div>
         <div>
-          <label className="block text-xs font-medium text-zinc-600 mb-1">Peso (kg)</label>
+          <label className="block text-xs font-medium text-zinc-600 mb-1">{t.field_weight}</label>
           <input
             type="number"
             inputMode="decimal"
@@ -332,7 +315,7 @@ function BoxRowInput({
         onClick={onRemove}
         className="text-xs text-red-500 hover:text-red-700"
       >
-        Quitar caja
+        {t.remove_box}
       </button>
     </div>
   )
@@ -343,6 +326,9 @@ function BoxRowInput({
 export default function NewIntakePage() {
   const router = useRouter()
   const online = useOnlineStatus()
+  const dict = useDict()
+  const t = dict.dashboard.intake_new
+
   const [rows, setRows] = useState<BoxRow[]>([newRow()])
   const [campaignId, setCampaignId] = useState("")
   const [campaigns, setCampaigns] = useState<Campaign[]>([])
@@ -356,13 +342,12 @@ export default function NewIntakePage() {
       .then((r) => r.ok ? r.json() : [])
       .then((data: Campaign[]) => {
         setCampaigns(data)
-        // Auto-select Donaciones Generales (first item, sorted by backend)
         if (data.length > 0 && !campaignId) {
           setCampaignId(data[0].id)
         }
       })
       .catch(() => setCampaigns([]))
-  }, [])
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const updateRow = (key: string) => (updated: BoxRow) =>
     setRows((prev) => prev.map((r) => (r.key === key ? updated : r)))
@@ -376,16 +361,13 @@ export default function NewIntakePage() {
     e.preventDefault()
     setError(null)
 
-    if (!campaignId) { setError("Selecciona una campaña."); return }
+    if (!campaignId) { setError(t.error_campaign); return }
 
     for (const row of rows) {
-      if (row.offlineBlocked) {
-        setError("Hay cajas bloqueadas por falta de conexión. Restablece la conexión o elimínalas.")
-        return
-      }
-      if (!row.product_type) { setError("Selecciona un producto para cada caja."); return }
-      if (row.product_type.is_controlled) { setError("Elimina productos controlados antes de guardar."); return }
-      if (!row.unit.trim()) { setError("Indica la unidad para cada caja."); return }
+      if (row.offlineBlocked) { setError(t.error_offline_boxes); return }
+      if (!row.product_type) { setError(t.error_no_product); return }
+      if (row.product_type.is_controlled) { setError(t.error_controlled); return }
+      if (!row.unit.trim()) { setError(t.error_unit); return }
     }
 
     const boxes: BoxDraft[] = rows.map((row) => ({
@@ -416,13 +398,10 @@ export default function NewIntakePage() {
   return (
     <div className="max-w-2xl mx-auto pb-12">
       <div className="mb-6">
-        <h1 className="text-xl font-semibold text-zinc-900">Nueva recepción</h1>
-        <p className="text-sm text-zinc-500 mt-1">
-          Registra cada caja como un ítem homogéneo (un solo producto + lote + caducidad).
-        </p>
+        <h1 className="text-xl font-semibold text-zinc-900">{t.title}</h1>
+        <p className="text-sm text-zinc-500 mt-1">{t.subtitle}</p>
       </div>
 
-      {/* Connectivity indicator */}
       <div className="mb-4">
         <div className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-xs ${
           online
@@ -430,18 +409,13 @@ export default function NewIntakePage() {
             : "border-amber-200 bg-amber-50 text-amber-700"
         }`}>
           <span className={`h-2 w-2 rounded-full ${online ? "bg-green-500" : "bg-amber-500"}`} />
-          {online
-            ? "Con conexión — búsqueda de barcodes activa"
-            : "Sin conexión — solo productos del catálogo local"}
+          {online ? t.online_status : t.offline_status}
         </div>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-5">
-        {/* Campaign selector */}
         <div>
-          <label className="block text-xs font-medium text-zinc-600 mb-1">
-            Campaña / Operación *
-          </label>
+          <label className="block text-xs font-medium text-zinc-600 mb-1">{t.campaign_label}</label>
           <select
             value={campaignId}
             onChange={(e) => setCampaignId(e.target.value)}
@@ -449,7 +423,7 @@ export default function NewIntakePage() {
             className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-900"
           >
             {campaigns.length === 0 && (
-              <option value="">Cargando campañas…</option>
+              <option value="">{t.campaigns_loading}</option>
             )}
             {campaigns.map((c) => (
               <option key={c.id} value={c.id}>
@@ -459,36 +433,32 @@ export default function NewIntakePage() {
           </select>
         </div>
 
-        {/* Header fields */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
-            <label className="block text-xs font-medium text-zinc-600 mb-1">
-              Donante (texto libre, sin datos personales)
-            </label>
+            <label className="block text-xs font-medium text-zinc-600 mb-1">{t.donor_label}</label>
             <input
               type="text"
               value={donante}
-              placeholder="Familia García, Empresa XYZ, …"
+              placeholder={t.donor_placeholder}
               onChange={(e) => setDonante(e.target.value)}
               className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-900"
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-zinc-600 mb-1">Notas</label>
+            <label className="block text-xs font-medium text-zinc-600 mb-1">{t.notes_label}</label>
             <input
               type="text"
               value={notes}
-              placeholder="Observaciones de la recepción…"
+              placeholder={t.notes_placeholder}
               onChange={(e) => setNotes(e.target.value)}
               className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-900"
             />
           </div>
         </div>
 
-        {/* Box rows */}
         <div className="space-y-3">
           <h2 className="text-sm font-medium text-zinc-700">
-            Cajas ({rows.length})
+            {t.boxes_header.replace("{count}", String(rows.length))}
           </h2>
           {rows.map((row) => (
             <BoxRowInput
@@ -504,7 +474,7 @@ export default function NewIntakePage() {
             onClick={addRow}
             className="w-full rounded-lg border-2 border-dashed border-zinc-300 py-3 text-sm text-zinc-500 hover:border-zinc-400 hover:text-zinc-700"
           >
-            + Agregar otra caja
+            {t.add_box}
           </button>
         </div>
 
@@ -520,14 +490,14 @@ export default function NewIntakePage() {
             disabled={submitting || rows.some((r) => r.offlineBlocked)}
             className="flex-1 rounded-lg bg-zinc-900 py-3 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-60"
           >
-            {submitting ? "Guardando…" : "Guardar recepción"}
+            {submitting ? t.submitting : t.submit}
           </button>
           <button
             type="button"
             onClick={() => router.back()}
             className="rounded-lg border border-zinc-300 px-4 py-3 text-sm font-medium text-zinc-600 hover:bg-zinc-50"
           >
-            Cancelar
+            {t.cancel}
           </button>
         </div>
       </form>

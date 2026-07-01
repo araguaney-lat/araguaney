@@ -11,14 +11,7 @@ import {
   dispatchTransferAction,
   receiveTransferAction,
 } from "@/lib/transfer-actions"
-
-const STATUS_LABELS: Record<TransferStatus, string> = {
-  REQUESTED: "Solicitada",
-  APPROVED: "Aprobada",
-  IN_TRANSIT: "En tránsito",
-  RECEIVED: "Recibida",
-  REJECTED: "Rechazada",
-}
+import { useDict } from "@/context/DictionaryContext"
 
 const STATUS_COLORS: Record<TransferStatus, string> = {
   REQUESTED: "bg-yellow-100 text-yellow-800",
@@ -29,6 +22,9 @@ const STATUS_COLORS: Record<TransferStatus, string> = {
 }
 
 export default function TransfersPage() {
+  const dict = useDict()
+  const t = dict.dashboard.transfers
+
   const { data: session } = useSession()
   const myCenter = (session as { centerId?: string | null } | null)?.centerId ?? null
   const myRole = (session as { centerRole?: string | null } | null)?.centerRole ?? null
@@ -59,10 +55,10 @@ export default function TransfersPage() {
       if (tab === "outgoing" && myCenter) params.set("from_center_id", myCenter)
       if (tab === "incoming" && myCenter) params.set("to_center_id", myCenter)
       const res = await fetch(`/api/transfers?${params}`)
-      if (!res.ok) throw new Error("Error al cargar transferencias")
+      if (!res.ok) throw new Error(dict.dashboard.common.error_unknown)
       setTransfers(await res.json())
     } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : "Error desconocido")
+      setError(e instanceof Error ? e.message : dict.dashboard.common.error_unknown)
     } finally {
       setLoading(false)
     }
@@ -73,7 +69,7 @@ export default function TransfersPage() {
     if (res.ok) setActiveDetail(await res.json())
   }
 
-  useEffect(() => { fetchTransfers() }, [tab])
+  useEffect(() => { fetchTransfers() }, [tab]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     fetch("/api/centers")
@@ -138,17 +134,17 @@ export default function TransfersPage() {
     }
   }
 
-  const canApproveOrReject = (t: TransferOut) =>
-    t.status === "REQUESTED" &&
-    (myRole === "national_admin" || myCenter === t.from_center_id)
+  const canApproveOrReject = (tr: TransferOut) =>
+    tr.status === "REQUESTED" &&
+    (myRole === "national_admin" || myCenter === tr.from_center_id)
 
-  const canDispatch = (t: TransferOut) =>
-    t.status === "APPROVED" &&
-    (myRole === "national_admin" || myCenter === t.from_center_id)
+  const canDispatch = (tr: TransferOut) =>
+    tr.status === "APPROVED" &&
+    (myRole === "national_admin" || myCenter === tr.from_center_id)
 
-  const canReceive = (t: TransferOut) =>
-    t.status === "IN_TRANSIT" &&
-    (myRole === "national_admin" || myCenter === t.to_center_id)
+  const canReceive = (tr: TransferOut) =>
+    tr.status === "IN_TRANSIT" &&
+    (myRole === "national_admin" || myCenter === tr.to_center_id)
 
   const centerName = (id: string) =>
     centers.find((c) => c.id === id)?.name ?? id.slice(0, 8)
@@ -156,55 +152,54 @@ export default function TransfersPage() {
   return (
     <div className="max-w-6xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold text-zinc-900">Transferencias</h1>
+        <h1 className="text-xl font-semibold text-zinc-900">{t.title}</h1>
         <button
           onClick={() => { setShowCreate(true); fetchSealedBoxes() }}
           className="px-4 py-2 bg-zinc-900 text-white rounded-lg text-sm font-medium hover:bg-zinc-700"
         >
-          + Nueva transferencia
+          {t.new}
         </button>
       </div>
 
       {error && (
         <div className="rounded-lg bg-red-50 border border-red-200 p-3 text-sm text-red-700">
           {error}
-          <button className="ml-2 underline" onClick={() => setError(null)}>Cerrar</button>
+          <button className="ml-2 underline" onClick={() => setError(null)}>{dict.dashboard.common.close}</button>
         </div>
       )}
 
-      {/* Create form */}
       {showCreate && (
         <div className="rounded-xl border border-zinc-200 bg-white p-5 space-y-4">
-          <h2 className="font-semibold text-sm text-zinc-900">Nueva transferencia</h2>
+          <h2 className="font-semibold text-sm text-zinc-900">{t.create_title}</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {myRole === "national_admin" && (
               <label className="space-y-1">
-                <span className="text-xs text-zinc-500">Centro origen</span>
+                <span className="text-xs text-zinc-500">{t.field_from}</span>
                 <select
                   className="w-full text-sm border border-zinc-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-zinc-400"
                   value={newTransfer.from_center_id}
                   onChange={(e) => setNewTransfer({ ...newTransfer, from_center_id: e.target.value, box_ids: [] })}
                 >
-                  <option value="">— Seleccionar —</option>
+                  <option value="">{t.select_placeholder}</option>
                   {centers.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
                 </select>
               </label>
             )}
             <label className="space-y-1">
-              <span className="text-xs text-zinc-500">Centro destino</span>
+              <span className="text-xs text-zinc-500">{t.field_to}</span>
               <select
                 className="w-full text-sm border border-zinc-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-zinc-400"
                 value={newTransfer.to_center_id}
                 onChange={(e) => setNewTransfer({ ...newTransfer, to_center_id: e.target.value })}
               >
-                <option value="">— Seleccionar —</option>
+                <option value="">{t.select_placeholder}</option>
                 {centers
                   .filter((c) => c.id !== newTransfer.from_center_id)
                   .map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
               </select>
             </label>
             <label className="space-y-1 sm:col-span-2">
-              <span className="text-xs text-zinc-500">Notas (opcional)</span>
+              <span className="text-xs text-zinc-500">{t.field_notes}</span>
               <input
                 className="w-full text-sm border border-zinc-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-zinc-400"
                 value={newTransfer.notes}
@@ -213,16 +208,19 @@ export default function TransfersPage() {
             </label>
           </div>
 
-          {/* Box selector */}
           <div>
             <p className="text-xs font-semibold text-zinc-500 mb-2">
-              Cajas selladas disponibles
+              {t.available_boxes}
               {newTransfer.box_ids.length > 0 && (
-                <span className="ml-2 text-zinc-900">{newTransfer.box_ids.length} seleccionadas</span>
+                <span className="ml-2 text-zinc-900">
+                  {newTransfer.box_ids.length === 1
+                    ? t.box_count_one
+                    : t.box_count_other.replace("{count}", String(newTransfer.box_ids.length))}
+                </span>
               )}
             </p>
             {sealedBoxes.length === 0 ? (
-              <p className="text-sm text-zinc-400">No hay cajas selladas disponibles.</p>
+              <p className="text-sm text-zinc-400">{t.no_sealed_boxes}</p>
             ) : (
               <div className="max-h-48 overflow-y-auto space-y-1 border border-zinc-200 rounded-lg p-2">
                 {sealedBoxes.map((box) => {
@@ -260,121 +258,117 @@ export default function TransfersPage() {
               disabled={!newTransfer.to_center_id || newTransfer.box_ids.length === 0 || actionLoading === "create"}
               className="px-4 py-2 bg-zinc-900 text-white rounded-lg text-sm hover:bg-zinc-700 disabled:opacity-50"
             >
-              {actionLoading === "create" ? "Creando…" : "Crear transferencia"}
+              {actionLoading === "create" ? t.creating : t.create_btn}
             </button>
             <button onClick={() => setShowCreate(false)} className="px-4 py-2 text-sm text-zinc-600 hover:text-zinc-900">
-              Cancelar
+              {t.cancel}
             </button>
           </div>
         </div>
       )}
 
-      {/* Tabs */}
       <div className="flex gap-2">
-        {(["outgoing", "incoming", "all"] as const).map((t) => (
+        {(["outgoing", "incoming", "all"] as const).map((tabKey) => (
           <button
-            key={t}
-            onClick={() => setTab(t)}
-            className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${tab === t ? "bg-zinc-900 text-white border-zinc-900" : "bg-white text-zinc-600 border-zinc-300 hover:border-zinc-500"}`}
+            key={tabKey}
+            onClick={() => setTab(tabKey)}
+            className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${tab === tabKey ? "bg-zinc-900 text-white border-zinc-900" : "bg-white text-zinc-600 border-zinc-300 hover:border-zinc-500"}`}
           >
-            {t === "outgoing" ? "Enviando" : t === "incoming" ? "Recibiendo" : "Todas"}
+            {tabKey === "outgoing" ? t.tab_outgoing : tabKey === "incoming" ? t.tab_incoming : t.tab_all}
           </button>
         ))}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* Transfer list */}
         <div className="space-y-2">
           {loading ? (
-            <p className="text-sm text-zinc-400">Cargando…</p>
+            <p className="text-sm text-zinc-400">{dict.dashboard.common.loading}</p>
           ) : transfers.length === 0 ? (
-            <p className="text-sm text-zinc-400">No hay transferencias.</p>
-          ) : transfers.map((t) => (
+            <p className="text-sm text-zinc-400">{t.empty}</p>
+          ) : transfers.map((tr) => (
             <div
-              key={t.id}
-              onClick={() => fetchDetail(t.id)}
-              className={`rounded-xl border p-4 cursor-pointer transition-colors ${activeDetail?.id === t.id ? "border-zinc-900 bg-zinc-50" : "border-zinc-200 bg-white hover:border-zinc-400"}`}
+              key={tr.id}
+              onClick={() => fetchDetail(tr.id)}
+              className={`rounded-xl border p-4 cursor-pointer transition-colors ${activeDetail?.id === tr.id ? "border-zinc-900 bg-zinc-50" : "border-zinc-200 bg-white hover:border-zinc-400"}`}
             >
               <div className="flex items-center justify-between gap-2 flex-wrap">
                 <div className="text-sm font-medium text-zinc-900">
-                  <span className="text-zinc-500 font-normal">De </span>{centerName(t.from_center_id)}
+                  <span className="text-zinc-500 font-normal">{t.from_label} </span>{centerName(tr.from_center_id)}
                   <span className="text-zinc-400 mx-1">→</span>
-                  {centerName(t.to_center_id)}
+                  {centerName(tr.to_center_id)}
                 </div>
-                <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${STATUS_COLORS[t.status]}`}>
-                  {STATUS_LABELS[t.status]}
+                <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${STATUS_COLORS[tr.status]}`}>
+                  {t.status[tr.status]}
                 </span>
               </div>
-              {t.notes && <p className="mt-1 text-xs text-zinc-400">{t.notes}</p>}
+              {tr.notes && <p className="mt-1 text-xs text-zinc-400">{tr.notes}</p>}
 
-              {/* Quick actions */}
               <div
                 className="mt-2 flex gap-2 flex-wrap"
                 onClick={(e) => e.stopPropagation()}
               >
-                {canApproveOrReject(t) && (
+                {canApproveOrReject(tr) && (
                   <>
                     <button
-                      onClick={() => handleAction(t.id, "approve")}
+                      onClick={() => handleAction(tr.id, "approve")}
                       disabled={!!actionLoading}
                       className="text-xs px-2 py-1 rounded border border-green-300 text-green-700 hover:bg-green-50 disabled:opacity-50"
                     >
-                      {actionLoading === t.id + "-approve" ? "…" : "Aprobar"}
+                      {actionLoading === tr.id + "-approve" ? "…" : t.approve}
                     </button>
                     <button
-                      onClick={() => setRejectingId(t.id)}
+                      onClick={() => setRejectingId(tr.id)}
                       disabled={!!actionLoading}
                       className="text-xs px-2 py-1 rounded border border-red-300 text-red-700 hover:bg-red-50 disabled:opacity-50"
                     >
-                      Rechazar
+                      {t.reject}
                     </button>
                   </>
                 )}
-                {canDispatch(t) && (
+                {canDispatch(tr) && (
                   <button
-                    onClick={() => handleAction(t.id, "dispatch")}
+                    onClick={() => handleAction(tr.id, "dispatch")}
                     disabled={!!actionLoading}
                     className="text-xs px-2 py-1 rounded border border-purple-300 text-purple-700 hover:bg-purple-50 disabled:opacity-50"
                   >
-                    {actionLoading === t.id + "-dispatch" ? "…" : "Despachar"}
+                    {actionLoading === tr.id + "-dispatch" ? "…" : t.dispatch}
                   </button>
                 )}
-                {canReceive(t) && (
+                {canReceive(tr) && (
                   <button
-                    onClick={() => handleAction(t.id, "receive")}
+                    onClick={() => handleAction(tr.id, "receive")}
                     disabled={!!actionLoading}
                     className="text-xs px-2 py-1 rounded border border-blue-300 text-blue-700 hover:bg-blue-50 disabled:opacity-50"
                   >
-                    {actionLoading === t.id + "-receive" ? "…" : "Confirmar recepción"}
+                    {actionLoading === tr.id + "-receive" ? "…" : t.receive}
                   </button>
                 )}
               </div>
 
-              {/* Reject reason inline form */}
-              {rejectingId === t.id && (
+              {rejectingId === tr.id && (
                 <div
                   className="mt-3 flex gap-2"
                   onClick={(e) => e.stopPropagation()}
                 >
                   <input
                     autoFocus
-                    placeholder="Motivo (opcional)"
+                    placeholder={t.reject_reason_placeholder}
                     value={rejectReason}
                     onChange={(e) => setRejectReason(e.target.value)}
                     className="flex-1 text-sm border border-zinc-300 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-red-300"
                   />
                   <button
-                    onClick={() => handleReject(t.id)}
+                    onClick={() => handleReject(tr.id)}
                     disabled={!!actionLoading}
                     className="text-xs px-3 py-1.5 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50"
                   >
-                    {actionLoading === t.id + "-reject" ? "…" : "Confirmar rechazo"}
+                    {actionLoading === tr.id + "-reject" ? "…" : t.confirm_reject}
                   </button>
                   <button
                     onClick={() => { setRejectingId(null); setRejectReason("") }}
                     className="text-xs text-zinc-500 hover:text-zinc-800"
                   >
-                    Cancelar
+                    {t.cancel}
                   </button>
                 </div>
               )}
@@ -382,7 +376,6 @@ export default function TransfersPage() {
           ))}
         </div>
 
-        {/* Detail panel */}
         {activeDetail && (
           <div className="rounded-xl border border-zinc-200 bg-white p-5 space-y-4">
             <div className="flex items-center justify-between">
@@ -391,7 +384,7 @@ export default function TransfersPage() {
                   {centerName(activeDetail.from_center_id)} → {centerName(activeDetail.to_center_id)}
                 </p>
                 <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${STATUS_COLORS[activeDetail.status]}`}>
-                  {STATUS_LABELS[activeDetail.status]}
+                  {t.status[activeDetail.status]}
                 </span>
               </div>
               <button onClick={() => setActiveDetail(null)} className="text-zinc-400 hover:text-zinc-700 text-sm">✕</button>
@@ -403,10 +396,12 @@ export default function TransfersPage() {
 
             <div>
               <p className="text-xs font-semibold text-zinc-500 mb-2">
-                {activeDetail.boxes.length} caja{activeDetail.boxes.length !== 1 ? "s" : ""}
+                {activeDetail.boxes.length === 1
+                  ? t.box_count_one
+                  : t.box_count_other.replace("{count}", String(activeDetail.boxes.length))}
               </p>
               {activeDetail.boxes.length === 0 ? (
-                <p className="text-sm text-zinc-400">Sin cajas.</p>
+                <p className="text-sm text-zinc-400">{dict.dashboard.common.no_data}</p>
               ) : (
                 <ul className="space-y-1 max-h-40 overflow-y-auto">
                   {activeDetail.boxes.map((box) => (
@@ -426,13 +421,13 @@ export default function TransfersPage() {
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded border border-zinc-300 text-zinc-700 hover:bg-zinc-50 transition-colors"
               >
-                Descargar manifiesto PDF
+                {t.download_manifest}
               </a>
             )}
 
             {activeDetail.events.length > 0 && (
               <div className="border-t border-zinc-100 pt-4">
-                <p className="text-xs font-semibold text-zinc-500 mb-3">Historial</p>
+                <p className="text-xs font-semibold text-zinc-500 mb-3">{dict.dashboard.common.history}</p>
                 <StatusTimeline events={activeDetail.events.map((e) => ({
                   from_status: e.from_status,
                   to_status: e.to_status,
