@@ -419,6 +419,17 @@ export default function TransfersPage() {
               )}
             </div>
 
+            {["APPROVED", "IN_TRANSIT", "RECEIVED"].includes(activeDetail.status) && (
+              <a
+                href={`/api/transfers/${activeDetail.id}/manifest.pdf`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded border border-zinc-300 text-zinc-700 hover:bg-zinc-50 transition-colors"
+              >
+                Descargar manifiesto PDF
+              </a>
+            )}
+
             {activeDetail.events.length > 0 && (
               <div className="border-t border-zinc-100 pt-4">
                 <p className="text-xs font-semibold text-zinc-500 mb-3">Historial</p>

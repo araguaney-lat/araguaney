@@ -83,7 +83,7 @@ Las transferencias tienen su propia tabla `transfer_events` (estado a estado + u
 | 10 | `POST /v1/transfers/{id}/reject` | `REQUESTED → REJECTED`; mismos permisos que approve; body: `{reason}` opcional | 🟡 | ✅ Completado |
 | 11 | `POST /v1/transfers/{id}/dispatch` | `APPROVED → IN_TRANSIT`; solo coordinator del centro origen o national_admin; confirma que las cajas físicamente salieron | 🟡 | ✅ Completado |
 | 12 | `POST /v1/transfers/{id}/receive` | `IN_TRANSIT → RECEIVED`; solo coordinator del centro destino o national_admin; muta `Box.center_id`; escribe `BoxEvent TRANSFERRED` por cada caja | 🟠 | ✅ Completado |
-| 13 | `GET /v1/transfers/{id}/manifest` — PDF | Manifiesto PDF de la transferencia: origen, destino, lista de cajas (producto, lote, cantidad, QR), fecha; encolado en ARQ; autenticado + rate-limited | 🟠 | ⬜ Pendiente |
+| 13 | `GET /v1/transfers/{id}/manifest` — PDF | Manifiesto PDF de la transferencia: origen, destino, lista de cajas (producto, lote, cantidad, QR), fecha; encolado en ARQ; autenticado + rate-limited | 🟠 | ✅ Completado |
 
 ---
 
@@ -91,9 +91,9 @@ Las transferencias tienen su propia tabla `transfer_events` (estado a estado + u
 
 | # | Tarea | Descripción | Complejidad | Estado |
 |---|-------|-------------|-------------|--------|
-| 14 | Email al crear transferencia | Al crear: notifica por email al coordinator del centro que NO inició (origen si pull, destino si push); asunto: "Nueva solicitud de transferencia desde [Centro X]" | 🟡 | ⬜ Pendiente |
-| 15 | Email al aprobar / rechazar | Notifica al initiator cuando la transferencia es aprobada o rechazada | 🟡 | ⬜ Pendiente |
-| 16 | Email al recibir | Notifica al coordinator del centro origen que las cajas fueron recibidas | 🟢 | ⬜ Pendiente |
+| 14 | Email al crear transferencia | Al crear: notifica por email al coordinator del centro que NO inició (origen si pull, destino si push); asunto: "Nueva solicitud de transferencia desde [Centro X]" | 🟡 | ✅ Completado |
+| 15 | Email al aprobar / rechazar | Notifica al initiator cuando la transferencia es aprobada o rechazada | 🟡 | ✅ Completado |
+| 16 | Email al recibir | Notifica al coordinator del centro origen que las cajas fueron recibidas | 🟢 | ✅ Completado |
 
 ---
 
@@ -104,7 +104,7 @@ Las transferencias tienen su propia tabla `transfer_events` (estado a estado + u
 | 17 | Lista de transferencias `/dashboard/transfers` | Dos pestañas: "Enviando" (from_center = mi centro) y "Recibiendo" (to_center = mi centro); estado visual con badge de color; acceso rápido a la acción pendiente (aprobar / despachar / confirmar recepción) | 🟠 | ✅ Completado |
 | 18 | Crear transferencia — selección de cajas | Formulario: seleccionar centro destino + filtrar/seleccionar cajas selladas disponibles (búsqueda por producto, cantidad); preview de lo que se enviará | 🟠 | ✅ Completado |
 | 19 | Panel de detalle de transferencia | Vista de estado, lista de cajas incluidas, historial de eventos, botones de acción según rol y estado actual | 🟡 | ✅ Completado |
-| 20 | Enlace a manifiesto PDF | Botón "Descargar manifiesto" disponible desde `APPROVED` en adelante | 🟢 | ⬜ Pendiente |
+| 20 | Enlace a manifiesto PDF | Botón "Descargar manifiesto" disponible desde `APPROVED` en adelante | 🟢 | ✅ Completado |
 
 ---
 
@@ -112,7 +112,7 @@ Las transferencias tienen su propia tabla `transfer_events` (estado a estado + u
 
 | # | Tarea | Descripción | Complejidad | Estado |
 |---|-------|-------------|-------------|--------|
-| 21 | Vista de transferencias en Studio `/studio/transfers` | Todas las transferencias del sistema; filtros por centro, estado, fecha; puede aprobar, rechazar, despachar y recibir cualquier transferencia | 🟡 | ⬜ Pendiente |
+| 21 | Vista de transferencias en Studio `/studio/transfers` | Todas las transferencias del sistema; filtros por estado; vista de solo lectura para superadmin | 🟡 | ✅ Completado |
 
 ---
 

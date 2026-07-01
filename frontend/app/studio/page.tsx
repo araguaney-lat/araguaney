@@ -19,6 +19,7 @@ async function getStats(token: string): Promise<NationalStats | null> {
 
 const QUICK_LINKS = [
   { href: "/studio/users", label: "Usuarios", desc: "Gestionar cuentas, bloquear usuarios, crear national admins" },
+  { href: "/studio/transfers", label: "Transferencias", desc: "Vista global de todas las transferencias entre centros" },
   { href: "/studio/audit", label: "Auditoría", desc: "Registro completo de todas las acciones del sistema" },
   { href: "/studio/settings", label: "Configuración", desc: "Variables operativas del sistema" },
 ]
