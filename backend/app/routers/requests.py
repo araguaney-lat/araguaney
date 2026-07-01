@@ -26,7 +26,7 @@ router = APIRouter(prefix="/requests", tags=["requests"])
 @router.post("", response_model=RequestOut, status_code=201)
 @limiter.limit("10/hour")
 def create_request(
-    http_request: Request,
+    request: Request,
     data: RequestCreate,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
@@ -49,7 +49,7 @@ def create_request(
 @router.get("", response_model=list[RequestOut])
 @limiter.limit("60/minute")
 def list_requests(
-    http_request: Request,
+    request: Request,
     status: str | None = Query(None),
     limit: int = Query(50, ge=1, le=200),
     offset: int = Query(0, ge=0),
@@ -64,7 +64,7 @@ def list_requests(
 @router.get("/{request_id}", response_model=RequestOut)
 @limiter.limit("60/minute")
 def get_request(
-    http_request: Request,
+    request: Request,
     request_id: UUID,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
@@ -80,7 +80,7 @@ def get_request(
 @router.post("/{request_id}/messages", response_model=RequestMessageOut, status_code=201)
 @limiter.limit("30/hour")
 def add_message(
-    http_request: Request,
+    request: Request,
     background_tasks: BackgroundTasks,
     request_id: UUID,
     data: RequestMessageCreate,
@@ -124,7 +124,7 @@ def add_message(
 @router.patch("/{request_id}/status", response_model=RequestOut)
 @limiter.limit("20/hour")
 def update_status(
-    http_request: Request,
+    request: Request,
     request_id: UUID,
     data: RequestStatusPatch,
     db: Session = Depends(get_db),
