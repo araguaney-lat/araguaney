@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Literal
 from uuid import UUID
 
 from app.schemas._base import StrictModel, StrictORMModel
@@ -30,6 +31,19 @@ class ProductTypeUpdate(StrictModel):
     default_unit: str | None = None
     is_controlled: bool | None = None
     min_shelf_life_days: int | None = None
+
+
+class BarcodePrefill(StrictModel):
+    gtin: str
+    display_name: str
+    brand: str | None
+    category: str
+
+
+class BarcodeResult(StrictModel):
+    source: Literal["local", "open_food_facts"]
+    product_type: "ProductTypeOut | None" = None
+    prefill: BarcodePrefill | None = None
 
 
 class ProductTypeOut(StrictORMModel):

@@ -1,18 +1,22 @@
+import json
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Request
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.dependencies import get_current_user, require_center_role
+from app.dependencies import require_center_role
 from app.models.user import User
 from app.repositories.product_type_repository import ProductTypeRepository
 from app.repositories.user_campaign_repository import UserCampaignRepository
-from app.schemas.product_type import ProductTypeOut
+from app.schemas.product_type import BarcodePrefill, BarcodeResult, ProductTypeOut
+from app.utils import cache
 from app.utils.errors import api_error
 from app.utils.rate_limit import limiter
 
 router = APIRouter(prefix="/v1/catalog", tags=["catalog"])
+
+_BARCODE_TTL = 86_400  # 24 h
 
 
 @router.get("/search", response_model=list[ProductTypeOut])
@@ -39,3 +43,51 @@ def catalog_search(
 
     results = ProductTypeRepository(db).search(q, category=category, campaign_ids=campaign_ids)
     return results
+
+
+@router.get("/barcode/{gtin}", response_model=BarcodeResult)
+@limiter.limit("30/minute")
+async def barcode_lookup(
+    request: Request,
+    gtin: str,
+    db: Session = Depends(get_db),
+    _: User = Depends(require_center_role),
+):
+    """Look up a barcode: local DB first, then Open Food Facts with 24-hour Redis cache."""
+    # 1. Local match — no internet needed
+    local = ProductTypeRepository(db).find_by_gtin(gtin)
+    if local:
+        return BarcodeResult(
+            source="local",
+            product_type=ProductTypeOut.model_validate(local),
+        )
+
+    # 2. Redis cache
+    cache_key = f"catalog:barcode:{gtin}"
+    cached = cache.get(cache_key)
+    if cached is not None:
+        data = json.loads(cached)
+        if data is None:
+            raise api_error("BARCODE_NOT_FOUND", "Barcode not found", status_code=404)
+        return BarcodeResult(source="open_food_facts", prefill=BarcodePrefill(**data))
+
+    # 3. Open Food Facts
+    import httpx
+    from app.utils.open_food_facts import lookup_barcode
+
+    try:
+        result = await lookup_barcode(gtin)
+    except httpx.HTTPError as exc:
+        raise api_error(
+            "EXTERNAL_SERVICE_UNAVAILABLE",
+            "Open Food Facts is unreachable — try again later",
+            status_code=503,
+        ) from exc
+
+    # Cache both hits and confirmed misses to avoid hammering OFF
+    cache.set(cache_key, json.dumps(result), ttl=_BARCODE_TTL)
+
+    if result is None:
+        raise api_error("BARCODE_NOT_FOUND", "Barcode not found in local catalog or Open Food Facts", status_code=404)
+
+    return BarcodeResult(source="open_food_facts", prefill=BarcodePrefill(**result))
