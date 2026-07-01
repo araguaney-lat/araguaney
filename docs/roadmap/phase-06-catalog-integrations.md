@@ -207,8 +207,8 @@ Todos vía `fire_audit(background_tasks, ...)` en los routers:
 
 | # | Tarea | Descripción | Complejidad | Estado |
 |---|-------|-------------|-------------|--------|
-| 32 | Componente `StatusTimeline` | `src/components/StatusTimeline.tsx`; props: `steps: TimelineStep[]`; responsive (vertical móvil, horizontal escritorio); sin dependencias externas, solo Tailwind | 🟡 | ⬜ Pendiente |
-| 33 | Integrar en ficha QR pública | En `/qr/[code]`: timeline al centro de la pantalla para caja y tarima; timestamps en formato `DD MMM, HH:mm` | 🟡 | ⬜ Pendiente |
+| 32 | Componente `StatusTimeline` | `src/components/StatusTimeline.tsx`; props: `steps: TimelineStep[]`; responsive (vertical móvil, horizontal escritorio); sin dependencias externas, solo Tailwind | 🟡 | ✅ Listo |
+| 33 | Integrar en ficha QR pública | En `/qr/[code]`: timeline al centro de la pantalla para caja y tarima; timestamps en formato `DD MMM, HH:mm` | 🟡 | ✅ Listo |
 | 34 | Integrar en vistas de detalle del dashboard | En vistas de detalle de caja, tarima, envío y transferencia; mismo componente, datos desde el endpoint de detalle | 🟡 | ⬜ Pendiente |
 
 ---
@@ -217,8 +217,8 @@ Todos vía `fire_audit(background_tasks, ...)` en los routers:
 
 | # | Tarea | Descripción | Complejidad | Estado |
 |---|-------|-------------|-------------|--------|
-| 30 | Export IFRC packing list (Excel) | Manifiesto en `.xlsx` con columnas IFRC: código de material, descripción, unidad, cantidad, peso | 🟡 | ⬜ Pendiente |
-| 31 | Sección "Estándares que respaldamos" | Bloque en home pública: logos/nombres de WHO, IFRC/ICRC, IOM, UNSPSC; texto breve de trazabilidad | 🟢 | ⬜ Pendiente |
+| 30 | Export IFRC packing list (Excel) | Manifiesto en `.xlsx` con columnas IFRC: código de material, descripción, unidad, cantidad, peso | 🟡 | ✅ Listo |
+| 31 | Sección "Estándares que respaldamos" | Bloque en home pública: logos/nombres de WHO, IFRC/ICRC, IOM, UNSPSC; texto breve de trazabilidad | 🟢 | ✅ Listo |
 
 ---
 

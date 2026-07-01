@@ -16,6 +16,7 @@ from app.services.shipment_service import ShipmentService
 from app.utils.audit import fire_audit
 from app.utils.cloudflare import get_client_ip
 from app.utils.manifest import ManifestBoxRow, ManifestData, ManifestPalletSection, generate_manifest_pdf
+from app.utils.manifest_xlsx import generate_manifest_xlsx
 from app.utils.rate_limit import limiter
 
 router = APIRouter(prefix="/v1/shipments", tags=["shipments"])
@@ -181,4 +182,67 @@ def download_manifest(
         io.BytesIO(pdf_bytes),
         media_type="application/pdf",
         headers={"Content-Disposition": f'attachment; filename="manifiesto-{ref}.pdf"'},
+    )
+
+
+@router.get("/{shipment_id}/manifest.xlsx")
+@limiter.limit("2/minute")
+def download_manifest_xlsx(
+    request: Request,
+    shipment_id: UUID,
+    db: Session = Depends(get_db),
+    _: User = Depends(require_coordinator),
+    scope: UUID | None = Depends(tenant_scope),
+):
+    """IFRC packing list in .xlsx format (rate-limited: 2/min)."""
+    from app.repositories.product_type_repository import ProductTypeRepository
+    from app.utils.errors import api_error
+
+    shipment = ShipmentRepository(db).find_by_id(shipment_id, scope)
+    if not shipment:
+        raise api_error("SHIPMENT_NOT_FOUND", "Shipment not found", status_code=404)
+
+    pallet_repo = PalletRepository(db)
+    pt_repo = ProductTypeRepository(db)
+    pt_cache: dict = {}
+
+    pallet_sections: list[ManifestPalletSection] = []
+    for pallet in ShipmentRepository(db).find_pallets(shipment_id):
+        boxes = pallet_repo.find_boxes(pallet.id)
+        rows: list[ManifestBoxRow] = []
+        for box in boxes:
+            pt_id = box.product_type_id
+            if pt_id not in pt_cache:
+                pt_cache[pt_id] = pt_repo.find_by_id(pt_id)
+            pt = pt_cache[pt_id]
+            rows.append(ManifestBoxRow(
+                code=box.code,
+                display_name=pt.display_name if pt else "—",
+                category=pt.category if pt else "OTHER",
+                inn_name=pt.inn_name if pt else None,
+                strength=pt.strength if pt else None,
+                batch=box.batch,
+                expiry_date=box.expiry_date,
+                quantity=box.quantity,
+                unit=box.unit,
+                weight_kg=box.weight_kg,
+            ))
+        pallet_sections.append(ManifestPalletSection(code=pallet.code, boxes=rows))
+
+    manifest_data = ManifestData(
+        shipment_id=str(shipment.id),
+        destination=shipment.destination,
+        carrier=shipment.carrier,
+        reference=shipment.reference,
+        status=shipment.status,
+        closed_at=shipment.closed_at,
+        pallets=pallet_sections,
+    )
+
+    xlsx_bytes = generate_manifest_xlsx(manifest_data)
+    ref = shipment.reference or str(shipment_id)[:8]
+    return StreamingResponse(
+        io.BytesIO(xlsx_bytes),
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={"Content-Disposition": f'attachment; filename="packing-list-ifrc-{ref}.xlsx"'},
     )
