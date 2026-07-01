@@ -155,7 +155,7 @@ Todos vía `fire_audit(background_tasks, ...)` en los routers:
 
 | # | Tarea | Descripción | Complejidad | Estado |
 |---|-------|-------------|-------------|--------|
-| 22 | Migración campos de peso | `unit_weight_kg` en `product_types`; `weight_kg` en `boxes`; `tare_weight_kg` en `pallets`; `weight_goal_kg` en `campaigns` — todos `NULLABLE` | 🟡 | ⬜ Pendiente |
+| 22 | Migración campos de peso | `unit_weight_kg` en `product_types`; `weight_kg` en `boxes`; `tare_weight_kg` en `pallets`; `weight_goal_kg` en `campaigns` — todos `NULLABLE` | 🟡 | ✅ Hecho |
 | 23 | Auto-cálculo de `weight_kg` en Box | En `BoxService.seal()`: si `product_type.unit_weight_kg` existe → calcular y guardar `weight_kg`; si no → dejar NULL (coordinador puede editar antes de sellar) | 🟡 | ⬜ Pendiente |
 | 24 | Endpoint de métricas de peso | `GET /v1/dashboard/weight?campaign_id=&center_id=` — retorna `{total_kg, goal_kg, progress_pct}` por campaña y `{center_kg}` por centro; `national_admin` puede omitir filtros para ver todo | 🟡 | ⬜ Pendiente |
 | 25 | Componente de progreso en dashboard | Tarjeta por campaña: muestra kg acopiados; si hay `weight_goal_kg` → barra de progreso con porcentaje; si no → solo el número. Visible para todos los roles | 🟡 | ⬜ Pendiente |

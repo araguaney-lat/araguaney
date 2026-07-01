@@ -1,5 +1,6 @@
 import re
 from datetime import date, datetime
+from decimal import Decimal
 from uuid import UUID
 
 from pydantic import field_validator
@@ -35,6 +36,7 @@ class CampaignUpdate(StrictModel):
     start_date: date | None = None
     end_date: date | None = None
     is_active: bool | None = None
+    weight_goal_kg: Decimal | None = None
 
     @field_validator("destination_country")
     @classmethod
@@ -51,6 +53,7 @@ class CampaignOut(StrictORMModel):
     end_date: date | None
     is_active: bool
     is_general: bool
+    weight_goal_kg: Decimal | None
     created_at: datetime
 
 
