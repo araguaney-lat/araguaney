@@ -11,11 +11,11 @@
 
 1. Cerrar los 2 hallazgos críticos (bypass de middleware Cloudflare, bypass de TOTP vía OAuth)
 2. Corregir los 7 hallazgos HIGH (open redirect, rate limit faltante, R2, filename, TOTP parcial, middleware /studio, headers de seguridad en frontend)
-3. Mejorar los 7 hallazgos MEDIUM (studio role guard, audit count, audit atomicidad, is_active ordering, warning de ENCRYPTION_KEY, timing oracle en login, extra="forbid")
+3. Mejorar los 9 hallazgos MEDIUM (studio role guard, audit count, audit atomicidad, is_active ordering, warning de ENCRYPTION_KEY, timing oracle en login, extra="forbid", RLS en DB, traza de IP en auditoría)
 4. Aplicar mejoras LOW (headers backend, cap CSV, doc lockout por IP, fuerza de contraseña en registro)
 
-> 20 tareas totales: 2 CRITICAL, 7 HIGH, 7 MEDIUM, 4 LOW. Hallazgos de la primera pasada (C/H/M/L)
-> y de la segunda pasada (N-1 a N-4) consolidados en los grupos A-D.
+> 22 tareas totales: 2 CRITICAL, 7 HIGH, 9 MEDIUM, 4 LOW. Hallazgos de la primera pasada (C/H/M/L)
+> y de la segunda pasada (N-1 a N-6) consolidados en los grupos A-D.
 
 ---
 
@@ -49,6 +49,8 @@
 | N-2 | 🟡 MEDIUM | User enumeration por timing oracle en login (bcrypt solo corre para usuarios existentes) | `backend/app/services/auth_service.py:86-100` |
 | N-3 | 🟡 MEDIUM | `StrictModel` usa `strict=True` pero no `extra="forbid"` — sin protección anti mass-assignment a nivel de schema | `backend/app/schemas/_base.py` |
 | N-4 | 🟢 LOW | Registro sin validación de fuerza de contraseña (change/reset exigen 8-128, register no valida) | `backend/app/schemas/auth.py` (`UserCreate`) |
+| N-5 | 🟡 MEDIUM | Sin Row-Level Security (RLS) a nivel DB — aislamiento multi-tenant depende 100% de `TenantRepository.scoped()`; un query que olvide `.scoped()` filtra entre centros sin red de seguridad en la DB | `backend/alembic/` + `backend/app/database.py` |
+| N-6 | 🟡 MEDIUM | Traza de IP incompleta en auditoría — los eventos privilegiados (alta de usuario, cambio de rol, reset de contraseña, invitación, aprobación de solicitud) usan `AuditRepository(db).log(...)` sin `ip=`; solo los eventos de estado vía `fire_audit` la capturan | `backend/app/routers/{studio,users,auth,requests}.py` |
 
 > **Verificado OK en 2ª pasada** (sin hallazgo): `UserCreate` no expone `role`/`center_role`/`center_id` (sin escalación de privilegios en registro); autz de transferencias correcta (coordinator scoped + guard de centro destino); dependencias del backend pinneadas; Turnstile verificado server-side y fail-closed; guards de máquina de estado presentes (`box.status != "DRAFT"` en sellado); sin logging de tokens/contraseñas; token de reset con `secrets.token_urlsafe(32)` + expiración 1h; usuarios OAuth (sin contraseña) no pueden resetear.
 
@@ -86,6 +88,8 @@
 | 13 | Doc M-3: Audit atomicidad | Documentar en `utils/audit.py` cuáles eventos son best-effort (fire_audit con BackgroundTask) y cuáles deben ir en la misma transacción. Migrar los eventos de cambio de estado crítico (sellado de caja, cierre de envío, cambio de rol) a audit síncrono en la misma sesión. | 🟡 | ⬜ Pendiente |
 | 18 | Fix N-2: Timing oracle en login | En `auth_service.login()`, cuando `user is None`, ejecutar un `verify_password` dummy contra un hash bcrypt fijo para igualar la latencia y evitar user enumeration. | 🟡 | ⬜ Pendiente |
 | 19 | Fix N-3: `extra="forbid"` en StrictModel | Agregar `extra="forbid"` a `ConfigDict` en `StrictModel` (schemas/_base.py). Verificar que ningún endpoint rompa por campos extra legítimos; corregir schemas afectados. Protección anti mass-assignment a nivel de boundary. | 🟡 | ⬜ Pendiente |
+| 21 | Fix N-5: Row-Level Security (RLS) en DB | Migración que active `ENABLE ROW LEVEL SECURITY` + `CREATE POLICY` en tablas con `center_id` (boxes, pallets, shipments, intakes, product_types...). Hook en `get_db` que ejecute `SET LOCAL app.current_center_id = ...` por transacción (compatible con PgBouncer transaction mode). Policy que lea `current_setting('app.current_center_id', true)`; bypass para `national_admin` (center_id NULL → policy USING clause que permita NULL, o rol con BYPASSRLS). No reemplaza `.scoped()`, lo respalda (defense-in-depth). Tests de aislamiento con `.scoped()` omitido a propósito. | 🟡 | ⬜ Pendiente |
+| 22 | Fix N-6: Traza de IP completa en auditoría | Pasar `ip=get_client_ip(request)` en todas las llamadas `AuditRepository(db).log(...)` de `studio.py`, `users.py`, `auth.py`, `requests.py`. Agregar `request: Request` a los handlers que aún no lo tengan. Confirmar que las 15 llamadas `fire_audit` también pasan ip (1 pendiente). Opcional: agregar `user_agent` a `AuditLog` para forense más rico. | 🟡 | ⬜ Pendiente |
 
 ### Grupo D — Low
 
@@ -113,6 +117,9 @@
 - [ ] Login con usuario inexistente vs existente → latencia comparable (sin timing oracle)
 - [ ] Request body con campo extra no declarado → retorna 422 (extra="forbid")
 - [ ] Registro con contraseña de 3 caracteres → retorna 422
+- [ ] Query sin `.scoped()` a propósito → RLS bloquea filas de otro centro (no filtra datos)
+- [ ] `national_admin` con RLS activo → sigue viendo todos los centros y la agregación nacional funciona
+- [ ] Alta de usuario / cambio de rol / reset de contraseña → registro de auditoría incluye `ip`
 
 ---
 
@@ -136,3 +143,36 @@ El `/studio` frontend sirve como panel de superadmin de plataforma. El `/dashboa
 - `users.py` router → `require_coordinator` / `require_national_admin` (domain role)
 
 Esto es consistente con lo que ya hace `transfer.py` que usa `get_current_superadmin` para sus endpoints de studio.
+
+### N-5 — RLS en DB con PgBouncer (transaction mode)
+
+El aislamiento multi-tenant hoy es 100% a nivel de aplicación (`TenantRepository.scoped()`). RLS agrega una segunda capa en la DB: aunque un query olvide `.scoped()`, Postgres rechaza las filas de otro centro.
+
+**Compatibilidad con PgBouncer:** en transaction pooling las variables de sesión (`SET`) no sobreviven entre transacciones. Hay que usar `SET LOCAL` dentro de cada transacción, típicamente en un hook al abrir la sesión en `get_db`:
+
+```python
+# database.py — al iniciar cada request/transacción
+db.execute(text("SET LOCAL app.current_center_id = :cid"),
+           {"cid": str(center_id) if center_id else ""})
+```
+
+```sql
+-- migración
+ALTER TABLE boxes ENABLE ROW LEVEL SECURITY;
+CREATE POLICY tenant_isolation ON boxes
+  USING (
+    current_setting('app.current_center_id', true) = ''      -- national_admin (NULL) ve todo
+    OR center_id::text = current_setting('app.current_center_id', true)
+  );
+```
+
+- `national_admin` (center_id NULL) → se setea `''` → el `USING` con `= ''` deja pasar todo, y la agregación nacional (`GROUP BY`) sigue funcionando.
+- Aplicar a todas las tablas con `center_id`: boxes, pallets, shipments, intakes, product_types (scoped), etc.
+- El rol de la app NO debe tener `BYPASSRLS`; el owner de las tablas sí puede bypasear en migraciones/seeds.
+- **No reemplaza `.scoped()`** — es defense-in-depth. El scoping de app sigue siendo la primera línea.
+
+### N-6 — Traza de IP como auditoría interna
+
+La infraestructura ya existe (`AuditLog.ip`, `fire_audit(ip=...)`, `AuditRepository.log(ip=...)`). El hueco: los `AuditRepository(db).log(...)` directos en `studio.py`, `users.py`, `auth.py` y `requests.py` no pasan `ip`. Esos son precisamente los eventos privilegiados (alta/edición de usuarios, roles, reset de contraseñas, invitaciones, aprobación de solicitudes) donde la IP es más valiosa para forense.
+
+Fix: usar siempre `ip=get_client_ip(request)` (de `utils/cloudflare.py`, que ya lee `CF-Connecting-IP`). Requiere que el handler reciba `request: Request`. Considerar agregar columna `user_agent` a `AuditLog` para trazas más ricas.
