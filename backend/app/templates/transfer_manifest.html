@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: Arial, sans-serif; font-size: 9pt; color: #111; }
+  .page { padding: 18mm 15mm; }
+  h1 { font-size: 15pt; font-weight: bold; margin-bottom: 2mm; }
+  h2 { font-size: 10pt; font-weight: bold; margin: 5mm 0 2mm; color: #333; border-bottom: 0.5pt solid #bbb; padding-bottom: 1mm; }
+  .meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2mm 8mm; margin: 4mm 0; font-size: 8.5pt; }
+  .meta-label { color: #666; font-size: 7.5pt; }
+  .meta-val { font-weight: bold; }
+  table { width: 100%; border-collapse: collapse; margin-top: 2mm; font-size: 7.5pt; }
+  th { background: #e5e7eb; padding: 2mm 2.5mm; text-align: left; font-size: 7pt; font-weight: bold; border: 0.3pt solid #ccc; }
+  td { padding: 1.5mm 2.5mm; border: 0.3pt solid #ddd; vertical-align: top; }
+  tr:nth-child(even) td { background: #f9fafb; }
+  .totals { margin-top: 8mm; padding: 4mm; background: #f3f4f6; border: 0.5pt solid #d1d5db; }
+  .totals h2 { border: none; margin-bottom: 2mm; }
+  .totals table td { border: none; background: none; }
+  .totals table td:first-child { font-weight: bold; width: 50%; }
+  .footer { margin-top: 12mm; font-size: 7pt; color: #999; text-align: center; border-top: 0.3pt solid #ddd; padding-top: 3mm; }
+  .route { font-size: 12pt; font-weight: bold; margin: 3mm 0 1mm; }
+  .arrow { color: #555; }
+</style>
+</head>
+<body>
+<div class="page">
+  <h1>Manifiesto de Transferencia</h1>
+  <div class="route">{{ transfer.from_center }} <span class="arrow">→</span> {{ transfer.to_center }}</div>
+
+  <div class="meta-grid">
+    <div>
+      <div class="meta-label">ID de transferencia</div>
+      <div class="meta-val" style="font-family:monospace;font-size:8pt">{{ transfer.transfer_id }}</div>
+    </div>
+    <div>
+      <div class="meta-label">Estado</div>
+      <div class="meta-val">{{ transfer.status }}</div>
+    </div>
+    <div>
+      <div class="meta-label">Fecha de solicitud</div>
+      <div class="meta-val">{{ transfer.created_at.strftime('%d/%m/%Y %H:%M') }}</div>
+    </div>
+    <div>
+      <div class="meta-label">Generado</div>
+      <div class="meta-val">{{ generated_at }}</div>
+    </div>
+  </div>
+
+  <h2>Cajas ({{ transfer.boxes | length }})</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Código</th>
+        <th>Producto</th>
+        <th>Categoría</th>
+        <th>INN</th>
+        <th>Concentración</th>
+        <th>Lote</th>
+        <th>Caducidad</th>
+        <th style="text-align:right">Cantidad</th>
+        <th>Unidad</th>
+        <th style="text-align:right">Peso kg</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in transfer.boxes %}
+      <tr>
+        <td style="font-family:monospace">{{ row.code }}</td>
+        <td>{{ row.display_name }}</td>
+        <td>{{ row.category }}</td>
+        <td>{{ row.inn_name or '—' }}</td>
+        <td>{{ row.strength or '—' }}</td>
+        <td>{{ row.batch or '—' }}</td>
+        <td>{{ row.expiry_date.strftime('%d/%m/%Y') if row.expiry_date else '—' }}</td>
+        <td style="text-align:right">{{ row.quantity }}</td>
+        <td>{{ row.unit }}</td>
+        <td style="text-align:right">{{ '%.3f'|format(row.weight_kg|float) if row.weight_kg else '—' }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <div class="totals">
+    <h2>Totales</h2>
+    <table>
+      <tr><td>Cajas:</td><td>{{ transfer.boxes | length }}</td></tr>
+      <tr><td>Unidades totales:</td><td>{{ total_units }}</td></tr>
+      <tr><td>Peso total estimado:</td><td>{{ '%.3f'|format(total_weight_kg) }} kg</td></tr>
+    </table>
+  </div>
+
+  <div class="footer">
+    Araguaney — Coordinación humanitaria · Documento generado automáticamente · {{ generated_at }}
+  </div>
+</div>
+</body>
+</html>

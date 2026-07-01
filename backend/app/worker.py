@@ -66,6 +66,23 @@ async def send_message_reply_email_task(ctx, to: str, thread_title: str, reply_p
     await asyncio.to_thread(send_message_reply_email, to, thread_title, reply_preview, sender_name)
 
 
+async def send_transfer_created_email_task(ctx, to: str, from_center: str, to_center: str) -> None:
+    from app.email import send_transfer_created_email
+    await asyncio.to_thread(send_transfer_created_email, to, from_center, to_center)
+
+
+async def send_transfer_status_email_task(
+    ctx, to: str, status: str, from_center: str, to_center: str, reason: str | None = None
+) -> None:
+    from app.email import send_transfer_status_email
+    await asyncio.to_thread(send_transfer_status_email, to, status, from_center, to_center, reason)
+
+
+async def send_transfer_received_email_task(ctx, to: str, from_center: str, to_center: str) -> None:
+    from app.email import send_transfer_received_email
+    await asyncio.to_thread(send_transfer_received_email, to, from_center, to_center)
+
+
 async def purge_attachments_cron(ctx) -> None:
     from app.database import SessionLocal
     from app.services.thread_service import ThreadService
@@ -97,6 +114,9 @@ def _build_fallbacks() -> dict:
         send_message_private_email,
         send_message_public_email,
         send_message_reply_email,
+        send_transfer_created_email,
+        send_transfer_status_email,
+        send_transfer_received_email,
     )
 
     return {
@@ -107,6 +127,9 @@ def _build_fallbacks() -> dict:
         "send_message_private_email_task": send_message_private_email,
         "send_message_public_email_task": send_message_public_email,
         "send_message_reply_email_task": send_message_reply_email,
+        "send_transfer_created_email_task": send_transfer_created_email,
+        "send_transfer_status_email_task": send_transfer_status_email,
+        "send_transfer_received_email_task": send_transfer_received_email,
     }
 
 
@@ -137,6 +160,9 @@ class WorkerSettings:
         send_message_private_email_task,
         send_message_public_email_task,
         send_message_reply_email_task,
+        send_transfer_created_email_task,
+        send_transfer_status_email_task,
+        send_transfer_received_email_task,
     ]
     cron_jobs = [
         cron(purge_audit_logs_cron, hour=3, minute=0),

@@ -70,3 +70,28 @@ def generate_manifest_pdf(data: ManifestData) -> bytes:
 
     html_str = render_manifest_html(data)
     return HTML(string=html_str).write_pdf()
+
+
+@dataclass
+class TransferManifestData:
+    transfer_id: str
+    from_center: str
+    to_center: str
+    status: str
+    created_at: datetime
+    boxes: list[ManifestBoxRow] = field(default_factory=list)
+
+
+def generate_transfer_manifest_pdf(data: TransferManifestData) -> bytes:
+    from weasyprint import HTML
+
+    template = _jinja_env.get_template("transfer_manifest.html")
+    total_units = sum(b.quantity for b in data.boxes)
+    total_weight = sum(float(b.weight_kg) for b in data.boxes if b.weight_kg)
+    html_str = template.render(
+        transfer=data,
+        total_units=total_units,
+        total_weight_kg=total_weight,
+        generated_at=datetime.now(tz=timezone.utc).strftime("%d/%m/%Y %H:%M UTC"),
+    )
+    return HTML(string=html_str).write_pdf()

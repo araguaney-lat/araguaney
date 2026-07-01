@@ -119,3 +119,55 @@ def send_message_reply_email(to: str, thread_title: str, reply_preview: str, sen
             messages_url=f"{site_url}/dashboard/messages",
         ),
     )
+
+
+def send_transfer_created_email(to: str, from_center: str, to_center: str) -> None:
+    site_url = settings.frontend_url.split(",")[0].strip()
+    _send(
+        to=to,
+        subject=f"Nueva transferencia: {from_center} → {to_center}",
+        html=_render(
+            "transfer_created.html",
+            from_center=from_center,
+            to_center=to_center,
+            transfers_url=f"{site_url}/dashboard/transfers",
+        ),
+    )
+
+
+def send_transfer_status_email(
+    to: str,
+    status: str,
+    from_center: str,
+    to_center: str,
+    reason: str | None = None,
+) -> None:
+    labels = {"APPROVED": "aprobada", "REJECTED": "rechazada"}
+    status_label = labels.get(status, status.lower())
+    site_url = settings.frontend_url.split(",")[0].strip()
+    _send(
+        to=to,
+        subject=f"Transferencia {status_label}: {from_center} → {to_center}",
+        html=_render(
+            "transfer_status.html",
+            status_label=status_label,
+            from_center=from_center,
+            to_center=to_center,
+            reason=reason,
+            transfers_url=f"{site_url}/dashboard/transfers",
+        ),
+    )
+
+
+def send_transfer_received_email(to: str, from_center: str, to_center: str) -> None:
+    site_url = settings.frontend_url.split(",")[0].strip()
+    _send(
+        to=to,
+        subject=f"Transferencia recibida: {from_center} → {to_center}",
+        html=_render(
+            "transfer_received.html",
+            from_center=from_center,
+            to_center=to_center,
+            transfers_url=f"{site_url}/dashboard/transfers",
+        ),
+    )

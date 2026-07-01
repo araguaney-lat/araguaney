@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.models.box import Box
 from app.models.transfer import Transfer, TransferEvent, TransferItem
+from app.models.user import User
 from app.repositories.base import BaseRepository
 
 
@@ -96,6 +97,21 @@ class TransferRepository(BaseRepository):
         self.db.add(event)
         self.db.flush()
         return event
+
+    def get_coordinator_emails(self, center_id: UUID) -> list[str]:
+        stmt = (
+            select(User.email)
+            .where(
+                User.center_id == center_id,
+                User.center_role == "coordinator",
+                User.is_active.is_(True),
+            )
+        )
+        return list(self.db.execute(stmt).scalars())
+
+    def get_user_email(self, user_id: UUID) -> str | None:
+        user = self.db.get(User, user_id)
+        return user.email if user else None
 
     def commit(self) -> None:
         self.db.commit()
