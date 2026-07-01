@@ -18,7 +18,7 @@ from app.schemas.report import (
     CountryPoint,
     ReportSummary,
 )
-from app.utils.api_error import api_error
+from app.utils.errors import api_error
 from app.utils.cloudflare import get_client_ip
 from app.utils.rate_limit import limiter
 
