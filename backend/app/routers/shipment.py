@@ -15,6 +15,7 @@ from app.schemas.shipment import ShipmentCreate, ShipmentDetailOut, ShipmentOut
 from app.services.shipment_service import ShipmentService
 from app.utils.audit import fire_audit
 from app.utils.cloudflare import get_client_ip
+from app.schemas.qr_ficha import QrEventOut
 from app.utils.manifest import ManifestBoxRow, ManifestData, ManifestPalletSection, generate_manifest_pdf
 from app.utils.manifest_xlsx import generate_manifest_xlsx
 from app.utils.rate_limit import limiter
@@ -246,3 +247,19 @@ def download_manifest_xlsx(
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         headers={"Content-Disposition": f'attachment; filename="packing-list-ifrc-{ref}.xlsx"'},
     )
+
+
+@router.get("/{shipment_id}/events", response_model=list[QrEventOut])
+@limiter.limit("120/minute")
+def list_shipment_events(
+    request: Request,
+    shipment_id: UUID,
+    db: Session = Depends(get_db),
+    _: User = Depends(require_coordinator),
+    scope: UUID | None = Depends(tenant_scope),
+):
+    shipment = ShipmentRepository(db).find_by_id(shipment_id, scope)
+    if not shipment:
+        from app.utils.errors import api_error
+        raise api_error("SHIPMENT_NOT_FOUND", "Shipment not found", status_code=404)
+    return ShipmentRepository(db).list_events(shipment_id)

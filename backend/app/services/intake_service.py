@@ -8,6 +8,7 @@ from app.models.intake import Intake
 from app.repositories.campaign_repository import CampaignRepository
 from app.repositories.intake_repository import IntakeRepository
 from app.repositories.product_type_repository import ProductTypeRepository
+from app.repositories.user_campaign_repository import UserCampaignRepository
 from app.schemas.intake import BoxDraft, IntakeCreate, IntakeOut, BoxOut
 from app.services.base import BaseService
 from app.services.validation_service import validate_box
@@ -24,13 +25,21 @@ class IntakeService(BaseService):
         if not data.boxes:
             raise api_error("NO_BOXES", "At least one box is required")
 
+        campaign_repo = CampaignRepository(self.db)
+
         # Resolve campaign — default to Donaciones Generales if not provided
         campaign_id = data.campaign_id
         if campaign_id is None:
-            general = CampaignRepository(self.db).find_general()
+            general = campaign_repo.find_general()
             if general is None:
                 raise api_error("NO_GENERAL_CAMPAIGN", "Default campaign not configured", status_code=500)
             campaign_id = general.id
+        else:
+            campaign = campaign_repo.find_by_id(campaign_id)
+            if not campaign or not campaign.is_active:
+                raise api_error("CAMPAIGN_NOT_FOUND", "Campaign not found or inactive", status_code=400)
+            if not UserCampaignRepository(self.db).is_member(user_id, campaign_id):
+                raise api_error("NOT_CAMPAIGN_MEMBER", "User is not assigned to this campaign", status_code=403)
 
         pt_repo = ProductTypeRepository(self.db)
         intake_repo = IntakeRepository(self.db)

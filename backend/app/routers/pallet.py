@@ -11,6 +11,7 @@ from app.dependencies import get_current_user, require_coordinator, tenant_scope
 from app.models.user import User
 from app.repositories.pallet_repository import PalletRepository
 from app.schemas.pallet import PalletCreate, PalletDetailOut, PalletOut, PalletPublicOut
+from app.schemas.qr_ficha import QrEventOut
 from app.services.pallet_service import PalletService
 from app.utils.audit import fire_audit
 from app.utils.cloudflare import get_client_ip
@@ -163,3 +164,16 @@ def pallet_label_pdf(
         media_type="application/pdf",
         headers={"Content-Disposition": f'attachment; filename="{filename}"'},
     )
+
+
+@router.get("/v1/pallets/{pallet_id}/events", response_model=list[QrEventOut])
+@limiter.limit("120/minute")
+def list_pallet_events(
+    request: Request,
+    pallet_id: UUID,
+    db: Session = Depends(get_db),
+    _: User = Depends(require_coordinator),
+    scope: UUID | None = Depends(tenant_scope),
+):
+    pallet = PalletService(db).get_detail(pallet_id, center_id=scope)  # validates tenant
+    return PalletRepository(db).list_events(pallet.id)

@@ -127,10 +127,18 @@ export interface BoxOut {
 export interface IntakeOut {
   id: string
   center_id: string
+  campaign_id: string
   donante_libre: string | null
   notes: string | null
   created_at: string
   boxes: BoxOut[]
+}
+
+export interface EventOut {
+  from_status: string | null
+  to_status: string
+  note: string | null
+  ts: string
 }
 
 export interface BoxPublicOut {

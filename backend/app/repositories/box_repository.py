@@ -4,6 +4,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.models.box import Box
+from app.models.events import BoxEvent
 from app.repositories.base import TenantRepository
 
 
@@ -43,6 +44,11 @@ class BoxRepository(TenantRepository[Box]):
             stmt = stmt.where(Box.status == status)
         stmt = self.scoped(stmt, center_id)
         return list(self.db.execute(stmt).scalars())
+
+    def list_events(self, box_id: UUID) -> list[BoxEvent]:
+        return list(self.db.execute(
+            select(BoxEvent).where(BoxEvent.box_id == box_id).order_by(BoxEvent.ts)
+        ).scalars())
 
     def save(self, box: Box) -> Box:
         self.db.add(box)

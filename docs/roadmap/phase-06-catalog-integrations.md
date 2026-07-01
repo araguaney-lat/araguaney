@@ -83,9 +83,9 @@ Todos vía `fire_audit(background_tasks, ...)` en los routers:
 | 3 | `014_product_type_scope` | Agregar `campaign_id UUID NULLABLE FK → campaigns(id)` a `product_types`; `NULL` = global; índice en `(campaign_id)` | 🟡 | ✅ Hecho |
 | 4 | `UserCampaignRepository` | `assign(user_id, campaign_id, assigned_by)`, `list_by_user(user_id)`, `list_by_campaign(campaign_id)`, `remove(user_id, campaign_id)`; guard: coordinator solo puede asignar usuarios de su propio `center_id` | 🟡 | ✅ Hecho |
 | 5 | Actualizar `ProductTypeRepository` | `list(user_id)` resuelve las campañas del usuario y retorna globales + los de esas campañas; guard de dedup `(inn_name, form, strength)` con `unaccent + lower` dentro del scope visible; `create()` exige `campaign_id` salvo `national_admin` | 🟠 | ✅ Hecho |
-| 6 | Endpoint de promoción (admin) | `POST /v1/studio/product-types/{id}/promote` — `national_admin` mueve `campaign_id → NULL`; log en auditoría | 🟡 | ⬜ Pendiente |
+| 6 | Endpoint de promoción (admin) | `POST /v1/studio/product-types/{id}/promote` — `national_admin` mueve `campaign_id → NULL`; log en auditoría | 🟡 | ✅ Hecho |
 | 7 | Endpoints de asignación de campañas | `POST /v1/campaigns/{id}/members` y `DELETE /v1/campaigns/{id}/members/{user_id}` — coordinator (solo su centro) y national_admin; `GET /v1/campaigns/{id}/members` — lista de asignados | 🟡 | ✅ Hecho |
-| 8 | Actualizar `IntakeService` y schemas | `IntakeCreate` incluye `campaign_id` requerido; validar que campaña está activa y el usuario tiene acceso a ella; `IntakeOut` expone `campaign_id` | 🟡 | ⬜ Pendiente |
+| 8 | Actualizar `IntakeService` y schemas | `IntakeCreate` incluye `campaign_id` requerido; validar que campaña está activa y el usuario tiene acceso a ella; `IntakeOut` expone `campaign_id` | 🟡 | ✅ Hecho |
 
 ---
 
@@ -209,7 +209,7 @@ Todos vía `fire_audit(background_tasks, ...)` en los routers:
 |---|-------|-------------|-------------|--------|
 | 32 | Componente `StatusTimeline` | `src/components/StatusTimeline.tsx`; props: `steps: TimelineStep[]`; responsive (vertical móvil, horizontal escritorio); sin dependencias externas, solo Tailwind | 🟡 | ✅ Listo |
 | 33 | Integrar en ficha QR pública | En `/qr/[code]`: timeline al centro de la pantalla para caja y tarima; timestamps en formato `DD MMM, HH:mm` | 🟡 | ✅ Listo |
-| 34 | Integrar en vistas de detalle del dashboard | En vistas de detalle de caja, tarima, envío y transferencia; mismo componente, datos desde el endpoint de detalle | 🟡 | ⬜ Pendiente |
+| 34 | Integrar en vistas de detalle del dashboard | En vistas de detalle de caja, tarima, envío y transferencia; mismo componente, datos desde el endpoint de detalle | 🟡 | ✅ Listo |
 
 ---
 

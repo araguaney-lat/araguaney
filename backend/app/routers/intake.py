@@ -49,6 +49,7 @@ def list_intakes(
         IntakeOut(
             id=i.id,
             center_id=i.center_id,
+            campaign_id=i.campaign_id,
             donante_libre=i.donante_libre,
             notes=i.notes,
             created_at=i.created_at,
