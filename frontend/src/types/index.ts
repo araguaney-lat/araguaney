@@ -67,6 +67,16 @@ export interface BarcodeResult {
   prefill: BarcodePrefill | null
 }
 
+export interface CampaignMember {
+  id: string
+  email: string
+  username: string
+  full_name: string | null
+  center_role: CenterRole | null
+  center_id: string | null
+  is_active: boolean
+}
+
 export interface Center {
   id: string
   name: string

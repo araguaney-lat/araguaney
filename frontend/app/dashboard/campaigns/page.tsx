@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import { useSession } from "next-auth/react"
 import { useEffect, useState } from "react"
 import { createCampaignAction, updateCampaignAction } from "@/lib/campaign-actions"
@@ -226,6 +227,15 @@ export default function CampaignsPage() {
                   {c.end_date && new Date(c.end_date).toLocaleDateString("es-MX")}
                 </p>
               )}
+
+              <div className="pt-1 border-t border-zinc-100">
+                <Link
+                  href={`/dashboard/campaigns/${c.id}/members`}
+                  className="text-xs text-zinc-500 hover:text-zinc-800"
+                >
+                  Ver miembros →
+                </Link>
+              </div>
             </div>
           ))}
         </div>
