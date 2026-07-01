@@ -192,6 +192,36 @@ export interface ShipmentDetailOut extends ShipmentOut {
   pallets: PalletDetailOut[]
 }
 
+// ── Transfers ─────────────────────────────────────────────────────────────────
+
+export type TransferStatus = "REQUESTED" | "APPROVED" | "IN_TRANSIT" | "RECEIVED" | "REJECTED"
+
+export interface TransferOut {
+  id: string
+  from_center_id: string
+  to_center_id: string
+  status: TransferStatus
+  initiated_by: string | null
+  notes: string | null
+  created_at: string
+  updated_at: string | null
+}
+
+export interface TransferEventOut {
+  id: string
+  transfer_id: string
+  from_status: string | null
+  to_status: string
+  user_id: string | null
+  note: string | null
+  ts: string
+}
+
+export interface TransferDetailOut extends TransferOut {
+  boxes: BoxOut[]
+  events: TransferEventOut[]
+}
+
 // ── Aggregate / Dashboard ──────────────────────────────────────────────────────
 
 export interface CategoryStockOut {
