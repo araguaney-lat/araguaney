@@ -100,8 +100,10 @@ class ShipmentService(BaseService):
             )
 
         pallet_repo = PalletRepository(self.db)
-        for pallet in repo.find_pallets(shipment_id):
-            for box in pallet_repo.find_boxes(pallet.id):
+        pallets = repo.find_pallets(shipment_id)
+        boxes_by_pallet = pallet_repo.find_boxes_for_pallets([p.id for p in pallets])
+        for pallet in pallets:
+            for box in boxes_by_pallet[pallet.id]:
                 box.status = "SHIPPED"
                 self.db.add(BoxEvent(box_id=box.id, user_id=user_id, from_status="SEALED", to_status="SHIPPED"))
             pallet.status = "SHIPPED"
@@ -119,16 +121,19 @@ class ShipmentService(BaseService):
             raise api_error("SHIPMENT_NOT_FOUND", "Shipment not found", status_code=404)
         return self._build_detail(shipment)
 
-    def list(self, center_id: UUID | None, status: str | None = None) -> list[Shipment]:
-        return ShipmentRepository(self.db).list_all(center_id, status=status)
+    def list(
+        self, center_id: UUID | None, status: str | None = None, limit: int = 200, offset: int = 0
+    ) -> list[Shipment]:
+        return ShipmentRepository(self.db).list_all(center_id, status=status, limit=limit, offset=offset)
 
     def _build_detail(self, shipment: Shipment) -> ShipmentDetailOut:
         s_repo = ShipmentRepository(self.db)
         p_repo = PalletRepository(self.db)
         pallets = s_repo.find_pallets(shipment.id)
+        boxes_by_pallet = p_repo.find_boxes_for_pallets([p.id for p in pallets])
         pallet_details = []
         for pallet in pallets:
-            boxes = p_repo.find_boxes(pallet.id)
+            boxes = boxes_by_pallet[pallet.id]
             pallet_details.append(PalletDetailOut(
                 id=pallet.id,
                 code=pallet.code,

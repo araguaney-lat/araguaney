@@ -23,11 +23,24 @@ class PalletRepository(TenantRepository[Pallet]):
         """Public lookup — pallet codes are globally unique."""
         return self.db.execute(select(Pallet).where(Pallet.code == code)).scalar_one_or_none()
 
-    def list_all(self, center_id: UUID | None, status: str | None = None) -> list[Pallet]:
-        stmt = select(Pallet).order_by(Pallet.created_at.desc())
+    def list_all(
+        self, center_id: UUID | None, status: str | None = None, limit: int = 200, offset: int = 0
+    ) -> list[Pallet]:
+        # Tiebreak on id — see BoxRepository.list_all for why created_at alone isn't stable.
+        stmt = select(Pallet).order_by(Pallet.created_at.desc(), Pallet.id)
         if status:
             stmt = stmt.where(Pallet.status == status)
-        return list(self.db.execute(self.scoped(stmt, center_id)).scalars())
+        stmt = self.scoped(stmt, center_id).limit(limit).offset(offset)
+        return list(self.db.execute(stmt).scalars())
+
+    def find_boxes_for_pallets(self, pallet_ids: list[UUID]) -> dict[UUID, list[Box]]:
+        if not pallet_ids:
+            return {}
+        stmt = select(Box).where(Box.pallet_id.in_(pallet_ids)).order_by(Box.created_at)
+        boxes_by_pallet: dict[UUID, list[Box]] = {pid: [] for pid in pallet_ids}
+        for box in self.db.execute(stmt).scalars():
+            boxes_by_pallet[box.pallet_id].append(box)
+        return boxes_by_pallet
 
     def find_boxes(self, pallet_id: UUID) -> list[Box]:
         stmt = select(Box).where(Box.pallet_id == pallet_id).order_by(Box.created_at)

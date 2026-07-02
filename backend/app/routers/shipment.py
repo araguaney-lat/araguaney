@@ -1,7 +1,7 @@
 import io
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Query, Request
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 
@@ -28,11 +28,13 @@ router = APIRouter(prefix="/v1/shipments", tags=["shipments"])
 def list_shipments(
     request: Request,
     status: str | None = None,
+    limit: int = Query(200, ge=1, le=500),
+    offset: int = Query(0, ge=0),
     db: Session = Depends(get_db),
     _: User = Depends(require_coordinator),
     scope: UUID | None = Depends(tenant_scope),
 ):
-    return ShipmentService(db).list(center_id=scope, status=status)
+    return ShipmentService(db).list(center_id=scope, status=status, limit=limit, offset=offset)
 
 
 @router.post("", response_model=ShipmentOut, status_code=201)
@@ -144,9 +146,11 @@ def download_manifest(
     pt_repo = ProductTypeRepository(db)
     pt_cache: dict = {}
 
+    pallets = ShipmentRepository(db).find_pallets(shipment_id)
+    boxes_by_pallet = pallet_repo.find_boxes_for_pallets([p.id for p in pallets])
     pallet_sections: list[ManifestPalletSection] = []
-    for pallet in ShipmentRepository(db).find_pallets(shipment_id):
-        boxes = pallet_repo.find_boxes(pallet.id)
+    for pallet in pallets:
+        boxes = boxes_by_pallet[pallet.id]
         rows: list[ManifestBoxRow] = []
         for box in boxes:
             pt_id = box.product_type_id
@@ -207,9 +211,11 @@ def download_manifest_xlsx(
     pt_repo = ProductTypeRepository(db)
     pt_cache: dict = {}
 
+    pallets = ShipmentRepository(db).find_pallets(shipment_id)
+    boxes_by_pallet = pallet_repo.find_boxes_for_pallets([p.id for p in pallets])
     pallet_sections: list[ManifestPalletSection] = []
-    for pallet in ShipmentRepository(db).find_pallets(shipment_id):
-        boxes = pallet_repo.find_boxes(pallet.id)
+    for pallet in pallets:
+        boxes = boxes_by_pallet[pallet.id]
         rows: list[ManifestBoxRow] = []
         for box in boxes:
             pt_id = box.product_type_id

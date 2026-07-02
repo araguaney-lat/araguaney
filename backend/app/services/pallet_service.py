@@ -93,8 +93,10 @@ class PalletService(BaseService):
             raise api_error("PALLET_NOT_FOUND", "Pallet not found", status_code=404)
         return self._build_detail(pallet)
 
-    def list(self, center_id: UUID | None, status: str | None = None) -> list[Pallet]:
-        return PalletRepository(self.db).list_all(center_id, status=status)
+    def list(
+        self, center_id: UUID | None, status: str | None = None, limit: int = 200, offset: int = 0
+    ) -> list[Pallet]:
+        return PalletRepository(self.db).list_all(center_id, status=status, limit=limit, offset=offset)
 
     def get_public(self, code: str) -> PalletPublicOut:
         pallet = PalletRepository(self.db).find_by_code(code)

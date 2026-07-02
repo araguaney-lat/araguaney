@@ -83,6 +83,8 @@ def list_transfers(
     status: str | None = Query(None),
     from_center_id: UUID | None = Query(None),
     to_center_id: UUID | None = Query(None),
+    limit: int = Query(200, ge=1, le=500),
+    offset: int = Query(0, ge=0),
     db: Session = Depends(get_db),
     current_user: User = Depends(require_coordinator),
 ):
@@ -91,6 +93,8 @@ def list_transfers(
         status=status,
         from_center_id=from_center_id,
         to_center_id=to_center_id,
+        limit=limit,
+        offset=offset,
     )
 
 

@@ -228,7 +228,7 @@ class TestShipmentAddPallet:
             MockSRepo.return_value.find_by_id.return_value = shipment
             MockSRepo.return_value.find_pallets.return_value = [pallet]
             MockPRepo.return_value.find_by_id.return_value = pallet
-            MockPRepo.return_value.find_boxes.return_value = []
+            MockPRepo.return_value.find_boxes_for_pallets.return_value = {pallet.id: []}
             svc.add_pallet(SHIPMENT_ID, PALLET_ID, center_id=CENTER_ID, user_id=USER_ID)
         assert pallet.shipment_id == SHIPMENT_ID
 
@@ -288,7 +288,7 @@ class TestShipmentShip:
         ):
             MockSRepo.return_value.find_by_id.return_value = shipment
             MockSRepo.return_value.find_pallets.return_value = [pallet]
-            MockPRepo.return_value.find_boxes.return_value = [box]
+            MockPRepo.return_value.find_boxes_for_pallets.return_value = {pallet.id: [box]}
             result = svc.ship(SHIPMENT_ID, center_id=CENTER_ID, user_id=USER_ID)
         assert result.status == "SHIPPED"
         assert box.status == "SHIPPED"

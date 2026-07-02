@@ -1,7 +1,7 @@
 import io
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Query, Request
 from fastapi.responses import Response, StreamingResponse
 from sqlalchemy.orm import Session
 
@@ -61,11 +61,13 @@ def pallet_qr_image(
 def list_pallets(
     request: Request,
     status: str | None = None,
+    limit: int = Query(200, ge=1, le=500),
+    offset: int = Query(0, ge=0),
     db: Session = Depends(get_db),
     _: User = Depends(require_coordinator),
     scope: UUID | None = Depends(tenant_scope),
 ):
-    return PalletService(db).list(center_id=scope, status=status)
+    return PalletService(db).list(center_id=scope, status=status, limit=limit, offset=offset)
 
 
 @router.post("/v1/pallets", response_model=PalletOut, status_code=201)

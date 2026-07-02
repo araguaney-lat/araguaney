@@ -128,5 +128,5 @@ class IntakeService(BaseService):
             ],
         )
 
-    def list(self, center_id: UUID | None) -> list[Intake]:
-        return IntakeRepository(self.db).find_all(center_id)
+    def list(self, center_id: UUID | None, limit: int = 200, offset: int = 0) -> list[Intake]:
+        return IntakeRepository(self.db).find_all(center_id, limit=limit, offset=offset)

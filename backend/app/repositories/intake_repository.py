@@ -14,8 +14,14 @@ class IntakeRepository(TenantRepository[Intake]):
         super().__init__(db)
         self.model = Intake
 
-    def find_all(self, center_id: UUID | None) -> list[Intake]:
-        stmt = self.scoped(select(Intake), center_id).order_by(Intake.created_at.desc())
+    def find_all(self, center_id: UUID | None, limit: int = 200, offset: int = 0) -> list[Intake]:
+        # Tiebreak on id — see BoxRepository.list_all for why created_at alone isn't stable.
+        stmt = (
+            self.scoped(select(Intake), center_id)
+            .order_by(Intake.created_at.desc(), Intake.id)
+            .limit(limit)
+            .offset(offset)
+        )
         return list(self.db.execute(stmt).scalars())
 
     def find_by_id(self, intake_id: UUID, center_id: UUID | None) -> Intake | None:

@@ -19,8 +19,8 @@ class BoxService(BaseService):
             raise api_error("BOX_NOT_FOUND", "Box not found", status_code=404)
         return box
 
-    def list(self, center_id: UUID | None, status: str | None = None) -> list[Box]:
-        return BoxRepository(self.db).list_all(center_id, status=status)
+    def list(self, center_id: UUID | None, status: str | None = None, limit: int = 200, offset: int = 0) -> list[Box]:
+        return BoxRepository(self.db).list_all(center_id, status=status, limit=limit, offset=offset)
 
     def seal(self, box_id: UUID, center_id: UUID | None, user_id: UUID) -> Box:
         repo = BoxRepository(self.db)

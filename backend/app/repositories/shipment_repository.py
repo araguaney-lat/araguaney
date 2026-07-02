@@ -19,11 +19,15 @@ class ShipmentRepository(TenantRepository[Shipment]):
         stmt = self.scoped(select(Shipment).where(Shipment.id == shipment_id), center_id)
         return self.db.execute(stmt).scalar_one_or_none()
 
-    def list_all(self, center_id: UUID | None, status: str | None = None) -> list[Shipment]:
-        stmt = select(Shipment).order_by(Shipment.created_at.desc())
+    def list_all(
+        self, center_id: UUID | None, status: str | None = None, limit: int = 200, offset: int = 0
+    ) -> list[Shipment]:
+        # Tiebreak on id — see BoxRepository.list_all for why created_at alone isn't stable.
+        stmt = select(Shipment).order_by(Shipment.created_at.desc(), Shipment.id)
         if status:
             stmt = stmt.where(Shipment.status == status)
-        return list(self.db.execute(self.scoped(stmt, center_id)).scalars())
+        stmt = self.scoped(stmt, center_id).limit(limit).offset(offset)
+        return list(self.db.execute(stmt).scalars())
 
     def find_pallets(self, shipment_id: UUID) -> list[Pallet]:
         stmt = select(Pallet).where(Pallet.shipment_id == shipment_id).order_by(Pallet.created_at)
