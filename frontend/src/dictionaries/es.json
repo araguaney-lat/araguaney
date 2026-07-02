@@ -869,7 +869,9 @@
   },
   "footer": {
     "tagline": "El estándar común para centros de acopio",
-    "privacy": "Sin datos personales de donantes ni beneficiarios. Solo inventario, trazable de la caja al envío."
+    "privacy": "Sin datos personales de donantes ni beneficiarios. Solo inventario, trazable de la caja al envío.",
+    "privacyLink": "Aviso de Privacidad",
+    "termsLink": "Términos y Condiciones"
   },
   "seo": {
     "site_title": "Araguaney — Software para centros de acopio y ayuda humanitaria",

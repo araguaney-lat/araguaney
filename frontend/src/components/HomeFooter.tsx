@@ -1,14 +1,25 @@
 import Image from "next/image"
-import type { Dictionary } from "@/lib/i18n"
+import Link from "next/link"
+import type { Dictionary, Locale } from "@/lib/i18n"
 
 const LOGO =
   "https://res.cloudinary.com/dtvdqlxtd/image/upload/v1782794310/image_degkq9.png"
 
-interface Props {
-  dict: Dictionary["footer"]
+// Legal routes are fixed-language pages, so link to the counterpart that
+// matches the footer's language.
+const LEGAL_LINKS: Record<Locale, { privacy: string; terms: string }> = {
+  es: { privacy: "/aviso-de-privacidad", terms: "/terminos" },
+  en: { privacy: "/privacy", terms: "/terms" },
 }
 
-export default function HomeFooter({ dict }: Props) {
+interface Props {
+  dict: Dictionary["footer"]
+  locale?: Locale
+}
+
+export default function HomeFooter({ dict, locale = "es" }: Props) {
+  const legal = LEGAL_LINKS[locale]
+
   return (
     <footer
       className="px-5 md:px-[46px] py-6 md:py-10 flex items-start md:items-center justify-between gap-4 flex-wrap"
@@ -37,7 +48,19 @@ export default function HomeFooter({ dict }: Props) {
           </div>
         </div>
       </div>
-      <div style={{ fontSize: 12, color: "#A89E8C", lineHeight: 1.55 }}>{dict.privacy}</div>
+
+      <div className="flex flex-col gap-2 md:items-end" style={{ maxWidth: 420 }}>
+        <div style={{ fontSize: 12, color: "#A89E8C", lineHeight: 1.55 }}>{dict.privacy}</div>
+        <div className="flex items-center gap-4">
+          <Link href={legal.privacy} style={{ fontSize: 12.5, color: "#E9E2D5", fontWeight: 600 }}>
+            {dict.privacyLink}
+          </Link>
+          <span style={{ color: "#5C5347" }}>·</span>
+          <Link href={legal.terms} style={{ fontSize: 12.5, color: "#E9E2D5", fontWeight: 600 }}>
+            {dict.termsLink}
+          </Link>
+        </div>
+      </div>
     </footer>
   )
 }
