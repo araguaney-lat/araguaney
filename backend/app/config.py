@@ -48,8 +48,15 @@ class Settings(BaseSettings):
     # ── Security ──────────────────────────────────────────────────────────────
     # Comma-separated IPs allowed to hit admin/internal routes (empty = open)
     admin_allowed_ips: str = ""
-    # Set to true in production to require Cloudflare proxy (blocks direct origin hits)
+    # Set to true in production to require Cloudflare proxy (blocks direct origin hits).
+    # On platforms where a proxy sits between Cloudflare and the app (e.g. Railway),
+    # the raw TCP peer is never actually Cloudflare's edge IP — it's the platform's own
+    # internal proxy — so this MUST be paired with cloudflare_shared_secret below.
     cloudflare_only: bool = False
+    # Shared secret validated against a request header (default: X-Origin-Auth) that a
+    # Cloudflare Transform Rule injects on every request before it reaches the origin.
+    # Required whenever cloudflare_only=True — see .env.example for setup instructions.
+    cloudflare_shared_secret: str = ""
     # Google Safe Browsing API key — enables URL reputation checks in
     # app.utils.url_security.check_safe_browsing (optional; fails open when empty)
     google_safe_browsing_api_key: str = ""
