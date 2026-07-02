@@ -93,12 +93,59 @@ async def send_password_changed_email_task(ctx, to: str) -> None:
     await asyncio.to_thread(send_password_changed_email, to)
 
 
+async def generate_shipment_manifest_pdf_task(ctx, job_id: str) -> None:
+    from app.services.export_generation import run_export_job
+    await asyncio.to_thread(run_export_job, job_id)
+
+
+async def generate_shipment_manifest_xlsx_task(ctx, job_id: str) -> None:
+    from app.services.export_generation import run_export_job
+    await asyncio.to_thread(run_export_job, job_id)
+
+
+async def generate_box_labels_pdf_task(ctx, job_id: str) -> None:
+    from app.services.export_generation import run_export_job
+    await asyncio.to_thread(run_export_job, job_id)
+
+
+async def generate_pallet_label_pdf_task(ctx, job_id: str) -> None:
+    from app.services.export_generation import run_export_job
+    await asyncio.to_thread(run_export_job, job_id)
+
+
+async def generate_transfer_manifest_pdf_task(ctx, job_id: str) -> None:
+    from app.services.export_generation import run_export_job
+    await asyncio.to_thread(run_export_job, job_id)
+
+
+async def generate_report_export_csv_task(ctx, job_id: str) -> None:
+    from app.services.export_generation import run_export_job
+    await asyncio.to_thread(run_export_job, job_id)
+
+
 async def purge_attachments_cron(ctx) -> None:
     from app.database import SessionLocal
     from app.services.thread_service import ThreadService
     with SessionLocal() as db:
         count = ThreadService.purge_expired(db)
     logger.info("Attachment purge: deleted %d expired attachments", count)
+
+
+async def purge_export_jobs_cron(ctx) -> None:
+    from app.database import SessionLocal
+    from app.repositories.export_job_repository import ExportJobRepository
+    from app.utils.r2 import delete_object
+
+    with SessionLocal() as db:
+        repo = ExportJobRepository(db)
+        expired = repo.purge_expired(datetime.now(tz=timezone.utc))
+        count = 0
+        for job in expired:
+            if job.r2_key:
+                delete_object(job.r2_key)
+            repo.delete(job.id)
+            count += 1
+    logger.info("Export job purge: deleted %d expired jobs", count)
 
 
 async def purge_audit_logs_cron(ctx) -> None:
@@ -130,6 +177,7 @@ def _build_fallbacks() -> dict:
         send_transfer_received_email,
         send_password_changed_email,
     )
+    from app.services.export_generation import run_export_job
 
     return {
         "notify_slack_task": notify_slack,
@@ -144,6 +192,12 @@ def _build_fallbacks() -> dict:
         "send_transfer_status_email_task": send_transfer_status_email,
         "send_transfer_received_email_task": send_transfer_received_email,
         "send_password_changed_email_task": send_password_changed_email,
+        "generate_shipment_manifest_pdf_task": run_export_job,
+        "generate_shipment_manifest_xlsx_task": run_export_job,
+        "generate_box_labels_pdf_task": run_export_job,
+        "generate_pallet_label_pdf_task": run_export_job,
+        "generate_transfer_manifest_pdf_task": run_export_job,
+        "generate_report_export_csv_task": run_export_job,
     }
 
 
@@ -179,10 +233,19 @@ class WorkerSettings:
         send_transfer_status_email_task,
         send_transfer_received_email_task,
         send_password_changed_email_task,
+        generate_shipment_manifest_pdf_task,
+        generate_shipment_manifest_xlsx_task,
+        generate_box_labels_pdf_task,
+        generate_pallet_label_pdf_task,
+        generate_transfer_manifest_pdf_task,
+        generate_report_export_csv_task,
     ]
     cron_jobs = [
         cron(purge_audit_logs_cron, hour=3, minute=0),
         cron(purge_attachments_cron, hour=4, minute=0),
+        # Export jobs expire 1h after DONE (see ExportJobRepository.DOWNLOAD_TTL_SECONDS) —
+        # runs hourly, not daily like the other purges, to keep R2/db lean on that timescale.
+        cron(purge_export_jobs_cron, minute=15),
     ]
     redis_settings = RedisSettings.from_dsn(os.environ.get("REDIS_URL", "redis://localhost:6379"))
     max_jobs = 10

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useTransition } from "react"
+import { useState, useEffect } from "react"
 import type { Campaign, ShipmentOut, ShipmentDetailOut, ShipmentStatus, PalletOut, EventOut } from "@/types"
 import { StatusTimeline } from "@/components/StatusTimeline"
 import {
@@ -8,8 +8,8 @@ import {
   addPalletToShipmentAction,
   closeShipmentAction,
   shipShipmentAction,
-  downloadManifestAction,
 } from "@/lib/shipment-actions"
+import { useExportJob } from "@/hooks/useExportJob"
 import { useDict } from "@/context/DictionaryContext"
 
 const STATUS_COLORS: Record<ShipmentStatus, string> = {
@@ -34,7 +34,7 @@ export default function ShipmentsPage() {
   const [showCreateForm, setShowCreateForm] = useState(false)
   const [newShipment, setNewShipment] = useState({ campaign_id: "", destination: "Venezuela", carrier: "", reference: "", notes: "" })
   const [actionLoading, setActionLoading] = useState<string | null>(null)
-  const [isPending, startTransition] = useTransition()
+  const manifestExport = useExportJob()
 
   const fetchShipments = async () => {
     setLoading(true)
@@ -67,6 +67,10 @@ export default function ShipmentsPage() {
   }
 
   useEffect(() => { fetchShipments() }, [filter]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (manifestExport.error) setError(manifestExport.error)
+  }, [manifestExport.error])
 
   useEffect(() => {
     fetch("/api/campaigns?active_only=true")
@@ -130,22 +134,9 @@ export default function ShipmentsPage() {
     }
   }
 
-  const handleDownloadManifest = (shipmentId: string, reference?: string | null) => {
-    startTransition(async () => {
-      const result = await downloadManifestAction(shipmentId, reference ?? undefined)
-      if (result.error) {
-        setError(result.error)
-      } else if (result.pdf) {
-        const bytes = Uint8Array.from(atob(result.pdf), (c) => c.charCodeAt(0))
-        const blob = new Blob([bytes], { type: "application/pdf" })
-        const url = URL.createObjectURL(blob)
-        const a = document.createElement("a")
-        a.href = url
-        a.download = result.filename ?? "manifiesto.pdf"
-        a.click()
-        URL.revokeObjectURL(url)
-      }
-    })
+  const handleDownloadManifest = (shipmentId: string) => {
+    setError(null)
+    manifestExport.start(`/v1/shipments/${shipmentId}/manifest.pdf`)
   }
 
   return (
@@ -262,10 +253,10 @@ export default function ShipmentsPage() {
                     {actionLoading === shipment.id + "-ship" ? t.dispatching : t.dispatch}
                   </button>
                 )}
-                <button onClick={(e) => { e.stopPropagation(); handleDownloadManifest(shipment.id, shipment.reference) }}
-                  disabled={isPending}
+                <button onClick={(e) => { e.stopPropagation(); handleDownloadManifest(shipment.id) }}
+                  disabled={manifestExport.isBusy}
                   className="text-xs px-2 py-1 rounded border border-zinc-300 text-zinc-700 hover:bg-zinc-50 disabled:opacity-50">
-                  {t.manifest_pdf}
+                  {manifestExport.isBusy ? dict.dashboard.common.exporting : t.manifest_pdf}
                 </button>
               </div>
             </div>

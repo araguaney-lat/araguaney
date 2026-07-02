@@ -1,14 +1,14 @@
 "use client"
 
-import { useState, useEffect, useTransition } from "react"
+import { useState, useEffect } from "react"
 import type { PalletOut, PalletDetailOut, PalletStatus, EventOut } from "@/types"
 import { StatusTimeline } from "@/components/StatusTimeline"
 import {
   createPalletAction,
   addBoxToPalletAction,
   closePalletAction,
-  downloadPalletLabelAction,
 } from "@/lib/pallet-actions"
+import { useExportJob } from "@/hooks/useExportJob"
 import { useDict } from "@/context/DictionaryContext"
 
 const STATUS_COLORS: Record<PalletStatus, string> = {
@@ -29,7 +29,7 @@ export default function PalletsPage() {
   const [palletEvents, setPalletEvents] = useState<EventOut[]>([])
   const [boxCodeInput, setBoxCodeInput] = useState("")
   const [actionLoading, setActionLoading] = useState<string | null>(null)
-  const [isPending, startTransition] = useTransition()
+  const labelExport = useExportJob()
 
   const fetchPallets = async () => {
     setLoading(true)
@@ -57,6 +57,10 @@ export default function PalletsPage() {
   }
 
   useEffect(() => { fetchPallets() }, [filter]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (labelExport.error) setError(labelExport.error)
+  }, [labelExport.error])
 
   const handleCreate = async () => {
     setActionLoading("create")
@@ -96,21 +100,8 @@ export default function PalletsPage() {
   }
 
   const handleDownloadLabel = (palletId: string) => {
-    startTransition(async () => {
-      const result = await downloadPalletLabelAction(palletId)
-      if (result.error) {
-        setError(result.error)
-      } else if (result.pdf) {
-        const bytes = Uint8Array.from(atob(result.pdf), (c) => c.charCodeAt(0))
-        const blob = new Blob([bytes], { type: "application/pdf" })
-        const url = URL.createObjectURL(blob)
-        const a = document.createElement("a")
-        a.href = url
-        a.download = result.filename ?? "tarima.pdf"
-        a.click()
-        URL.revokeObjectURL(url)
-      }
-    })
+    setError(null)
+    labelExport.start(`/v1/pallets/${palletId}/label.pdf`)
   }
 
   return (
@@ -176,10 +167,10 @@ export default function PalletsPage() {
                 )}
                 <button
                   onClick={(e) => { e.stopPropagation(); handleDownloadLabel(pallet.id) }}
-                  disabled={isPending}
+                  disabled={labelExport.isBusy}
                   className="text-xs px-2 py-1 rounded border border-zinc-300 text-zinc-700 hover:bg-zinc-50 disabled:opacity-50"
                 >
-                  {t.label_pdf}
+                  {labelExport.isBusy ? dict.dashboard.common.exporting : t.label_pdf}
                 </button>
               </div>
             </div>

@@ -45,15 +45,19 @@ class BoxRepository(TenantRepository[Box]):
         return list(self.db.execute(stmt).scalars())
 
     def list_all(
-        self, center_id: UUID | None, status: str | None = None, limit: int = 200, offset: int = 0
+        self, center_id: UUID | None, status: str | None = None, limit: int | None = 200, offset: int = 0
     ) -> list[Box]:
         # Tiebreak on id: bulk inserts in one transaction share the same created_at
         # (Postgres now() is transaction-scoped), which makes LIMIT/OFFSET non-deterministic
         # across pages without a secondary sort key.
+        # limit=None is for legitimate "export everything matching the filter" callers
+        # (e.g. box label generation) — NOT the default, which stays bounded for UI listings.
         stmt = select(Box).order_by(Box.created_at.desc(), Box.id)
         if status:
             stmt = stmt.where(Box.status == status)
-        stmt = self.scoped(stmt, center_id).limit(limit).offset(offset)
+        stmt = self.scoped(stmt, center_id)
+        if limit is not None:
+            stmt = stmt.limit(limit).offset(offset)
         return list(self.db.execute(stmt).scalars())
 
     def list_events(self, box_id: UUID) -> list[BoxEvent]:

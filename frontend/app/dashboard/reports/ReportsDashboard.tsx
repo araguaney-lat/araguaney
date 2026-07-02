@@ -15,6 +15,7 @@ import {
 } from "recharts"
 import { ComposableMap, Geographies, Geography, ZoomableGroup } from "react-simple-maps"
 import { Download } from "lucide-react"
+import { useExportJob } from "@/hooks/useExportJob"
 import { useDict } from "@/context/DictionaryContext"
 
 // ── Types ──────────────────────────────────────────────────────────────────────
@@ -135,6 +136,8 @@ export default function ReportsDashboard({ campaigns, defaultCampaignId, centerR
   const [byCenter, setByCenter] = useState<CenterBreakdown[]>([])
   const [countries, setCountries] = useState<CountryPoint[]>([])
   const [loading, setLoading] = useState(false)
+  const [exportError, setExportError] = useState<string | null>(null)
+  const csvExport = useExportJob()
 
   const isNational = centerRole === "national_admin"
 
@@ -177,9 +180,14 @@ export default function ReportsDashboard({ campaigns, defaultCampaignId, centerR
 
   useEffect(() => { fetchAll() }, [fetchAll])
 
+  useEffect(() => {
+    if (csvExport.error) setExportError(csvExport.error)
+  }, [csvExport.error])
+
   function handleExport() {
     if (!campaignId) return
-    window.open(`/api/reports/${campaignId}/export.csv?start=${start}&end=${end}`, "_blank")
+    setExportError(null)
+    csvExport.start(`/v1/reports/campaign/${campaignId}/export.csv?start=${start}&end=${end}`)
   }
 
   const countrySet = new Set(countries.map((c) => ALPHA2_TO_ALPHA3[c.country_code] ?? ""))
@@ -248,12 +256,20 @@ export default function ReportsDashboard({ campaigns, defaultCampaignId, centerR
 
         <button
           onClick={handleExport}
-          className="ml-auto flex items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-xs font-semibold text-zinc-700 hover:bg-zinc-50 transition-colors"
+          disabled={csvExport.isBusy}
+          className="ml-auto flex items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-xs font-semibold text-zinc-700 hover:bg-zinc-50 transition-colors disabled:opacity-50"
         >
           <Download size={13} />
-          {t.export_csv}
+          {csvExport.isBusy ? dict.dashboard.common.exporting : t.export_csv}
         </button>
       </div>
+
+      {exportError && (
+        <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700 flex items-center justify-between">
+          <span>{exportError}</span>
+          <button className="ml-2 underline" onClick={() => setExportError(null)}>{dict.dashboard.common.close}</button>
+        </div>
+      )}
 
       {loading && (
         <div className="text-center text-xs text-zinc-400 py-4">{t.loading_data}</div>

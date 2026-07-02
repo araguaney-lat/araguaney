@@ -1,16 +1,16 @@
-import csv
-import io
 from datetime import date, timedelta
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Query, Request
-from fastapi.responses import StreamingResponse
+from fastapi import APIRouter, BackgroundTasks, Depends, Query, Request
 from sqlalchemy.orm import Session
 
+from app.arq_pool import enqueue
 from app.database import get_db
 from app.dependencies import get_current_user
 from app.models.user import User
+from app.repositories.export_job_repository import ExportJobRepository
 from app.repositories.report_repository import ReportRepository
+from app.schemas.export_job import ExportJobOut
 from app.schemas.report import (
     ActivityPoint,
     CategoryBreakdown,
@@ -130,32 +130,33 @@ def get_countries(
     return repo.countries(campaign_id, _center_scope(current_user), s, e)
 
 
-@router.get("/campaign/{campaign_id}/export.csv")
+@router.post("/campaign/{campaign_id}/export.csv", response_model=ExportJobOut, status_code=202)
 @limiter.limit("10/minute")
 def export_csv(
     request: Request,
     campaign_id: UUID,
+    background_tasks: BackgroundTasks,
     start: date | None = Query(None),
     end: date | None = Query(None),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
+    """Queue the campaign CSV export generation (rate-limited: 10/min). Poll GET /v1/exports/{id}."""
     repo = ReportRepository(db)
     _require_campaign_access(repo, current_user, campaign_id)
     s, e = _resolve_dates(start, end)
-    rows = repo.export_rows(campaign_id, _center_scope(current_user), s, e)
+    scope = _center_scope(current_user)
 
-    output = io.StringIO()
-    if rows:
-        writer = csv.DictWriter(output, fieldnames=list(rows[0].keys()))
-        writer.writeheader()
-        writer.writerows(rows)
-    else:
-        output.write("No data for the selected period.\n")
-
-    filename = f"reporte_{campaign_id}_{s}_{e}.csv"
-    return StreamingResponse(
-        iter([output.getvalue()]),
-        media_type="text/csv",
-        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    job = ExportJobRepository(db).create(
+        kind="REPORT_EXPORT_CSV",
+        params={
+            "campaign_id": str(campaign_id),
+            "center_id": str(scope) if scope else None,
+            "start": s.isoformat(),
+            "end": e.isoformat(),
+        },
+        requested_by=current_user.id,
+        center_id=scope,
     )
+    enqueue(background_tasks, "generate_report_export_csv_task", str(job.id))
+    return ExportJobOut(id=job.id, kind=job.kind, status=job.status, error=None)

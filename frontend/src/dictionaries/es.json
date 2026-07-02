@@ -145,7 +145,8 @@
       "no_events": "Sin eventos registrados.",
       "add": "Agregar",
       "all": "Todos",
-      "empty_placeholder": "—"
+      "empty_placeholder": "—",
+      "exporting": "Generando…"
     },
     "home": {
       "title": "Panel de control",

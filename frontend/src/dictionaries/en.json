@@ -145,7 +145,8 @@
       "no_events": "No events recorded.",
       "add": "Add",
       "all": "All",
-      "empty_placeholder": "—"
+      "empty_placeholder": "—",
+      "exporting": "Generating…"
     },
     "home": {
       "title": "Control panel",
