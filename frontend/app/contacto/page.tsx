@@ -32,8 +32,8 @@ export default function ContactoPage() {
         <div className="hidden md:flex items-center gap-[30px]">
           {[
             { href: "/", label: "Inicio" },
-            { href: "/por-que-araguaney", label: "Por qué Araguaney" },
-            { href: "/estandares", label: "Estándares" },
+            { href: "/#por-que", label: "Por qué Araguaney" },
+            { href: "/#estandares", label: "Estándares" },
             { href: "/contacto", label: "Contacto", active: true },
           ].map((l) => (
             <Link key={l.href} href={l.href}

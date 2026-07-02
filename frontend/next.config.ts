@@ -27,6 +27,11 @@ const nextConfig: NextConfig = {
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }]
   },
+  experimental: {
+    // Default Server Action body limit is 1MB — too small for avatar photo uploads
+    // (matches the 5MB cap enforced server-side in ProfileService.upload_avatar).
+    serverActions: { bodySizeLimit: "5mb" },
+  },
   images: {
     remotePatterns: [
       {
