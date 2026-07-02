@@ -2,7 +2,14 @@ import { ImageResponse } from "next/og"
 import { apiFetch } from "@/lib/api"
 import type { PublicNeedsOut } from "@/types"
 
-export const revalidate = 300
+// Force request-time rendering instead of build-time static generation.
+// This route fetches the backend during `next build`'s static-generation
+// pass, and doing so alongside /necesidades/page's own build-time fetch in
+// the same route segment caused the Vercel build to hang for 60s x 3
+// attempts and fail (same failure mode fixed for app/sitemap.ts). Social
+// crawlers fetching this on-demand at request time is a fine tradeoff for
+// an image that's only ever requested when a link is shared.
+export const dynamic = "force-dynamic"
 export const alt = "Qué falta — Inventario de ayuda humanitaria en tiempo real"
 export const size = { width: 1200, height: 630 }
 export const contentType = "image/png"
@@ -23,6 +30,7 @@ export default async function Image() {
   try {
     data = await apiFetch<PublicNeedsOut>("/v1/public/needs", {
       next: { revalidate: 300, tags: ["public-needs"] },
+      signal: AbortSignal.timeout(5000),
     })
   } catch {
     data = null
