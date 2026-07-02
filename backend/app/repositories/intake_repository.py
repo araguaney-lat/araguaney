@@ -37,6 +37,7 @@ class IntakeRepository(TenantRepository[Intake]):
 
     def save_box(self, box: Box) -> Box:
         self.db.add(box)
+        self.db.flush()  # populate box.id — callers build a BoxEvent referencing it right after
         return box
 
     def commit(self) -> None:

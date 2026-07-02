@@ -3,7 +3,7 @@ from uuid import UUID
 
 from pydantic import field_validator
 
-from app.schemas._base import StrictModel, StrictORMModel
+from app.schemas._base import StrictModel, StrictORMModel, StrictUUID
 from app.utils.r2 import ALLOWED_CONTENT_TYPES, MAX_FILE_SIZE_BYTES, MAX_FILES_PER_MESSAGE
 
 
@@ -49,8 +49,8 @@ class ConfirmAttachmentRequest(StrictModel):
     filename: str
     content_type: str
     size_bytes: int
-    thread_id: UUID | None = None
-    reply_id: UUID | None = None
+    thread_id: StrictUUID | None = None
+    reply_id: StrictUUID | None = None
 
 
 class AttachmentOut(StrictORMModel):
@@ -65,8 +65,8 @@ class ThreadCreate(StrictModel):
     title: str
     body: str
     thread_type: str
-    campaign_id: UUID
-    recipient_ids: list[UUID] = []
+    campaign_id: StrictUUID
+    recipient_ids: list[StrictUUID] = []
 
     @field_validator("thread_type")
     @classmethod

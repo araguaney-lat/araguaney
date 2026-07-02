@@ -5,7 +5,7 @@ from uuid import UUID
 
 from pydantic import field_validator
 
-from app.schemas._base import StrictModel, StrictORMModel
+from app.schemas._base import StrictModel, StrictORMModel, StrictUUID, StrictDate, StrictDecimal
 
 _CC_RE = re.compile(r"^[A-Z]{2}$")
 
@@ -20,8 +20,8 @@ class CampaignCreate(StrictModel):
     name: str
     destination_country: str | None = None
     description: str | None = None
-    start_date: date | None = None
-    end_date: date | None = None
+    start_date: StrictDate | None = None
+    end_date: StrictDate | None = None
 
     @field_validator("destination_country")
     @classmethod
@@ -33,10 +33,10 @@ class CampaignUpdate(StrictModel):
     name: str | None = None
     destination_country: str | None = None
     description: str | None = None
-    start_date: date | None = None
-    end_date: date | None = None
+    start_date: StrictDate | None = None
+    end_date: StrictDate | None = None
     is_active: bool | None = None
-    weight_goal_kg: Decimal | None = None
+    weight_goal_kg: StrictDecimal | None = None
 
     @field_validator("destination_country")
     @classmethod
@@ -59,7 +59,7 @@ class CampaignOut(StrictORMModel):
 
 
 class CampaignMemberAdd(StrictModel):
-    user_id: UUID
+    user_id: StrictUUID
 
 
 class CampaignMemberOut(StrictORMModel):

@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Any
 from uuid import UUID
 
-from app.schemas._base import StrictModel, StrictORMModel
+from app.schemas._base import StrictModel, StrictORMModel, StrictUUID
 
 
 # ── Audit ─────────────────────────────────────────────────────────────────────
@@ -31,13 +31,13 @@ class StudioUserCreate(StrictModel):
     email: str
     username: str
     full_name: str | None = None
-    center_id: UUID | None = None
+    center_id: StrictUUID | None = None
     center_role: str = "volunteer"
     password: str | None = None  # if None, a random temp password is generated
 
 
 class StudioUserPatch(StrictModel):
-    center_id: UUID | None = None
+    center_id: StrictUUID | None = None
     center_role: str | None = None
     is_active: bool | None = None
     full_name: str | None = None

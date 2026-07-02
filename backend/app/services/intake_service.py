@@ -89,7 +89,7 @@ class IntakeService(BaseService):
             saved_boxes.append(box)
 
             event = BoxEvent(
-                box_id=box.id if box.id else None,
+                box_id=box.id,
                 user_id=user_id,
                 from_status=None,
                 to_status=status,
