@@ -2,20 +2,20 @@ from datetime import date, datetime
 from decimal import Decimal
 from uuid import UUID
 
-from app.schemas._base import StrictModel, StrictORMModel
+from app.schemas._base import StrictModel, StrictORMModel, StrictUUID, StrictDate, StrictDecimal
 
 
 class BoxDraft(StrictModel):
-    product_type_id: UUID
+    product_type_id: StrictUUID
     quantity: int
     unit: str
     batch: str | None = None
-    expiry_date: date | None = None
-    weight_kg: Decimal | None = None
+    expiry_date: StrictDate | None = None
+    weight_kg: StrictDecimal | None = None
 
 
 class IntakeCreate(StrictModel):
-    campaign_id: UUID | None = None
+    campaign_id: StrictUUID | None = None
     donante_libre: str | None = None
     notes: str | None = None
     boxes: list[BoxDraft]

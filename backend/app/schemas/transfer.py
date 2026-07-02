@@ -1,14 +1,14 @@
 from datetime import datetime
 from uuid import UUID
 
-from app.schemas._base import StrictModel, StrictORMModel
+from app.schemas._base import StrictModel, StrictORMModel, StrictUUID
 from app.schemas.box import BoxOut
 
 
 class TransferCreate(StrictModel):
-    from_center_id: UUID
-    to_center_id: UUID
-    box_ids: list[UUID]
+    from_center_id: StrictUUID
+    to_center_id: StrictUUID
+    box_ids: list[StrictUUID]
     notes: str | None = None
 
 

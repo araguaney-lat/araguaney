@@ -1,12 +1,12 @@
 from datetime import datetime
 from uuid import UUID
 
-from app.schemas._base import StrictModel, StrictORMModel
+from app.schemas._base import StrictModel, StrictORMModel, StrictUUID
 from app.schemas.pallet import PalletDetailOut
 
 
 class ShipmentCreate(StrictModel):
-    campaign_id: UUID | None = None
+    campaign_id: StrictUUID | None = None
     destination: str = "Venezuela"
     carrier: str | None = None
     reference: str | None = None

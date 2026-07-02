@@ -2,13 +2,13 @@ from datetime import datetime
 from decimal import Decimal
 from uuid import UUID
 
-from app.schemas._base import StrictModel, StrictORMModel
+from app.schemas._base import StrictModel, StrictORMModel, StrictDecimal
 from app.schemas.box import BoxOut
 
 
 class PalletCreate(StrictModel):
     notes: str | None = None
-    tare_weight_kg: Decimal | None = None
+    tare_weight_kg: StrictDecimal | None = None
 
 
 class PalletOut(StrictORMModel):
