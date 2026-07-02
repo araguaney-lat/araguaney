@@ -38,7 +38,10 @@ export default function BoxPublicFichaPage() {
   const [box, setBox] = useState<BoxPublicOut | null>(null)
   const [turnstileKey, setTurnstileKey] = useState(0)
 
-  const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!
+  // .trim() guards against a trailing newline in the env var value (a common
+  // paste artifact in dashboard UIs) — Turnstile throws an uncaught error on
+  // an invalid sitekey, which breaks rendering for the rest of the page.
+  const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!.trim()
   const publicApiUrl = process.env.NEXT_PUBLIC_API_URL ?? ""
 
   async function handleVerify(token: string) {
