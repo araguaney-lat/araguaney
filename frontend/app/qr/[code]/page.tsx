@@ -148,7 +148,7 @@ export default async function QrFichaPage({
       <div className="mx-auto max-w-lg px-4 py-8">
         {/* Header */}
         <div className="mb-6">
-          <p className="text-xs text-zinc-400 font-mono mb-1">{ficha.code}</p>
+          <p className="text-xs text-zinc-500 font-mono mb-1">{ficha.code}</p>
           <div className="flex items-center gap-3">
             <h1 className="text-2xl font-bold text-zinc-900 leading-tight">
               {ficha.kind === "box" ? ficha.display_name : `Tarima ${ficha.code}`}
@@ -197,7 +197,7 @@ function BoxSection({ ficha }: { ficha: BoxFicha }) {
       {/* Product details */}
       <section className="rounded-xl border border-zinc-200 bg-white divide-y divide-zinc-100 mb-4">
         <div className="px-4 py-3">
-          <p className="text-xs font-semibold text-zinc-400 uppercase tracking-wide">Producto</p>
+          <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wide">Producto</p>
         </div>
         <div className="px-4">
           <Row label="Categoría" value={CATEGORY_LABELS[ficha.category] ?? ficha.category} />
@@ -210,7 +210,7 @@ function BoxSection({ ficha }: { ficha: BoxFicha }) {
       {/* Lot / expiry */}
       <section className="rounded-xl border border-zinc-200 bg-white divide-y divide-zinc-100 mb-4">
         <div className="px-4 py-3">
-          <p className="text-xs font-semibold text-zinc-400 uppercase tracking-wide">Lote y caducidad</p>
+          <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wide">Lote y caducidad</p>
         </div>
         <div className="px-4">
           <Row label="Lote" value={ficha.batch} />
@@ -232,7 +232,7 @@ function BoxSection({ ficha }: { ficha: BoxFicha }) {
       {/* Quantity & weight */}
       <section className="rounded-xl border border-zinc-200 bg-white divide-y divide-zinc-100 mb-4">
         <div className="px-4 py-3">
-          <p className="text-xs font-semibold text-zinc-400 uppercase tracking-wide">Cantidad y peso</p>
+          <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wide">Cantidad y peso</p>
         </div>
         <div className="px-4">
           <Row label="Cantidad" value={`${ficha.quantity} ${ficha.unit}`} />
@@ -243,7 +243,7 @@ function BoxSection({ ficha }: { ficha: BoxFicha }) {
       {/* Context */}
       <section className="rounded-xl border border-zinc-200 bg-white divide-y divide-zinc-100">
         <div className="px-4 py-3">
-          <p className="text-xs font-semibold text-zinc-400 uppercase tracking-wide">Origen</p>
+          <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wide">Origen</p>
         </div>
         <div className="px-4">
           <Row label="Centro" value={ficha.center_name} />
@@ -272,7 +272,7 @@ function PalletSection({ ficha }: { ficha: PalletFicha }) {
       {/* Summary */}
       <section className="rounded-xl border border-zinc-200 bg-white divide-y divide-zinc-100 mb-4">
         <div className="px-4 py-3">
-          <p className="text-xs font-semibold text-zinc-400 uppercase tracking-wide">Resumen</p>
+          <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wide">Resumen</p>
         </div>
         <div className="px-4">
           <Row label="Centro" value={ficha.center_name} />
@@ -297,7 +297,7 @@ function PalletSection({ ficha }: { ficha: PalletFicha }) {
       {ficha.boxes.length > 0 && (
         <section className="rounded-xl border border-zinc-200 bg-white overflow-hidden">
           <div className="px-4 py-3 border-b border-zinc-100">
-            <p className="text-xs font-semibold text-zinc-400 uppercase tracking-wide">
+            <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wide">
               Contenido ({ficha.boxes.length} cajas)
             </p>
           </div>
@@ -306,7 +306,7 @@ function PalletSection({ ficha }: { ficha: PalletFicha }) {
               <li key={i} className="flex items-center justify-between px-4 py-3 gap-2">
                 <div className="min-w-0">
                   <p className="text-sm font-medium text-zinc-900 truncate">{b.display_name}</p>
-                  <p className="text-xs text-zinc-400">
+                  <p className="text-xs text-zinc-500">
                     {CATEGORY_LABELS[b.category] ?? b.category}
                   </p>
                 </div>
@@ -314,7 +314,7 @@ function PalletSection({ ficha }: { ficha: PalletFicha }) {
                   <p className="text-sm font-medium text-zinc-900">
                     {b.quantity} {b.unit}
                   </p>
-                  <p className="text-xs text-zinc-400">{fmt(b.weight_kg)}</p>
+                  <p className="text-xs text-zinc-500">{fmt(b.weight_kg)}</p>
                 </div>
               </li>
             ))}

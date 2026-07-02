@@ -86,14 +86,14 @@ export default async function HomePage() {
               gap: 7,
               letterSpacing: "0.1em",
               textTransform: "uppercase",
-              color: "#B07D00",
+              color: "#946A00",
               fontWeight: 700,
               marginBottom: 16,
             }}
           >
             <span
               className="w-[18px] md:w-[24px]"
-              style={{ height: 1.5, background: "#E0A100" }}
+              style={{ height: 1.5, background: "#906400" }}
             />
             <span className="hidden md:inline">{dict.hero.eyebrow_desktop}</span>
             <span className="md:hidden">{dict.hero.eyebrow_mobile}</span>
@@ -165,7 +165,7 @@ export default async function HomePage() {
               style={{
                 letterSpacing: "0.1em",
                 textTransform: "uppercase",
-                color: "#9A9081",
+                color: "#6E6557",
                 marginBottom: 8,
                 fontWeight: 700,
               }}
@@ -216,6 +216,7 @@ export default async function HomePage() {
             width={400}
             height={400}
             priority
+            sizes="(min-width: 768px) 400px, 240px"
             className="w-[240px] md:w-[400px] max-w-full"
             style={{
               position: "relative",
@@ -244,7 +245,7 @@ export default async function HomePage() {
           </h2>
           <span
             className="hidden md:inline"
-            style={{ fontSize: 13.5, color: "#8A8073" }}
+            style={{ fontSize: 13.5, color: "#6E6557" }}
           >
             {dict.steps.subtitle}
           </span>
@@ -266,7 +267,7 @@ export default async function HomePage() {
                 style={{
                   fontFamily: "var(--font-source-serif)",
                   fontSize: 26,
-                  color: "#E0A100",
+                  color: "#906400",
                   fontWeight: 600,
                 }}
               >
@@ -297,7 +298,7 @@ export default async function HomePage() {
                 style={{
                   fontFamily: "var(--font-source-serif)",
                   fontSize: 20,
-                  color: "#E0A100",
+                  color: "#906400",
                   fontWeight: 600,
                   flexShrink: 0,
                 }}
@@ -345,11 +346,11 @@ export default async function HomePage() {
               gap: 7,
               letterSpacing: "0.1em",
               textTransform: "uppercase",
-              color: "#B07D00",
+              color: "#946A00",
               fontWeight: 700,
             }}
           >
-            <span style={{ width: 18, height: 1.5, background: "#E0A100", display: "inline-block" }} />
+            <span style={{ width: 18, height: 1.5, background: "#906400", display: "inline-block" }} />
             {dict.why.heading}
           </div>
 
@@ -438,11 +439,11 @@ export default async function HomePage() {
               gap: 7,
               letterSpacing: "0.1em",
               textTransform: "uppercase",
-              color: "#B07D00",
+              color: "#946A00",
               fontWeight: 700,
             }}
           >
-            <span style={{ width: 18, height: 1.5, background: "#E0A100", display: "inline-block" }} />
+            <span style={{ width: 18, height: 1.5, background: "#906400", display: "inline-block" }} />
             {dict.standards.heading}
           </div>
 

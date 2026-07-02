@@ -24,7 +24,7 @@ export default function LoginPage() {
     <div style={{ minHeight: "100vh" }} className="flex flex-col md:grid md:grid-cols-2">
 
       {/* Brand panel */}
-      <div style={{ background: "linear-gradient(160deg,#F3C033,#E0A100 60%,#C98A00)", position: "relative", overflow: "hidden" }}
+      <div style={{ background: "linear-gradient(160deg,#F3C033,#906400 60%,#C98A00)", position: "relative", overflow: "hidden" }}
         className="flex flex-col items-center justify-center text-center px-6 py-[44px] md:py-[54px] md:px-[50px] md:items-start md:text-left md:justify-between">
         <div style={{ position: "absolute", right: -60, bottom: -60, width: 360, height: 360, borderRadius: "50%", background: "rgba(255,255,255,.16)" }}
           className="hidden md:block" />
@@ -33,7 +33,7 @@ export default function LoginPage() {
           className="justify-center md:justify-start">
           <span style={{ width: 40, height: 40, borderRadius: "50%", background: "#fff" }}
             className="flex items-center justify-center overflow-hidden flex-none">
-            <Image src={LOGO} alt="Araguaney" width={36} height={36} className="object-contain" />
+            <Image src={LOGO} alt="" width={36} height={36} className="object-contain" />
           </span>
           <span style={{ fontFamily: "var(--font-source-serif)", fontSize: 22, fontWeight: 600, color: "#3B2A00" }}>
             Araguaney
