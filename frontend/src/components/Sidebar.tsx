@@ -23,7 +23,6 @@ import {
   UserCog,
   ScrollText,
   BarChart2,
-  Settings,
   LogOut,
   PanelLeftClose,
   PanelLeftOpen,
@@ -250,17 +249,12 @@ export function Sidebar({ centerRole, platformRole, centerName, nav, roleLabels,
             className="text-violet-600 hover:bg-violet-50 hover:text-violet-700 data-[active=true]:bg-violet-50 data-[active=true]:text-violet-700"
           />
         )}
-        <NavLink
-          href="/dashboard/settings"
-          label={nav.settings}
-          icon={<Settings size={17} />}
-          isActive={pathname.startsWith("/dashboard/settings")}
-          collapsed={collapsed}
-        />
-
-        {/* User info */}
+        {/* User info — links to profile/settings */}
         {(userName || userEmail) && (
-          <div className={`flex items-center gap-2.5 rounded-lg px-2.5 py-2 ${collapsed ? "justify-center" : ""}`}
+          <Link
+            href="/dashboard/settings"
+            data-active={pathname.startsWith("/dashboard/settings")}
+            className={`flex items-center gap-2.5 rounded-lg px-2.5 py-2 transition-colors hover:bg-amber-100 data-[active=true]:bg-amber-200/70 ${collapsed ? "justify-center" : ""}`}
             title={collapsed ? `${userName ?? userEmail}${centerRole ? ` · ${roleLabels[centerRole as keyof DashboardRoleLabels] ?? centerRole}` : ""}` : undefined}
           >
             <span className="flex-shrink-0 flex h-7 w-7 items-center justify-center rounded-full bg-amber-300 text-xs font-bold text-amber-900">
@@ -276,7 +270,7 @@ export function Sidebar({ centerRole, platformRole, centerName, nav, roleLabels,
                 )}
               </div>
             )}
-          </div>
+          </Link>
         )}
 
         <form action={logoutAction}>
