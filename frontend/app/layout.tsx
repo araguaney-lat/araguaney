@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import { Hanken_Grotesk, Source_Serif_4 } from "next/font/google"
 import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistration"
+import { GoogleAnalytics } from "@/components/GoogleAnalytics"
 import { getLocale, getDictionary } from "@/lib/i18n"
 import { SITE_URL } from "@/lib/seo"
 import "./globals.css"
@@ -51,6 +52,9 @@ export async function generateMetadata(): Promise<Metadata> {
       description: site_description,
       images: [OG_IMAGE],
     },
+    verification: process.env.GOOGLE_SITE_VERIFICATION
+      ? { google: process.env.GOOGLE_SITE_VERIFICATION }
+      : undefined,
   }
 }
 
@@ -67,6 +71,7 @@ export default async function RootLayout({
       <body className="min-h-full flex flex-col">
         {children}
         <ServiceWorkerRegistration />
+        <GoogleAnalytics />
       </body>
     </html>
   )

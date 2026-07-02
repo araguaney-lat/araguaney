@@ -3,6 +3,7 @@ import Link from "next/link"
 import type { Metadata } from "next"
 import HomeNav from "@/components/HomeNav"
 import HomeFooter from "@/components/HomeFooter"
+import { CtaLink } from "@/components/CtaLink"
 import { getLocale, getDictionary } from "@/lib/i18n"
 import { SITE_URL } from "@/lib/seo"
 
@@ -123,8 +124,9 @@ export default async function HomePage() {
 
           {/* CTAs */}
           <div className="flex flex-col md:flex-row gap-[10px] md:gap-[13px] mt-[22px] md:mt-8">
-            <Link
+            <CtaLink
               href="/login"
+              ctaLabel="home_hero"
               className="flex items-center justify-center px-[26px] py-[14px]"
               style={{
                 background: "#1F5E8C",
@@ -136,7 +138,7 @@ export default async function HomePage() {
               }}
             >
               {dict.hero.cta_login}
-            </Link>
+            </CtaLink>
             <Link
               href="#por-que"
               className="flex items-center justify-center px-6 py-[14px]"
