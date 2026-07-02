@@ -69,6 +69,8 @@
 | 13 | Auditar N+1 en servicios | Revisión periódica de loops que llaman repos por ítem. Preferir `selectinload`/`joinedload` o batch. Confirmar patrón `pt_cache` replicado donde aplique. | 🟡 | ⬜ Pendiente |
 | 14 | Uso de caché (Redis) en lecturas caras | Verificar que las lecturas públicas cacheables (ficha QR, panel "qué falta") usen `app.utils.cache`. Medir hit rate. | 🟡 | ⬜ Pendiente |
 | 15 | Paginación en listados sin límite | Confirmar que todo listado tenga `LIMIT`/paginación (evitar unbounded queries). | 🟡 | ⬜ Pendiente |
+| 15b | Email de invitación de usuario — no implementado | **Urgente.** `send_invitation_email_task` está referenciado solo como `# TODO: enqueue send_invitation_email_task(...)` en `routers/users.py` (crear usuario y reinvitar) — la función ni existe en `worker.py`. El flujo documentado en CLAUDE.md §6 ("Admin crea usuario → sistema genera clave temporal → envía email de invitación") está roto: el admin crea el usuario, pero el email con la clave temporal nunca se envía. Implementar la tarea ARQ (seguir el patrón de `send_transfer_created_email_task`) + registrar en `WorkerSettings.functions` + reemplazar los 2 TODOs en `users.py`. | 🔴 | ⬜ Pendiente |
+| 15c | Encolar PDF/export en ARQ | Los 6 endpoints de generación de archivos (`shipment.py`: manifiesto PDF y XLSX; `box.py`: etiquetas de cajas; `pallet.py`: etiqueta de tarima; `transfer.py`: manifiesto de transferencia; `report.py`: export CSV) generan el archivo síncronamente dentro del request/response — contradice CLAUDE.md §10 ("PDF/export: siempre encolado en ARQ"). Mitigado hoy con rate limiting (2-10/min), pero no encolado; crece de riesgo con el volumen de cajas/pallets por envío. | 🟡 | ⬜ Pendiente |
 
 ### Grupo D — Frontend / Core Web Vitals (semilla, crecerá)
 
@@ -85,6 +87,20 @@
 | 19 | Edge cache de lecturas públicas | Verificar headers de cache en ficha QR y `/necesidades` (Cloudflare edge). Medir. | 🟡 | ⬜ Pendiente |
 | 20 | Tuning de ARQ / cola | Revisar concurrencia y timeouts de los jobs (PDF/export en lote). Evitar saturar la DB con jobs paralelos. | 🟢 | ⬜ Pendiente |
 | 21 | Tuning de PgBouncer | Revisar `pool_mode` (transaction), `default_pool_size`, `max_client_conn` según carga real. (Ya referenciado en Fase 4.) | 🟢 | ⬜ Pendiente |
+
+### Grupo F — Load testing / validación bajo carga (semilla, crecerá)
+
+> Es el mecanismo de validación de toda la fase: la Definition of Done exige medir
+> antes/después de cada optimización — esto es lo que hace esa medición real en vez
+> de una suposición.
+
+| # | Tarea | Descripción | Prioridad | Estado |
+|---|-------|-------------|-----------|--------|
+| 22 | Elegir herramienta de load testing | k6 (Grafana, gratis, scripts JS, hecho para APIs REST) vs Locust (Python, encaja con el stack del backend) vs Artillery. Elegir una, documentar setup local y cómo correrlo contra staging. | 🟡 | ⬜ Pendiente |
+| 23 | Escenario: intake + sellado de cajas | Simular N voluntarios concurrentes registrando donaciones (`POST /v1/intake`) y sellando cajas — el flujo de mayor volumen de escritura de la app. | 🟡 | ⬜ Pendiente |
+| 24 | Escenario: panel nacional / dashboard | Simular lectura concurrente en `/v1/dashboard/national` y `/v1/dashboard/weight` — las agregaciones más pesadas de la app, las que más se benefician de los índices del Grupo A. | 🟡 | ⬜ Pendiente |
+| 25 | Escenario: exports pesados | Simular varios usuarios pidiendo manifiesto PDF/CSV a la vez — valida si el rate limiting actual (o el encolado en ARQ de la tarea 15c, una vez implementado) aguanta sin saturar la DB o generar timeouts. | 🟡 | ⬜ Pendiente |
+| 26 | Baseline antes/después de índices de DB | Correr los escenarios 23-24 antes y después de aplicar los índices del Grupo A — documentar la mejora medida (p95/p99 de latencia, throughput) en el PR de los índices. Es la medición que exige la Definition of Done de esta fase. | 🔴 | ⬜ Pendiente |
 
 ---
 
