@@ -140,6 +140,13 @@ export default function LoginPage() {
             ¿Tu centro aún no usa Araguaney?<br className="md:hidden" />
             {" "}<Link href="/contacto" style={{ color: "#1F5E8C", fontWeight: 600 }}>Solicita el alta</Link>
           </p>
+
+          <p style={{ margin: "18px 0 0", fontSize: 11.5, color: "#9A907E", textAlign: "center", lineHeight: 1.6 }}>
+            Al iniciar sesión aceptas los{" "}
+            <Link href="/terminos" style={{ color: "#7A7163", fontWeight: 600, textDecoration: "underline" }}>Términos</Link>
+            {" "}y el{" "}
+            <Link href="/aviso-de-privacidad" style={{ color: "#7A7163", fontWeight: 600, textDecoration: "underline" }}>Aviso de Privacidad</Link>.
+          </p>
         </div>
       </div>
     </div>

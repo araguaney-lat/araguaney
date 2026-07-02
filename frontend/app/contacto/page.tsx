@@ -109,7 +109,11 @@ export default function ContactoPage() {
       <footer style={{ background: "#2B2723", color: "#A89E8C" }}
         className="px-5 md:px-[46px] py-6 md:py-[26px] flex justify-between flex-wrap gap-3 text-[12.5px]">
         <span style={{ fontFamily: "var(--font-source-serif)", fontSize: 16, color: "#fff", fontWeight: 600 }}>Araguaney</span>
-        <span>El estándar común · México → Venezuela</span>
+        <span className="flex items-center gap-4">
+          <Link href="/aviso-de-privacidad" style={{ color: "#E9E2D5", fontWeight: 600 }}>Aviso de Privacidad</Link>
+          <span>·</span>
+          <Link href="/terminos" style={{ color: "#E9E2D5", fontWeight: 600 }}>Términos</Link>
+        </span>
       </footer>
     </div>
   )

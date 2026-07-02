@@ -186,7 +186,7 @@ export default async function HumanitarianAidPage() {
         </p>
       </div>
 
-      <HomeFooter dict={dict.footer} />
+      <HomeFooter dict={dict.footer} locale="en" />
     </div>
   )
 }

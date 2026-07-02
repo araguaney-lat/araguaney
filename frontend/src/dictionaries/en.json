@@ -869,7 +869,9 @@
   },
   "footer": {
     "tagline": "The common standard for aid centers",
-    "privacy": "No personal data of donors or recipients. Just inventory, traceable from box to shipment."
+    "privacy": "No personal data of donors or recipients. Just inventory, traceable from box to shipment.",
+    "privacyLink": "Privacy Notice",
+    "termsLink": "Terms and Conditions"
   },
   "seo": {
     "site_title": "Araguaney — Donation Center & Humanitarian Aid Software",
