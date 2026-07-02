@@ -1,4 +1,5 @@
 import logging
+import secrets
 import sys
 from contextlib import asynccontextmanager
 
@@ -17,7 +18,7 @@ from starlette.middleware.gzip import GZipMiddleware
 from uvicorn.middleware.proxy_headers import ProxyHeadersMiddleware
 
 from app.config import settings
-from app.utils.cloudflare import get_client_ip, is_cloudflare_ip
+from app.utils.cloudflare import get_client_ip
 from app.utils.rate_limit import limiter
 
 # ── Routers ────────────────────────────────────────────────────────────────────
@@ -103,21 +104,29 @@ class RLSContextMiddleware(BaseHTTPMiddleware):
         return await call_next(request)
 
 
+_CF_AUTH_HEADER = "X-Origin-Auth"
+
+
 class CloudflareOnlyMiddleware(BaseHTTPMiddleware):
     """Block requests that did not pass through Cloudflare.
 
     Only active when CLOUDFLARE_ONLY=true. The /health endpoint is always allowed.
-    Runs BEFORE ProxyHeadersMiddleware so request.client.host is the raw TCP IP
-    (the actual connecting peer), which is validated against Cloudflare's published ranges.
+
+    Validates a shared secret (CLOUDFLARE_SHARED_SECRET) sent via the
+    X-Origin-Auth header, which a Cloudflare Transform Rule injects on every
+    request before it reaches the origin. This does NOT check request.client.host:
+    on platforms where a proxy sits between Cloudflare and the app (e.g. Railway),
+    the raw TCP peer is the platform's own internal proxy, never Cloudflare's edge
+    IP — checking it there blocks 100% of traffic unconditionally, including login.
     """
 
     async def dispatch(self, request: Request, call_next) -> Response:
         if not settings.cloudflare_only or request.url.path == "/health":
             return await call_next(request)
 
-        tcp_ip = request.client.host if request.client else None
-        if not tcp_ip or not is_cloudflare_ip(tcp_ip):
-            logger.warning("Blocked non-Cloudflare TCP IP %s on %s", tcp_ip, request.url.path)
+        provided = request.headers.get(_CF_AUTH_HEADER, "")
+        if not provided or not secrets.compare_digest(provided, settings.cloudflare_shared_secret):
+            logger.warning("Blocked request missing/invalid %s on %s", _CF_AUTH_HEADER, request.url.path)
             return Response(content="Forbidden", status_code=403)
 
         return await call_next(request)
@@ -139,6 +148,13 @@ if settings.sentry_dsn:
 if len(settings.secret_key.encode()) < 32:
     raise ValueError(
         "SECRET_KEY is too short — minimum 32 bytes required. "
+        "Generate one with: python -c \"import secrets; print(secrets.token_hex(32))\""
+    )
+
+if settings.cloudflare_only and not settings.cloudflare_shared_secret:
+    raise ValueError(
+        "CLOUDFLARE_ONLY=true requires CLOUDFLARE_SHARED_SECRET to be set — "
+        "otherwise every request is blocked (see .env.example for setup). "
         "Generate one with: python -c \"import secrets; print(secrets.token_hex(32))\""
     )
 

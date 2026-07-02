@@ -244,7 +244,10 @@ tiene un solo `batch` y una sola `expiry_date`. Si llega mezcla → se divide en
 ## 9. Seguridad y protección DDoS/EDoS
 
 1. Cloudflare delante de todo (plan Free): DDoS + WAF + rate limiting.
-2. **Activar Cloudflare-only mode** en backend (`CLOUDFLARE_ONLY=true`).
+2. **Activar Cloudflare-only mode** en backend (`CLOUDFLARE_ONLY=true`). Requiere
+   `CLOUDFLARE_SHARED_SECRET` + una Transform Rule en Cloudflare (ver `.env.example`)
+   — el chequeo valida un header secreto, **no** el IP del TCP peer, porque en Railway
+   ese peer es siempre el proxy interno de Railway, nunca el edge de Cloudflare.
 3. Vercel WAF + rate limiting en el front.
 4. **Turnstile** (gratis) en formularios públicos de escritura.
 5. **Cache en el edge** de toda lectura pública (ficha QR, panel "qué falta").
