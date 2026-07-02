@@ -19,8 +19,15 @@ from app.models.intake import Intake
 from app.models.user import User
 from app.repositories.aggregate_repository import AggregateRepository
 from app.repositories.box_repository import BoxRepository
+from app.repositories.campaign_repository import CampaignRepository
 from app.repositories.pallet_repository import PalletRepository
-from app.schemas.aggregate import NationalDashboardOut, PublicNeedsOut, WeightDashboardOut
+from app.schemas.aggregate import (
+    NationalDashboardOut,
+    PublicCampaignListItemOut,
+    PublicCampaignOut,
+    PublicNeedsOut,
+    WeightDashboardOut,
+)
 from app.schemas.qr_ficha import QrBoxFicha, QrEventOut, QrPalletBoxRow, QrPalletFicha
 from app.utils import cache
 from app.utils.errors import api_error
@@ -244,6 +251,83 @@ def public_needs(
 
     repo = AggregateRepository(db)
     payload = PublicNeedsOut(by_category=repo.needed_by_category())
+    serialized = payload.model_dump_json()
+    cache.set(cache_key, serialized, ttl=_PUBLIC_TTL)
+    return JSONResponse(
+        content=json.loads(serialized),
+        headers={"Cache-Control": f"public, max-age={_PUBLIC_TTL}, stale-while-revalidate=60"},
+    )
+
+
+# ── Public campaigns (event landing pages) ────────────────────────────────────
+
+@router.get("/public/campaigns", response_model=list[PublicCampaignListItemOut])
+@limiter.limit("60/minute")
+def public_campaigns(
+    request: Request,
+    db: Session = Depends(get_db),
+):
+    """Active, non-general campaigns — safe for public listing (sitemap, event links).
+
+    No PII, no operational data. Feeds sitemap.xml and internal linking on the frontend.
+    """
+    cache_key = "public:campaigns"
+    cached = cache.get(cache_key)
+    if cached:
+        return JSONResponse(
+            content=json.loads(cached),
+            headers={"Cache-Control": f"public, max-age={_PUBLIC_TTL}, stale-while-revalidate=60"},
+        )
+
+    campaigns = CampaignRepository(db).find_public_active()
+    payload = [
+        PublicCampaignListItemOut(
+            slug=c.slug, name=c.name, destination_country=c.destination_country
+        )
+        for c in campaigns
+    ]
+    serialized = json.dumps([p.model_dump() for p in payload])
+    cache.set(cache_key, serialized, ttl=_PUBLIC_TTL)
+    return JSONResponse(
+        content=json.loads(serialized),
+        headers={"Cache-Control": f"public, max-age={_PUBLIC_TTL}, stale-while-revalidate=60"},
+    )
+
+
+@router.get("/public/campaigns/{slug}", response_model=PublicCampaignOut)
+@limiter.limit("60/minute")
+def public_campaign_detail(
+    request: Request,
+    slug: str,
+    db: Session = Depends(get_db),
+):
+    """Event landing page data: campaign context + what's needed for it.
+
+    Only active, non-general campaigns are exposed — draft/inactive/general
+    campaigns 404 here even if the slug exists.
+    """
+    cache_key = f"public:campaign:{slug}"
+    cached = cache.get(cache_key)
+    if cached:
+        return JSONResponse(
+            content=json.loads(cached),
+            headers={"Cache-Control": f"public, max-age={_PUBLIC_TTL}, stale-while-revalidate=60"},
+        )
+
+    campaign = CampaignRepository(db).find_by_slug(slug)
+    if not campaign or not campaign.is_active or campaign.is_general:
+        raise api_error("NOT_FOUND", "Campaign not found", status_code=404)
+
+    repo = AggregateRepository(db)
+    payload = PublicCampaignOut(
+        slug=campaign.slug,
+        name=campaign.name,
+        description=campaign.description,
+        destination_country=campaign.destination_country,
+        start_date=campaign.start_date,
+        end_date=campaign.end_date,
+        by_category=repo.needed_by_category(campaign_id=campaign.id),
+    )
     serialized = payload.model_dump_json()
     cache.set(cache_key, serialized, ttl=_PUBLIC_TTL)
     return JSONResponse(

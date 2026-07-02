@@ -1,12 +1,36 @@
 import type { MetadataRoute } from "next"
+import { apiFetch } from "@/lib/api"
 import { SITE_URL } from "@/lib/seo"
+import type { PublicCampaignListItem } from "@/types"
 
-// Campaign landing pages and QR fichas are not yet listed here: there is no
-// public listing endpoint to enumerate them (see backend/app/routers/dashboard.py
-// public/* routes, which are lookup-by-code/campaign only). Add them once a
-// public listing endpoint exists (tracked in phase-11 Group A/C).
-export default function sitemap(): MetadataRoute.Sitemap {
+// Force this route to render at request time instead of during `next build`.
+// The build's static-generation worker hung for 60s x 3 attempts trying to
+// reach the backend for /v1/public/campaigns — even with an AbortSignal
+// timeout on the fetch — and failed the whole Vercel deployment. Whatever the
+// exact cause (build sandbox network restrictions, DNS-level hang below where
+// AbortSignal can intervene), the fix is to not attempt this fetch during the
+// build at all. At request time in the deployed serverless function, normal
+// network egress applies and this behaves like any other dynamic route.
+export const dynamic = "force-dynamic"
+
+// QR fichas are not listed here: there is no public listing endpoint to
+// enumerate box/pallet codes (backend/app/routers/dashboard.py's public/qr/{code}
+// route is lookup-by-code only, by design — codes aren't meant to be enumerable).
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date()
+
+  // Still keep a fetch-level timeout as defense-in-depth for the deployed
+  // runtime — a slow/unreachable backend at request time should degrade to
+  // the static-only sitemap instead of hanging the response.
+  let campaigns: PublicCampaignListItem[] = []
+  try {
+    campaigns = await apiFetch<PublicCampaignListItem[]>("/v1/public/campaigns", {
+      next: { revalidate: 300 },
+      signal: AbortSignal.timeout(5000),
+    })
+  } catch {
+    campaigns = []
+  }
 
   return [
     { url: SITE_URL, lastModified: now, changeFrequency: "weekly", priority: 1 },
@@ -35,10 +59,34 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     },
     {
+      url: `${SITE_URL}/guias/como-organizar-un-centro-de-acopio`,
+      lastModified: now,
+      changeFrequency: "yearly",
+      priority: 0.6,
+    },
+    {
+      url: `${SITE_URL}/guias/que-se-puede-donar`,
+      lastModified: now,
+      changeFrequency: "yearly",
+      priority: 0.6,
+    },
+    {
+      url: `${SITE_URL}/guias/como-preparar-carga-humanitaria-para-aduana`,
+      lastModified: now,
+      changeFrequency: "yearly",
+      priority: 0.6,
+    },
+    {
       url: `${SITE_URL}/contacto`,
       lastModified: now,
       changeFrequency: "monthly",
       priority: 0.3,
     },
+    ...campaigns.map((c) => ({
+      url: `${SITE_URL}/eventos/${c.slug}`,
+      lastModified: now,
+      changeFrequency: "daily" as const,
+      priority: 0.85,
+    })),
   ]
 }

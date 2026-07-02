@@ -47,6 +47,7 @@ class CampaignUpdate(StrictModel):
 class CampaignOut(StrictORMModel):
     id: UUID
     name: str
+    slug: str | None
     destination_country: str | None
     description: str | None
     start_date: date | None

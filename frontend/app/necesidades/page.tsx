@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import Link from "next/link"
 import { apiFetch } from "@/lib/api"
 import { getLocale, getDictionary } from "@/lib/i18n"
 import type { PublicNeedsOut } from "@/types"
@@ -96,7 +97,13 @@ export default async function NecesidadesPage() {
           </div>
         )}
 
-        <p className="mt-8 text-center text-xs text-zinc-400">
+        <p className="mt-6 text-center text-sm">
+          <Link href="/guias/que-se-puede-donar" className="text-blue-600 font-medium hover:text-blue-800">
+            ¿Qué se puede donar? →
+          </Link>
+        </p>
+
+        <p className="mt-4 text-center text-xs text-zinc-400">
           Esta página es pública y no contiene información personal.
         </p>
       </div>

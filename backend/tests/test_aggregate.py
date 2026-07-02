@@ -12,6 +12,8 @@ from app.schemas.aggregate import (
     CenterStockOut,
     InnStockOut,
     NationalDashboardOut,
+    PublicCampaignListItemOut,
+    PublicCampaignOut,
     PublicNeedsOut,
     SummaryTotalsOut,
 )
@@ -104,6 +106,45 @@ class TestPublicNeedsOut:
         assert len(out.by_category) == 2
 
 
+class TestPublicCampaignListItemOut:
+    def test_valid(self):
+        out = PublicCampaignListItemOut(
+            slug="operacion-venezuela", name="Operación Venezuela", destination_country="VE"
+        )
+        assert out.slug == "operacion-venezuela"
+
+    def test_nullable_destination(self):
+        out = PublicCampaignListItemOut(slug="ayuda", name="Ayuda", destination_country=None)
+        assert out.destination_country is None
+
+
+class TestPublicCampaignOut:
+    def test_full(self):
+        out = PublicCampaignOut(
+            slug="operacion-venezuela",
+            name="Operación Venezuela",
+            description="Terremoto norte de Venezuela",
+            destination_country="VE",
+            start_date=None,
+            end_date=None,
+            by_category=[CategoryStockOut(category="MEDICINE", total_units=50, box_count=5)],
+        )
+        assert out.slug == "operacion-venezuela"
+        assert len(out.by_category) == 1
+
+    def test_empty_needs(self):
+        out = PublicCampaignOut(
+            slug="ayuda",
+            name="Ayuda",
+            description=None,
+            destination_country=None,
+            start_date=None,
+            end_date=None,
+            by_category=[],
+        )
+        assert out.by_category == []
+
+
 # ── Repository unit tests (mock DB) ───────────────────────────────────────────
 
 def _make_repo():
@@ -149,3 +190,28 @@ class TestAggregateRepository:
         assert result[0]["category"] == "MEDICINE"
         assert result[1]["category"] == "FOOD"
         assert result[2]["category"] == "WATER"
+
+    def test_needed_by_category_passes_campaign_id_through(self):
+        repo = _make_repo()
+        campaign_id = uuid4()
+        with patch.object(repo, "stock_by_category", return_value=[]) as mock_stock:
+            repo.needed_by_category(campaign_id=campaign_id)
+        mock_stock.assert_called_once_with(center_id=None, campaign_id=campaign_id)
+
+    def test_stock_by_category_with_campaign_id_joins_intake(self):
+        repo = _make_repo()
+        campaign_id = uuid4()
+        mock_row = MagicMock()
+        mock_row.category = "MEDICINE"
+        mock_row.total_units = 40
+        mock_row.box_count = 4
+
+        # Base chain: query().join(ProductType).filter(status). With campaign_id set,
+        # an extra join(Intake).filter(campaign_id) is inserted before group_by.
+        chain = repo.db.query.return_value.join.return_value.filter.return_value
+        chain.join.return_value.filter.return_value.group_by.return_value.order_by.return_value.all.return_value = [
+            mock_row
+        ]
+
+        result = repo.stock_by_category(campaign_id=campaign_id)
+        assert result == [{"category": "MEDICINE", "total_units": 40, "box_count": 4}]

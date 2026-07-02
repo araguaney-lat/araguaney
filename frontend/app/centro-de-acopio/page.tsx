@@ -187,10 +187,15 @@ export default async function CentroDeAcopioPage() {
         >
           Sumar mi centro de acopio
         </Link>
-        <p className="text-[13.5px]" style={{ color: "#8A8073" }}>
+        <p className="text-[13.5px] mb-2" style={{ color: "#8A8073" }}>
           ¿Coordinas ayuda para otro tipo de emergencia?{" "}
           <Link href="/ayuda-humanitaria" style={{ color: "#1F5E8C", fontWeight: 600 }}>
             Conoce Araguaney para ayuda humanitaria →
+          </Link>
+        </p>
+        <p className="text-[13.5px]" style={{ color: "#8A8073" }}>
+          <Link href="/guias/como-organizar-un-centro-de-acopio" style={{ color: "#1F5E8C", fontWeight: 600 }}>
+            Guía: cómo organizar un centro de acopio →
           </Link>
         </p>
       </div>

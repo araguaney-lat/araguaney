@@ -10,6 +10,7 @@ class Campaign(Base):
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     name = Column(String, nullable=False)
+    slug = Column(String, unique=True, nullable=True, index=True)  # public URL slug, e.g. /eventos/{slug}
     destination_country = Column(String(2), nullable=True)   # ISO 3166-1 alpha-2
     description = Column(String, nullable=True)
     start_date = Column(Date, nullable=True)
