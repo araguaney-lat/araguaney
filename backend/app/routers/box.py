@@ -1,7 +1,7 @@
 import io
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Query, Request
 from fastapi.responses import Response, StreamingResponse
 from sqlalchemy.orm import Session
 
@@ -69,11 +69,13 @@ def box_qr_image(
 def list_boxes(
     request: Request,
     status: str | None = None,
+    limit: int = Query(200, ge=1, le=500),
+    offset: int = Query(0, ge=0),
     db: Session = Depends(get_db),
     _: User = Depends(require_center_role),
     scope: UUID | None = Depends(tenant_scope),
 ):
-    return BoxService(db).list(center_id=scope, status=status)
+    return BoxService(db).list(center_id=scope, status=status, limit=limit, offset=offset)
 
 
 @router.get("/v1/boxes/{box_id}", response_model=BoxOut)

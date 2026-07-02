@@ -189,7 +189,7 @@ class ThreadService:
     # ── Get thread detail ──────────────────────────────────────────────────────
 
     def get_detail(self, thread_id: uuid.UUID, user: User) -> ThreadDetailOut:
-        thread = self.repo.find_by_id(thread_id)
+        thread = self.repo.find_by_id_with_replies(thread_id)
         if not thread:
             raise api_error("NOT_FOUND", "Hilo no encontrado", status_code=404)
         self._access_guard(thread, user)

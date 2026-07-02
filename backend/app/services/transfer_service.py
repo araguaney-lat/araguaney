@@ -42,9 +42,11 @@ class TransferService(BaseService):
         box_repo = BoxRepository(self.db)
         repo = TransferRepository(self.db)
 
-        # Validate every box
+        # Validate every box — batch-fetch first, then check in Python (avoids N+1 queries)
+        boxes_by_id = box_repo.find_by_ids(data.box_ids, center_id=None)  # no tenant filter — admin may create cross-center
+        active_transfer_box_ids = repo.boxes_in_active_transfer(data.box_ids)
         for box_id in data.box_ids:
-            box = box_repo.find_by_id(box_id, center_id=None)  # no tenant filter — admin may create cross-center
+            box = boxes_by_id.get(box_id)
             if not box:
                 raise api_error("BOX_NOT_FOUND", f"Box {box_id} not found", status_code=404)
             if box.center_id != data.from_center_id:
@@ -55,7 +57,7 @@ class TransferService(BaseService):
                                 status_code=400)
             if box.pallet_id is not None:
                 raise api_error("BOX_IN_PALLET", f"Box {box_id} is assigned to a pallet", status_code=400)
-            if repo.box_in_active_transfer(box_id):
+            if box_id in active_transfer_box_ids:
                 raise api_error("BOX_IN_TRANSFER",
                                 f"Box {box_id} is already in an active transfer", status_code=409)
 
@@ -101,6 +103,8 @@ class TransferService(BaseService):
         status: str | None = None,
         from_center_id: UUID | None = None,
         to_center_id: UUID | None = None,
+        limit: int = 200,
+        offset: int = 0,
     ) -> list[TransferOut]:
         center_id = None if current_user.center_role == "national_admin" else current_user.center_id
         transfers = TransferRepository(self.db).list_by_center(
@@ -108,6 +112,8 @@ class TransferService(BaseService):
             status=status,
             from_center_id=from_center_id,
             to_center_id=to_center_id,
+            limit=limit,
+            offset=offset,
         )
         return [_transfer_out(t) for t in transfers]
 

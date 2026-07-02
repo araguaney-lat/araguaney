@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 from uuid import UUID
 
 from sqlalchemy import func, select, or_
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 
 from app.models.messaging import Thread, ThreadAttachment, ThreadParticipant, ThreadReply
 from app.models.user_campaign import UserCampaign
@@ -16,6 +16,15 @@ class ThreadRepository(BaseRepository):
 
     def find_by_id(self, thread_id: UUID) -> Thread | None:
         return self.db.get(Thread, thread_id)
+
+    def find_by_id_with_replies(self, thread_id: UUID) -> Thread | None:
+        """Eager-loads replies + each reply's attachments — avoids N+1 in get_detail."""
+        stmt = (
+            select(Thread)
+            .where(Thread.id == thread_id)
+            .options(selectinload(Thread.replies).selectinload(ThreadReply.attachments))
+        )
+        return self.db.execute(stmt).scalar_one_or_none()
 
     def list_for_user(
         self,

@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from fastapi import APIRouter, BackgroundTasks, Depends, Request
+from fastapi import APIRouter, BackgroundTasks, Depends, Query, Request
 from sqlalchemy.orm import Session
 
 from app.database import get_db
@@ -39,12 +39,14 @@ def create_intake(
 @limiter.limit("60/minute")
 def list_intakes(
     request: Request,
+    limit: int = Query(200, ge=1, le=500),
+    offset: int = Query(0, ge=0),
     db: Session = Depends(get_db),
     _: User = Depends(require_center_role),
     scope: UUID | None = Depends(tenant_scope),
 ):
     from app.services.intake_service import IntakeService
-    intakes = IntakeService(db).list(center_id=scope)
+    intakes = IntakeService(db).list(center_id=scope, limit=limit, offset=offset)
     return [
         IntakeOut(
             id=i.id,

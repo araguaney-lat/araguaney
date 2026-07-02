@@ -23,6 +23,8 @@ class TransferRepository(BaseRepository):
         status: str | None = None,
         from_center_id: UUID | None = None,
         to_center_id: UUID | None = None,
+        limit: int = 200,
+        offset: int = 0,
     ) -> list[Transfer]:
         stmt = select(Transfer)
         if center_id is not None:
@@ -35,7 +37,8 @@ class TransferRepository(BaseRepository):
             stmt = stmt.where(Transfer.from_center_id == from_center_id)
         if to_center_id:
             stmt = stmt.where(Transfer.to_center_id == to_center_id)
-        stmt = stmt.order_by(Transfer.created_at.desc())
+        # Tiebreak on id — see BoxRepository.list_all for why created_at alone isn't stable.
+        stmt = stmt.order_by(Transfer.created_at.desc(), Transfer.id).limit(limit).offset(offset)
         return list(self.db.execute(stmt).scalars())
 
     def find_boxes(self, transfer_id: UUID) -> list[Box]:
@@ -66,6 +69,20 @@ class TransferRepository(BaseRepository):
             .limit(1)
         )
         return self.db.execute(stmt).scalar_one_or_none() is not None
+
+    def boxes_in_active_transfer(self, box_ids: list[UUID]) -> set[UUID]:
+        """Batch version of box_in_active_transfer — returns the subset of box_ids currently in a non-terminal transfer."""
+        if not box_ids:
+            return set()
+        stmt = (
+            select(TransferItem.box_id)
+            .join(Transfer, Transfer.id == TransferItem.transfer_id)
+            .where(
+                TransferItem.box_id.in_(box_ids),
+                Transfer.status.in_(("REQUESTED", "APPROVED", "IN_TRANSIT")),
+            )
+        )
+        return set(self.db.execute(stmt).scalars())
 
     def save(self, transfer: Transfer) -> Transfer:
         self.db.add(transfer)

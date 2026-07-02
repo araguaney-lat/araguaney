@@ -18,6 +18,12 @@ class BoxRepository(TenantRepository[Box]):
         stmt = self.scoped(select(Box).where(Box.id == box_id), center_id)
         return self.db.execute(stmt).scalar_one_or_none()
 
+    def find_by_ids(self, box_ids: list[UUID], center_id: UUID | None) -> dict[UUID, Box]:
+        if not box_ids:
+            return {}
+        stmt = self.scoped(select(Box).where(Box.id.in_(box_ids)), center_id)
+        return {box.id: box for box in self.db.execute(stmt).scalars()}
+
     def find_by_code(self, code: str) -> Box | None:
         """Public lookup — no tenant filter (code is globally unique)."""
         return self.db.execute(
@@ -38,11 +44,16 @@ class BoxRepository(TenantRepository[Box]):
         )
         return list(self.db.execute(stmt).scalars())
 
-    def list_all(self, center_id: UUID | None, status: str | None = None) -> list[Box]:
-        stmt = select(Box).order_by(Box.created_at.desc())
+    def list_all(
+        self, center_id: UUID | None, status: str | None = None, limit: int = 200, offset: int = 0
+    ) -> list[Box]:
+        # Tiebreak on id: bulk inserts in one transaction share the same created_at
+        # (Postgres now() is transaction-scoped), which makes LIMIT/OFFSET non-deterministic
+        # across pages without a secondary sort key.
+        stmt = select(Box).order_by(Box.created_at.desc(), Box.id)
         if status:
             stmt = stmt.where(Box.status == status)
-        stmt = self.scoped(stmt, center_id)
+        stmt = self.scoped(stmt, center_id).limit(limit).offset(offset)
         return list(self.db.execute(stmt).scalars())
 
     def list_events(self, box_id: UUID) -> list[BoxEvent]:
