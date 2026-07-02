@@ -44,19 +44,19 @@
 
 | # | Tarea | SQL / Descripción | Prioridad | Estado |
 |---|-------|-------------------|-----------|--------|
-| 1 | `ix_boxes_intake_id` | `CREATE INDEX CONCURRENTLY ix_boxes_intake_id ON boxes (intake_id);` — desatasca los 6 joins Box→Intake de reportes. Agregar `index=True` al modelo. | 🔴 | ⬜ Pendiente |
-| 2 | Compuesto boxes filtro+sort | `CREATE INDEX CONCURRENTLY ix_boxes_center_status_created ON boxes (center_id, status, created_at DESC);` — cubre `list_draft`/`list_sealed`/`list_all`. | 🔴 | ⬜ Pendiente |
-| 3 | `ix_boxes_created_at` | `CREATE INDEX CONCURRENTLY ix_boxes_created_at ON boxes (created_at);` — rangos de reportes del panel nacional (center_id NULL). | 🔴 | ⬜ Pendiente |
-| 4 | Índices de auditoría | `CREATE INDEX CONCURRENTLY ix_audit_user ON audit_log (user_id);` + `ix_audit_entity_created ON audit_log (entity_type, created_at DESC);`. Agregar `index=True` a `audit_log.user_id`. | 🔴 | ⬜ Pendiente |
-| 5 | Índice parcial de agregación | `CREATE INDEX CONCURRENTLY ix_boxes_sealed_center ON boxes (center_id) WHERE status = 'SEALED';` — más chico/rápido para `stock_by_center`. | 🟡 | ⬜ Pendiente |
-| 6 | Compuestos shipment/pallet/request | `(center_id, status, created_at DESC)` en las 3 tablas — mismo patrón filtro+sort de sus listados. | 🟡 | ⬜ Pendiente |
-| 7 | Migración `016_perf_indexes` | Alembic con todos los índices anteriores. Usar `CREATE INDEX CONCURRENTLY` (no bloquea escrituras en prod) → requiere `op.execute` fuera de transacción (`autocommit_block`). Reversible. | 🔴 | ⬜ Pendiente |
+| 1 | `ix_boxes_intake_id` | `CREATE INDEX CONCURRENTLY ix_boxes_intake_id ON boxes (intake_id);` — desatasca los 6 joins Box→Intake de reportes. Agregar `index=True` al modelo. | 🔴 | ✅ Done |
+| 2 | Compuesto boxes filtro+sort | `CREATE INDEX CONCURRENTLY ix_boxes_center_status_created ON boxes (center_id, status, created_at DESC);` — cubre `list_draft`/`list_sealed`/`list_all`. | 🔴 | ✅ Done |
+| 3 | `ix_boxes_created_at` | `CREATE INDEX CONCURRENTLY ix_boxes_created_at ON boxes (created_at);` — rangos de reportes del panel nacional (center_id NULL). | 🔴 | ✅ Done |
+| 4 | Índices de auditoría | `CREATE INDEX CONCURRENTLY ix_audit_user ON audit_log (user_id);` + `ix_audit_entity_created ON audit_log (entity_type, created_at DESC);`. Agregar `index=True` a `audit_log.user_id`. | 🔴 | ✅ Done |
+| 5 | Índice parcial de agregación | `CREATE INDEX CONCURRENTLY ix_boxes_sealed_center ON boxes (center_id) WHERE status = 'SEALED';` — más chico/rápido para `stock_by_center`. | 🟡 | ✅ Done |
+| 6 | Compuestos shipment/pallet/request | `(center_id, status, created_at DESC)` en las 3 tablas — mismo patrón filtro+sort de sus listados. | 🟡 | ✅ Done |
+| 7 | Migración `018_perf_indexes` | Alembic con todos los índices anteriores. Usar `CREATE INDEX CONCURRENTLY` (no bloquea escrituras en prod) → requiere `op.execute` fuera de transacción (`autocommit_block`). Reversible. Nota: `016` ya estaba tomado por `row_level_security`, se usó `018` (siguiente libre tras `017_campaign_slug`). Verificado con un Postgres 16 desechable en Docker: upgrade desde cero (cadena completa 000→018), downgrade -1 borra los 9 índices, re-upgrade limpio, sin índices `INVALID`. | 🔴 | ✅ Done |
 
 ### Grupo B — Mantenimiento de DB
 
 | # | Tarea | Descripción | Prioridad | Estado |
 |---|-------|-------------|-----------|--------|
-| 8 | `ANALYZE` post-migración | Correr `ANALYZE` en boxes/audit_log/shipments/pallets/requests tras crear índices, para que el planner los adopte. | 🟡 | ⬜ Pendiente |
+| 8 | `ANALYZE` post-migración | Correr `ANALYZE` en boxes/audit_log/shipments/pallets/requests tras crear índices, para que el planner los adopte. | 🟡 | ✅ Done — incluido al final de `upgrade()` en la misma migración `018`. |
 | 9 | Autovacuum tuning en tablas append-heavy | Bajar `autovacuum_vacuum_scale_factor` en `audit_log`, `box_events`, `pallet_events`, `shipment_events` (crecen sin parar) para evitar bloat. | 🟢 | ⬜ Pendiente |
 | 10 | Retención de eventos `*_event` | Evaluar política de retención/archivado para `box_events`/`pallet_events`/`shipment_events` (hoy solo `audit_log` se purga). Definir cutoff o archivado a tabla histórica. | 🟢 | ⬜ Pendiente |
 | 11 | Índice parcial `Center.is_active` | Opcional: `WHERE is_active = true` si crece el nº de centros (se cuenta en cada carga del panel). | 🟢 | ⬜ Pendiente |
