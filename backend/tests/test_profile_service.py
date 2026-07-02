@@ -98,7 +98,7 @@ class TestUploadAvatar:
         assert user.avatar_url == "https://res.cloudinary.com/dtvdqlxtd/x.webp"
         mock_repo.return_value.save.assert_called_once_with(user)
         _, kwargs = mock_uploader.upload.call_args
-        assert kwargs["folder"] == "araguaney/avatars"
+        assert kwargs["folder"] == "araguaney/profile"
         assert kwargs["public_id"] == str(user.id)
 
     @patch("app.services.profile_service.UserRepository")

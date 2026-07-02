@@ -60,7 +60,7 @@ class ProfileService(BaseService):
             result = cloudinary.uploader.upload(
                 io.BytesIO(contents),
                 public_id=str(user.id),
-                folder="araguaney/avatars",
+                folder="araguaney/profile",
                 overwrite=True,
                 invalidate=True,
                 format="webp",
