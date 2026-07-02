@@ -2,11 +2,18 @@
 
 import { useState, useCallback, useRef, useEffect } from "react"
 import { useRouter } from "next/navigation"
+import dynamic from "next/dynamic"
 import type { Campaign, ProductType, BarcodeResult } from "@/types"
 import { createIntakeAction, type BoxDraft } from "@/lib/actions"
-import { CameraScanner } from "@/components/CameraScanner"
 import { useOnlineStatus } from "@/components/ConnectivityBanner"
 import { useDict } from "@/context/DictionaryContext"
+
+// @zxing/browser is only needed when the camera scanner actually opens —
+// keep it out of the initial bundle for this high-traffic intake flow.
+const CameraScanner = dynamic(
+  () => import("@/components/CameraScanner").then((mod) => mod.CameraScanner),
+  { ssr: false }
+)
 
 interface BoxRow {
   key: string

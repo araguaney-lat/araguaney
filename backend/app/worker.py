@@ -25,6 +25,7 @@ from datetime import datetime, timedelta, timezone
 
 from arq.connections import RedisSettings
 from arq.cron import cron
+from arq.worker import func
 
 logger = logging.getLogger(__name__)
 
@@ -233,12 +234,15 @@ class WorkerSettings:
         send_transfer_status_email_task,
         send_transfer_received_email_task,
         send_password_changed_email_task,
-        generate_shipment_manifest_pdf_task,
-        generate_shipment_manifest_xlsx_task,
-        generate_box_labels_pdf_task,
-        generate_pallet_label_pdf_task,
-        generate_transfer_manifest_pdf_task,
-        generate_report_export_csv_task,
+        # Export jobs get a longer per-task timeout than the global 60s: PDF/XLSX
+        # generation for a shipment with many pallets (DB queries + reportlab/WeasyPrint
+        # + R2 upload, all in one job) can plausibly exceed 60s where an email send can't.
+        func(generate_shipment_manifest_pdf_task, timeout=300),
+        func(generate_shipment_manifest_xlsx_task, timeout=300),
+        func(generate_box_labels_pdf_task, timeout=300),
+        func(generate_pallet_label_pdf_task, timeout=300),
+        func(generate_transfer_manifest_pdf_task, timeout=300),
+        func(generate_report_export_csv_task, timeout=300),
     ]
     cron_jobs = [
         cron(purge_audit_logs_cron, hour=3, minute=0),

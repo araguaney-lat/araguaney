@@ -122,7 +122,7 @@ def qr_ficha(
     if cached:
         return JSONResponse(
             content=json.loads(cached),
-            headers={"Cache-Control": f"public, max-age={_QR_TTL}, stale-while-revalidate=300"},
+            headers={"Cache-Control": f"public, max-age={_QR_TTL}, s-maxage={_QR_TTL}, stale-while-revalidate=300"},
         )
 
     # ── Try box ──
@@ -165,7 +165,7 @@ def qr_ficha(
         cache.set(cache_key, serialized, ttl=_QR_TTL)
         return JSONResponse(
             content=json.loads(serialized),
-            headers={"Cache-Control": f"public, max-age={_QR_TTL}, stale-while-revalidate=300"},
+            headers={"Cache-Control": f"public, max-age={_QR_TTL}, s-maxage={_QR_TTL}, stale-while-revalidate=300"},
         )
 
     # ── Try pallet ──
@@ -221,7 +221,7 @@ def qr_ficha(
         cache.set(cache_key, serialized, ttl=_QR_TTL)
         return JSONResponse(
             content=json.loads(serialized),
-            headers={"Cache-Control": f"public, max-age={_QR_TTL}, stale-while-revalidate=300"},
+            headers={"Cache-Control": f"public, max-age={_QR_TTL}, s-maxage={_QR_TTL}, stale-while-revalidate=300"},
         )
 
     raise api_error("NOT_FOUND", "QR code not found", status_code=404)
@@ -246,7 +246,7 @@ def public_needs(
     if cached:
         return JSONResponse(
             content=json.loads(cached),
-            headers={"Cache-Control": f"public, max-age={_PUBLIC_TTL}, stale-while-revalidate=60"},
+            headers={"Cache-Control": f"public, max-age={_PUBLIC_TTL}, s-maxage={_PUBLIC_TTL}, stale-while-revalidate=60"},
         )
 
     repo = AggregateRepository(db)
@@ -255,7 +255,7 @@ def public_needs(
     cache.set(cache_key, serialized, ttl=_PUBLIC_TTL)
     return JSONResponse(
         content=json.loads(serialized),
-        headers={"Cache-Control": f"public, max-age={_PUBLIC_TTL}, stale-while-revalidate=60"},
+        headers={"Cache-Control": f"public, max-age={_PUBLIC_TTL}, s-maxage={_PUBLIC_TTL}, stale-while-revalidate=60"},
     )
 
 
@@ -276,7 +276,7 @@ def public_campaigns(
     if cached:
         return JSONResponse(
             content=json.loads(cached),
-            headers={"Cache-Control": f"public, max-age={_PUBLIC_TTL}, stale-while-revalidate=60"},
+            headers={"Cache-Control": f"public, max-age={_PUBLIC_TTL}, s-maxage={_PUBLIC_TTL}, stale-while-revalidate=60"},
         )
 
     campaigns = CampaignRepository(db).find_public_active()
@@ -290,7 +290,7 @@ def public_campaigns(
     cache.set(cache_key, serialized, ttl=_PUBLIC_TTL)
     return JSONResponse(
         content=json.loads(serialized),
-        headers={"Cache-Control": f"public, max-age={_PUBLIC_TTL}, stale-while-revalidate=60"},
+        headers={"Cache-Control": f"public, max-age={_PUBLIC_TTL}, s-maxage={_PUBLIC_TTL}, stale-while-revalidate=60"},
     )
 
 
@@ -311,7 +311,7 @@ def public_campaign_detail(
     if cached:
         return JSONResponse(
             content=json.loads(cached),
-            headers={"Cache-Control": f"public, max-age={_PUBLIC_TTL}, stale-while-revalidate=60"},
+            headers={"Cache-Control": f"public, max-age={_PUBLIC_TTL}, s-maxage={_PUBLIC_TTL}, stale-while-revalidate=60"},
         )
 
     campaign = CampaignRepository(db).find_by_slug(slug)
@@ -332,5 +332,5 @@ def public_campaign_detail(
     cache.set(cache_key, serialized, ttl=_PUBLIC_TTL)
     return JSONResponse(
         content=json.loads(serialized),
-        headers={"Cache-Control": f"public, max-age={_PUBLIC_TTL}, stale-while-revalidate=60"},
+        headers={"Cache-Control": f"public, max-age={_PUBLIC_TTL}, s-maxage={_PUBLIC_TTL}, stale-while-revalidate=60"},
     )
