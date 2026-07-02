@@ -36,6 +36,7 @@ export default async function SettingsPage() {
             avatar_change: t.avatar_change,
             avatar_uploading: t.avatar_uploading,
             avatar_hint: t.avatar_hint,
+            avatar_uploaded: t.avatar_uploaded,
           }}
         />
 

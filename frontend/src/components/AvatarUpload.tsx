@@ -10,24 +10,28 @@ interface AvatarUploadProps {
     avatar_change: string
     avatar_uploading: string
     avatar_hint: string
+    avatar_uploaded: string
   }
 }
 
 export function AvatarUpload({ initialUrl, initials, labels }: AvatarUploadProps) {
   const [state, formAction, isPending] = useActionState(uploadAvatarAction, null)
   const [preview, setPreview] = useState<string | null>(initialUrl)
+  const [success, setSuccess] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
   const avatarUrl = (state && "avatar_url" in state ? state.avatar_url : null) ?? preview
 
   return (
     <form
-      action={(formData) => {
+      action={async (formData) => {
         const file = inputRef.current?.files?.[0]
         if (file) setPreview(URL.createObjectURL(file))
-        formAction(formData)
+        setSuccess(false)
+        await formAction(formData)
+        setSuccess(true)
       }}
-      className="flex items-center gap-4"
+      className="flex flex-wrap items-center gap-4"
     >
       <div className="flex-shrink-0 flex h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-amber-300 text-lg font-bold text-amber-900">
         {avatarUrl ? (
@@ -37,7 +41,7 @@ export function AvatarUpload({ initialUrl, initials, labels }: AvatarUploadProps
           initials
         )}
       </div>
-      <div>
+      <div className="min-w-0 flex-1">
         <input
           ref={inputRef}
           type="file"
@@ -56,7 +60,10 @@ export function AvatarUpload({ initialUrl, initials, labels }: AvatarUploadProps
         </label>
         <p className="text-xs text-zinc-500 mt-1">{labels.avatar_hint}</p>
         {state && "error" in state && state.error && (
-          <p className="text-xs text-red-600 mt-1">{state.error as string}</p>
+          <p className="text-sm text-red-600 mt-1">{state.error as string}</p>
+        )}
+        {success && !(state && "error" in state && state.error) && (
+          <p className="text-sm text-green-600 mt-1">{labels.avatar_uploaded}</p>
         )}
       </div>
     </form>

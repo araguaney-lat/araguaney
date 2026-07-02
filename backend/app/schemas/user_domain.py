@@ -17,6 +17,7 @@ class UserOut(StrictORMModel):
     email: str
     username: str
     full_name: str | None
+    avatar_url: str | None
     role: str
     center_role: str | None
     center_id: UUID | None

@@ -561,6 +561,7 @@
       "avatar_change": "Cambiar foto",
       "avatar_uploading": "Subiendo…",
       "avatar_hint": "JPEG, PNG, WebP o GIF. Máximo 5 MB.",
+      "avatar_uploaded": "Imagen cargada exitosamente",
       "name_updated": "Nombre actualizado",
       "password_section": "Contraseña",
       "totp_link_title": "Autenticación en dos pasos (2FA)",

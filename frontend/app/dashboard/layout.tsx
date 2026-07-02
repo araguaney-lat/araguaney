@@ -9,7 +9,9 @@ import type { CenterRole } from "@/types"
 
 const API_URL = process.env.API_URL ?? "http://localhost:8000"
 
-async function fetchMe(token: string): Promise<{ full_name?: string | null; username?: string; email?: string } | null> {
+async function fetchMe(
+  token: string
+): Promise<{ full_name?: string | null; username?: string; email?: string; avatar_url?: string | null } | null> {
   try {
     const res = await fetch(`${API_URL}/v1/auth/me`, {
       headers: { Authorization: `Bearer ${token}` },
@@ -35,6 +37,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const me = await fetchMe(session.accessToken)
   const userName = me?.full_name ?? me?.username ?? null
   const userEmail = me?.email ?? null
+  const userAvatarUrl = me?.avatar_url ?? null
 
   return (
     <SessionProvider session={session}>
@@ -51,6 +54,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
               roleLabels={dict.dashboard.role}
               userName={userName}
               userEmail={userEmail}
+              userAvatarUrl={userAvatarUrl}
               locale={locale}
             />
           </div>
