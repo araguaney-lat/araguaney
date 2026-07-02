@@ -2,6 +2,7 @@ import Link from "next/link"
 import type { Metadata } from "next"
 import HomeNav from "@/components/HomeNav"
 import HomeFooter from "@/components/HomeFooter"
+import { CtaLink } from "@/components/CtaLink"
 import { getDictionary } from "@/lib/i18n"
 
 const TITLE = "Cómo preparar carga humanitaria para aduana"
@@ -108,13 +109,14 @@ export default async function AduanaGuidePage() {
               Genera manifiestos exportables desde el primer envío
             </p>
             <div className="flex flex-col md:flex-row gap-3 justify-center">
-              <Link
+              <CtaLink
                 href="/login"
+                ctaLabel="guia_aduana_final"
                 className="inline-flex items-center justify-center px-5 py-2.5"
                 style={{ background: "#1F5E8C", color: "#fff", fontWeight: 600, fontSize: 14, borderRadius: 99 }}
               >
                 Empezar ahora
-              </Link>
+              </CtaLink>
               <Link
                 href="/ayuda-humanitaria"
                 className="inline-flex items-center justify-center px-5 py-2.5"

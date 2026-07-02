@@ -2,6 +2,7 @@ import Link from "next/link"
 import type { Metadata } from "next"
 import HomeNav from "@/components/HomeNav"
 import HomeFooter from "@/components/HomeFooter"
+import { CtaLink } from "@/components/CtaLink"
 import { getDictionary } from "@/lib/i18n"
 
 const TITLE = "Humanitarian Aid Software"
@@ -73,8 +74,9 @@ export default async function HumanitarianAidPage() {
             emergency — it's not tied to a single event.
           </p>
 
-          <Link
+          <CtaLink
             href="/login"
+            ctaLabel="humanitarian_aid_hero"
             className="inline-flex items-center justify-center px-[26px] py-[14px]"
             style={{
               background: "#1F5E8C",
@@ -86,7 +88,7 @@ export default async function HumanitarianAidPage() {
             }}
           >
             Get started
-          </Link>
+          </CtaLink>
         </div>
       </div>
 
@@ -151,8 +153,9 @@ export default async function HumanitarianAidPage() {
         >
           Get ready before the next emergency hits
         </h2>
-        <Link
+        <CtaLink
           href="/login"
+          ctaLabel="humanitarian_aid_final"
           className="inline-flex items-center justify-center px-[26px] py-[14px] mb-4"
           style={{
             background: "#1F5E8C",
@@ -164,7 +167,7 @@ export default async function HumanitarianAidPage() {
           }}
         >
           Get started
-        </Link>
+        </CtaLink>
         <p className="text-[13.5px] mb-2" style={{ color: "#8A8073" }}>
           Coordinating a donation center specifically?{" "}
           <Link href="/centro-de-acopio" style={{ color: "#1F5E8C", fontWeight: 600 }}>

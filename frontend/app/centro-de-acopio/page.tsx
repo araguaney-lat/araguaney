@@ -2,6 +2,7 @@ import Link from "next/link"
 import type { Metadata } from "next"
 import HomeNav from "@/components/HomeNav"
 import HomeFooter from "@/components/HomeFooter"
+import { CtaLink } from "@/components/CtaLink"
 import { getDictionary } from "@/lib/i18n"
 
 const TITLE = "Software para centro de acopio"
@@ -94,8 +95,9 @@ export default async function CentroDeAcopioPage() {
             estándar que usan decenas de centros de acopio para coordinarse entre sí.
           </p>
 
-          <Link
+          <CtaLink
             href="/login"
+            ctaLabel="centro_de_acopio_hero"
             className="inline-flex items-center justify-center px-[26px] py-[14px]"
             style={{
               background: "#1F5E8C",
@@ -107,7 +109,7 @@ export default async function CentroDeAcopioPage() {
             }}
           >
             Sumar mi centro de acopio
-          </Link>
+          </CtaLink>
         </div>
       </div>
 
@@ -173,8 +175,9 @@ export default async function CentroDeAcopioPage() {
         >
           Conecta tu centro de acopio con el estándar nacional
         </h2>
-        <Link
+        <CtaLink
           href="/login"
+          ctaLabel="centro_de_acopio_final"
           className="inline-flex items-center justify-center px-[26px] py-[14px] mb-4"
           style={{
             background: "#1F5E8C",
@@ -186,7 +189,7 @@ export default async function CentroDeAcopioPage() {
           }}
         >
           Sumar mi centro de acopio
-        </Link>
+        </CtaLink>
         <p className="text-[13.5px] mb-2" style={{ color: "#8A8073" }}>
           ¿Coordinas ayuda para otro tipo de emergencia?{" "}
           <Link href="/ayuda-humanitaria" style={{ color: "#1F5E8C", fontWeight: 600 }}>
