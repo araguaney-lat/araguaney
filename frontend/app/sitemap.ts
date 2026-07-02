@@ -9,10 +9,15 @@ import type { PublicCampaignListItem } from "@/types"
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date()
 
+  // Hard timeout so a slow/unreachable backend can never hang sitemap
+  // generation — Next.js retries a stalled metadata route 3× at 60s each
+  // before failing the whole build, so a bare try/catch isn't enough if the
+  // request never rejects (network black-hole rather than a fast error).
   let campaigns: PublicCampaignListItem[] = []
   try {
     campaigns = await apiFetch<PublicCampaignListItem[]>("/v1/public/campaigns", {
       next: { revalidate: 300 },
+      signal: AbortSignal.timeout(5000),
     })
   } catch {
     campaigns = []
