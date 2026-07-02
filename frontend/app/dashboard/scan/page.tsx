@@ -2,8 +2,14 @@
 
 import { useState, useCallback } from "react"
 import { useRouter } from "next/navigation"
-import { CameraScanner } from "@/components/CameraScanner"
+import dynamic from "next/dynamic"
 import { useDict } from "@/context/DictionaryContext"
+
+// @zxing/browser is only needed when the camera scanner actually opens.
+const CameraScanner = dynamic(
+  () => import("@/components/CameraScanner").then((mod) => mod.CameraScanner),
+  { ssr: false }
+)
 
 export default function ScanPage() {
   const dict = useDict()

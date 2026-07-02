@@ -1,8 +1,12 @@
 import { auth } from "@/auth"
 import { apiFetch } from "@/lib/api"
 import { redirect } from "next/navigation"
+import dynamic from "next/dynamic"
 import { getLocale, getDictionary } from "@/lib/i18n"
-import ReportsDashboard from "./ReportsDashboard"
+
+// recharts + react-simple-maps are only needed on this page — keep them out
+// of the initial JS chunk, loaded on demand instead.
+const ReportsDashboard = dynamic(() => import("./ReportsDashboard"))
 
 interface Campaign {
   id: string
