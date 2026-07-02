@@ -4,6 +4,7 @@ import type { Metadata } from "next"
 import HomeNav from "@/components/HomeNav"
 import HomeFooter from "@/components/HomeFooter"
 import { getDictionary } from "@/lib/i18n"
+import { DEFAULT_OG_IMAGE } from "@/lib/seo"
 import type { PublicCampaign } from "@/types"
 
 export const revalidate = 300
@@ -65,8 +66,8 @@ export async function generateMetadata({
     title,
     description,
     alternates: { canonical: `/eventos/${campaign.slug}` },
-    openGraph: { title: `${title} — Araguaney`, description },
-    twitter: { title: `${title} — Araguaney`, description },
+    openGraph: { title: `${title} — Araguaney`, description, images: [DEFAULT_OG_IMAGE] },
+    twitter: { card: "summary_large_image", title: `${title} — Araguaney`, description, images: [DEFAULT_OG_IMAGE] },
   }
 }
 

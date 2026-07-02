@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation"
 import type { Metadata } from "next"
 import { StatusTimeline } from "@/components/StatusTimeline"
+import { DEFAULT_OG_IMAGE } from "@/lib/seo"
 
 const API_URL = process.env.API_URL ?? "http://localhost:8000"
 
@@ -125,8 +126,8 @@ export async function generateMetadata({
     title,
     description,
     alternates: { canonical: `/qr/${ficha.code}` },
-    openGraph: { title, description },
-    twitter: { title, description },
+    openGraph: { title, description, images: [DEFAULT_OG_IMAGE] },
+    twitter: { card: "summary_large_image", title, description, images: [DEFAULT_OG_IMAGE] },
   }
 }
 

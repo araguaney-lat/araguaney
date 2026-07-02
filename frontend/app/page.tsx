@@ -5,7 +5,7 @@ import HomeNav from "@/components/HomeNav"
 import HomeFooter from "@/components/HomeFooter"
 import { CtaLink } from "@/components/CtaLink"
 import { getLocale, getDictionary } from "@/lib/i18n"
-import { SITE_URL } from "@/lib/seo"
+import { SITE_URL, DEFAULT_OG_IMAGE } from "@/lib/seo"
 
 const LOGO =
   "https://res.cloudinary.com/dtvdqlxtd/image/upload/v1782794310/image_degkq9.png"
@@ -19,8 +19,13 @@ export async function generateMetadata(): Promise<Metadata> {
     title: home_title,
     description: home_description,
     alternates: { canonical: "/" },
-    openGraph: { title: home_title, description: home_description },
-    twitter: { title: home_title, description: home_description },
+    openGraph: { title: home_title, description: home_description, images: [DEFAULT_OG_IMAGE] },
+    twitter: {
+      card: "summary_large_image",
+      title: home_title,
+      description: home_description,
+      images: [DEFAULT_OG_IMAGE],
+    },
   }
 }
 
