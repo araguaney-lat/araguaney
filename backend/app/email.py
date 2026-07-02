@@ -61,7 +61,7 @@ def send_password_reset_email(to: str, token: str) -> None:
     site_url = settings.frontend_url.split(",")[0].strip()
     _send(
         to=to,
-        subject="Reset your password",
+        subject="Restablece tu contraseña de Araguaney",
         html=_render("password_reset.html", reset_url=f"{site_url}/reset-password?token={token}"),
     )
 
