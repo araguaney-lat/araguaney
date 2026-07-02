@@ -109,10 +109,11 @@ interface SidebarProps {
   roleLabels: DashboardRoleLabels
   userName?: string | null
   userEmail?: string | null
+  userAvatarUrl?: string | null
   locale: Locale
 }
 
-export function Sidebar({ centerRole, platformRole, centerName, nav, roleLabels, userName, userEmail, locale }: SidebarProps) {
+export function Sidebar({ centerRole, platformRole, centerName, nav, roleLabels, userName, userEmail, userAvatarUrl, locale }: SidebarProps) {
   const pathname = usePathname()
   const [collapsed, setCollapsed] = useState(false)
   const [mounted, setMounted] = useState(false)
@@ -257,8 +258,12 @@ export function Sidebar({ centerRole, platformRole, centerName, nav, roleLabels,
             className={`flex items-center gap-2.5 rounded-lg px-2.5 py-2 transition-colors hover:bg-amber-100 data-[active=true]:bg-amber-200/70 ${collapsed ? "justify-center" : ""}`}
             title={collapsed ? `${userName ?? userEmail}${centerRole ? ` · ${roleLabels[centerRole as keyof DashboardRoleLabels] ?? centerRole}` : ""}` : undefined}
           >
-            <span className="flex-shrink-0 flex h-7 w-7 items-center justify-center rounded-full bg-amber-300 text-xs font-bold text-amber-900">
-              {(userName ?? userEmail ?? "?")[0].toUpperCase()}
+            <span className="flex-shrink-0 flex h-7 w-7 items-center justify-center overflow-hidden rounded-full bg-amber-300 text-xs font-bold text-amber-900">
+              {userAvatarUrl ? (
+                <Image src={userAvatarUrl} alt="" width={28} height={28} className="h-full w-full object-cover" />
+              ) : (
+                (userName ?? userEmail ?? "?")[0].toUpperCase()
+              )}
             </span>
             {!collapsed && (
               <div className="min-w-0">
