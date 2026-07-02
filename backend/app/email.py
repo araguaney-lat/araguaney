@@ -66,6 +66,20 @@ def send_password_reset_email(to: str, token: str) -> None:
     )
 
 
+def send_invitation_email(to: str, username: str, temp_password: str) -> None:
+    site_url = settings.frontend_url.split(",")[0].strip()
+    _send(
+        to=to,
+        subject="Fuiste invitado a Araguaney",
+        html=_render(
+            "invitation.html",
+            username=username,
+            temp_password=temp_password,
+            login_url=f"{site_url}/login",
+        ),
+    )
+
+
 def send_request_reply_email(to: str, request_title: str, reply_body: str, request_url: str) -> None:
     _send(
         to=to,

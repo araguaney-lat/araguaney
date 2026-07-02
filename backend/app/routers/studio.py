@@ -5,6 +5,7 @@ from uuid import UUID
 from fastapi import APIRouter, BackgroundTasks, Depends, Query, Request
 from sqlalchemy.orm import Session
 
+from app.arq_pool import enqueue
 from app.database import get_db
 from app.dependencies import get_current_superadmin, get_current_user
 from app.models.user import User
@@ -61,6 +62,7 @@ def list_users(
 def create_user(
     request: Request,
     data: StudioUserCreate,
+    background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
     admin: User = Depends(get_current_superadmin),
 ):
@@ -99,6 +101,7 @@ def create_user(
         ip=get_client_ip(request),
     )
     db.commit()
+    enqueue(background_tasks, "send_invitation_email_task", user.email, user.username, raw_password)
     return user
 
 
@@ -107,6 +110,7 @@ def create_user(
 def reinvite_user(
     request: Request,
     user_id: UUID,
+    background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
     admin: User = Depends(get_current_superadmin),
 ):
@@ -130,7 +134,7 @@ def reinvite_user(
         ip=get_client_ip(request),
     )
     db.commit()
-    # TODO: enqueue send_invitation_email_task(user.email, raw_password)
+    enqueue(background_tasks, "send_invitation_email_task", user.email, user.username, raw_password)
     return {"message": "Invitation sent"}
 
 
