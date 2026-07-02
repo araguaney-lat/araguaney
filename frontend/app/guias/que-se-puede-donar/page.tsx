@@ -3,6 +3,7 @@ import type { Metadata } from "next"
 import HomeNav from "@/components/HomeNav"
 import HomeFooter from "@/components/HomeFooter"
 import { getDictionary } from "@/lib/i18n"
+import { DEFAULT_OG_IMAGE } from "@/lib/seo"
 
 const TITLE = "Qué se puede donar en un centro de acopio"
 const DESCRIPTION =
@@ -12,8 +13,8 @@ export const metadata: Metadata = {
   title: TITLE,
   description: DESCRIPTION,
   alternates: { canonical: "/guias/que-se-puede-donar" },
-  openGraph: { title: `${TITLE} — Araguaney`, description: DESCRIPTION },
-  twitter: { title: `${TITLE} — Araguaney`, description: DESCRIPTION },
+  openGraph: { title: `${TITLE} — Araguaney`, description: DESCRIPTION, images: [DEFAULT_OG_IMAGE] },
+  twitter: { card: "summary_large_image", title: `${TITLE} — Araguaney`, description: DESCRIPTION, images: [DEFAULT_OG_IMAGE] },
 }
 
 const CATEGORIAS = [

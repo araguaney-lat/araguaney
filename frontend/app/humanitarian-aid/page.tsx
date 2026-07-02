@@ -4,6 +4,7 @@ import HomeNav from "@/components/HomeNav"
 import HomeFooter from "@/components/HomeFooter"
 import { CtaLink } from "@/components/CtaLink"
 import { getDictionary } from "@/lib/i18n"
+import { DEFAULT_OG_IMAGE } from "@/lib/seo"
 
 const TITLE = "Humanitarian Aid Software"
 const OG_TITLE = "Humanitarian Aid Software — Araguaney"
@@ -14,8 +15,8 @@ export const metadata: Metadata = {
   title: TITLE,
   description: DESCRIPTION,
   alternates: { canonical: "/humanitarian-aid", languages: { es: "/ayuda-humanitaria" } },
-  openGraph: { title: OG_TITLE, description: DESCRIPTION },
-  twitter: { title: OG_TITLE, description: DESCRIPTION },
+  openGraph: { title: OG_TITLE, description: DESCRIPTION, images: [DEFAULT_OG_IMAGE] },
+  twitter: { card: "summary_large_image", title: OG_TITLE, description: DESCRIPTION, images: [DEFAULT_OG_IMAGE] },
 }
 
 const SCENARIOS = [

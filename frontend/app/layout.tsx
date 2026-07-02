@@ -3,7 +3,7 @@ import { Hanken_Grotesk, Source_Serif_4 } from "next/font/google"
 import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistration"
 import { GoogleAnalytics } from "@/components/GoogleAnalytics"
 import { getLocale, getDictionary } from "@/lib/i18n"
-import { SITE_URL } from "@/lib/seo"
+import { SITE_URL, DEFAULT_OG_IMAGE } from "@/lib/seo"
 import "./globals.css"
 
 const hanken = Hanken_Grotesk({
@@ -18,9 +18,6 @@ const sourceSerif = Source_Serif_4({
   weight: ["400", "500", "600", "700"],
   style: ["normal", "italic"],
 })
-
-const OG_IMAGE =
-  "https://res.cloudinary.com/dtvdqlxtd/image/upload/w_1200,h_630,c_pad,b_white,f_png/v1782786243/araguaney_logo_ol8lm1"
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale()
@@ -42,7 +39,7 @@ export async function generateMetadata(): Promise<Metadata> {
     openGraph: {
       title: site_title,
       description: site_description,
-      images: [{ url: OG_IMAGE, width: 1200, height: 630 }],
+      images: [{ url: DEFAULT_OG_IMAGE, width: 1200, height: 630 }],
       type: "website",
       locale: locale === "en" ? "en_US" : "es_MX",
     },
@@ -50,7 +47,7 @@ export async function generateMetadata(): Promise<Metadata> {
       card: "summary_large_image",
       title: site_title,
       description: site_description,
-      images: [OG_IMAGE],
+      images: [DEFAULT_OG_IMAGE],
     },
     verification: process.env.GOOGLE_SITE_VERIFICATION
       ? { google: process.env.GOOGLE_SITE_VERIFICATION }

@@ -4,6 +4,7 @@ import HomeNav from "@/components/HomeNav"
 import HomeFooter from "@/components/HomeFooter"
 import { CtaLink } from "@/components/CtaLink"
 import { getDictionary } from "@/lib/i18n"
+import { DEFAULT_OG_IMAGE } from "@/lib/seo"
 
 const TITLE = "Cómo preparar carga humanitaria para aduana"
 const DESCRIPTION =
@@ -13,8 +14,8 @@ export const metadata: Metadata = {
   title: TITLE,
   description: DESCRIPTION,
   alternates: { canonical: "/guias/como-preparar-carga-humanitaria-para-aduana" },
-  openGraph: { title: `${TITLE} — Araguaney`, description: DESCRIPTION },
-  twitter: { title: `${TITLE} — Araguaney`, description: DESCRIPTION },
+  openGraph: { title: `${TITLE} — Araguaney`, description: DESCRIPTION, images: [DEFAULT_OG_IMAGE] },
+  twitter: { card: "summary_large_image", title: `${TITLE} — Araguaney`, description: DESCRIPTION, images: [DEFAULT_OG_IMAGE] },
 }
 
 const ERRORES = [
