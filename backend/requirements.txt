@@ -30,8 +30,8 @@ cryptography>=42.0.8
 # ── Optional layers ───────────────────────────────────────────────────────────
 # Uncomment the section(s) you need. See docs/optional-layers.md for setup.
 
-# Cloudinary — image / video uploads
-# cloudinary==1.41.0
+# Cloudinary — image / video uploads (avatars)
+cloudinary==1.41.0
 
 # AI / OpenAI-compatible providers (OpenAI, DeepSeek, Groq, etc.)
 # openai==1.55.0
