@@ -83,6 +83,11 @@ async def send_transfer_received_email_task(ctx, to: str, from_center: str, to_c
     await asyncio.to_thread(send_transfer_received_email, to, from_center, to_center)
 
 
+async def send_password_changed_email_task(ctx, to: str) -> None:
+    from app.email import send_password_changed_email
+    await asyncio.to_thread(send_password_changed_email, to)
+
+
 async def purge_attachments_cron(ctx) -> None:
     from app.database import SessionLocal
     from app.services.thread_service import ThreadService
@@ -117,6 +122,7 @@ def _build_fallbacks() -> dict:
         send_transfer_created_email,
         send_transfer_status_email,
         send_transfer_received_email,
+        send_password_changed_email,
     )
 
     return {
@@ -130,6 +136,7 @@ def _build_fallbacks() -> dict:
         "send_transfer_created_email_task": send_transfer_created_email,
         "send_transfer_status_email_task": send_transfer_status_email,
         "send_transfer_received_email_task": send_transfer_received_email,
+        "send_password_changed_email_task": send_password_changed_email,
     }
 
 
@@ -163,6 +170,7 @@ class WorkerSettings:
         send_transfer_created_email_task,
         send_transfer_status_email_task,
         send_transfer_received_email_task,
+        send_password_changed_email_task,
     ]
     cron_jobs = [
         cron(purge_audit_logs_cron, hour=3, minute=0),

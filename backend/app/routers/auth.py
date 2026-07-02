@@ -1,8 +1,9 @@
-from fastapi import APIRouter, BackgroundTasks, Depends, Request, status
+from fastapi import APIRouter, BackgroundTasks, Depends, File, Request, UploadFile, status
 from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
+from app.arq_pool import enqueue
 from app.database import get_db
 from app.dependencies import get_current_user
 from app.models.user import User
@@ -19,8 +20,9 @@ from app.schemas.auth import (
     Token,
     UserCreate,
 )
-from app.schemas.user_domain import UserOut
+from app.schemas.user_domain import AvatarOut, UserOut, UserProfileOut, UserUpdate
 from app.services.auth_service import AuthService
+from app.services.profile_service import ProfileService
 from app.utils.cloudflare import get_client_ip
 from app.utils.rate_limit import limiter
 
@@ -106,11 +108,43 @@ def get_me(current_user: User = Depends(get_current_user)):
     return current_user
 
 
+@router.get("/me/profile", response_model=UserProfileOut)
+def get_my_profile(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    return ProfileService(db).get_profile(current_user)
+
+
+@router.patch("/me", response_model=UserOut)
+@limiter.limit("20/hour")
+def update_me(
+    request: Request,
+    data: UserUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    return ProfileService(db).update_profile(current_user, data)
+
+
+@router.post("/me/avatar", response_model=AvatarOut)
+@limiter.limit("10/hour")
+async def upload_my_avatar(
+    request: Request,
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    contents = await file.read()
+    return ProfileService(db).upload_avatar(current_user, file.content_type, contents)
+
+
 @router.patch("/me/password", response_model=Token)
 @limiter.limit("10/hour")
 def change_password(
     request: Request,
     data: ChangePasswordRequest,
+    background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
@@ -124,6 +158,7 @@ def change_password(
         ip=get_client_ip(request),
     )
     db.commit()
+    enqueue(background_tasks, "send_password_changed_email_task", current_user.email)
     return result
 
 

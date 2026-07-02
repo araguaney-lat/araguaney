@@ -159,6 +159,15 @@ def send_transfer_status_email(
     )
 
 
+def send_password_changed_email(to: str) -> None:
+    site_url = settings.frontend_url.split(",")[0].strip()
+    _send(
+        to=to,
+        subject="Tu contraseña de Araguaney fue actualizada",
+        html=_render("password_changed.html", login_url=f"{site_url}/login"),
+    )
+
+
 def send_transfer_received_email(to: str, from_center: str, to_center: str) -> None:
     site_url = settings.frontend_url.split(",")[0].strip()
     _send(

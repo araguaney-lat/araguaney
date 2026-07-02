@@ -140,6 +140,57 @@ export async function changePasswordAction(_: unknown, formData: FormData) {
   }
 }
 
+export async function updateProfileAction(_: unknown, formData: FormData) {
+  const session = await auth()
+  if (!session?.accessToken) return { error: "No autenticado" }
+
+  const full_name = (formData.get("full_name") as string | null)?.trim() ?? ""
+  if (!full_name) return { error: "El nombre no puede estar vacío" }
+
+  const res = await fetch(`${API_URL}/v1/auth/me`, {
+    method: "PATCH",
+    body: JSON.stringify({ full_name }),
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${session.accessToken}`,
+    },
+  })
+
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}))
+    return { error: extractError(data, "Error al actualizar el perfil") }
+  }
+
+  revalidatePath("/dashboard", "layout")
+  return { success: true }
+}
+
+export async function uploadAvatarAction(_: unknown, formData: FormData) {
+  const session = await auth()
+  if (!session?.accessToken) return { error: "No autenticado" }
+
+  const file = formData.get("file") as File | null
+  if (!file || file.size === 0) return { error: "Selecciona una imagen" }
+
+  const uploadForm = new FormData()
+  uploadForm.append("file", file)
+
+  const res = await fetch(`${API_URL}/v1/auth/me/avatar`, {
+    method: "POST",
+    body: uploadForm,
+    headers: { Authorization: `Bearer ${session.accessToken}` },
+  })
+
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}))
+    return { error: extractError(data, "Error al subir la imagen") }
+  }
+
+  const data = await res.json()
+  revalidatePath("/dashboard", "layout")
+  return { success: true, avatar_url: data.avatar_url as string | null }
+}
+
 // ── Intake ────────────────────────────────────────────────────────────────────
 
 export interface BoxDraft {

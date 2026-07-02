@@ -32,6 +32,18 @@ export interface UserOut {
   created_at: string
 }
 
+export interface UserProfileOut {
+  id: string
+  email: string
+  username: string
+  full_name: string | null
+  avatar_url: string | null
+  center_role: CenterRole | null
+  center_id: string | null
+  center_name: string | null
+  campaigns: { id: string; name: string }[]
+}
+
 export type ProductCategory =
   | "MEDICINE"
   | "MEDICAL_SUPPLY"
