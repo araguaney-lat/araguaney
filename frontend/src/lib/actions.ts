@@ -91,6 +91,47 @@ export async function registerAction(_: unknown, formData: FormData) {
   redirect(`/verify-email?email=${encodeURIComponent(body.email as string)}`)
 }
 
+export async function forgotPasswordAction(_: unknown, formData: FormData) {
+  const email = formData.get("email") as string
+
+  const res = await fetch(`${API_URL}/v1/auth/forgot-password`, {
+    method: "POST",
+    body: JSON.stringify({ email }),
+    headers: { "Content-Type": "application/json" },
+  })
+
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}))
+    return { error: extractError(data, "No pudimos procesar la solicitud.") }
+  }
+
+  // Always a generic success message — the backend intentionally doesn't
+  // reveal whether the email is registered (enumeration protection).
+  return { success: true }
+}
+
+export async function resetPasswordAction(_: unknown, formData: FormData) {
+  const token = formData.get("token") as string
+  const new_password = formData.get("new_password") as string
+  const confirm_password = formData.get("confirm_password") as string
+
+  if (new_password !== confirm_password) return { error: "Las contraseñas no coinciden" }
+  if (new_password.length < 8) return { error: "La contraseña debe tener al menos 8 caracteres" }
+
+  const res = await fetch(`${API_URL}/v1/auth/reset-password`, {
+    method: "POST",
+    body: JSON.stringify({ token, new_password }),
+    headers: { "Content-Type": "application/json" },
+  })
+
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}))
+    return { error: extractError(data, "El enlace es inválido o expiró.") }
+  }
+
+  return { success: true }
+}
+
 export async function logoutAction() {
   const session = await auth()
   if (session?.accessToken) {

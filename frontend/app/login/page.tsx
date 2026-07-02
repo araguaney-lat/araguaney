@@ -107,7 +107,7 @@ export default function LoginPage() {
             />
 
             <div style={{ textAlign: "right", marginBottom: 24 }}>
-              <a href="#" style={{ fontSize: 12.5, color: "#1F5E8C", fontWeight: 600 }}>¿Olvidaste tu contraseña?</a>
+              <Link href="/forgot-password" style={{ fontSize: 12.5, color: "#1F5E8C", fontWeight: 600 }}>¿Olvidaste tu contraseña?</Link>
             </div>
 
             {state && "error" in state && state.error && (
