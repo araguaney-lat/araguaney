@@ -1,23 +1,20 @@
-import io
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Query, Request
-from fastapi.responses import StreamingResponse
+from fastapi import APIRouter, BackgroundTasks, Depends, Query, Request
 from sqlalchemy.orm import Session
 
-from app.config import settings
+from app.arq_pool import enqueue
 from app.database import get_db
 from app.dependencies import require_coordinator, tenant_scope
 from app.models.user import User
-from app.repositories.pallet_repository import PalletRepository
+from app.repositories.export_job_repository import ExportJobRepository
 from app.repositories.shipment_repository import ShipmentRepository
+from app.schemas.export_job import ExportJobOut
 from app.schemas.shipment import ShipmentCreate, ShipmentDetailOut, ShipmentOut
 from app.services.shipment_service import ShipmentService
 from app.repositories.audit_repository import AuditRepository
 from app.utils.cloudflare import get_client_ip
 from app.schemas.qr_ficha import QrEventOut
-from app.utils.manifest import ManifestBoxRow, ManifestData, ManifestPalletSection, generate_manifest_pdf
-from app.utils.manifest_xlsx import generate_manifest_xlsx
 from app.utils.rate_limit import limiter
 
 router = APIRouter(prefix="/v1/shipments", tags=["shipments"])
@@ -125,134 +122,58 @@ def ship_shipment(
     return shipment
 
 
-@router.get("/{shipment_id}/manifest.pdf")
+@router.post("/{shipment_id}/manifest.pdf", response_model=ExportJobOut, status_code=202)
 @limiter.limit("2/minute")
 def download_manifest(
     request: Request,
     shipment_id: UUID,
+    background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
-    _: User = Depends(require_coordinator),
+    current_user: User = Depends(require_coordinator),
     scope: UUID | None = Depends(tenant_scope),
 ):
-    """Generate and download the shipment manifest PDF (rate-limited: 2/min)."""
-    from app.repositories.product_type_repository import ProductTypeRepository
-
-    shipment = ShipmentRepository(db).find_by_id(shipment_id, scope)
-    if not shipment:
-        from app.utils.errors import api_error
-        raise api_error("SHIPMENT_NOT_FOUND", "Shipment not found", status_code=404)
-
-    pallet_repo = PalletRepository(db)
-    pt_repo = ProductTypeRepository(db)
-    pt_cache: dict = {}
-
-    pallets = ShipmentRepository(db).find_pallets(shipment_id)
-    boxes_by_pallet = pallet_repo.find_boxes_for_pallets([p.id for p in pallets])
-    pallet_sections: list[ManifestPalletSection] = []
-    for pallet in pallets:
-        boxes = boxes_by_pallet[pallet.id]
-        rows: list[ManifestBoxRow] = []
-        for box in boxes:
-            pt_id = box.product_type_id
-            if pt_id not in pt_cache:
-                pt_cache[pt_id] = pt_repo.find_by_id(pt_id)
-            pt = pt_cache[pt_id]
-            rows.append(ManifestBoxRow(
-                code=box.code,
-                display_name=pt.display_name if pt else "—",
-                category=pt.category if pt else "OTHER",
-                inn_name=pt.inn_name if pt else None,
-                strength=pt.strength if pt else None,
-                batch=box.batch,
-                expiry_date=box.expiry_date,
-                quantity=box.quantity,
-                unit=box.unit,
-                weight_kg=box.weight_kg,
-            ))
-        pallet_sections.append(ManifestPalletSection(code=pallet.code, boxes=rows))
-
-    manifest_data = ManifestData(
-        shipment_id=str(shipment.id),
-        destination=shipment.destination,
-        carrier=shipment.carrier,
-        reference=shipment.reference,
-        status=shipment.status,
-        closed_at=shipment.closed_at,
-        pallets=pallet_sections,
-    )
-
-    pdf_bytes = generate_manifest_pdf(manifest_data)
-    ref = shipment.reference or str(shipment_id)[:8]
-    return StreamingResponse(
-        io.BytesIO(pdf_bytes),
-        media_type="application/pdf",
-        headers={"Content-Disposition": f'attachment; filename="manifiesto-{ref}.pdf"'},
-    )
-
-
-@router.get("/{shipment_id}/manifest.xlsx")
-@limiter.limit("2/minute")
-def download_manifest_xlsx(
-    request: Request,
-    shipment_id: UUID,
-    db: Session = Depends(get_db),
-    _: User = Depends(require_coordinator),
-    scope: UUID | None = Depends(tenant_scope),
-):
-    """IFRC packing list in .xlsx format (rate-limited: 2/min)."""
-    from app.repositories.product_type_repository import ProductTypeRepository
+    """Queue shipment manifest PDF generation (rate-limited: 2/min). Poll GET /v1/exports/{id}."""
     from app.utils.errors import api_error
 
     shipment = ShipmentRepository(db).find_by_id(shipment_id, scope)
     if not shipment:
         raise api_error("SHIPMENT_NOT_FOUND", "Shipment not found", status_code=404)
 
-    pallet_repo = PalletRepository(db)
-    pt_repo = ProductTypeRepository(db)
-    pt_cache: dict = {}
-
-    pallets = ShipmentRepository(db).find_pallets(shipment_id)
-    boxes_by_pallet = pallet_repo.find_boxes_for_pallets([p.id for p in pallets])
-    pallet_sections: list[ManifestPalletSection] = []
-    for pallet in pallets:
-        boxes = boxes_by_pallet[pallet.id]
-        rows: list[ManifestBoxRow] = []
-        for box in boxes:
-            pt_id = box.product_type_id
-            if pt_id not in pt_cache:
-                pt_cache[pt_id] = pt_repo.find_by_id(pt_id)
-            pt = pt_cache[pt_id]
-            rows.append(ManifestBoxRow(
-                code=box.code,
-                display_name=pt.display_name if pt else "—",
-                category=pt.category if pt else "OTHER",
-                inn_name=pt.inn_name if pt else None,
-                strength=pt.strength if pt else None,
-                batch=box.batch,
-                expiry_date=box.expiry_date,
-                quantity=box.quantity,
-                unit=box.unit,
-                weight_kg=box.weight_kg,
-            ))
-        pallet_sections.append(ManifestPalletSection(code=pallet.code, boxes=rows))
-
-    manifest_data = ManifestData(
-        shipment_id=str(shipment.id),
-        destination=shipment.destination,
-        carrier=shipment.carrier,
-        reference=shipment.reference,
-        status=shipment.status,
-        closed_at=shipment.closed_at,
-        pallets=pallet_sections,
+    job = ExportJobRepository(db).create(
+        kind="SHIPMENT_MANIFEST_PDF",
+        params={"shipment_id": str(shipment_id)},
+        requested_by=current_user.id,
+        center_id=scope,
     )
+    enqueue(background_tasks, "generate_shipment_manifest_pdf_task", str(job.id))
+    return ExportJobOut(id=job.id, kind=job.kind, status=job.status, error=None)
 
-    xlsx_bytes = generate_manifest_xlsx(manifest_data)
-    ref = shipment.reference or str(shipment_id)[:8]
-    return StreamingResponse(
-        io.BytesIO(xlsx_bytes),
-        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        headers={"Content-Disposition": f'attachment; filename="packing-list-ifrc-{ref}.xlsx"'},
+
+@router.post("/{shipment_id}/manifest.xlsx", response_model=ExportJobOut, status_code=202)
+@limiter.limit("2/minute")
+def download_manifest_xlsx(
+    request: Request,
+    shipment_id: UUID,
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_coordinator),
+    scope: UUID | None = Depends(tenant_scope),
+):
+    """Queue the IFRC packing list (.xlsx) generation (rate-limited: 2/min). Poll GET /v1/exports/{id}."""
+    from app.utils.errors import api_error
+
+    shipment = ShipmentRepository(db).find_by_id(shipment_id, scope)
+    if not shipment:
+        raise api_error("SHIPMENT_NOT_FOUND", "Shipment not found", status_code=404)
+
+    job = ExportJobRepository(db).create(
+        kind="SHIPMENT_MANIFEST_XLSX",
+        params={"shipment_id": str(shipment_id)},
+        requested_by=current_user.id,
+        center_id=scope,
     )
+    enqueue(background_tasks, "generate_shipment_manifest_xlsx_task", str(job.id))
+    return ExportJobOut(id=job.id, kind=job.kind, status=job.status, error=None)
 
 
 @router.get("/{shipment_id}/events", response_model=list[QrEventOut])

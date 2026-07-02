@@ -72,6 +72,23 @@ def generate_download_url(r2_key: str) -> str:
     )
 
 
+def put_object(r2_key: str, data: bytes, content_type: str, filename: str | None = None) -> None:
+    """Server-side upload — used by ARQ workers that generate bytes in-process
+    (unlike message attachments, which are uploaded directly by the browser
+    via generate_upload_url).
+
+    filename, when given, sets Content-Disposition so a direct browser
+    navigation to the presigned download URL (see generate_download_url)
+    downloads with the right name instead of the raw R2 key.
+    """
+    extra: dict = {}
+    if filename:
+        extra["ContentDisposition"] = f'attachment; filename="{filename}"'
+    _client().put_object(
+        Bucket=settings.r2_bucket_name, Key=r2_key, Body=data, ContentType=content_type, **extra
+    )
+
+
 def object_exists(r2_key: str) -> bool:
     """True if the object exists in R2 (used to confirm upload before registering)."""
     try:

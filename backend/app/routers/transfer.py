@@ -1,8 +1,6 @@
-import io
 from uuid import UUID
 
 from fastapi import APIRouter, BackgroundTasks, Depends, Query, Request
-from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 
 from app.arq_pool import enqueue
@@ -10,7 +8,9 @@ from app.database import get_db
 from app.dependencies import get_current_superadmin, require_coordinator
 from app.models.user import User
 from app.repositories.center_repository import CenterRepository
+from app.repositories.export_job_repository import ExportJobRepository
 from app.repositories.transfer_repository import TransferRepository
+from app.schemas.export_job import ExportJobOut
 from app.schemas.transfer import (
     TransferCreate,
     TransferDetailOut,
@@ -20,7 +20,6 @@ from app.schemas.transfer import (
 from app.services.transfer_service import TransferService
 from app.utils.audit import fire_audit
 from app.utils.cloudflare import get_client_ip
-from app.utils.manifest import ManifestBoxRow, TransferManifestData, generate_transfer_manifest_pdf
 from app.utils.rate_limit import limiter
 
 router = APIRouter(prefix="/v1/transfers", tags=["transfers"])
@@ -98,16 +97,16 @@ def list_transfers(
     )
 
 
-@router.get("/{transfer_id}/manifest.pdf")
+@router.post("/{transfer_id}/manifest.pdf", response_model=ExportJobOut, status_code=202)
 @limiter.limit("2/minute")
 def download_transfer_manifest(
     request: Request,
     transfer_id: UUID,
+    background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
     current_user: User = Depends(require_coordinator),
 ):
-    """Generate and stream the transfer manifest PDF (rate-limited: 2/min)."""
-    from app.repositories.product_type_repository import ProductTypeRepository
+    """Queue the transfer manifest PDF generation (rate-limited: 2/min). Poll GET /v1/exports/{id}."""
     from app.utils.errors import api_error
 
     repo = TransferRepository(db)
@@ -127,48 +126,14 @@ def download_transfer_manifest(
             status_code=409,
         )
 
-    center_repo = CenterRepository(db)
-    from_center = center_repo.find_by_id(transfer.from_center_id)
-    to_center = center_repo.find_by_id(transfer.to_center_id)
-
-    pt_repo = ProductTypeRepository(db)
-    pt_cache: dict = {}
-    boxes = repo.find_boxes(transfer_id)
-    rows: list[ManifestBoxRow] = []
-    for box in boxes:
-        pt_id = box.product_type_id
-        if pt_id not in pt_cache:
-            pt_cache[pt_id] = pt_repo.find_by_id(pt_id)
-        pt = pt_cache[pt_id]
-        rows.append(ManifestBoxRow(
-            code=box.code,
-            display_name=pt.display_name if pt else "—",
-            category=pt.category if pt else "OTHER",
-            inn_name=pt.inn_name if pt else None,
-            strength=pt.strength if pt else None,
-            batch=box.batch,
-            expiry_date=box.expiry_date,
-            quantity=box.quantity,
-            unit=box.unit,
-            weight_kg=box.weight_kg,
-        ))
-
-    manifest_data = TransferManifestData(
-        transfer_id=str(transfer.id),
-        from_center=from_center.name if from_center else str(transfer.from_center_id)[:8],
-        to_center=to_center.name if to_center else str(transfer.to_center_id)[:8],
-        status=transfer.status,
-        created_at=transfer.created_at,
-        boxes=rows,
+    job = ExportJobRepository(db).create(
+        kind="TRANSFER_MANIFEST_PDF",
+        params={"transfer_id": str(transfer_id)},
+        requested_by=current_user.id,
+        center_id=current_user.center_id,
     )
-
-    pdf_bytes = generate_transfer_manifest_pdf(manifest_data)
-    short_id = str(transfer_id)[:8]
-    return StreamingResponse(
-        io.BytesIO(pdf_bytes),
-        media_type="application/pdf",
-        headers={"Content-Disposition": f'attachment; filename="transferencia-{short_id}.pdf"'},
-    )
+    enqueue(background_tasks, "generate_transfer_manifest_pdf_task", str(job.id))
+    return ExportJobOut(id=job.id, kind=job.kind, status=job.status, error=None)
 
 
 @router.get("/{transfer_id}", response_model=TransferDetailOut)

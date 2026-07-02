@@ -11,6 +11,7 @@ import {
   dispatchTransferAction,
   receiveTransferAction,
 } from "@/lib/transfer-actions"
+import { useExportJob } from "@/hooks/useExportJob"
 import { useDict } from "@/context/DictionaryContext"
 
 const STATUS_COLORS: Record<TransferStatus, string> = {
@@ -46,6 +47,7 @@ export default function TransfersPage() {
   })
   const [rejectReason, setRejectReason] = useState("")
   const [rejectingId, setRejectingId] = useState<string | null>(null)
+  const manifestExport = useExportJob()
 
   const fetchTransfers = async () => {
     setLoading(true)
@@ -70,6 +72,10 @@ export default function TransfersPage() {
   }
 
   useEffect(() => { fetchTransfers() }, [tab]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (manifestExport.error) setError(manifestExport.error)
+  }, [manifestExport.error])
 
   useEffect(() => {
     fetch("/api/centers")
@@ -415,14 +421,13 @@ export default function TransfersPage() {
             </div>
 
             {["APPROVED", "IN_TRANSIT", "RECEIVED"].includes(activeDetail.status) && (
-              <a
-                href={`/api/transfers/${activeDetail.id}/manifest.pdf`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded border border-zinc-300 text-zinc-700 hover:bg-zinc-50 transition-colors"
+              <button
+                onClick={() => manifestExport.start(`/v1/transfers/${activeDetail.id}/manifest.pdf`)}
+                disabled={manifestExport.isBusy}
+                className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded border border-zinc-300 text-zinc-700 hover:bg-zinc-50 transition-colors disabled:opacity-50"
               >
-                {t.download_manifest}
-              </a>
+                {manifestExport.isBusy ? dict.dashboard.common.exporting : t.download_manifest}
+              </button>
             )}
 
             {activeDetail.events.length > 0 && (

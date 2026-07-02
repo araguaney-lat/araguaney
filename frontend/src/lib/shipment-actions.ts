@@ -82,24 +82,3 @@ export async function shipShipmentAction(shipmentId: string) {
   }
 }
 
-export async function downloadManifestAction(shipmentId: string, reference?: string) {
-  const session = await auth()
-  if (!session?.accessToken) return { error: "No autenticado" }
-
-  try {
-    const API_URL = process.env.API_URL ?? "http://localhost:8000"
-    const res = await fetch(`${API_URL}/v1/shipments/${shipmentId}/manifest.pdf`, {
-      headers: { Authorization: `Bearer ${session.accessToken}` },
-    })
-    if (!res.ok) {
-      const body = await res.json().catch(() => ({}))
-      return { error: body.error?.message ?? "Error al generar manifiesto" }
-    }
-    const buffer = await res.arrayBuffer()
-    const base64 = Buffer.from(buffer).toString("base64")
-    const ref = reference ?? shipmentId.slice(0, 8)
-    return { pdf: base64, filename: `manifiesto-${ref}.pdf` }
-  } catch (err: unknown) {
-    return { error: err instanceof Error ? err.message : "Error al descargar manifiesto" }
-  }
-}

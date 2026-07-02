@@ -1,9 +1,10 @@
 "use client"
 
-import { useState, useEffect, useTransition } from "react"
+import { useState, useEffect } from "react"
 import type { BoxOut, BoxStatus, EventOut } from "@/types"
 import { StatusTimeline } from "@/components/StatusTimeline"
-import { sealBoxAction, downloadLabelsPdfAction } from "@/lib/box-actions"
+import { sealBoxAction } from "@/lib/box-actions"
+import { useExportJob } from "@/hooks/useExportJob"
 import { useDict } from "@/context/DictionaryContext"
 
 const STATUS_COLORS: Record<BoxStatus, string> = {
@@ -24,7 +25,7 @@ export default function BoxesPage() {
   const [sealing, setSealing] = useState<string | null>(null)
   const [expandedBoxId, setExpandedBoxId] = useState<string | null>(null)
   const [boxEvents, setBoxEvents] = useState<Record<string, EventOut[]>>({})
-  const [isPending, startTransition] = useTransition()
+  const labelsExport = useExportJob()
 
   const fetchBoxes = async () => {
     setLoading(true)
@@ -43,6 +44,10 @@ export default function BoxesPage() {
 
   useEffect(() => { fetchBoxes() }, [filter]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  useEffect(() => {
+    if (labelsExport.error) setError(labelsExport.error)
+  }, [labelsExport.error])
+
   const handleSeal = async (boxId: string) => {
     setSealing(boxId)
     const result = await sealBoxAction(boxId)
@@ -54,24 +59,9 @@ export default function BoxesPage() {
     }
   }
 
-  const handleDownloadPdf = async () => {
-    startTransition(async () => {
-      const result = await downloadLabelsPdfAction(filter || "DRAFT")
-      if (result.error) {
-        setError(result.error)
-        return
-      }
-      if (result.pdf) {
-        const bytes = Uint8Array.from(atob(result.pdf), (c) => c.charCodeAt(0))
-        const blob = new Blob([bytes], { type: "application/pdf" })
-        const url = URL.createObjectURL(blob)
-        const a = document.createElement("a")
-        a.href = url
-        a.download = result.filename ?? "etiquetas.pdf"
-        a.click()
-        URL.revokeObjectURL(url)
-      }
-    })
+  const handleDownloadPdf = () => {
+    setError(null)
+    labelsExport.start(`/v1/boxes/labels/pdf?status=${filter || "DRAFT"}`)
   }
 
   const toggleBoxDetail = async (boxId: string) => {
@@ -108,10 +98,10 @@ export default function BoxesPage() {
           </select>
           <button
             onClick={handleDownloadPdf}
-            disabled={isPending || boxes.length === 0}
+            disabled={labelsExport.isBusy || boxes.length === 0}
             className="rounded-lg border border-zinc-300 px-3 py-1.5 text-sm text-zinc-700 hover:bg-zinc-50 disabled:opacity-50"
           >
-            {isPending ? t.generating_pdf : t.download_labels}
+            {labelsExport.isBusy ? t.generating_pdf : t.download_labels}
           </button>
         </div>
       </div>

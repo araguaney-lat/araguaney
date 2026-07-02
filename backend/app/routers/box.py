@@ -1,23 +1,22 @@
-import io
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Query, Request
-from fastapi.responses import Response, StreamingResponse
+from fastapi import APIRouter, BackgroundTasks, Depends, Query, Request
+from fastapi.responses import Response
 from sqlalchemy.orm import Session
 
+from app.arq_pool import enqueue
 from app.config import settings
 from app.database import get_db
 from app.dependencies import get_current_user, require_center_role, tenant_scope
 from app.models.user import User
 from app.repositories.box_repository import BoxRepository
-from app.repositories.product_type_repository import ProductTypeRepository
-from app.repositories.center_repository import CenterRepository
+from app.repositories.export_job_repository import ExportJobRepository
 from app.schemas.box import BoxOut, BoxPublicOut
+from app.schemas.export_job import ExportJobOut
 from app.schemas.qr_ficha import QrEventOut
 from app.services.box_service import BoxService
 from app.repositories.audit_repository import AuditRepository
 from app.utils.cloudflare import get_client_ip
-from app.utils.pdf_labels import LabelData, generate_labels_pdf
 from app.utils.qr import box_qr_png
 from app.utils.rate_limit import limiter
 
@@ -122,55 +121,29 @@ def box_qr_authenticated(
     return Response(content=png, media_type="image/png")
 
 
-@router.get("/v1/boxes/labels/pdf")
+@router.post("/v1/boxes/labels/pdf", response_model=ExportJobOut, status_code=202)
 @limiter.limit("10/minute")
 def download_labels_pdf(
     request: Request,
+    background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
     current_user: User = Depends(require_center_role),
     scope: UUID | None = Depends(tenant_scope),
     status: str = "DRAFT",
 ):
-    """Generate A4 multi-label PDF for boxes (10 per page). Rate-limited."""
-    boxes = BoxRepository(db).list_all(scope, status=status)
-    if not boxes:
+    """Queue A4 multi-label PDF generation for boxes (10 per page, rate-limited). Poll GET /v1/exports/{id}."""
+    if not BoxRepository(db).list_all(scope, status=status, limit=1):
         from app.utils.errors import api_error
         raise api_error("NO_BOXES", "No boxes found with the given filters", status_code=404)
 
-    pt_cache: dict = {}
-    center_name = "Acopio"
-    if scope:
-        cr = CenterRepository(db)
-        center = cr.find_by_id(scope)
-        if center:
-            center_name = center.name
-
-    base_url = settings.frontend_url.split(",")[0].strip().rstrip("/")
-
-    labels: list[LabelData] = []
-    for box in boxes:
-        pt_id = box.product_type_id
-        if pt_id not in pt_cache:
-            pt_cache[pt_id] = ProductTypeRepository(db).find_by_id(pt_id)
-        pt = pt_cache[pt_id]
-        labels.append(LabelData(
-            code=box.code,
-            display_name=pt.display_name if pt else "—",
-            category=pt.category if pt else "OTHER",
-            batch=box.batch,
-            expiry_date=box.expiry_date,
-            quantity=box.quantity,
-            unit=box.unit,
-            center_name=center_name,
-            base_url=base_url,
-        ))
-
-    pdf_bytes = generate_labels_pdf(labels)
-    return StreamingResponse(
-        io.BytesIO(pdf_bytes),
-        media_type="application/pdf",
-        headers={"Content-Disposition": f'attachment; filename="etiquetas-{status.lower()}.pdf"'},
+    job = ExportJobRepository(db).create(
+        kind="BOX_LABELS_PDF",
+        params={"center_id": str(scope) if scope else None, "status": status},
+        requested_by=current_user.id,
+        center_id=scope,
     )
+    enqueue(background_tasks, "generate_box_labels_pdf_task", str(job.id))
+    return ExportJobOut(id=job.id, kind=job.kind, status=job.status, error=None)
 
 
 @router.get("/v1/boxes/{box_id}/events", response_model=list[QrEventOut])

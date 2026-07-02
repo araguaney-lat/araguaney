@@ -1,21 +1,22 @@
-import io
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Query, Request
-from fastapi.responses import Response, StreamingResponse
+from fastapi import APIRouter, BackgroundTasks, Depends, Query, Request
+from fastapi.responses import Response
 from sqlalchemy.orm import Session
 
+from app.arq_pool import enqueue
 from app.config import settings
 from app.database import get_db
 from app.dependencies import get_current_user, require_coordinator, tenant_scope
 from app.models.user import User
+from app.repositories.export_job_repository import ExportJobRepository
 from app.repositories.pallet_repository import PalletRepository
+from app.schemas.export_job import ExportJobOut
 from app.schemas.pallet import PalletCreate, PalletDetailOut, PalletOut, PalletPublicOut
 from app.schemas.qr_ficha import QrEventOut
 from app.services.pallet_service import PalletService
 from app.repositories.audit_repository import AuditRepository
 from app.utils.cloudflare import get_client_ip
-from app.utils.pdf_pallet_label import PalletLabelData, generate_pallet_label_pdf
 from app.utils.qr import pallet_qr_png
 from app.utils.rate_limit import limiter
 
@@ -140,32 +141,27 @@ def close_pallet(
     return pallet
 
 
-@router.get("/v1/pallets/{pallet_id}/label.pdf")
+@router.post("/v1/pallets/{pallet_id}/label.pdf", response_model=ExportJobOut, status_code=202)
 @limiter.limit("10/minute")
 def pallet_label_pdf(
     request: Request,
     pallet_id: UUID,
+    background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
     current_user: User = Depends(require_coordinator),
     scope: UUID | None = Depends(tenant_scope),
 ):
-    detail = PalletService(db).get_detail(pallet_id, center_id=scope)
-    base_url = settings.frontend_url.split(",")[0].strip().rstrip("/")
-    label = PalletLabelData(
-        code=detail.code,
-        center_name=str(detail.center_id),
-        status=detail.status,
-        box_codes=[b.code for b in detail.boxes],
-        closed_at=detail.closed_at,
-        base_url=base_url,
+    """Queue the pallet label PDF generation (rate-limited). Poll GET /v1/exports/{id}."""
+    PalletService(db).get_detail(pallet_id, center_id=scope)  # validates existence + tenant access
+
+    job = ExportJobRepository(db).create(
+        kind="PALLET_LABEL_PDF",
+        params={"pallet_id": str(pallet_id)},
+        requested_by=current_user.id,
+        center_id=scope,
     )
-    pdf_bytes = generate_pallet_label_pdf(label)
-    filename = f"tarima-{detail.code}.pdf"
-    return StreamingResponse(
-        io.BytesIO(pdf_bytes),
-        media_type="application/pdf",
-        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
-    )
+    enqueue(background_tasks, "generate_pallet_label_pdf_task", str(job.id))
+    return ExportJobOut(id=job.id, kind=job.kind, status=job.status, error=None)
 
 
 @router.get("/v1/pallets/{pallet_id}/events", response_model=list[QrEventOut])
