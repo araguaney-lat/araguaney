@@ -28,7 +28,9 @@ export async function submitContact(formData: unknown): Promise<ContactResult> {
     return { ok: false, error: "Verificación de seguridad fallida. Intenta de nuevo." }
   }
 
-  const apiKey = process.env.RESEND_API_KEY
+  // .trim() guards against a trailing newline in the env var value (same
+  // class of paste artifact that broke the Turnstile sitekey).
+  const apiKey = process.env.RESEND_API_KEY?.trim()
   if (!apiKey) {
     return { ok: false, error: "Servicio de correo no configurado." }
   }
@@ -41,7 +43,7 @@ export async function submitContact(formData: unknown): Promise<ContactResult> {
 
   const resend = new Resend(apiKey)
   const { error } = await resend.emails.send({
-    from: "Araguaney Contacto <contacto@bioflow.io>",
+    from: "Araguaney <contacto@araguaney.lat>",
     to: ["hola@araguaney.lat"],
     replyTo: correo,
     subject: `[Contacto] ${tipoLabel[tipo]} — ${organizacion}`,
@@ -56,6 +58,7 @@ export async function submitContact(formData: unknown): Promise<ContactResult> {
   })
 
   if (error) {
+    console.error("[contact-actions] Resend send failed:", error)
     return { ok: false, error: "Error al enviar el correo. Intenta más tarde." }
   }
 
