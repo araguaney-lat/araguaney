@@ -46,6 +46,11 @@ async def send_password_reset_email_task(ctx, to: str, token: str) -> None:
     await asyncio.to_thread(send_password_reset_email, to, token)
 
 
+async def send_invitation_email_task(ctx, to: str, username: str, temp_password: str) -> None:
+    from app.email import send_invitation_email
+    await asyncio.to_thread(send_invitation_email, to, username, temp_password)
+
+
 async def send_request_reply_email_task(ctx, to: str, request_title: str, reply_body: str, request_url: str) -> None:
     from app.email import send_request_reply_email
     await asyncio.to_thread(send_request_reply_email, to, request_title, reply_body, request_url)
@@ -115,6 +120,7 @@ def _build_fallbacks() -> dict:
     from app.email import (
         send_verification_email,
         send_password_reset_email,
+        send_invitation_email,
         send_request_reply_email,
         send_message_private_email,
         send_message_public_email,
@@ -129,6 +135,7 @@ def _build_fallbacks() -> dict:
         "notify_slack_task": notify_slack,
         "send_verification_email_task": send_verification_email,
         "send_password_reset_email_task": send_password_reset_email,
+        "send_invitation_email_task": send_invitation_email,
         "send_request_reply_email_task": send_request_reply_email,
         "send_message_private_email_task": send_message_private_email,
         "send_message_public_email_task": send_message_public_email,
@@ -163,6 +170,7 @@ class WorkerSettings:
         notify_slack_task,
         send_verification_email_task,
         send_password_reset_email_task,
+        send_invitation_email_task,
         send_request_reply_email_task,
         send_message_private_email_task,
         send_message_public_email_task,

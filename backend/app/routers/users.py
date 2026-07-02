@@ -1,9 +1,10 @@
 import secrets
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, BackgroundTasks, Depends, Request
 from sqlalchemy.orm import Session
 
+from app.arq_pool import enqueue
 from app.database import get_db
 from app.dependencies import require_coordinator
 from app.models.user import User
@@ -26,6 +27,7 @@ def invite_user(
     request: Request,
     center_id: UUID,
     data: UserInvite,
+    background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
     current_user: User = Depends(require_coordinator),
 ):
@@ -42,11 +44,12 @@ def invite_user(
     if repo.username_exists(data.username):
         raise api_error("USERNAME_TAKEN", "Username already taken", field="username")
 
+    raw_password = secrets.token_urlsafe(16)
     user = repo.save(User(
         email=data.email,
         username=data.username,
         full_name=data.full_name,
-        hashed_password=AuthService.hash_password(secrets.token_urlsafe(16)),
+        hashed_password=AuthService.hash_password(raw_password),
         is_verified=True,
         must_change_password=True,
         center_id=center_id,
@@ -67,7 +70,7 @@ def invite_user(
         ip=get_client_ip(request),
     )
     db.commit()
-    # TODO: enqueue send_invitation_email_task(user.email, raw_password)
+    enqueue(background_tasks, "send_invitation_email_task", user.email, user.username, raw_password)
     return user
 
 
@@ -77,6 +80,7 @@ def reinvite_center_user(
     request: Request,
     center_id: UUID,
     user_id: UUID,
+    background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
     current_user: User = Depends(require_coordinator),
 ):
@@ -103,7 +107,7 @@ def reinvite_center_user(
         ip=get_client_ip(request),
     )
     db.commit()
-    # TODO: enqueue send_invitation_email_task(user.email, raw_password)
+    enqueue(background_tasks, "send_invitation_email_task", user.email, user.username, raw_password)
     return {"message": "Invitation sent"}
 
 

@@ -8,6 +8,7 @@ import jwt
 from fastapi import BackgroundTasks, HTTPException, status
 from sqlalchemy.orm import Session
 
+from app.arq_pool import enqueue
 from app.config import settings
 from app.models.token_denylist import TokenDenylist
 from app.models.user import User
@@ -283,7 +284,7 @@ class AuthService(BaseService):
         user.reset_password_token = None
         user.reset_password_token_expires_at = None
         repo.commit()
-        # TODO: enqueue send_password_changed_email_task
+        enqueue(background_tasks, "send_password_changed_email_task", user.email)
         return {"message": "Password updated successfully."}
 
     # ── TOTP / 2FA ─────────────────────────────────────────────────────────────
