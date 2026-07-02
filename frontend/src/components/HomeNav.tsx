@@ -62,7 +62,7 @@ export default function HomeNav({ dict, locale, localeLinks }: Props) {
             >
               <Image
                 src={LOGO}
-                alt="Araguaney"
+                alt=""
                 width={34}
                 height={34}
                 className="object-contain"

@@ -83,14 +83,14 @@ export default async function NecesidadesPage() {
                     <p className="font-medium text-zinc-900">
                       {CATEGORY_LABELS[row.category] ?? row.category}
                     </p>
-                    <p className="text-xs text-zinc-400">{row.box_count.toLocaleString()} cajas</p>
+                    <p className="text-xs text-zinc-500">{row.box_count.toLocaleString()} cajas</p>
                   </div>
                 </div>
                 <div className="text-right">
                   <p className="text-lg font-bold text-zinc-900">
                     {row.total_units.toLocaleString()}
                   </p>
-                  <p className="text-xs text-zinc-400">unidades</p>
+                  <p className="text-xs text-zinc-500">unidades</p>
                 </div>
               </div>
             ))}
@@ -103,7 +103,7 @@ export default async function NecesidadesPage() {
           </Link>
         </p>
 
-        <p className="mt-4 text-center text-xs text-zinc-400">
+        <p className="mt-4 text-center text-xs text-zinc-500">
           Esta página es pública y no contiene información personal.
         </p>
       </div>

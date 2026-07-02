@@ -101,11 +101,11 @@ export default async function EventoPage({
               gap: 7,
               letterSpacing: "0.1em",
               textTransform: "uppercase",
-              color: "#B07D00",
+              color: "#946A00",
               fontWeight: 700,
             }}
           >
-            <span style={{ width: 18, height: 1.5, background: "#E0A100", display: "inline-block" }} />
+            <span style={{ width: 18, height: 1.5, background: "#906400", display: "inline-block" }} />
             Ayuda humanitaria
           </div>
 
@@ -165,12 +165,12 @@ export default async function EventoPage({
                       <p className="font-medium text-zinc-900">
                         {CATEGORY_LABELS[row.category] ?? row.category}
                       </p>
-                      <p className="text-xs text-zinc-400">{row.box_count.toLocaleString()} cajas</p>
+                      <p className="text-xs text-zinc-500">{row.box_count.toLocaleString()} cajas</p>
                     </div>
                   </div>
                   <div className="text-right">
                     <p className="text-lg font-bold text-zinc-900">{row.total_units.toLocaleString()}</p>
-                    <p className="text-xs text-zinc-400">unidades</p>
+                    <p className="text-xs text-zinc-500">unidades</p>
                   </div>
                 </div>
               ))}
@@ -195,7 +195,7 @@ export default async function EventoPage({
         >
           Sumar un centro de acopio
         </Link>
-        <p className="text-[13.5px]" style={{ color: "#8A8073" }}>
+        <p className="text-[13.5px]" style={{ color: "#6E6557" }}>
           ¿Quieres saber cómo funciona para cualquier emergencia?{" "}
           <Link href="/ayuda-humanitaria" style={{ color: "#1F5E8C", fontWeight: 600 }}>
             Conoce Araguaney →

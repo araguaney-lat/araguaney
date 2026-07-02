@@ -50,7 +50,7 @@ export default function TwoFactorPage() {
       <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 32, textDecoration: "none" }}>
         <span style={{ width: 36, height: 36, borderRadius: "50%", background: "#F3C033" }}
           className="flex items-center justify-center overflow-hidden flex-none">
-          <Image src={LOGO} alt="Araguaney" width={32} height={32} className="object-contain" />
+          <Image src={LOGO} alt="" width={32} height={32} className="object-contain" />
         </span>
         <span style={{ fontFamily: "var(--font-source-serif)", fontSize: 20, fontWeight: 600, color: "#3B2A00" }}>
           Araguaney

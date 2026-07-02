@@ -22,7 +22,7 @@ export default function ContactoPage() {
         <Link href="/" className="flex items-center gap-[9px] md:gap-[11px]">
           <span style={{ borderRadius: "50%", border: "1px solid #EADFC4" }}
             className="w-8 h-8 md:w-[38px] md:h-[38px] flex items-center justify-center overflow-hidden bg-white flex-none">
-            <Image src={LOGO} alt="Araguaney" width={34} height={34} className="object-contain" />
+            <Image src={LOGO} alt="" width={34} height={34} className="object-contain" />
           </span>
           <span style={{ fontFamily: "var(--font-source-serif)", fontWeight: 600, color: "#2B2723" }}
             className="text-[18px] md:text-[21px]">Araguaney</span>
@@ -61,9 +61,9 @@ export default function ContactoPage() {
 
         {/* Left: info */}
         <div className="px-5 md:px-[46px] py-7 md:py-[56px]">
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 7, fontSize: 10.5, letterSpacing: "0.12em", textTransform: "uppercase", color: "#B07D00", fontWeight: 700, marginBottom: 14 }}
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 7, fontSize: 10.5, letterSpacing: "0.12em", textTransform: "uppercase", color: "#946A00", fontWeight: 700, marginBottom: 14 }}
             className="md:text-[12px] md:mb-[18px]">
-            <span style={{ width: 18, height: 1.5, background: "#E0A100" }} className="md:w-6" />
+            <span style={{ width: 18, height: 1.5, background: "#906400" }} className="md:w-6" />
             Hablemos
           </div>
           <h1 style={{ fontFamily: "var(--font-source-serif)", margin: "0 0 14px", fontWeight: 600, letterSpacing: "-0.3px", lineHeight: 1.1 }}
@@ -78,9 +78,9 @@ export default function ContactoPage() {
           {/* Contact info — desktop only */}
           <div className="hidden md:flex flex-col gap-[18px] mt-9">
             {[
-              { bg: "#FBEFC9", c: "#B07D00", title: "Correo", val: "hola@araguaney.lat" },
+              { bg: "#FBEFC9", c: "#946A00", title: "Correo", val: "hola@araguaney.lat" },
               { bg: "#E9F1F8", c: "#1F5E8C", title: "Alta de centro", val: "Respuesta en menos de 48 horas hábiles" },
-              { bg: "#FBEFC9", c: "#B07D00", title: "Centros activos", val: "Operando en México · destino Venezuela" },
+              { bg: "#FBEFC9", c: "#946A00", title: "Centros activos", val: "Operando en México · destino Venezuela" },
             ].map((item) => (
               <div key={item.title} className="flex gap-[14px] items-start">
                 <div style={{ width: 40, height: 40, borderRadius: 10, background: item.bg, border: `2px solid ${item.c}`, flexShrink: 0 }} />

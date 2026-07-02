@@ -42,11 +42,11 @@ export default async function AduanaGuidePage() {
               gap: 7,
               letterSpacing: "0.1em",
               textTransform: "uppercase",
-              color: "#B07D00",
+              color: "#946A00",
               fontWeight: 700,
             }}
           >
-            <span style={{ width: 18, height: 1.5, background: "#E0A100", display: "inline-block" }} />
+            <span style={{ width: 18, height: 1.5, background: "#906400", display: "inline-block" }} />
             Guía
           </div>
 

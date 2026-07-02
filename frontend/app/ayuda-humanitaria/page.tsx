@@ -44,11 +44,11 @@ export default async function AyudaHumanitariaPage() {
               gap: 7,
               letterSpacing: "0.1em",
               textTransform: "uppercase",
-              color: "#B07D00",
+              color: "#946A00",
               fontWeight: 700,
             }}
           >
-            <span style={{ width: 18, height: 1.5, background: "#E0A100", display: "inline-block" }} />
+            <span style={{ width: 18, height: 1.5, background: "#906400", display: "inline-block" }} />
             Ayuda humanitaria
           </div>
 
@@ -168,13 +168,13 @@ export default async function AyudaHumanitariaPage() {
         >
           Empezar ahora
         </CtaLink>
-        <p className="text-[13.5px] mb-2" style={{ color: "#8A8073" }}>
+        <p className="text-[13.5px] mb-2" style={{ color: "#6E6557" }}>
           ¿Coordinas específicamente un centro de acopio?{" "}
           <Link href="/centro-de-acopio" style={{ color: "#1F5E8C", fontWeight: 600 }}>
             Conoce el estándar completo →
           </Link>
         </p>
-        <p className="text-[13.5px]" style={{ color: "#8A8073" }}>
+        <p className="text-[13.5px]" style={{ color: "#6E6557" }}>
           <Link href="/guias/que-se-puede-donar" style={{ color: "#1F5E8C", fontWeight: 600 }}>
             Qué se puede donar
           </Link>

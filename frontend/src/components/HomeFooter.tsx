@@ -19,7 +19,7 @@ export default function HomeFooter({ dict }: Props) {
           className="flex items-center justify-center overflow-hidden flex-none"
           style={{ width: 38, height: 38, borderRadius: "50%", background: "#fff" }}
         >
-          <Image src={LOGO} alt="Araguaney" width={34} height={34} className="object-contain" />
+          <Image src={LOGO} alt="" width={34} height={34} className="object-contain" />
         </span>
         <div>
           <div

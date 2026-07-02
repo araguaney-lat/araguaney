@@ -65,11 +65,11 @@ export default async function CentroDeAcopioPage() {
               gap: 7,
               letterSpacing: "0.1em",
               textTransform: "uppercase",
-              color: "#B07D00",
+              color: "#946A00",
               fontWeight: 700,
             }}
           >
-            <span style={{ width: 18, height: 1.5, background: "#E0A100", display: "inline-block" }} />
+            <span style={{ width: 18, height: 1.5, background: "#906400", display: "inline-block" }} />
             Software para centros de acopio
           </div>
 
@@ -190,13 +190,13 @@ export default async function CentroDeAcopioPage() {
         >
           Sumar mi centro de acopio
         </CtaLink>
-        <p className="text-[13.5px] mb-2" style={{ color: "#8A8073" }}>
+        <p className="text-[13.5px] mb-2" style={{ color: "#6E6557" }}>
           ¿Coordinas ayuda para otro tipo de emergencia?{" "}
           <Link href="/ayuda-humanitaria" style={{ color: "#1F5E8C", fontWeight: 600 }}>
             Conoce Araguaney para ayuda humanitaria →
           </Link>
         </p>
-        <p className="text-[13.5px]" style={{ color: "#8A8073" }}>
+        <p className="text-[13.5px]" style={{ color: "#6E6557" }}>
           <Link href="/guias/como-organizar-un-centro-de-acopio" style={{ color: "#1F5E8C", fontWeight: 600 }}>
             Guía: cómo organizar un centro de acopio →
           </Link>
