@@ -19,7 +19,10 @@ export default function ContactForm() {
   const [errorMsg, setErrorMsg] = useState("")
   const [turnstileKey, setTurnstileKey] = useState(0)
 
-  const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!
+  // .trim() guards against a trailing newline in the env var value (a common
+  // paste artifact in dashboard UIs) — Turnstile throws an uncaught error on
+  // an invalid sitekey, which breaks rendering for the rest of the form.
+  const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!.trim()
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
