@@ -17,7 +17,6 @@ import {
   ScanLine,
   Flag,
   Building2,
-  MessageSquare,
   MessageCircle,
   Users,
   UserCog,
@@ -84,8 +83,9 @@ const NAV_ITEMS: NavItem[] = [
   // (they're the only role that can create/manage campaigns) — this entry
   // is coordinator/volunteer-only so it never duplicates that one.
   { href: "/dashboard/campaigns", labelKey: "campaigns", roles: ["coordinator", "volunteer"], icon: Flag },
-  { href: "/dashboard/messages", labelKey: "messages", roles: ["national_admin", "coordinator", "volunteer"], icon: MessageCircle, badgeKey: "messages" },
-  { href: "/dashboard/requests", labelKey: "requests", roles: ["national_admin", "coordinator", "volunteer"], icon: MessageSquare },
+  // "Solicitudes" hidden for now — reported not working, revisit before
+  // re-enabling. Left commented (not deleted) so it's easy to restore.
+  // { href: "/dashboard/requests", labelKey: "requests", roles: ["national_admin", "coordinator", "volunteer"], icon: MessageSquare },
   { href: "/dashboard/team", labelKey: "team", roles: ["coordinator"], icon: Users },
 ]
 
@@ -95,6 +95,7 @@ const OPS_ITEMS: NavItem[] = [
   { href: "/dashboard/scan", labelKey: "scan", roles: ["national_admin", "coordinator", "volunteer"], icon: ScanLine },
   { href: "/dashboard/transfers", labelKey: "transfers", roles: ["national_admin", "coordinator"], icon: ArrowLeftRight },
   { href: "/dashboard/reports", labelKey: "reports", roles: ["national_admin", "coordinator", "volunteer"], icon: BarChart2 },
+  { href: "/dashboard/messages", labelKey: "messages", roles: ["national_admin", "coordinator", "volunteer"], icon: MessageCircle, badgeKey: "messages" },
 ]
 
 interface AdminNavItem {
