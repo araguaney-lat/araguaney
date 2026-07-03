@@ -70,7 +70,10 @@ type DashboardRoleLabels = {
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { href: "/dashboard", labelKey: "home", roles: ["national_admin", "coordinator", "volunteer"], icon: Home },
+  // "Inicio" is a dead redirect to /dashboard/national for national_admin
+  // (see app/dashboard/page.tsx) — Panel Nacional is already their home,
+  // showing both was a duplicate entry pointing at the same page.
+  { href: "/dashboard", labelKey: "home", roles: ["coordinator", "volunteer"], icon: Home },
   { href: "/dashboard/national", labelKey: "national", roles: ["national_admin"], icon: Globe },
   { href: "/dashboard/intake", labelKey: "intake", roles: ["coordinator", "volunteer"], icon: PackagePlus },
   { href: "/dashboard/boxes", labelKey: "boxes", roles: ["coordinator", "volunteer"], icon: Package },
