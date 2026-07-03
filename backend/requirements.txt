@@ -43,18 +43,18 @@ cloudinary==1.41.0
 # stripe==11.2.0
 
 # 2FA / TOTP — authenticator app codes + backup codes
-pyotp==2.9.0
+pyotp==2.10.0
 
 # QR codes + PDF label generation
-qrcode[pil]==8.0
-reportlab==4.4.1
+qrcode[pil]==8.2
+reportlab==4.5.1
 
 # IFRC packing list Excel export
 openpyxl==3.1.5
 
 # Manifest PDF (HTML → PDF via WeasyPrint + Jinja2 is already above)
 # Dockerfile system deps required: apt-get install -y libpango-1.0-0 libpangocairo-1.0-0 libcairo2 libgif-dev fonts-liberation
-weasyprint==68.0
+weasyprint==68.1
 
 # GeoIP — MaxMind GeoLite2 country/city lookup
 # geoip2==4.8.0
@@ -63,4 +63,4 @@ weasyprint==68.0
 # elevenlabs==1.9.0
 
 # Cloudflare R2 / S3-compatible storage (messaging attachments)
-boto3==1.35.95
+boto3==1.43.38
