@@ -22,7 +22,7 @@ export const termsEs: LegalDoc = {
           emphasis:
             "Araguaney es una herramienta de coordinación y gestión de inventario. NO transporta, entrega ni distribuye ayuda, y NO garantiza que las donaciones lleguen a un destino o beneficiario determinado. La logística, el transporte y los trámites aduaneros son responsabilidad exclusiva de los centros y organizaciones que operan la ayuda.",
         },
-        "El servicio se presta sin fines de lucro, con el objetivo de estandarizar y coordinar la ayuda humanitaria entre México y Venezuela.",
+        "El servicio se presta sin fines de lucro, con el objetivo de estandarizar y coordinar la ayuda humanitaria entre centros de acopio y sus destinos de envío.",
       ],
     },
     {
