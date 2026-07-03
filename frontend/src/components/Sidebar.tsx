@@ -28,7 +28,9 @@ import {
   Wrench,
 } from "lucide-react"
 import { LanguageSwitcher } from "@/components/LanguageSwitcher"
+import { ThemeToggle } from "@/components/ThemeToggle"
 import type { Locale } from "@/lib/i18n"
+import type { Theme } from "@/lib/theme"
 
 type IconComponent = React.ComponentType<{ size?: number; className?: string }>
 
@@ -131,9 +133,10 @@ interface SidebarProps {
   userEmail?: string | null
   userAvatarUrl?: string | null
   locale: Locale
+  theme: Theme
 }
 
-export function Sidebar({ centerRole, platformRole, centerName, nav, roleLabels, userName, userEmail, userAvatarUrl, locale }: SidebarProps) {
+export function Sidebar({ centerRole, platformRole, centerName, nav, roleLabels, userName, userEmail, userAvatarUrl, locale, theme }: SidebarProps) {
   const pathname = usePathname()
   const [collapsed, setCollapsed] = useState(false)
   const [mounted, setMounted] = useState(false)
@@ -175,37 +178,39 @@ export function Sidebar({ centerRole, platformRole, centerName, nav, roleLabels,
 
   return (
     <aside
-      className={`flex h-full flex-col border-r border-[#EAD9B0] bg-[#FBEFC9] transition-all duration-200 ${width} flex-shrink-0`}
+      className={`flex h-full flex-col border-r border-sideB bg-side transition-all duration-200 ${width} flex-shrink-0`}
     >
       {/* Header */}
       {collapsed ? (
-        <div className="flex flex-col items-center gap-1 border-b border-[#EAD9B0] px-2 py-3">
+        <div className="flex flex-col items-center gap-1 border-b border-sideB px-2 py-3">
           <Image src={LOGO} alt="Araguaney" width={28} height={28} className="rounded-full object-contain" />
           <button
             onClick={toggle}
-            className="rounded-lg p-1 text-[#906400] hover:bg-[#F3E3B8] hover:text-[#3B2A00] transition-colors"
+            className="rounded-lg p-1 text-sTx hover:bg-sAct hover:text-sActTx transition-colors"
             title="Expandir menú"
           >
             <PanelLeftOpen size={16} />
           </button>
+          <ThemeToggle theme={theme} collapsed />
           <LanguageSwitcher locale={locale} collapsed />
         </div>
       ) : (
-        <div className="flex items-center justify-between border-b border-[#EAD9B0] px-3 py-3">
+        <div className="flex items-center justify-between border-b border-sideB px-3 py-3">
           <div className="flex items-center gap-2 min-w-0">
             <Image src={LOGO} alt="Araguaney" width={28} height={28} className="rounded-full object-contain flex-shrink-0" />
             <div className="min-w-0">
-              <span className="text-sm font-semibold text-[#3B2A00] truncate block">Araguaney</span>
+              <span className="text-sm font-semibold text-sActTx truncate block">Araguaney</span>
               {centerName && (
-                <p className="text-xs text-[#906400]/80 truncate">{centerName}</p>
+                <p className="text-xs text-sTx/80 truncate">{centerName}</p>
               )}
             </div>
           </div>
           <div className="flex items-center gap-1 flex-shrink-0">
+            <ThemeToggle theme={theme} />
             <LanguageSwitcher locale={locale} />
             <button
               onClick={toggle}
-              className="rounded-lg p-1.5 text-[#906400] hover:bg-[#F3E3B8] hover:text-[#3B2A00] transition-colors"
+              className="rounded-lg p-1.5 text-sTx hover:bg-sAct hover:text-sActTx transition-colors"
               title="Colapsar menú"
             >
               <PanelLeftClose size={18} />
@@ -236,11 +241,11 @@ export function Sidebar({ centerRole, platformRole, centerName, nav, roleLabels,
         {visibleOpsItems.length > 0 && (
           <div className="pt-2">
             {!collapsed && (
-              <p className="px-2 pb-1 text-xs font-semibold uppercase tracking-wider text-[#946A00]/85">
+              <p className="px-2 pb-1 text-xs font-semibold uppercase tracking-wider text-sec">
                 {nav.ops_section}
               </p>
             )}
-            {collapsed && <div className="my-1 border-t border-[#EAD9B0]" />}
+            {collapsed && <div className="my-1 border-t border-sideB" />}
             {visibleOpsItems.map((item) => {
               const isActive = pathname === item.href
               const Icon = item.icon
@@ -261,11 +266,11 @@ export function Sidebar({ centerRole, platformRole, centerName, nav, roleLabels,
         {visibleAdminItems.length > 0 && (
           <div className="pt-2">
             {!collapsed && (
-              <p className="px-2 pb-1 text-xs font-semibold uppercase tracking-wider text-[#946A00]/85">
+              <p className="px-2 pb-1 text-xs font-semibold uppercase tracking-wider text-sec">
                 {nav.admin_section}
               </p>
             )}
-            {collapsed && <div className="my-1 border-t border-[#EAD9B0]" />}
+            {collapsed && <div className="my-1 border-t border-sideB" />}
             {visibleAdminItems.map((item) => {
               const isActive = pathname.startsWith(item.href)
               const Icon = item.icon
@@ -285,7 +290,7 @@ export function Sidebar({ centerRole, platformRole, centerName, nav, roleLabels,
       </nav>
 
       {/* Footer */}
-      <div className="border-t border-[#EAD9B0] px-2 py-2 space-y-0.5">
+      <div className="border-t border-sideB px-2 py-2 space-y-0.5">
         {platformRole === "superadmin" && (
           <NavLink
             href="/studio"
@@ -301,10 +306,10 @@ export function Sidebar({ centerRole, platformRole, centerName, nav, roleLabels,
           <Link
             href="/dashboard/settings"
             data-active={pathname.startsWith("/dashboard/settings")}
-            className={`flex items-center gap-2.5 rounded-lg px-2.5 py-2 transition-colors hover:bg-[#F3E3B8] data-[active=true]:bg-[#F3C033]/35 ${collapsed ? "justify-center" : ""}`}
+            className={`flex items-center gap-2.5 rounded-lg px-2.5 py-2 transition-colors hover:bg-sAct data-[active=true]:bg-sAct ${collapsed ? "justify-center" : ""}`}
             title={collapsed ? `${userName ?? userEmail}${centerRole ? ` · ${roleLabels[centerRole as keyof DashboardRoleLabels] ?? centerRole}` : ""}` : undefined}
           >
-            <span className="flex-shrink-0 flex h-7 w-7 items-center justify-center overflow-hidden rounded-full bg-[#F3C033] text-xs font-bold text-[#3B2A00]">
+            <span className="flex-shrink-0 flex h-7 w-7 items-center justify-center overflow-hidden rounded-full bg-[var(--gold)] text-xs font-bold text-[#3B2A00]">
               {userAvatarUrl ? (
                 <Image src={userAvatarUrl} alt="" width={28} height={28} className="h-full w-full object-cover" />
               ) : (
@@ -313,9 +318,9 @@ export function Sidebar({ centerRole, platformRole, centerName, nav, roleLabels,
             </span>
             {!collapsed && (
               <div className="min-w-0">
-                <p className="text-xs font-semibold text-[#3B2A00] truncate">{userName ?? userEmail}</p>
+                <p className="text-xs font-semibold text-sActTx truncate">{userName ?? userEmail}</p>
                 {centerRole && (
-                  <p className="text-xs text-[#906400]/85 truncate">
+                  <p className="text-xs text-sTx/85 truncate">
                     {roleLabels[centerRole as keyof DashboardRoleLabels] ?? centerRole}
                   </p>
                 )}
@@ -328,7 +333,7 @@ export function Sidebar({ centerRole, platformRole, centerName, nav, roleLabels,
           <button
             type="submit"
             title={collapsed ? nav.logout : undefined}
-            className={`flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm text-[#906400] hover:bg-[#F3E3B8] hover:text-[#3B2A00] transition-colors ${collapsed ? "justify-center" : ""}`}
+            className={`flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm text-sTx hover:bg-sAct hover:text-sActTx transition-colors ${collapsed ? "justify-center" : ""}`}
           >
             <LogOut size={17} className="flex-shrink-0" />
             {!collapsed && <span>{nav.logout}</span>}
@@ -352,8 +357,8 @@ interface NavLinkProps {
 function NavLink({ href, label, icon, isActive, collapsed, className, badge = 0 }: NavLinkProps) {
   const base =
     "flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm font-medium transition-colors"
-  const active = "bg-[#F3C033]/35 text-[#3B2A00]"
-  const inactive = "text-[#906400] hover:bg-[#F3E3B8] hover:text-[#3B2A00]"
+  const active = "bg-sAct text-sActTx"
+  const inactive = "text-sTx hover:bg-sAct hover:text-sActTx"
 
   return (
     <Link

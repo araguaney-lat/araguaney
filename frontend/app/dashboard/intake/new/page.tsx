@@ -153,31 +153,31 @@ function BoxRowInput({
   const isControlled = row.product_type?.is_controlled
 
   return (
-    <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-4 space-y-3">
+    <div className="rounded-xl border border-cardB bg-card2 p-4 space-y-3">
       {/* Barcode scanner */}
       <div>
-        <label className="block text-xs font-medium text-zinc-600 mb-1">{t.label_barcode}</label>
+        <label className="block text-xs font-medium text-mut mb-1">{t.label_barcode}</label>
         <div className="flex gap-2">
           <input
             type="text"
             inputMode="numeric"
             value={barcodeInput}
             placeholder={t.barcode_placeholder}
-            className="flex-1 rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-900"
+            className="flex-1 rounded-lg border border-inpB bg-inp px-3 py-2 text-sm text-tx focus:outline-none focus:ring-2 focus:ring-[var(--gold)]"
             onChange={(e) => setBarcodeInput(e.target.value)}
             onKeyDown={handleBarcodeKeyDown}
           />
           <button
             type="button"
             onClick={() => setScanning(true)}
-            className="rounded-lg border border-zinc-300 px-3 py-2 text-lg hover:bg-zinc-50"
+            className="rounded-lg border border-inpB px-3 py-2 text-lg hover:bg-card2"
             title={t.scan_camera}
           >
             📷
           </button>
         </div>
         {barcodeError && (
-          <p className={`mt-1 text-xs ${row.offlineBlocked ? "text-amber-700" : "text-red-600"}`}>
+          <p className={`mt-1 text-xs ${row.offlineBlocked ? "text-dDraftT" : "text-[var(--dRejT)]"}`}>
             {barcodeError}
           </p>
         )}
@@ -192,15 +192,15 @@ function BoxRowInput({
 
       {/* Product search */}
       <div className="relative">
-        <label className="block text-xs font-medium text-zinc-600 mb-1">{t.product_label}</label>
+        <label className="block text-xs font-medium text-mut mb-1">{t.product_label}</label>
         {row.product_type ? (
-          <div className="flex items-center justify-between rounded-lg border border-zinc-300 bg-white px-3 py-2">
+          <div className="flex items-center justify-between rounded-lg border border-inpB bg-card px-3 py-2">
             <div>
-              <p className="text-sm font-medium text-zinc-900">{row.product_type.display_name}</p>
-              <p className="text-xs text-zinc-500">
+              <p className="text-sm font-medium text-tx">{row.product_type.display_name}</p>
+              <p className="text-xs text-mut">
                 {categoryLabels[row.product_type.category as keyof typeof categoryLabels] ?? row.product_type.category}
                 {row.product_type.is_controlled && (
-                  <span className="ml-2 rounded bg-red-100 px-1 py-0.5 text-xs font-medium text-red-700">
+                  <span className="ml-2 rounded bg-dRejB px-1 py-0.5 text-xs font-medium text-dRejT">
                     {t.product_controlled_badge}
                   </span>
                 )}
@@ -209,7 +209,7 @@ function BoxRowInput({
             <button
               type="button"
               onClick={() => onChange({ ...row, product_type: null, offlineBlocked: false })}
-              className="text-xs text-zinc-400 hover:text-zinc-700"
+              className="text-xs text-fnt hover:text-tx"
             >
               {t.product_change}
             </button>
@@ -220,27 +220,27 @@ function BoxRowInput({
               type="text"
               value={query}
               placeholder={t.product_search_placeholder}
-              className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-900"
+              className="w-full rounded-lg border border-inpB bg-inp px-3 py-2 text-sm text-tx focus:outline-none focus:ring-2 focus:ring-[var(--gold)]"
               onChange={(e) => { search(e.target.value); setShowDropdown(true) }}
               onFocus={() => setShowDropdown(true)}
             />
-            {loading && <p className="mt-1 text-xs text-zinc-400">{t.searching}</p>}
+            {loading && <p className="mt-1 text-xs text-fnt">{t.searching}</p>}
             {showDropdown && results.length > 0 && (
-              <ul className="absolute z-10 mt-1 max-h-48 w-full overflow-y-auto rounded-lg border border-zinc-200 bg-white shadow-md">
+              <ul className="absolute z-10 mt-1 max-h-48 w-full overflow-y-auto rounded-lg border border-cardB bg-card shadow-md">
                 {results.map((pt) => (
                   <li key={pt.id}>
                     <button
                       type="button"
-                      className="flex w-full items-start gap-2 px-3 py-2 text-left hover:bg-zinc-50"
+                      className="flex w-full items-start gap-2 px-3 py-2 text-left hover:bg-card2"
                       onClick={() => selectProduct(pt)}
                     >
                       <div>
-                        <p className="text-sm text-zinc-900">{pt.display_name}</p>
-                        <p className="text-xs text-zinc-500">
+                        <p className="text-sm text-tx">{pt.display_name}</p>
+                        <p className="text-xs text-mut">
                           {categoryLabels[pt.category as keyof typeof categoryLabels] ?? pt.category}
                           {pt.inn_name && ` · ${pt.inn_name}`}
                           {pt.is_controlled && (
-                            <span className="ml-1 text-red-600">{t.controlled_warning_emoji}</span>
+                            <span className="ml-1 text-[var(--dRejT)]">{t.controlled_warning_emoji}</span>
                           )}
                         </p>
                       </div>
@@ -254,7 +254,7 @@ function BoxRowInput({
       </div>
 
       {isControlled && (
-        <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+        <div className="rounded-lg bg-dRejB px-3 py-2 text-sm text-dRejT">
           {t.product_controlled_warning}
         </div>
       )}
@@ -262,50 +262,50 @@ function BoxRowInput({
       {/* Fields */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
         <div>
-          <label className="block text-xs font-medium text-zinc-600 mb-1">{t.field_quantity}</label>
+          <label className="block text-xs font-medium text-mut mb-1">{t.field_quantity}</label>
           <input
             type="number"
             inputMode="numeric"
             min="1"
             value={row.quantity}
             onChange={set("quantity")}
-            className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-900"
+            className="w-full rounded-lg border border-inpB bg-inp px-3 py-2 text-sm text-tx focus:outline-none focus:ring-2 focus:ring-[var(--gold)]"
           />
         </div>
         <div>
-          <label className="block text-xs font-medium text-zinc-600 mb-1">{t.field_unit}</label>
+          <label className="block text-xs font-medium text-mut mb-1">{t.field_unit}</label>
           <input
             type="text"
             value={row.unit}
             placeholder={row.product_type?.default_unit ?? t.field_unit_placeholder}
             onChange={set("unit")}
-            className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-900"
+            className="w-full rounded-lg border border-inpB bg-inp px-3 py-2 text-sm text-tx focus:outline-none focus:ring-2 focus:ring-[var(--gold)]"
           />
         </div>
         <div>
-          <label className="block text-xs font-medium text-zinc-600 mb-1">{t.field_batch}</label>
+          <label className="block text-xs font-medium text-mut mb-1">{t.field_batch}</label>
           <input
             type="text"
             value={row.batch}
             placeholder={t.field_batch_placeholder}
             onChange={set("batch")}
-            className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-900"
+            className="w-full rounded-lg border border-inpB bg-inp px-3 py-2 text-sm text-tx focus:outline-none focus:ring-2 focus:ring-[var(--gold)]"
           />
         </div>
         <div>
-          <label className="block text-xs font-medium text-zinc-600 mb-1">
+          <label className="block text-xs font-medium text-mut mb-1">
             {t.field_expiry}
-            {row.product_type?.category === "MEDICINE" && <span className="text-red-500 ml-0.5">*</span>}
+            {row.product_type?.category === "MEDICINE" && <span className="text-[var(--dRejT)] ml-0.5">*</span>}
           </label>
           <input
             type="date"
             value={row.expiry_date}
             onChange={set("expiry_date")}
-            className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-900"
+            className="w-full rounded-lg border border-inpB bg-inp px-3 py-2 text-sm text-tx focus:outline-none focus:ring-2 focus:ring-[var(--gold)]"
           />
         </div>
         <div>
-          <label className="block text-xs font-medium text-zinc-600 mb-1">{t.field_weight}</label>
+          <label className="block text-xs font-medium text-mut mb-1">{t.field_weight}</label>
           <input
             type="number"
             inputMode="decimal"
@@ -314,7 +314,7 @@ function BoxRowInput({
             value={row.weight_kg}
             placeholder="5.00"
             onChange={set("weight_kg")}
-            className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-900"
+            className="w-full rounded-lg border border-inpB bg-inp px-3 py-2 text-sm text-tx focus:outline-none focus:ring-2 focus:ring-[var(--gold)]"
           />
         </div>
       </div>
@@ -322,7 +322,7 @@ function BoxRowInput({
       <button
         type="button"
         onClick={onRemove}
-        className="text-xs text-red-500 hover:text-red-700"
+        className="text-xs text-[var(--dRejT)] hover:opacity-80"
       >
         {t.remove_box}
       </button>
@@ -430,17 +430,17 @@ export default function NewIntakePage() {
   return (
     <div className="max-w-2xl mx-auto pb-12">
       <div className="mb-6">
-        <h1 className="text-xl font-semibold text-zinc-900">{t.title}</h1>
-        <p className="text-sm text-zinc-500 mt-1">{t.subtitle}</p>
+        <h1 className="text-xl font-semibold text-tx">{t.title}</h1>
+        <p className="text-sm text-mut mt-1">{t.subtitle}</p>
       </div>
 
       <div className="mb-4">
-        <div className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-xs ${
+        <div className={`flex items-center gap-2 rounded-lg px-3 py-2 text-xs ${
           online
-            ? "border-green-200 bg-green-50 text-green-700"
-            : "border-amber-200 bg-amber-50 text-amber-700"
+            ? "bg-dSealB text-dSealT"
+            : "bg-dDraftB text-dDraftT"
         }`}>
-          <span className={`h-2 w-2 rounded-full ${online ? "bg-green-500" : "bg-amber-500"}`} />
+          <span className={`h-2 w-2 rounded-full ${online ? "bg-[var(--dSealT)]" : "bg-[var(--dDraftT)]"}`} />
           {online ? t.online_status : t.offline_status}
         </div>
       </div>
@@ -448,15 +448,15 @@ export default function NewIntakePage() {
       <form onSubmit={handleSubmit} className="space-y-5">
         {isNationalAdmin && (
           <div>
-            <label className="block text-xs font-medium text-zinc-600 mb-1">{tc.select_center_label}</label>
+            <label className="block text-xs font-medium text-mut mb-1">{tc.select_center_label}</label>
             {centers.length === 0 ? (
-              <p className="text-sm text-zinc-400">{tc.no_centers_available}</p>
+              <p className="text-sm text-fnt">{tc.no_centers_available}</p>
             ) : (
               <select
                 value={selectedCenterId}
                 onChange={(e) => setSelectedCenterId(e.target.value)}
                 required
-                className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-900"
+                className="w-full rounded-lg border border-inpB bg-inp px-3 py-2 text-sm text-tx focus:outline-none focus:ring-2 focus:ring-[var(--gold)]"
               >
                 {centers.map((c) => (
                   <option key={c.id} value={c.id}>{c.name}</option>
@@ -467,12 +467,12 @@ export default function NewIntakePage() {
         )}
 
         <div>
-          <label className="block text-xs font-medium text-zinc-600 mb-1">{t.campaign_label}</label>
+          <label className="block text-xs font-medium text-mut mb-1">{t.campaign_label}</label>
           <select
             value={campaignId}
             onChange={(e) => setCampaignId(e.target.value)}
             required
-            className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-900"
+            className="w-full rounded-lg border border-inpB bg-inp px-3 py-2 text-sm text-tx focus:outline-none focus:ring-2 focus:ring-[var(--gold)]"
           >
             {campaigns.length === 0 && (
               <option value="">{t.campaigns_loading}</option>
@@ -487,29 +487,29 @@ export default function NewIntakePage() {
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
-            <label className="block text-xs font-medium text-zinc-600 mb-1">{t.donor_label}</label>
+            <label className="block text-xs font-medium text-mut mb-1">{t.donor_label}</label>
             <input
               type="text"
               value={donante}
               placeholder={t.donor_placeholder}
               onChange={(e) => setDonante(e.target.value)}
-              className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-900"
+              className="w-full rounded-lg border border-inpB bg-inp px-3 py-2 text-sm text-tx focus:outline-none focus:ring-2 focus:ring-[var(--gold)]"
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-zinc-600 mb-1">{t.notes_label}</label>
+            <label className="block text-xs font-medium text-mut mb-1">{t.notes_label}</label>
             <input
               type="text"
               value={notes}
               placeholder={t.notes_placeholder}
               onChange={(e) => setNotes(e.target.value)}
-              className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-900"
+              className="w-full rounded-lg border border-inpB bg-inp px-3 py-2 text-sm text-tx focus:outline-none focus:ring-2 focus:ring-[var(--gold)]"
             />
           </div>
         </div>
 
         <div className="space-y-3">
-          <h2 className="text-sm font-medium text-zinc-700">
+          <h2 className="text-sm font-medium text-tx">
             {t.boxes_header.replace("{count}", String(rows.length))}
           </h2>
           {rows.map((row) => (
@@ -524,14 +524,14 @@ export default function NewIntakePage() {
           <button
             type="button"
             onClick={addRow}
-            className="w-full rounded-lg border-2 border-dashed border-zinc-300 py-3 text-sm text-zinc-500 hover:border-zinc-400 hover:text-zinc-700"
+            className="w-full rounded-lg border-2 border-dashed border-cardB py-3 text-sm text-mut hover:border-sec hover:text-tx"
           >
             {t.add_box}
           </button>
         </div>
 
         {error && (
-          <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          <div className="rounded-lg bg-dRejB px-4 py-3 text-sm text-dRejT">
             {error}
           </div>
         )}
@@ -540,14 +540,14 @@ export default function NewIntakePage() {
           <button
             type="submit"
             disabled={submitting || rows.some((r) => r.offlineBlocked)}
-            className="flex-1 rounded-lg bg-zinc-900 py-3 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-60"
+            className="flex-1 rounded-lg bg-[var(--gold)] py-3 text-sm font-medium text-[#3B2A00] hover:opacity-90 disabled:opacity-60"
           >
             {submitting ? t.submitting : t.submit}
           </button>
           <button
             type="button"
             onClick={() => router.back()}
-            className="rounded-lg border border-zinc-300 px-4 py-3 text-sm font-medium text-zinc-600 hover:bg-zinc-50"
+            className="rounded-lg border border-cardB px-4 py-3 text-sm font-medium text-mut hover:bg-card2"
           >
             {t.cancel}
           </button>

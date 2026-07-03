@@ -35,8 +35,8 @@ export default async function ReportsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-xl font-semibold text-zinc-900">{t.title}</h1>
-        <p className="text-sm text-zinc-500 mt-1">{t.subtitle_campaign}</p>
+        <h1 className="text-xl font-semibold text-tx">{t.title}</h1>
+        <p className="text-sm text-mut mt-1">{t.subtitle_campaign}</p>
       </div>
       <ReportsDashboard
         campaigns={campaigns}

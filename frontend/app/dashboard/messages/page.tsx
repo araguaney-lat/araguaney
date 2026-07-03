@@ -35,7 +35,7 @@ function AttachmentLink({ attachment }: { attachment: AttachmentOut }) {
   return (
     <button
       onClick={download}
-      className="inline-flex items-center gap-1.5 text-xs text-zinc-600 hover:text-zinc-900 border border-zinc-200 rounded px-2 py-1 hover:bg-zinc-50"
+      className="inline-flex items-center gap-1.5 text-xs text-mut hover:text-tx border border-cardB rounded px-2 py-1 hover:bg-card2"
     >
       <FileIcon contentType={attachment.content_type} />
       <span className="truncate max-w-[160px]">{attachment.filename}</span>
@@ -170,13 +170,13 @@ export default function MessagesPage() {
   return (
     <div className="flex h-full max-h-[calc(100vh-6rem)] gap-4">
       {/* Thread list */}
-      <div className="w-80 flex-shrink-0 flex flex-col border border-zinc-200 rounded-xl bg-white overflow-hidden">
-        <div className="p-3 border-b border-zinc-100">
+      <div className="w-80 flex-shrink-0 flex flex-col border border-cardB rounded-xl bg-card overflow-hidden">
+        <div className="p-3 border-b border-line">
           <div className="flex items-center justify-between mb-2">
-            <h1 className="text-sm font-semibold text-zinc-900">{t.title}</h1>
+            <h1 className="text-sm font-semibold text-tx">{t.title}</h1>
             <button
               onClick={() => setShowCreate(true)}
-              className="text-xs px-2 py-1 bg-zinc-900 text-white rounded-lg hover:bg-zinc-700"
+              className="text-xs px-2 py-1 bg-[var(--gold)] text-[#3B2A00] rounded-lg hover:opacity-90"
             >
               {t.new_short}
             </button>
@@ -186,7 +186,7 @@ export default function MessagesPage() {
               <button
                 key={tabKey}
                 onClick={() => setTab(tabKey)}
-                className={`flex-1 text-xs py-1 rounded-lg font-medium transition-colors ${tab === tabKey ? "bg-zinc-900 text-white" : "text-zinc-500 hover:text-zinc-800"}`}
+                className={`flex-1 text-xs py-1 rounded-lg font-medium transition-colors ${tab === tabKey ? "bg-[var(--gold)] text-[#3B2A00]" : "text-mut hover:text-tx"}`}
               >
                 {tabKey === "PRIVATE" ? t.tab_private : t.tab_campaign}
               </button>
@@ -194,46 +194,46 @@ export default function MessagesPage() {
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto divide-y divide-zinc-50">
+        <div className="flex-1 overflow-y-auto divide-y divide-line">
           {loading ? (
-            <p className="text-xs text-zinc-400 p-4">{dict.dashboard.common.loading}</p>
+            <p className="text-xs text-fnt p-4">{dict.dashboard.common.loading}</p>
           ) : threads.length === 0 ? (
-            <p className="text-xs text-zinc-400 p-4">{t.empty}</p>
+            <p className="text-xs text-fnt p-4">{t.empty}</p>
           ) : threads.map((thread) => (
             <button
               key={thread.id}
               onClick={() => fetchDetail(thread.id)}
-              className={`w-full text-left p-3 hover:bg-zinc-50 transition-colors ${activeThread?.id === thread.id ? "bg-zinc-50" : ""}`}
+              className={`w-full text-left p-3 hover:bg-card2 transition-colors ${activeThread?.id === thread.id ? "bg-card2" : ""}`}
             >
-              <p className="text-xs font-semibold text-zinc-900 truncate">{thread.title}</p>
-              <p className="text-xs text-zinc-400 mt-0.5">{formatDate(thread.updated_at)}</p>
+              <p className="text-xs font-semibold text-tx truncate">{thread.title}</p>
+              <p className="text-xs text-fnt mt-0.5">{formatDate(thread.updated_at)}</p>
             </button>
           ))}
         </div>
       </div>
 
       {/* Thread detail */}
-      <div className="flex-1 flex flex-col border border-zinc-200 rounded-xl bg-white overflow-hidden">
+      <div className="flex-1 flex flex-col border border-cardB rounded-xl bg-card overflow-hidden">
         {!activeThread ? (
-          <div className="flex-1 flex items-center justify-center text-sm text-zinc-400">
+          <div className="flex-1 flex items-center justify-center text-sm text-fnt">
             {t.select_thread}
           </div>
         ) : (
           <>
-            <div className="border-b border-zinc-100 p-4 flex items-start justify-between gap-3">
+            <div className="border-b border-line p-4 flex items-start justify-between gap-3">
               <div>
-                <p className="text-sm font-semibold text-zinc-900">{activeThread.title}</p>
-                <span className={`text-xs font-medium px-1.5 py-0.5 rounded-full ${activeThread.thread_type === "PRIVATE" ? "bg-blue-50 text-blue-700" : "bg-green-50 text-green-700"}`}>
+                <p className="text-sm font-semibold text-tx">{activeThread.title}</p>
+                <span className={`text-xs font-medium px-1.5 py-0.5 rounded-full ${activeThread.thread_type === "PRIVATE" ? "bg-[var(--blueSoft)] text-[var(--blue)]" : "bg-dSealB text-dSealT"}`}>
                   {activeThread.thread_type === "PRIVATE" ? t.type_private : t.type_campaign}
                 </span>
               </div>
-              <button onClick={() => setActiveThread(null)} className="text-zinc-400 hover:text-zinc-700 flex-shrink-0">✕</button>
+              <button onClick={() => setActiveThread(null)} className="text-fnt hover:text-tx flex-shrink-0">✕</button>
             </div>
 
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
               <div className="space-y-1">
-                <p className="text-xs text-zinc-400">{formatDate(activeThread.created_at)}</p>
-                <div className="bg-zinc-50 rounded-xl p-3 text-sm text-zinc-800 whitespace-pre-wrap">
+                <p className="text-xs text-fnt">{formatDate(activeThread.created_at)}</p>
+                <div className="bg-card2 rounded-xl p-3 text-sm text-tx whitespace-pre-wrap">
                   {activeThread.body}
                 </div>
                 {activeThread.attachments.length > 0 && (
@@ -247,14 +247,14 @@ export default function MessagesPage() {
                 const isMe = reply.sender_id === myUserId
                 return (
                   <div key={reply.id} className={`flex ${isMe ? "justify-end" : "justify-start"}`}>
-                    <div className={`max-w-[75%] rounded-xl p-3 space-y-1 ${isMe ? "bg-zinc-900 text-white" : "bg-zinc-100 text-zinc-800"}`}>
+                    <div className={`max-w-[75%] rounded-xl p-3 space-y-1 ${isMe ? "bg-[var(--blue)] text-white" : "bg-card2 text-tx"}`}>
                       <p className="text-sm whitespace-pre-wrap">{reply.body}</p>
                       {reply.attachments.length > 0 && (
                         <div className="flex flex-wrap gap-1">
                           {reply.attachments.map((a) => <AttachmentLink key={a.id} attachment={a} />)}
                         </div>
                       )}
-                      <p className={`text-xs mt-1 ${isMe ? "text-zinc-400" : "text-zinc-500"}`}>
+                      <p className={`text-xs mt-1 ${isMe ? "text-white/70" : "text-mut"}`}>
                         {formatDate(reply.created_at)}
                       </p>
                     </div>
@@ -264,14 +264,14 @@ export default function MessagesPage() {
               <div ref={replyEndRef} />
             </div>
 
-            <div className="border-t border-zinc-100 p-3 space-y-2">
+            <div className="border-t border-line p-3 space-y-2">
               {error && (
-                <p className="text-xs text-red-600">{error} <button className="underline ml-1" onClick={() => setError(null)}>✕</button></p>
+                <p className="text-xs text-[var(--dRejT)]">{error} <button className="underline ml-1" onClick={() => setError(null)}>✕</button></p>
               )}
               {pendingFiles.length > 0 && (
                 <div className="flex flex-wrap gap-1">
                   {pendingFiles.map((f, i) => (
-                    <span key={i} className="inline-flex items-center gap-1 text-xs border border-zinc-200 rounded px-2 py-0.5 text-zinc-600">
+                    <span key={i} className="inline-flex items-center gap-1 text-xs border border-cardB rounded px-2 py-0.5 text-mut">
                       {f.name}
                       <button onClick={() => setPendingFiles((prev) => prev.filter((_, j) => j !== i))}>
                         <X size={10} />
@@ -287,7 +287,7 @@ export default function MessagesPage() {
                   onKeyDown={(e) => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) handleReply() }}
                   placeholder={t.reply_placeholder_detail}
                   rows={2}
-                  className="flex-1 text-sm border border-zinc-300 rounded-lg px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-zinc-400"
+                  className="flex-1 text-sm border border-inpB bg-inp text-tx rounded-lg px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-[var(--gold)]"
                 />
                 <div className="flex flex-col gap-1">
                   <input
@@ -300,7 +300,7 @@ export default function MessagesPage() {
                   />
                   <button
                     onClick={() => fileInputRef.current?.click()}
-                    className="p-2 text-zinc-500 hover:text-zinc-800 border border-zinc-200 rounded-lg"
+                    className="p-2 text-mut hover:text-tx border border-cardB rounded-lg"
                     title={t.attach_file}
                   >
                     <Paperclip size={16} />
@@ -308,7 +308,7 @@ export default function MessagesPage() {
                   <button
                     onClick={handleReply}
                     disabled={!replyBody.trim() || actionLoading}
-                    className="p-2 bg-zinc-900 text-white rounded-lg hover:bg-zinc-700 disabled:opacity-50"
+                    className="p-2 bg-[var(--gold)] text-[#3B2A00] rounded-lg hover:opacity-90 disabled:opacity-50"
                     title={t.send}
                   >
                     <Send size={16} />
@@ -322,20 +322,20 @@ export default function MessagesPage() {
 
       {showCreate && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="bg-white rounded-2xl w-full max-w-lg shadow-xl p-6 space-y-4">
+          <div className="bg-card rounded-2xl w-full max-w-lg shadow-xl p-6 space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="text-sm font-semibold text-zinc-900">{t.new_modal_title}</h2>
-              <button onClick={() => setShowCreate(false)} className="text-zinc-400 hover:text-zinc-700"><X size={18} /></button>
+              <h2 className="text-sm font-semibold text-tx">{t.new_modal_title}</h2>
+              <button onClick={() => setShowCreate(false)} className="text-fnt hover:text-tx"><X size={18} /></button>
             </div>
 
-            {error && <p className="text-xs text-red-600">{error}</p>}
+            {error && <p className="text-xs text-[var(--dRejT)]">{error}</p>}
 
             <div className="flex gap-2">
               {(["PRIVATE", "PUBLIC"] as const).map((typeKey) => (
                 <button
                   key={typeKey}
                   onClick={() => setNewType(typeKey)}
-                  className={`flex-1 text-xs py-1.5 rounded-lg font-medium border transition-colors ${newType === typeKey ? "bg-zinc-900 text-white border-zinc-900" : "border-zinc-300 text-zinc-600 hover:border-zinc-500"}`}
+                  className={`flex-1 text-xs py-1.5 rounded-lg font-medium border transition-colors ${newType === typeKey ? "bg-[var(--gold)] text-[#3B2A00] border-[var(--gold)]" : "border-cardB text-mut hover:border-sec"}`}
                 >
                   {typeKey === "PRIVATE" ? t.type_private : t.type_campaign}
                 </button>
@@ -343,9 +343,9 @@ export default function MessagesPage() {
             </div>
 
             <label className="block space-y-1">
-              <span className="text-xs text-zinc-500">{t.field_campaign}</span>
+              <span className="text-xs text-mut">{t.field_campaign}</span>
               <select
-                className="w-full text-sm border border-zinc-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-zinc-400"
+                className="w-full text-sm border border-inpB bg-inp text-tx rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--gold)]"
                 value={newCampaignId}
                 onChange={(e) => { setNewCampaignId(e.target.value); setNewRecipientIds([]) }}
               >
@@ -356,14 +356,14 @@ export default function MessagesPage() {
 
             {newType === "PRIVATE" && newCampaignId && (
               <label className="block space-y-1">
-                <span className="text-xs text-zinc-500">{t.field_recipients}</span>
-                <div className="max-h-32 overflow-y-auto border border-zinc-200 rounded-lg p-2 space-y-1">
+                <span className="text-xs text-mut">{t.field_recipients}</span>
+                <div className="max-h-32 overflow-y-auto border border-cardB rounded-lg p-2 space-y-1">
                   {campaignMembers
                     .filter((m) => m.id !== myUserId)
                     .map((m) => {
                       const selected = newRecipientIds.includes(m.id)
                       return (
-                        <label key={m.id} className={`flex items-center gap-2 text-xs p-1 rounded cursor-pointer ${selected ? "bg-zinc-100" : "hover:bg-zinc-50"}`}>
+                        <label key={m.id} className={`flex items-center gap-2 text-xs p-1 rounded cursor-pointer ${selected ? "bg-card2" : "hover:bg-card2"}`}>
                           <input
                             type="checkbox"
                             checked={selected}
@@ -377,16 +377,16 @@ export default function MessagesPage() {
                       )
                     })}
                   {campaignMembers.filter((m) => m.id !== myUserId).length === 0 && (
-                    <p className="text-zinc-400 text-xs p-1">{t.no_members}</p>
+                    <p className="text-fnt text-xs p-1">{t.no_members}</p>
                   )}
                 </div>
               </label>
             )}
 
             <label className="block space-y-1">
-              <span className="text-xs text-zinc-500">{t.field_subject}</span>
+              <span className="text-xs text-mut">{t.field_subject}</span>
               <input
-                className="w-full text-sm border border-zinc-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-zinc-400"
+                className="w-full text-sm border border-inpB bg-inp text-tx rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--gold)]"
                 value={newTitle}
                 onChange={(e) => setNewTitle(e.target.value)}
                 placeholder={t.subject_placeholder}
@@ -395,9 +395,9 @@ export default function MessagesPage() {
             </label>
 
             <label className="block space-y-1">
-              <span className="text-xs text-zinc-500">{t.field_body}</span>
+              <span className="text-xs text-mut">{t.field_body}</span>
               <textarea
-                className="w-full text-sm border border-zinc-300 rounded-lg px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-zinc-400"
+                className="w-full text-sm border border-inpB bg-inp text-tx rounded-lg px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-[var(--gold)]"
                 rows={4}
                 value={newBody}
                 onChange={(e) => setNewBody(e.target.value)}
@@ -409,11 +409,11 @@ export default function MessagesPage() {
               <button
                 onClick={handleCreate}
                 disabled={!newTitle.trim() || !newBody.trim() || !newCampaignId || actionLoading || (newType === "PRIVATE" && newRecipientIds.length === 0)}
-                className="px-4 py-2 bg-zinc-900 text-white rounded-lg text-sm hover:bg-zinc-700 disabled:opacity-50"
+                className="px-4 py-2 bg-[var(--gold)] text-[#3B2A00] rounded-lg text-sm hover:opacity-90 disabled:opacity-50"
               >
                 {actionLoading ? t.sending : t.send}
               </button>
-              <button onClick={() => setShowCreate(false)} className="px-4 py-2 text-sm text-zinc-600 hover:text-zinc-900">
+              <button onClick={() => setShowCreate(false)} className="px-4 py-2 text-sm text-mut hover:text-tx">
                 {t.cancel}
               </button>
             </div>

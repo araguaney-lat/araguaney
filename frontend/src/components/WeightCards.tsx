@@ -39,34 +39,34 @@ export function WeightCards() {
     <div className="mt-8 space-y-4">
       {/* Center total */}
       {data.center_kg !== null && (
-        <div className="rounded-xl border border-zinc-200 bg-white p-5">
-          <p className="text-xs text-zinc-500 mb-1">Tu centro ha acopiado</p>
-          <p className="text-2xl font-bold text-zinc-900">{fmt(data.center_kg)}</p>
+        <div className="rounded-xl border border-cardB bg-card p-5">
+          <p className="text-xs text-mut mb-1">Tu centro ha acopiado</p>
+          <p className="text-2xl font-bold text-tx">{fmt(data.center_kg)}</p>
         </div>
       )}
 
       {/* Campaign weight cards */}
       {campaignsWithWeight.length > 0 && (
         <div>
-          <p className="text-xs font-medium text-zinc-500 uppercase tracking-wide mb-2">
+          <p className="text-xs font-medium text-fnt uppercase tracking-wide mb-2">
             Por campaña
           </p>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {campaignsWithWeight.map((c) => (
-              <div key={c.campaign_id} className="rounded-xl border border-zinc-200 bg-white p-4">
-                <p className="text-sm font-medium text-zinc-800 leading-snug line-clamp-1 mb-2">
+              <div key={c.campaign_id} className="rounded-xl border border-cardB bg-card p-4">
+                <p className="text-sm font-medium text-tx leading-snug line-clamp-1 mb-2">
                   {c.campaign_name}
                 </p>
-                <p className="text-xl font-bold text-zinc-900">{fmt(c.total_kg)}</p>
+                <p className="text-xl font-bold text-tx">{fmt(c.total_kg)}</p>
                 {c.goal_kg !== null && (
                   <>
-                    <div className="mt-2 h-1.5 rounded-full bg-zinc-100 overflow-hidden">
+                    <div className="mt-2 h-1.5 rounded-full bg-chip overflow-hidden">
                       <div
-                        className="h-full rounded-full bg-zinc-900 transition-all"
+                        className="h-full rounded-full bg-[var(--gold)] transition-all"
                         style={{ width: `${Math.min(c.progress_pct ?? 0, 100)}%` }}
                       />
                     </div>
-                    <p className="text-xs text-zinc-400 mt-1">
+                    <p className="text-xs text-fnt mt-1">
                       {c.progress_pct?.toFixed(1)}% de {fmt(c.goal_kg)}
                     </p>
                   </>

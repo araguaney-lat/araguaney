@@ -44,23 +44,23 @@ export default function ScanPage() {
   return (
     <div className="max-w-sm mx-auto pt-8 px-4 text-center space-y-6">
       <div>
-        <h1 className="text-xl font-semibold text-zinc-900">{t.title}</h1>
-        <p className="text-sm text-zinc-500 mt-1">{t.subtitle_detail}</p>
+        <h1 className="text-xl font-semibold text-tx">{t.title}</h1>
+        <p className="text-sm text-mut mt-1">{t.subtitle_detail}</p>
       </div>
 
       <button
         type="button"
         onClick={() => { setError(null); setScanning(true) }}
-        className="w-full rounded-xl bg-zinc-900 py-4 text-sm font-medium text-white hover:bg-zinc-700"
+        className="w-full rounded-xl bg-[var(--gold)] py-4 text-sm font-medium text-[#3B2A00] hover:opacity-90"
       >
         {t.open_camera}
       </button>
 
       {error && (
-        <p className="text-sm text-red-600">{error}</p>
+        <p className="text-sm text-[var(--dRejT)]">{error}</p>
       )}
 
-      <p className="text-xs text-zinc-400">{t.manual_label}</p>
+      <p className="text-xs text-fnt">{t.manual_label}</p>
 
       <form
         onSubmit={(e) => {
@@ -74,11 +74,11 @@ export default function ScanPage() {
           name="code"
           type="text"
           placeholder="B-XXXX o P-XXXX"
-          className="flex-1 rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-900"
+          className="flex-1 rounded-lg border border-inpB bg-inp px-3 py-2 text-sm text-tx focus:outline-none focus:ring-2 focus:ring-[var(--gold)]"
         />
         <button
           type="submit"
-          className="rounded-lg bg-zinc-100 px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-200"
+          className="rounded-lg bg-chip px-4 py-2 text-sm font-medium text-tx hover:bg-card2"
         >
           {t.go}
         </button>

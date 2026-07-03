@@ -30,8 +30,8 @@ export default async function NationalDashboardPage() {
   if (error || !data) {
     return (
       <div>
-        <h1 className="text-2xl font-semibold text-zinc-900 mb-4">{t.title}</h1>
-        <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">{error}</div>
+        <h1 className="text-2xl font-semibold text-tx mb-4">{t.title}</h1>
+        <div className="rounded-xl bg-dRejB p-4 text-sm text-dRejT">{error}</div>
       </div>
     )
   }
@@ -41,8 +41,8 @@ export default async function NationalDashboardPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-semibold text-zinc-900 mb-1">{t.title}</h1>
-        <p className="text-sm text-zinc-500">{t.subtitle}</p>
+        <h1 className="text-2xl font-semibold text-tx mb-1">{t.title}</h1>
+        <p className="text-sm text-mut">{t.subtitle}</p>
       </div>
 
       {/* Totals */}
@@ -55,36 +55,36 @@ export default async function NationalDashboardPage() {
           { label: t.stat_shipments_sent, value: totals.total_shipments_sent.toLocaleString() },
           { label: t.stat_centers, value: totals.active_centers.toLocaleString() },
         ].map(({ label, value }) => (
-          <div key={label} className="rounded-xl border border-[#EAD9B0] bg-[#FBEFC9] p-4">
-            <p className="text-xs text-[#906400]/85 mb-1">{label}</p>
-            <p className="text-2xl font-bold text-[#3B2A00]">{value}</p>
+          <div key={label} className="rounded-xl border border-goldB bg-goldSoft p-4">
+            <p className="text-xs text-sTx mb-1">{label}</p>
+            <p className="text-2xl font-bold text-tx">{value}</p>
           </div>
         ))}
       </div>
 
       {/* Stock by category */}
       <section>
-        <h2 className="text-base font-semibold text-zinc-900 mb-3">{t.category_heading}</h2>
+        <h2 className="text-base font-semibold text-tx mb-3">{t.category_heading}</h2>
         {by_category.length === 0 ? (
-          <p className="text-sm text-zinc-500">{t.no_data}</p>
+          <p className="text-sm text-mut">{t.no_data}</p>
         ) : (
-          <div className="overflow-x-auto rounded-xl border border-zinc-200 bg-white">
+          <div className="overflow-x-auto rounded-xl border border-cardB bg-card">
             <table className="w-full text-sm">
-              <thead className="border-b border-zinc-100 bg-zinc-50 text-xs text-zinc-500">
+              <thead className="border-b border-line bg-card2 text-xs text-mut">
                 <tr>
                   <th className="px-4 py-3 text-left font-medium">{t.col_category}</th>
                   <th className="px-4 py-3 text-right font-medium">{t.col_boxes}</th>
                   <th className="px-4 py-3 text-right font-medium">{t.col_units}</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-zinc-100">
+              <tbody className="divide-y divide-line">
                 {by_category.map((row) => (
-                  <tr key={row.category} className="hover:bg-zinc-50">
-                    <td className="px-4 py-3 text-zinc-900">
+                  <tr key={row.category} className="hover:bg-card2">
+                    <td className="px-4 py-3 text-tx">
                       {t.categories[row.category as keyof typeof t.categories] ?? row.category}
                     </td>
-                    <td className="px-4 py-3 text-right text-zinc-600">{row.box_count.toLocaleString()}</td>
-                    <td className="px-4 py-3 text-right font-medium text-zinc-900">{row.total_units.toLocaleString()}</td>
+                    <td className="px-4 py-3 text-right text-mut">{row.box_count.toLocaleString()}</td>
+                    <td className="px-4 py-3 text-right font-medium text-tx">{row.total_units.toLocaleString()}</td>
                   </tr>
                 ))}
               </tbody>
@@ -96,10 +96,10 @@ export default async function NationalDashboardPage() {
       {/* Stock by center */}
       {by_center.length > 0 && (
         <section>
-          <h2 className="text-base font-semibold text-zinc-900 mb-3">{t.center_heading}</h2>
-          <div className="overflow-x-auto rounded-xl border border-zinc-200 bg-white">
+          <h2 className="text-base font-semibold text-tx mb-3">{t.center_heading}</h2>
+          <div className="overflow-x-auto rounded-xl border border-cardB bg-card">
             <table className="w-full text-sm">
-              <thead className="border-b border-zinc-100 bg-zinc-50 text-xs text-zinc-500">
+              <thead className="border-b border-line bg-card2 text-xs text-mut">
                 <tr>
                   <th className="px-4 py-3 text-left font-medium">{t.col_center}</th>
                   <th className="px-4 py-3 text-left font-medium">{t.col_location}</th>
@@ -107,15 +107,15 @@ export default async function NationalDashboardPage() {
                   <th className="px-4 py-3 text-right font-medium">{t.col_units}</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-zinc-100">
+              <tbody className="divide-y divide-line">
                 {by_center.map((row) => (
-                  <tr key={row.center_id} className="hover:bg-zinc-50">
-                    <td className="px-4 py-3 text-zinc-900">{row.center_name}</td>
-                    <td className="px-4 py-3 text-zinc-500 text-xs">
+                  <tr key={row.center_id} className="hover:bg-card2">
+                    <td className="px-4 py-3 text-tx">{row.center_name}</td>
+                    <td className="px-4 py-3 text-fnt text-xs">
                       {[row.country_code, row.state_name].filter(Boolean).join(" / ") || DASH}
                     </td>
-                    <td className="px-4 py-3 text-right text-zinc-600">{row.box_count.toLocaleString()}</td>
-                    <td className="px-4 py-3 text-right font-medium text-zinc-900">{row.total_units.toLocaleString()}</td>
+                    <td className="px-4 py-3 text-right text-mut">{row.box_count.toLocaleString()}</td>
+                    <td className="px-4 py-3 text-right font-medium text-tx">{row.total_units.toLocaleString()}</td>
                   </tr>
                 ))}
               </tbody>
@@ -127,10 +127,10 @@ export default async function NationalDashboardPage() {
       {/* Top medicines by INN */}
       {by_inn.length > 0 && (
         <section>
-          <h2 className="text-base font-semibold text-zinc-900 mb-3">{t.inn_heading}</h2>
-          <div className="overflow-x-auto rounded-xl border border-zinc-200 bg-white">
+          <h2 className="text-base font-semibold text-tx mb-3">{t.inn_heading}</h2>
+          <div className="overflow-x-auto rounded-xl border border-cardB bg-card">
             <table className="w-full text-sm">
-              <thead className="border-b border-zinc-100 bg-zinc-50 text-xs text-zinc-500">
+              <thead className="border-b border-line bg-card2 text-xs text-mut">
                 <tr>
                   <th className="px-4 py-3 text-left font-medium">{t.col_inn}</th>
                   <th className="px-4 py-3 text-left font-medium">{t.col_strength}</th>
@@ -139,14 +139,14 @@ export default async function NationalDashboardPage() {
                   <th className="px-4 py-3 text-right font-medium">{t.col_units}</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-zinc-100">
+              <tbody className="divide-y divide-line">
                 {by_inn.map((row, i) => (
-                  <tr key={i} className="hover:bg-zinc-50">
-                    <td className="px-4 py-3 text-zinc-900 font-medium">{row.inn_name ?? DASH}</td>
-                    <td className="px-4 py-3 text-zinc-500">{row.strength ?? DASH}</td>
-                    <td className="px-4 py-3 text-zinc-500">{row.form ?? DASH}</td>
-                    <td className="px-4 py-3 text-right text-zinc-600">{row.box_count.toLocaleString()}</td>
-                    <td className="px-4 py-3 text-right font-medium text-zinc-900">{row.total_units.toLocaleString()}</td>
+                  <tr key={i} className="hover:bg-card2">
+                    <td className="px-4 py-3 text-tx font-medium">{row.inn_name ?? DASH}</td>
+                    <td className="px-4 py-3 text-mut">{row.strength ?? DASH}</td>
+                    <td className="px-4 py-3 text-mut">{row.form ?? DASH}</td>
+                    <td className="px-4 py-3 text-right text-mut">{row.box_count.toLocaleString()}</td>
+                    <td className="px-4 py-3 text-right font-medium text-tx">{row.total_units.toLocaleString()}</td>
                   </tr>
                 ))}
               </tbody>

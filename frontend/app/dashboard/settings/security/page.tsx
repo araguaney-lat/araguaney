@@ -25,8 +25,8 @@ export default async function SecurityPage() {
   return (
     <div className="max-w-lg space-y-6">
       <div>
-        <h1 className="text-xl font-semibold text-zinc-900">{t.security_title}</h1>
-        <p className="text-sm text-zinc-500 mt-1">{t.security_subtitle}</p>
+        <h1 className="text-xl font-semibold text-tx">{t.security_title}</h1>
+        <p className="text-sm text-mut mt-1">{t.security_subtitle}</p>
       </div>
       <TOTPSettings initialEnabled={totpEnabled} />
     </div>
