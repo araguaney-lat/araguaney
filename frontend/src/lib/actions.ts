@@ -5,6 +5,7 @@ import { AuthError } from "next-auth"
 import { redirect } from "next/navigation"
 import { revalidatePath } from "next/cache"
 import { apiFetch } from "@/lib/api"
+import { CURRENT_TERMS_VERSION } from "@/lib/legal"
 
 const API_URL = process.env.API_URL ?? "http://localhost:8000"
 
@@ -177,6 +178,39 @@ export async function changePasswordAction(_: unknown, formData: FormData) {
     await signIn("credentials", { accessToken: data.access_token, redirectTo: "/dashboard" })
   } catch (error) {
     if (error instanceof AuthError) return { error: "Error al actualizar sesión" }
+    throw error
+  }
+}
+
+export async function acceptTermsAction(_: unknown, formData: FormData) {
+  const session = await auth()
+  if (!session?.accessToken) return { error: "No autenticado" }
+
+  if (!formData.get("accepted_terms")) {
+    return { error: "Debes aceptar los Términos y el Aviso de Privacidad para continuar." }
+  }
+
+  const res = await fetch(`${API_URL}/v1/auth/me/accept-terms`, {
+    method: "POST",
+    body: JSON.stringify({ version: CURRENT_TERMS_VERSION }),
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${session.accessToken}`,
+    },
+  })
+
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}))
+    return { error: extractError(data, "Error al registrar la aceptación") }
+  }
+
+  // Force NextAuth to rebuild the session from a fresh /me — otherwise the
+  // JWT cookie keeps must_accept_terms=true and the dashboard/studio layout
+  // gate would redirect back here in an infinite loop.
+  try {
+    await signIn("credentials", { accessToken: session.accessToken, redirectTo: "/dashboard" })
+  } catch (error) {
+    if (error instanceof AuthError) return { error: "Error al actualizar la sesión" }
     throw error
   }
 }

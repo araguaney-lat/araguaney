@@ -42,6 +42,10 @@ class User(Base):
     # Invitation / forced password change
     must_change_password = Column(Boolean, nullable=False, server_default="false")
 
+    # Legal — Fase 13 tarea 3 (LFPDPPP)
+    accepted_terms_at = Column(DateTime(timezone=True), nullable=True)
+    accepted_terms_version = Column(String, nullable=True)
+
     # 2FA / TOTP
     totp_secret = Column(String, nullable=True)        # Fernet-encrypted base32 secret
     totp_enabled = Column(Boolean, nullable=False, server_default="false")
@@ -50,3 +54,8 @@ class User(Base):
     # Timestamps
     created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
     updated_at = Column(DateTime(timezone=True), nullable=True, onupdate=func.now())
+
+    @property
+    def must_accept_terms(self) -> bool:
+        from app.legal import CURRENT_TERMS_VERSION
+        return self.accepted_terms_version != CURRENT_TERMS_VERSION

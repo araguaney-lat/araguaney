@@ -32,11 +32,16 @@ class Token(StrictModel):
     center_role: str | None = None
     center_id: str | None = None
     must_change_password: bool = False
+    must_accept_terms: bool = False
 
 
 class ChangePasswordRequest(StrictModel):
     current_password: str
     new_password: str
+
+
+class AcceptTermsRequest(StrictModel):
+    version: str
 
 
 class ResendRequest(StrictModel):
