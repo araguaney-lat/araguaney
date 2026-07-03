@@ -80,7 +80,7 @@ export default function ContactoPage() {
             {[
               { bg: "#FBEFC9", c: "#946A00", title: "Correo", val: "hola@araguaney.lat" },
               { bg: "#E9F1F8", c: "#1F5E8C", title: "Alta de centro", val: "Respuesta en menos de 48 horas hábiles" },
-              { bg: "#FBEFC9", c: "#946A00", title: "Centros activos", val: "Operando en México · destino Venezuela" },
+              { bg: "#FBEFC9", c: "#946A00", title: "Centros activos", val: "Operando en México · múltiples destinos" },
             ].map((item) => (
               <div key={item.title} className="flex gap-[14px] items-start">
                 <div style={{ width: 40, height: 40, borderRadius: 10, background: item.bg, border: `2px solid ${item.c}`, flexShrink: 0 }} />

@@ -21,7 +21,7 @@ export const termsEn: LegalDoc = {
           emphasis:
             "Araguaney is a coordination and inventory-management tool. It does NOT transport, deliver or distribute aid, and does NOT guarantee that donations reach any particular destination or beneficiary. Logistics, transport and customs procedures are the sole responsibility of the centers and organizations operating the aid.",
         },
-        "The service is provided on a non-profit basis, with the goal of standardizing and coordinating humanitarian aid between Mexico and Venezuela.",
+        "The service is provided on a non-profit basis, with the goal of standardizing and coordinating humanitarian aid between collection centers and their shipment destinations.",
       ],
     },
     {
