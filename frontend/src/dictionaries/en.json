@@ -544,7 +544,10 @@
       "volunteers_heading": "Volunteers",
       "no_coordinators": "No coordinators assigned.",
       "no_volunteers": "No volunteers registered.",
-      "manage_team": "Manage team"
+      "manage_team": "Manage team",
+      "select_center_label": "Center",
+      "select_center_placeholder": "— Select center —",
+      "no_centers": "No centers available."
     },
     "settings": {
       "title": "Settings",
@@ -629,6 +632,9 @@
       "field_username": "Username *",
       "field_center_id": "Center ID (UUID)",
       "center_id_placeholder": "Center UUID (optional)",
+      "field_country": "Country",
+      "country_hint": "For national_admin: default filter for centers seen in Team.",
+      "select_country": "— No country assigned —",
       "field_temp_password": "Temporary password (optional)",
       "temp_password_placeholder": "Auto-generated if left blank",
       "creating": "Creating...",

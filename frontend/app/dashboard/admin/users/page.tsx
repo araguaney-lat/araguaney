@@ -4,9 +4,10 @@ import { useEffect, useState } from "react"
 import { listStudioUsersAction, createStudioUserAction, patchStudioUserAction, reinviteStudioUserAction } from "@/lib/studio-actions"
 import type { UserOut } from "@/types"
 import { useDict } from "@/context/DictionaryContext"
+import { COUNTRIES, flagEmoji } from "@/lib/countries"
 
 const ROLES = ["volunteer", "coordinator", "national_admin"]
-const EMPTY_FORM = { email: "", username: "", full_name: "", center_role: "volunteer", center_id: "", password: "" }
+const EMPTY_FORM = { email: "", username: "", full_name: "", center_role: "volunteer", center_id: "", country_code: "", password: "" }
 
 export default function StudioUsersPage() {
   const dict = useDict()
@@ -19,7 +20,7 @@ export default function StudioUsersPage() {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [editingId, setEditingId] = useState<string | null>(null)
-  const [editForm, setEditForm] = useState<{ center_role: string; is_active: boolean }>({ center_role: "", is_active: true })
+  const [editForm, setEditForm] = useState<{ center_role: string; is_active: boolean; country_code: string }>({ center_role: "", is_active: true, country_code: "" })
   const [filterRole, setFilterRole] = useState("")
   const [reinviting, setReinviting] = useState<string | null>(null)
 
@@ -46,6 +47,7 @@ export default function StudioUsersPage() {
         full_name: form.full_name.trim() || undefined,
         center_role: form.center_role,
         center_id: form.center_id.trim() || undefined,
+        country_code: form.country_code || undefined,
         password: form.password.trim() || undefined,
       })
       setUsers((u) => [created, ...u])
@@ -77,6 +79,7 @@ export default function StudioUsersPage() {
       const updated = await patchStudioUserAction(userId, {
         center_role: editForm.center_role,
         is_active: editForm.is_active,
+        country_code: editForm.country_code || undefined,
       })
       setUsers((u) => u.map((x) => (x.id === updated.id ? updated : x)))
       setEditingId(null)
@@ -159,6 +162,17 @@ export default function StudioUsersPage() {
                 className="mt-1 w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-zinc-400" />
             </div>
             <div>
+              <label className="text-xs text-zinc-500">{t.field_country}</label>
+              <select value={form.country_code} onChange={field("country_code")}
+                className="mt-1 w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-400">
+                <option value="">{t.select_country}</option>
+                {COUNTRIES.map((c) => (
+                  <option key={c.code} value={c.code}>{flagEmoji(c.code)} {c.name}</option>
+                ))}
+              </select>
+              <p className="mt-1 text-xs text-zinc-400">{t.country_hint}</p>
+            </div>
+            <div>
               <label className="text-xs text-zinc-500">{t.field_temp_password}</label>
               <input type="password" value={form.password} onChange={field("password")} placeholder={t.temp_password_placeholder}
                 className="mt-1 w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-400" />
@@ -215,6 +229,13 @@ export default function StudioUsersPage() {
                           <option value="true">{t.status_active}</option>
                           <option value="false">{t.status_inactive}</option>
                         </select>
+                        <select value={editForm.country_code} onChange={(e) => setEditForm((f) => ({ ...f, country_code: e.target.value }))}
+                          className="rounded border border-zinc-200 px-2 py-1 text-xs focus:outline-none">
+                          <option value="">{t.select_country}</option>
+                          {COUNTRIES.map((c) => (
+                            <option key={c.code} value={c.code}>{flagEmoji(c.code)} {c.name}</option>
+                          ))}
+                        </select>
                         <button onClick={() => handlePatch(u.id)} disabled={saving}
                           className="rounded px-2 py-1 text-xs font-medium bg-zinc-900 text-white hover:bg-zinc-700 disabled:opacity-50">
                           {t.save}
@@ -235,7 +256,7 @@ export default function StudioUsersPage() {
                           {reinviting === u.id ? "..." : t.reinvite}
                         </button>
                         <button
-                          onClick={() => { setEditingId(u.id); setEditForm({ center_role: u.center_role ?? "volunteer", is_active: u.is_active }) }}
+                          onClick={() => { setEditingId(u.id); setEditForm({ center_role: u.center_role ?? "volunteer", is_active: u.is_active, country_code: u.country_code ?? "" }) }}
                           className="rounded px-2 py-1 text-xs text-zinc-500 hover:bg-zinc-100"
                         >
                           {t.edit}

@@ -54,6 +54,7 @@ def invite_user(
         must_change_password=True,
         center_id=center_id,
         center_role=data.center_role,
+        country_code=data.country_code,
     ))
 
     # Auto-assign to Donaciones Generales

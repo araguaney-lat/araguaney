@@ -10,6 +10,7 @@ export interface StudioUserCreate {
   full_name?: string
   center_id?: string
   center_role: string
+  country_code?: string
   password?: string
 }
 
@@ -18,6 +19,7 @@ export interface StudioUserPatch {
   center_role?: string
   is_active?: boolean
   full_name?: string
+  country_code?: string
 }
 
 export async function listStudioUsersAction(params?: {

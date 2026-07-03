@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Query, Request
 from sqlalchemy.orm import Session
 
 from app.database import get_db
@@ -18,10 +18,15 @@ router = APIRouter(prefix="/centers", tags=["centers"])
 def list_centers(
     request: Request,
     active_only: bool = False,
+    country_code: str | None = Query(None),
     db: Session = Depends(get_db),
-    _: User = Depends(require_national_admin),
+    current_user: User = Depends(require_national_admin),
 ):
-    return CenterService(db).list_centers(active_only=active_only)
+    # Default to the requesting national_admin's own country (Team page's
+    # center selector) when the caller doesn't explicitly filter — falls
+    # back to "all countries" for admins with no country_code set yet.
+    effective_country = country_code if country_code is not None else current_user.country_code
+    return CenterService(db).list_centers(active_only=active_only, country_code=effective_country)
 
 
 @router.get("/{center_id}", response_model=CenterOut)

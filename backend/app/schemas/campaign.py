@@ -1,19 +1,17 @@
-import re
 from datetime import date, datetime
 from decimal import Decimal
 from uuid import UUID
 
 from pydantic import field_validator
 
-from app.schemas._base import StrictModel, StrictORMModel, StrictUUID, StrictDate, StrictDecimal
-
-_CC_RE = re.compile(r"^[A-Z]{2}$")
-
-
-def _validate_cc(v: str | None) -> str | None:
-    if v is not None and not _CC_RE.match(v):
-        raise ValueError("must be 2 uppercase letters (ISO 3166-1 alpha-2)")
-    return v
+from app.schemas._base import (
+    StrictModel,
+    StrictORMModel,
+    StrictUUID,
+    StrictDate,
+    StrictDecimal,
+    validate_country_code,
+)
 
 
 class CampaignCreate(StrictModel):
@@ -30,7 +28,7 @@ class CampaignCreate(StrictModel):
     @field_validator("origin_country", "destination_country")
     @classmethod
     def validate_country(cls, v: str | None) -> str | None:
-        return _validate_cc(v)
+        return validate_country_code(v)
 
 
 class CampaignUpdate(StrictModel):
@@ -46,7 +44,7 @@ class CampaignUpdate(StrictModel):
     @field_validator("origin_country", "destination_country")
     @classmethod
     def validate_country(cls, v: str | None) -> str | None:
-        return _validate_cc(v)
+        return validate_country_code(v)
 
 
 class CampaignOut(StrictORMModel):

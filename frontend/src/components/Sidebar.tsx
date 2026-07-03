@@ -94,9 +94,10 @@ const OPS_ITEMS: NavItem[] = [
   { href: "/dashboard/scan", labelKey: "scan", roles: ["national_admin", "coordinator", "volunteer"], icon: ScanLine },
   { href: "/dashboard/transfers", labelKey: "transfers", roles: ["national_admin", "coordinator"], icon: ArrowLeftRight },
   { href: "/dashboard/reports", labelKey: "reports", roles: ["national_admin", "coordinator", "volunteer"], icon: BarChart2 },
-  // Team directory now open to volunteers too (was coordinator-only) — see
-  // list_center_users in backend/app/routers/users.py.
-  { href: "/dashboard/team", labelKey: "team", roles: ["coordinator", "volunteer"], icon: Users },
+  // Team directory: open to everyone. Coordinator/volunteer see their own
+  // center directly; national_admin gets a center selector (scoped to their
+  // own country_code) — see list_center_users in backend/app/routers/users.py.
+  { href: "/dashboard/team", labelKey: "team", roles: ["national_admin", "coordinator", "volunteer"], icon: Users },
   { href: "/dashboard/messages", labelKey: "messages", roles: ["national_admin", "coordinator", "volunteer"], icon: MessageCircle, badgeKey: "messages" },
 ]
 
