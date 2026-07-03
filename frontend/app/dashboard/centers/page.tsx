@@ -4,7 +4,7 @@ import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import { createCenterAction, updateCenterAction } from "@/lib/center-actions"
-import { COUNTRIES, countryName } from "@/lib/countries"
+import { COUNTRIES, countryName, flagEmoji } from "@/lib/countries"
 import type { Center } from "@/types"
 import { useDict } from "@/context/DictionaryContext"
 
@@ -66,13 +66,18 @@ export default function CentersPage() {
         state_name: form.state_name || undefined,
       })
       setCenters((cs) => [created, ...cs])
-      setForm(EMPTY_FORM)
-      setShowForm(false)
+      closeForm()
     } catch (err) {
       setError(err instanceof Error ? err.message : dict.dashboard.common.error_unknown)
     } finally {
       setSaving(false)
     }
+  }
+
+  function closeForm() {
+    setForm(EMPTY_FORM)
+    setError(null)
+    setShowForm(false)
   }
 
   async function toggleActive(center: Center) {
@@ -96,12 +101,14 @@ export default function CentersPage() {
           <span className="text-sm text-zinc-500">
             {centers.length === 1 ? t.count_one : t.count_other.replace("{count}", String(centers.length))}
           </span>
-          <button
-            onClick={() => setShowForm((v) => !v)}
-            className="rounded-lg bg-zinc-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-zinc-700"
-          >
-            {showForm ? t.cancel : t.new}
-          </button>
+          {!showForm && (
+            <button
+              onClick={() => setShowForm(true)}
+              className="rounded-lg bg-zinc-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-zinc-700"
+            >
+              {t.new}
+            </button>
+          )}
         </div>
       </div>
 
@@ -147,7 +154,7 @@ export default function CentersPage() {
                 <option value="">{t.select_country}</option>
                 {COUNTRIES.map((c) => (
                   <option key={c.code} value={c.code}>
-                    {c.name} ({c.code})
+                    {flagEmoji(c.code)} {c.name}
                   </option>
                 ))}
               </select>
@@ -187,7 +194,15 @@ export default function CentersPage() {
             </div>
           </div>
 
-          <div className="flex justify-end pt-1">
+          <div className="flex justify-end gap-2 pt-1">
+            <button
+              type="button"
+              onClick={closeForm}
+              disabled={saving}
+              className="rounded-lg border border-zinc-200 px-4 py-2 text-sm font-medium text-zinc-600 hover:bg-zinc-50 disabled:opacity-50"
+            >
+              {t.cancel}
+            </button>
             <button
               type="submit"
               disabled={saving}
@@ -224,6 +239,7 @@ export default function CentersPage() {
 
               {(c.country_code || c.state_name) && (
                 <p className="mt-1.5 text-xs text-zinc-600 font-medium">
+                  {c.country_code && <>{flagEmoji(c.country_code)} </>}
                   {[
                     c.state_name,
                     c.country_code ? countryName(c.country_code) : null,
