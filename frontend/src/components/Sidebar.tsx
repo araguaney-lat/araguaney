@@ -172,15 +172,15 @@ export function Sidebar({ centerRole, platformRole, centerName, nav, roleLabels,
 
   return (
     <aside
-      className={`flex h-full flex-col border-r border-amber-200 bg-amber-50 transition-all duration-200 ${width} flex-shrink-0`}
+      className={`flex h-full flex-col border-r border-[#EAD9B0] bg-[#FBEFC9] transition-all duration-200 ${width} flex-shrink-0`}
     >
       {/* Header */}
       {collapsed ? (
-        <div className="flex flex-col items-center gap-1 border-b border-amber-100 px-2 py-3">
+        <div className="flex flex-col items-center gap-1 border-b border-[#EAD9B0] px-2 py-3">
           <Image src={LOGO} alt="Araguaney" width={28} height={28} className="rounded-full object-contain" />
           <button
             onClick={toggle}
-            className="rounded-lg p-1 text-amber-600 hover:bg-amber-100 hover:text-amber-800 transition-colors"
+            className="rounded-lg p-1 text-[#906400] hover:bg-[#F3E3B8] hover:text-[#3B2A00] transition-colors"
             title="Expandir menú"
           >
             <PanelLeftOpen size={16} />
@@ -188,13 +188,13 @@ export function Sidebar({ centerRole, platformRole, centerName, nav, roleLabels,
           <LanguageSwitcher locale={locale} collapsed />
         </div>
       ) : (
-        <div className="flex items-center justify-between border-b border-amber-100 px-3 py-3">
+        <div className="flex items-center justify-between border-b border-[#EAD9B0] px-3 py-3">
           <div className="flex items-center gap-2 min-w-0">
             <Image src={LOGO} alt="Araguaney" width={28} height={28} className="rounded-full object-contain flex-shrink-0" />
             <div className="min-w-0">
-              <span className="text-sm font-semibold text-amber-900 truncate block">Araguaney</span>
+              <span className="text-sm font-semibold text-[#3B2A00] truncate block">Araguaney</span>
               {centerName && (
-                <p className="text-xs text-amber-700/70 truncate">{centerName}</p>
+                <p className="text-xs text-[#906400]/80 truncate">{centerName}</p>
               )}
             </div>
           </div>
@@ -202,7 +202,7 @@ export function Sidebar({ centerRole, platformRole, centerName, nav, roleLabels,
             <LanguageSwitcher locale={locale} />
             <button
               onClick={toggle}
-              className="rounded-lg p-1.5 text-amber-600 hover:bg-amber-100 hover:text-amber-800 transition-colors"
+              className="rounded-lg p-1.5 text-[#906400] hover:bg-[#F3E3B8] hover:text-[#3B2A00] transition-colors"
               title="Colapsar menú"
             >
               <PanelLeftClose size={18} />
@@ -233,11 +233,11 @@ export function Sidebar({ centerRole, platformRole, centerName, nav, roleLabels,
         {visibleOpsItems.length > 0 && (
           <div className="pt-2">
             {!collapsed && (
-              <p className="px-2 pb-1 text-xs font-semibold uppercase tracking-wider text-amber-600/70">
+              <p className="px-2 pb-1 text-xs font-semibold uppercase tracking-wider text-[#946A00]/85">
                 {nav.ops_section}
               </p>
             )}
-            {collapsed && <div className="my-1 border-t border-amber-100" />}
+            {collapsed && <div className="my-1 border-t border-[#EAD9B0]" />}
             {visibleOpsItems.map((item) => {
               const isActive = pathname === item.href
               const Icon = item.icon
@@ -258,11 +258,11 @@ export function Sidebar({ centerRole, platformRole, centerName, nav, roleLabels,
         {visibleAdminItems.length > 0 && (
           <div className="pt-2">
             {!collapsed && (
-              <p className="px-2 pb-1 text-xs font-semibold uppercase tracking-wider text-amber-600/70">
+              <p className="px-2 pb-1 text-xs font-semibold uppercase tracking-wider text-[#946A00]/85">
                 {nav.admin_section}
               </p>
             )}
-            {collapsed && <div className="my-1 border-t border-amber-100" />}
+            {collapsed && <div className="my-1 border-t border-[#EAD9B0]" />}
             {visibleAdminItems.map((item) => {
               const isActive = pathname.startsWith(item.href)
               const Icon = item.icon
@@ -282,7 +282,7 @@ export function Sidebar({ centerRole, platformRole, centerName, nav, roleLabels,
       </nav>
 
       {/* Footer */}
-      <div className="border-t border-amber-100 px-2 py-2 space-y-0.5">
+      <div className="border-t border-[#EAD9B0] px-2 py-2 space-y-0.5">
         {platformRole === "superadmin" && (
           <NavLink
             href="/studio"
@@ -298,10 +298,10 @@ export function Sidebar({ centerRole, platformRole, centerName, nav, roleLabels,
           <Link
             href="/dashboard/settings"
             data-active={pathname.startsWith("/dashboard/settings")}
-            className={`flex items-center gap-2.5 rounded-lg px-2.5 py-2 transition-colors hover:bg-amber-100 data-[active=true]:bg-amber-200/70 ${collapsed ? "justify-center" : ""}`}
+            className={`flex items-center gap-2.5 rounded-lg px-2.5 py-2 transition-colors hover:bg-[#F3E3B8] data-[active=true]:bg-[#F3C033]/35 ${collapsed ? "justify-center" : ""}`}
             title={collapsed ? `${userName ?? userEmail}${centerRole ? ` · ${roleLabels[centerRole as keyof DashboardRoleLabels] ?? centerRole}` : ""}` : undefined}
           >
-            <span className="flex-shrink-0 flex h-7 w-7 items-center justify-center overflow-hidden rounded-full bg-amber-300 text-xs font-bold text-amber-900">
+            <span className="flex-shrink-0 flex h-7 w-7 items-center justify-center overflow-hidden rounded-full bg-[#F3C033] text-xs font-bold text-[#3B2A00]">
               {userAvatarUrl ? (
                 <Image src={userAvatarUrl} alt="" width={28} height={28} className="h-full w-full object-cover" />
               ) : (
@@ -310,9 +310,9 @@ export function Sidebar({ centerRole, platformRole, centerName, nav, roleLabels,
             </span>
             {!collapsed && (
               <div className="min-w-0">
-                <p className="text-xs font-semibold text-amber-900 truncate">{userName ?? userEmail}</p>
+                <p className="text-xs font-semibold text-[#3B2A00] truncate">{userName ?? userEmail}</p>
                 {centerRole && (
-                  <p className="text-xs text-amber-700/80 truncate">
+                  <p className="text-xs text-[#906400]/85 truncate">
                     {roleLabels[centerRole as keyof DashboardRoleLabels] ?? centerRole}
                   </p>
                 )}
@@ -325,7 +325,7 @@ export function Sidebar({ centerRole, platformRole, centerName, nav, roleLabels,
           <button
             type="submit"
             title={collapsed ? nav.logout : undefined}
-            className={`flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm text-amber-700 hover:bg-amber-100 hover:text-amber-900 transition-colors ${collapsed ? "justify-center" : ""}`}
+            className={`flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm text-[#906400] hover:bg-[#F3E3B8] hover:text-[#3B2A00] transition-colors ${collapsed ? "justify-center" : ""}`}
           >
             <LogOut size={17} className="flex-shrink-0" />
             {!collapsed && <span>{nav.logout}</span>}
@@ -349,8 +349,8 @@ interface NavLinkProps {
 function NavLink({ href, label, icon, isActive, collapsed, className, badge = 0 }: NavLinkProps) {
   const base =
     "flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm font-medium transition-colors"
-  const active = "bg-amber-200/70 text-amber-900"
-  const inactive = "text-amber-800 hover:bg-amber-100 hover:text-amber-900"
+  const active = "bg-[#F3C033]/35 text-[#3B2A00]"
+  const inactive = "text-[#906400] hover:bg-[#F3E3B8] hover:text-[#3B2A00]"
 
   return (
     <Link

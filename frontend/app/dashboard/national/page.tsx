@@ -55,9 +55,9 @@ export default async function NationalDashboardPage() {
           { label: t.stat_shipments_sent, value: totals.total_shipments_sent.toLocaleString() },
           { label: t.stat_centers, value: totals.active_centers.toLocaleString() },
         ].map(({ label, value }) => (
-          <div key={label} className="rounded-xl border border-amber-200 bg-amber-50 p-4">
-            <p className="text-xs text-amber-700/80 mb-1">{label}</p>
-            <p className="text-2xl font-bold text-amber-900">{value}</p>
+          <div key={label} className="rounded-xl border border-[#EAD9B0] bg-[#FBEFC9] p-4">
+            <p className="text-xs text-[#906400]/85 mb-1">{label}</p>
+            <p className="text-2xl font-bold text-[#3B2A00]">{value}</p>
           </div>
         ))}
       </div>
