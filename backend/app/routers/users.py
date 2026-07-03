@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 
 from app.arq_pool import enqueue
 from app.database import get_db
-from app.dependencies import require_coordinator
+from app.dependencies import require_center_role, require_coordinator
 from app.models.user import User
 from app.repositories.audit_repository import AuditRepository
 from app.repositories.campaign_repository import CampaignRepository
@@ -117,9 +117,11 @@ def list_center_users(
     request: Request,
     center_id: UUID,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_coordinator),
+    current_user: User = Depends(require_center_role),
 ):
-    if current_user.center_role == "coordinator" and current_user.center_id != center_id:
+    # Volunteers can now browse their own center's team directory too (Team
+    # page) — national_admin can view any center, everyone else only theirs.
+    if current_user.center_role != "national_admin" and current_user.center_id != center_id:
         raise api_error("FORBIDDEN", "You can only view users from your own center", status_code=403)
 
     from sqlalchemy import select

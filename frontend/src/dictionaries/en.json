@@ -539,7 +539,12 @@
       "status_inactive": "Inactive",
       "reinvite": "Re-invite",
       "invite_success": "User invited. They will receive their credentials by email.",
-      "reinvite_success": "Invitation resent."
+      "reinvite_success": "Invitation resent.",
+      "coordinators_heading": "Coordinators",
+      "volunteers_heading": "Volunteers",
+      "no_coordinators": "No coordinators assigned.",
+      "no_volunteers": "No volunteers registered.",
+      "manage_team": "Manage team"
     },
     "settings": {
       "title": "Settings",

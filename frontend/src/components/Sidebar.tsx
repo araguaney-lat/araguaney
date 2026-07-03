@@ -86,7 +86,6 @@ const NAV_ITEMS: NavItem[] = [
   // "Solicitudes" hidden for now — reported not working, revisit before
   // re-enabling. Left commented (not deleted) so it's easy to restore.
   // { href: "/dashboard/requests", labelKey: "requests", roles: ["national_admin", "coordinator", "volunteer"], icon: MessageSquare },
-  { href: "/dashboard/team", labelKey: "team", roles: ["coordinator"], icon: Users },
 ]
 
 // Operations — day-to-day tools, grouped under its own header.
@@ -95,6 +94,9 @@ const OPS_ITEMS: NavItem[] = [
   { href: "/dashboard/scan", labelKey: "scan", roles: ["national_admin", "coordinator", "volunteer"], icon: ScanLine },
   { href: "/dashboard/transfers", labelKey: "transfers", roles: ["national_admin", "coordinator"], icon: ArrowLeftRight },
   { href: "/dashboard/reports", labelKey: "reports", roles: ["national_admin", "coordinator", "volunteer"], icon: BarChart2 },
+  // Team directory now open to volunteers too (was coordinator-only) — see
+  // list_center_users in backend/app/routers/users.py.
+  { href: "/dashboard/team", labelKey: "team", roles: ["coordinator", "volunteer"], icon: Users },
   { href: "/dashboard/messages", labelKey: "messages", roles: ["national_admin", "coordinator", "volunteer"], icon: MessageCircle, badgeKey: "messages" },
 ]
 
