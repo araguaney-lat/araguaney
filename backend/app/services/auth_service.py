@@ -144,6 +144,7 @@ class AuthService(BaseService):
             "center_role": user.center_role,
             "center_id": str(user.center_id) if user.center_id else None,
             "must_change_password": bool(user.must_change_password),
+            "must_accept_terms": user.must_accept_terms,
         }
 
     @staticmethod
@@ -265,7 +266,23 @@ class AuthService(BaseService):
             "center_role": user.center_role,
             "center_id": str(user.center_id) if user.center_id else None,
             "must_change_password": False,
+            "must_accept_terms": user.must_accept_terms,
         }
+
+    def accept_terms(self, user: User, version: str) -> dict:
+        from app.legal import CURRENT_TERMS_VERSION
+
+        if version != CURRENT_TERMS_VERSION:
+            raise api_error(
+                "TERMS_VERSION_MISMATCH",
+                "Los documentos legales se actualizaron. Recarga la página e intenta de nuevo.",
+                status_code=409,
+            )
+
+        user.accepted_terms_at = datetime.now(timezone.utc)
+        user.accepted_terms_version = version
+        self.db.commit()
+        return {"accepted_terms_version": version, "must_accept_terms": False}
 
     def reset_password(self, token: str, new_password: str, background_tasks: BackgroundTasks) -> dict:
         if len(new_password) < 8:
@@ -407,4 +424,5 @@ class AuthService(BaseService):
             "center_role": user.center_role,
             "center_id": str(user.center_id) if user.center_id else None,
             "must_change_password": bool(user.must_change_password),
+            "must_accept_terms": user.must_accept_terms,
         }

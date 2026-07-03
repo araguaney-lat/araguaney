@@ -28,6 +28,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const session = await auth()
   if (!session) redirect("/login")
   if (session.mustChangePassword) redirect("/change-password")
+  if (session.mustAcceptTerms) redirect("/accept-terms")
 
   const centerRole = (session.centerRole as CenterRole | null) ?? null
   const platformRole = session.platformRole ?? null

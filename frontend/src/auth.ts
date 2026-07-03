@@ -29,6 +29,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             centerId: me.center_id ?? null,
             userId: me.id,
             mustChangePassword: false,
+            mustAcceptTerms: me.must_accept_terms ?? false,
           }
         }
 
@@ -60,6 +61,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           centerId: data.center_id ?? null,
           userId: _extractSub(data.access_token),
           mustChangePassword: data.must_change_password ?? false,
+          mustAcceptTerms: data.must_accept_terms ?? false,
         }
       },
     }),
@@ -73,6 +75,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token.centerId = user.centerId
         token.userId = user.userId
         token.mustChangePassword = user.mustChangePassword
+        token.mustAcceptTerms = user.mustAcceptTerms
       }
       return token
     },
@@ -83,6 +86,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       session.centerId = token.centerId
       session.userId = token.userId
       session.mustChangePassword = token.mustChangePassword
+      session.mustAcceptTerms = token.mustAcceptTerms
       return session
     },
   },

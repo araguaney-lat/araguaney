@@ -22,6 +22,8 @@ async function fetchMe(token: string): Promise<{ full_name?: string | null; user
 export default async function StudioLayout({ children }: { children: React.ReactNode }) {
   const session = await auth()
   if (!session) redirect("/login")
+  if (session.mustChangePassword) redirect("/change-password")
+  if (session.mustAcceptTerms) redirect("/accept-terms")
   if (session.platformRole !== "superadmin") redirect("/dashboard")
 
   const locale = await getLocale()

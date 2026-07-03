@@ -8,6 +8,7 @@ from app.database import get_db
 from app.dependencies import get_current_user
 from app.models.user import User
 from app.schemas.auth import (
+    AcceptTermsRequest,
     ChangePasswordRequest,
     ForgotPasswordRequest,
     OAuthLogin,
@@ -159,6 +160,29 @@ def change_password(
     )
     db.commit()
     enqueue(background_tasks, "send_password_changed_email_task", current_user.email)
+    return result
+
+
+@router.post("/me/accept-terms")
+@limiter.limit("20/hour")
+def accept_terms(
+    request: Request,
+    data: AcceptTermsRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    from app.repositories.audit_repository import AuditRepository
+
+    result = AuthService(db).accept_terms(current_user, data.version)
+    AuditRepository(db).log(
+        "USER_TERMS_ACCEPTED",
+        "user",
+        user_id=current_user.id,
+        entity_id=str(current_user.id),
+        extra={"version": data.version},
+        ip=get_client_ip(request),
+    )
+    db.commit()
     return result
 
 

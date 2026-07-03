@@ -23,6 +23,7 @@ class UserOut(StrictORMModel):
     center_id: UUID | None
     is_active: bool
     totp_enabled: bool
+    must_accept_terms: bool
 
 
 class UserUpdate(StrictModel):
