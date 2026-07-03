@@ -1,6 +1,6 @@
-# [Project Name]
+# Araguaney
 
-> [One-line description of the project]
+> Plataforma gratuita para la gestión de Donativos en Centros de Acopio
 
 ## Tech Stack
 
