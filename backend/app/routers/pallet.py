@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from app.arq_pool import enqueue
 from app.config import settings
 from app.database import get_db
-from app.dependencies import get_current_user, require_coordinator, tenant_scope
+from app.dependencies import get_current_user, require_coordinator, resolve_write_center_id, tenant_scope
 from app.models.user import User
 from app.repositories.export_job_repository import ExportJobRepository
 from app.repositories.pallet_repository import PalletRepository
@@ -80,7 +80,8 @@ def create_pallet(
     current_user: User = Depends(require_coordinator),
     scope: UUID | None = Depends(tenant_scope),
 ):
-    return PalletService(db).create(center_id=scope, user_id=current_user.id, data=data)
+    center_id = resolve_write_center_id(current_user, data.center_id)
+    return PalletService(db).create(center_id=center_id, user_id=current_user.id, data=data)
 
 
 @router.get("/v1/pallets/{pallet_id}", response_model=PalletDetailOut)

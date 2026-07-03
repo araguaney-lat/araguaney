@@ -2,13 +2,16 @@ from datetime import datetime
 from decimal import Decimal
 from uuid import UUID
 
-from app.schemas._base import StrictModel, StrictORMModel, StrictDecimal
+from app.schemas._base import StrictModel, StrictORMModel, StrictUUID, StrictDecimal
 from app.schemas.box import BoxOut
 
 
 class PalletCreate(StrictModel):
     notes: str | None = None
     tare_weight_kg: StrictDecimal | None = None
+    # Only honored for national_admin (no home center) — coordinator always
+    # uses their own center_id, this field is ignored for them.
+    center_id: StrictUUID | None = None
 
 
 class PalletOut(StrictORMModel):

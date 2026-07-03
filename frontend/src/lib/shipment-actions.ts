@@ -10,6 +10,7 @@ export async function createShipmentAction(data: {
   carrier?: string
   reference?: string
   notes?: string
+  center_id?: string
 }) {
   const session = await auth()
   if (!session?.accessToken) return { error: "No autenticado" }
@@ -24,6 +25,7 @@ export async function createShipmentAction(data: {
         carrier: data.carrier ?? null,
         reference: data.reference ?? null,
         notes: data.notes ?? null,
+        center_id: data.center_id ?? undefined,
       }),
     })
     revalidatePath("/dashboard/shipments")

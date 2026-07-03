@@ -147,7 +147,10 @@
       "add": "Agregar",
       "all": "Todos",
       "empty_placeholder": "—",
-      "exporting": "Generando…"
+      "exporting": "Generando…",
+      "select_center_label": "Centro",
+      "select_center_placeholder": "— Seleccionar centro —",
+      "no_centers_available": "No hay centros disponibles."
     },
     "home": {
       "title": "Panel de control",

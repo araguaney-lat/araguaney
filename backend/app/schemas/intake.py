@@ -19,6 +19,9 @@ class IntakeCreate(StrictModel):
     donante_libre: str | None = None
     notes: str | None = None
     boxes: list[BoxDraft]
+    # Only honored for national_admin (no home center) — coordinator/volunteer
+    # always use their own center_id, this field is ignored for them.
+    center_id: StrictUUID | None = None
 
 
 class BoxOut(StrictORMModel):

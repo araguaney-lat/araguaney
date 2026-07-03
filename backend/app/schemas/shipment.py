@@ -11,6 +11,9 @@ class ShipmentCreate(StrictModel):
     carrier: str | None = None
     reference: str | None = None
     notes: str | None = None
+    # Only honored for national_admin (no home center) — coordinator always
+    # uses their own center_id, this field is ignored for them.
+    center_id: StrictUUID | None = None
 
 
 class ShipmentOut(StrictORMModel):

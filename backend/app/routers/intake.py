@@ -4,7 +4,7 @@ from fastapi import APIRouter, BackgroundTasks, Depends, Query, Request
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.dependencies import require_center_role, tenant_scope
+from app.dependencies import require_center_role, resolve_write_center_id, tenant_scope
 from app.models.user import User
 from app.schemas.intake import IntakeCreate, IntakeOut
 from app.services.intake_service import IntakeService
@@ -25,10 +25,7 @@ def create_intake(
     current_user: User = Depends(require_center_role),
     scope: UUID | None = Depends(tenant_scope),
 ):
-    center_id = current_user.center_id
-    if not center_id:
-        from app.utils.errors import api_error
-        raise api_error("NO_CENTER", "User has no center assigned", status_code=400)
+    center_id = resolve_write_center_id(current_user, data.center_id)
     intake = IntakeService(db).create(data, center_id=center_id, user_id=current_user.id)
     fire_audit(background_tasks, "INTAKE_CREATED", "intake",
                user_id=current_user.id, entity_id=str(intake.id), ip=get_client_ip(request))

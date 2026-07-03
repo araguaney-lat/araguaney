@@ -4,7 +4,7 @@ import { auth } from "@/auth"
 import { apiFetch } from "@/lib/api"
 import { revalidatePath } from "next/cache"
 
-export async function createPalletAction(notes?: string) {
+export async function createPalletAction(notes?: string, centerId?: string) {
   const session = await auth()
   if (!session?.accessToken) return { error: "No autenticado" }
 
@@ -12,7 +12,7 @@ export async function createPalletAction(notes?: string) {
     const data = await apiFetch("/v1/pallets", {
       method: "POST",
       token: session.accessToken,
-      body: JSON.stringify({ notes: notes ?? null }),
+      body: JSON.stringify({ notes: notes ?? null, center_id: centerId ?? undefined }),
     })
     revalidatePath("/dashboard/pallets")
     return { data }

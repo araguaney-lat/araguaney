@@ -1,7 +1,9 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import type { PalletOut, PalletDetailOut, PalletStatus, EventOut } from "@/types"
+import { useSession } from "next-auth/react"
+import { apiFetch } from "@/lib/api"
+import type { Center, PalletOut, PalletDetailOut, PalletStatus, EventOut } from "@/types"
 import { StatusTimeline } from "@/components/StatusTimeline"
 import {
   createPalletAction,
@@ -20,6 +22,27 @@ const STATUS_COLORS: Record<PalletStatus, string> = {
 export default function PalletsPage() {
   const dict = useDict()
   const t = dict.dashboard.pallets
+  const tc = dict.dashboard.common
+
+  const { data: session } = useSession()
+  const isNationalAdmin = session?.centerRole === "national_admin"
+  const token = session?.accessToken ?? ""
+
+  // national_admin has no home center — they must pick one before creating
+  // a pallet. Coordinator never sees this, their own center is used
+  // automatically server-side.
+  const [centers, setCenters] = useState<Center[]>([])
+  const [selectedCenterId, setSelectedCenterId] = useState("")
+
+  useEffect(() => {
+    if (!isNationalAdmin || !token) return
+    apiFetch<Center[]>("/v1/centers", { token })
+      .then((data) => {
+        setCenters(data)
+        if (data.length > 0) setSelectedCenterId((id) => id || data[0].id)
+      })
+      .catch(() => setCenters([]))
+  }, [isNationalAdmin, token])
 
   const [pallets, setPallets] = useState<PalletOut[]>([])
   const [filter, setFilter] = useState<PalletStatus | "">("")
@@ -63,8 +86,9 @@ export default function PalletsPage() {
   }, [labelExport.error])
 
   const handleCreate = async () => {
+    if (isNationalAdmin && !selectedCenterId) { setError(tc.select_center_label); return }
     setActionLoading("create")
-    const result = await createPalletAction()
+    const result = await createPalletAction(undefined, isNationalAdmin ? selectedCenterId : undefined)
     setActionLoading(null)
     if (result.error) {
       setError(result.error)
@@ -106,15 +130,28 @@ export default function PalletsPage() {
 
   return (
     <div className="p-6 max-w-6xl mx-auto space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-3 flex-wrap">
         <h1 className="text-2xl font-bold text-zinc-900">{t.title}</h1>
-        <button
-          onClick={handleCreate}
-          disabled={actionLoading === "create"}
-          className="px-4 py-2 bg-zinc-900 text-white rounded-lg text-sm font-medium hover:bg-zinc-700 disabled:opacity-50"
-        >
-          {actionLoading === "create" ? t.creating : t.new}
-        </button>
+        <div className="flex items-center gap-2">
+          {isNationalAdmin && centers.length > 0 && (
+            <select
+              value={selectedCenterId}
+              onChange={(e) => setSelectedCenterId(e.target.value)}
+              className="rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-400"
+            >
+              {centers.map((c) => (
+                <option key={c.id} value={c.id}>{c.name}</option>
+              ))}
+            </select>
+          )}
+          <button
+            onClick={handleCreate}
+            disabled={actionLoading === "create" || (isNationalAdmin && !selectedCenterId)}
+            className="px-4 py-2 bg-zinc-900 text-white rounded-lg text-sm font-medium hover:bg-zinc-700 disabled:opacity-50"
+          >
+            {actionLoading === "create" ? t.creating : t.new}
+          </button>
+        </div>
       </div>
 
       {error && (

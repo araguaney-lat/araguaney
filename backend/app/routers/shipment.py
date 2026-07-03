@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.arq_pool import enqueue
 from app.database import get_db
-from app.dependencies import require_coordinator, tenant_scope
+from app.dependencies import require_coordinator, resolve_write_center_id, tenant_scope
 from app.models.user import User
 from app.repositories.export_job_repository import ExportJobRepository
 from app.repositories.shipment_repository import ShipmentRepository
@@ -43,7 +43,8 @@ def create_shipment(
     current_user: User = Depends(require_coordinator),
     scope: UUID | None = Depends(tenant_scope),
 ):
-    return ShipmentService(db).create(center_id=scope, user_id=current_user.id, data=data)
+    center_id = resolve_write_center_id(current_user, data.center_id)
+    return ShipmentService(db).create(center_id=center_id, user_id=current_user.id, data=data)
 
 
 @router.get("/{shipment_id}", response_model=ShipmentDetailOut)
