@@ -46,6 +46,20 @@ class UserCampaignRepository(BaseRepository):
         )
         self.db.flush()
 
+    def assign_users_from_centers(
+        self,
+        center_ids: list[UUID],
+        campaign_id: UUID,
+        assigned_by_id: UUID | None = None,
+    ) -> int:
+        """Add every active user of the given centers as a campaign member. Idempotent."""
+        users = self.db.execute(
+            select(User).where(User.center_id.in_(center_ids), User.is_active.is_(True))
+        ).scalars().all()
+        for user in users:
+            self.assign(user.id, campaign_id, assigned_by_id=assigned_by_id)
+        return len(users)
+
     def list_campaigns_for_user(self, user_id: UUID) -> list[Campaign]:
         rows = self.db.execute(
             select(Campaign)

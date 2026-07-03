@@ -411,7 +411,12 @@
       "toggle_deactivate": "Clic para desactivar",
       "toggle_activate": "Clic para activar",
       "destination_label": "Destino:",
-      "select_country": "— Seleccionar país —"
+      "select_country": "— Seleccionar país —",
+      "field_centers": "Centros participantes (opcional)",
+      "field_centers_help": "Se agregará automáticamente a todos los usuarios activos de los centros que selecciones como miembros de la campaña.",
+      "no_centers_available": "No hay centros disponibles.",
+      "centers_selected_one": "1 centro seleccionado",
+      "centers_selected_other": "{count} centros seleccionados"
     },
     "centers": {
       "title": "Centros",

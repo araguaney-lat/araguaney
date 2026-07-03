@@ -38,3 +38,11 @@ export function countryName(code: string | null): string {
   if (!code) return ""
   return COUNTRIES.find((c) => c.code === code)?.name ?? code
 }
+
+/** ISO 3166-1 alpha-2 → flag emoji, via Unicode regional indicator symbols. */
+export function flagEmoji(code: string | null): string {
+  if (!code || code.length !== 2) return ""
+  return code
+    .toUpperCase()
+    .replace(/./g, (char) => String.fromCodePoint(127397 + char.charCodeAt(0)))
+}

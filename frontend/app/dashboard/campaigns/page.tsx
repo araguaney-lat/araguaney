@@ -4,8 +4,8 @@ import Link from "next/link"
 import { useSession } from "next-auth/react"
 import { useEffect, useState } from "react"
 import { createCampaignAction, updateCampaignAction } from "@/lib/campaign-actions"
-import { COUNTRIES, countryName } from "@/lib/countries"
-import type { Campaign } from "@/types"
+import { COUNTRIES, countryName, flagEmoji } from "@/lib/countries"
+import type { Campaign, Center } from "@/types"
 import { useDict } from "@/context/DictionaryContext"
 
 const EMPTY_FORM = {
@@ -30,6 +30,9 @@ export default function CampaignsPage() {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  const [centers, setCenters] = useState<Center[]>([])
+  const [selectedCenterIds, setSelectedCenterIds] = useState<string[]>([])
+
   useEffect(() => {
     if (status !== "authenticated") return
     fetch("/api/campaigns")
@@ -38,6 +41,20 @@ export default function CampaignsPage() {
       .catch(() => setCampaigns([]))
       .finally(() => setLoading(false))
   }, [status])
+
+  useEffect(() => {
+    if (!showForm || !isAdmin) return
+    fetch("/api/centers")
+      .then((r) => (r.ok ? r.json() : []))
+      .then(setCenters)
+      .catch(() => setCenters([]))
+  }, [showForm, isAdmin])
+
+  function toggleCenter(centerId: string) {
+    setSelectedCenterIds((ids) =>
+      ids.includes(centerId) ? ids.filter((id) => id !== centerId) : [...ids, centerId]
+    )
+  }
 
   const field =
     (k: keyof typeof EMPTY_FORM) =>
@@ -56,9 +73,11 @@ export default function CampaignsPage() {
         description: form.description || undefined,
         start_date: form.start_date || undefined,
         end_date: form.end_date || undefined,
+        center_ids: selectedCenterIds.length > 0 ? selectedCenterIds : undefined,
       })
       setCampaigns((cs) => [created, ...cs])
       setForm(EMPTY_FORM)
+      setSelectedCenterIds([])
       setShowForm(false)
     } catch (err) {
       setError(err instanceof Error ? err.message : dict.dashboard.common.error_unknown)
@@ -137,7 +156,7 @@ export default function CampaignsPage() {
                 <option value="">{t.select_country}</option>
                 {COUNTRIES.map((c) => (
                   <option key={c.code} value={c.code}>
-                    {c.name} ({c.code})
+                    {flagEmoji(c.code)} {c.name}
                   </option>
                 ))}
               </select>
@@ -169,6 +188,40 @@ export default function CampaignsPage() {
                 className="mt-1 w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-400 resize-none"
               />
             </div>
+          </div>
+
+          <div className="pt-2 border-t border-zinc-100">
+            <label className="text-xs text-zinc-500">{t.field_centers}</label>
+            <p className="text-xs text-zinc-400 mt-0.5 mb-2">{t.field_centers_help}</p>
+            {centers.length === 0 ? (
+              <p className="text-xs text-zinc-400">{t.no_centers_available}</p>
+            ) : (
+              <>
+                <div className="max-h-40 overflow-y-auto rounded-lg border border-zinc-200 divide-y divide-zinc-100">
+                  {centers.map((c) => (
+                    <label
+                      key={c.id}
+                      className="flex items-center gap-2 px-3 py-2 text-sm text-zinc-700 hover:bg-zinc-50 cursor-pointer"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={selectedCenterIds.includes(c.id)}
+                        onChange={() => toggleCenter(c.id)}
+                        className="h-4 w-4 rounded border-zinc-300 text-zinc-900 focus:ring-zinc-400"
+                      />
+                      {c.name}
+                    </label>
+                  ))}
+                </div>
+                {selectedCenterIds.length > 0 && (
+                  <p className="text-xs text-zinc-500 mt-1.5">
+                    {selectedCenterIds.length === 1
+                      ? t.centers_selected_one
+                      : t.centers_selected_other.replace("{count}", String(selectedCenterIds.length))}
+                  </p>
+                )}
+              </>
+            )}
           </div>
 
           <div className="flex justify-end pt-1">
@@ -212,7 +265,7 @@ export default function CampaignsPage() {
 
               {c.destination_country && (
                 <p className="text-xs font-medium text-zinc-600">
-                  {t.destination_label} {countryName(c.destination_country)}
+                  {t.destination_label} {flagEmoji(c.destination_country)} {countryName(c.destination_country)}
                 </p>
               )}
 

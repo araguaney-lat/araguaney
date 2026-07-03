@@ -22,6 +22,9 @@ class CampaignCreate(StrictModel):
     description: str | None = None
     start_date: StrictDate | None = None
     end_date: StrictDate | None = None
+    # Optional: every active user of these centers is added as a campaign
+    # member on creation (same mechanism as adding members one by one).
+    center_ids: list[StrictUUID] | None = None
 
     @field_validator("destination_country")
     @classmethod

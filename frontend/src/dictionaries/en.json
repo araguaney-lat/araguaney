@@ -411,7 +411,12 @@
       "toggle_deactivate": "Click to deactivate",
       "toggle_activate": "Click to activate",
       "destination_label": "Destination:",
-      "select_country": "— Select country —"
+      "select_country": "— Select country —",
+      "field_centers": "Participating centers (optional)",
+      "field_centers_help": "Every active user of the centers you select will be automatically added as a campaign member.",
+      "no_centers_available": "No centers available.",
+      "centers_selected_one": "1 center selected",
+      "centers_selected_other": "{count} centers selected"
     },
     "centers": {
       "title": "Centers",
