@@ -96,3 +96,26 @@ def tenant_scope(current_user: User = Depends(get_current_user)) -> _uuid.UUID |
     if current_user.center_role == "national_admin":
         return None
     return current_user.center_id
+
+
+def resolve_write_center_id(current_user: User, requested_center_id: _uuid.UUID | None) -> _uuid.UUID:
+    """Write-side counterpart to tenant_scope: every create endpoint needs a
+    concrete center_id, never None. national_admin has no home center, so
+    they must pass one explicitly in the request body; everyone else always
+    uses their own (a coordinator/volunteer can never write to a center
+    other than their own, regardless of what they send in the body).
+    """
+    from app.utils.errors import api_error
+
+    if current_user.center_role == "national_admin":
+        if requested_center_id is None:
+            raise api_error(
+                "CENTER_REQUIRED",
+                "national_admin must specify a center_id",
+                field="center_id",
+                status_code=400,
+            )
+        return requested_center_id
+    if not current_user.center_id:
+        raise api_error("NO_CENTER", "User has no center assigned", status_code=400)
+    return current_user.center_id

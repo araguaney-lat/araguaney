@@ -147,7 +147,10 @@
       "add": "Add",
       "all": "All",
       "empty_placeholder": "—",
-      "exporting": "Generating…"
+      "exporting": "Generating…",
+      "select_center_label": "Center",
+      "select_center_placeholder": "— Select center —",
+      "no_centers_available": "No centers available."
     },
     "home": {
       "title": "Control panel",

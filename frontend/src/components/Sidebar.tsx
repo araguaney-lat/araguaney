@@ -76,9 +76,11 @@ const NAV_ITEMS: NavItem[] = [
   // showing both was a duplicate entry pointing at the same page.
   { href: "/dashboard", labelKey: "home", roles: ["coordinator", "volunteer"], icon: Home },
   { href: "/dashboard/national", labelKey: "national", roles: ["national_admin"], icon: Globe },
-  { href: "/dashboard/boxes", labelKey: "boxes", roles: ["coordinator", "volunteer"], icon: Package },
-  { href: "/dashboard/pallets", labelKey: "pallets", roles: ["coordinator"], icon: Layers },
-  { href: "/dashboard/shipments", labelKey: "shipments", roles: ["coordinator"], icon: Truck },
+  // Role hierarchy: national_admin sees everything coordinator/volunteer see
+  // (plus their own admin-only tools) — they never lose visibility going up.
+  { href: "/dashboard/boxes", labelKey: "boxes", roles: ["national_admin", "coordinator", "volunteer"], icon: Package },
+  { href: "/dashboard/pallets", labelKey: "pallets", roles: ["national_admin", "coordinator"], icon: Layers },
+  { href: "/dashboard/shipments", labelKey: "shipments", roles: ["national_admin", "coordinator"], icon: Truck },
   // national_admin sees "Campañas" grouped under Administración instead
   // (they're the only role that can create/manage campaigns) — this entry
   // is coordinator/volunteer-only so it never duplicates that one.
@@ -90,7 +92,7 @@ const NAV_ITEMS: NavItem[] = [
 
 // Operations — day-to-day tools, grouped under its own header.
 const OPS_ITEMS: NavItem[] = [
-  { href: "/dashboard/intake", labelKey: "intake", roles: ["coordinator", "volunteer"], icon: PackagePlus },
+  { href: "/dashboard/intake", labelKey: "intake", roles: ["national_admin", "coordinator", "volunteer"], icon: PackagePlus },
   { href: "/dashboard/scan", labelKey: "scan", roles: ["national_admin", "coordinator", "volunteer"], icon: ScanLine },
   { href: "/dashboard/transfers", labelKey: "transfers", roles: ["national_admin", "coordinator"], icon: ArrowLeftRight },
   { href: "/dashboard/reports", labelKey: "reports", roles: ["national_admin", "coordinator", "volunteer"], icon: BarChart2 },

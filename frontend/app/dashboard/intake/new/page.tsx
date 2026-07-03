@@ -3,7 +3,9 @@
 import { useState, useCallback, useRef, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import dynamic from "next/dynamic"
-import type { Campaign, ProductType, BarcodeResult } from "@/types"
+import { useSession } from "next-auth/react"
+import { apiFetch } from "@/lib/api"
+import type { Campaign, Center, ProductType, BarcodeResult } from "@/types"
 import { createIntakeAction, type BoxDraft } from "@/lib/actions"
 import { useOnlineStatus } from "@/components/ConnectivityBanner"
 import { useDict } from "@/context/DictionaryContext"
@@ -335,6 +337,11 @@ export default function NewIntakePage() {
   const online = useOnlineStatus()
   const dict = useDict()
   const t = dict.dashboard.intake_new
+  const tc = dict.dashboard.common
+
+  const { data: session } = useSession()
+  const isNationalAdmin = session?.centerRole === "national_admin"
+  const token = session?.accessToken ?? ""
 
   const [rows, setRows] = useState<BoxRow[]>([newRow()])
   const [campaignId, setCampaignId] = useState("")
@@ -343,6 +350,22 @@ export default function NewIntakePage() {
   const [notes, setNotes] = useState("")
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  // national_admin has no home center — they must pick one to attribute
+  // this intake to. Coordinator/volunteer never see this, their own center
+  // is used automatically server-side.
+  const [centers, setCenters] = useState<Center[]>([])
+  const [selectedCenterId, setSelectedCenterId] = useState("")
+
+  useEffect(() => {
+    if (!isNationalAdmin || !token) return
+    apiFetch<Center[]>("/v1/centers", { token })
+      .then((data) => {
+        setCenters(data)
+        if (data.length > 0) setSelectedCenterId((id) => id || data[0].id)
+      })
+      .catch(() => setCenters([]))
+  }, [isNationalAdmin, token])
 
   useEffect(() => {
     fetch("/api/campaigns/mine")
@@ -369,6 +392,7 @@ export default function NewIntakePage() {
     setError(null)
 
     if (!campaignId) { setError(t.error_campaign); return }
+    if (isNationalAdmin && !selectedCenterId) { setError(tc.select_center_label); return }
 
     for (const row of rows) {
       if (row.offlineBlocked) { setError(t.error_offline_boxes); return }
@@ -392,6 +416,7 @@ export default function NewIntakePage() {
       donante_libre: donante.trim() || undefined,
       notes: notes.trim() || undefined,
       boxes,
+      center_id: isNationalAdmin ? selectedCenterId : undefined,
     })
     setSubmitting(false)
 
@@ -421,6 +446,26 @@ export default function NewIntakePage() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-5">
+        {isNationalAdmin && (
+          <div>
+            <label className="block text-xs font-medium text-zinc-600 mb-1">{tc.select_center_label}</label>
+            {centers.length === 0 ? (
+              <p className="text-sm text-zinc-400">{tc.no_centers_available}</p>
+            ) : (
+              <select
+                value={selectedCenterId}
+                onChange={(e) => setSelectedCenterId(e.target.value)}
+                required
+                className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-900"
+              >
+                {centers.map((c) => (
+                  <option key={c.id} value={c.id}>{c.name}</option>
+                ))}
+              </select>
+            )}
+          </div>
+        )}
+
         <div>
           <label className="block text-xs font-medium text-zinc-600 mb-1">{t.campaign_label}</label>
           <select

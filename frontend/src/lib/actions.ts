@@ -293,6 +293,7 @@ export interface CreateIntakePayload {
   donante_libre?: string
   notes?: string
   boxes: BoxDraft[]
+  center_id?: string
 }
 
 export async function createIntakeAction(payload: CreateIntakePayload) {

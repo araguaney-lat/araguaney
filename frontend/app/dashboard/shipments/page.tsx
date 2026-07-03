@@ -1,7 +1,9 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import type { Campaign, ShipmentOut, ShipmentDetailOut, ShipmentStatus, PalletOut, EventOut } from "@/types"
+import { useSession } from "next-auth/react"
+import { apiFetch } from "@/lib/api"
+import type { Campaign, Center, ShipmentOut, ShipmentDetailOut, ShipmentStatus, PalletOut, EventOut } from "@/types"
 import { StatusTimeline } from "@/components/StatusTimeline"
 import {
   createShipmentAction,
@@ -21,6 +23,27 @@ const STATUS_COLORS: Record<ShipmentStatus, string> = {
 export default function ShipmentsPage() {
   const dict = useDict()
   const t = dict.dashboard.shipments
+  const tc = dict.dashboard.common
+
+  const { data: session } = useSession()
+  const isNationalAdmin = session?.centerRole === "national_admin"
+  const token = session?.accessToken ?? ""
+
+  // national_admin has no home center — they must pick one before creating
+  // a shipment. Coordinator never sees this, their own center is used
+  // automatically server-side.
+  const [centers, setCenters] = useState<Center[]>([])
+  const [selectedCenterId, setSelectedCenterId] = useState("")
+
+  useEffect(() => {
+    if (!isNationalAdmin || !token) return
+    apiFetch<Center[]>("/v1/centers", { token })
+      .then((data) => {
+        setCenters(data)
+        if (data.length > 0) setSelectedCenterId((id) => id || data[0].id)
+      })
+      .catch(() => setCenters([]))
+  }, [isNationalAdmin, token])
 
   const [shipments, setShipments] = useState<ShipmentOut[]>([])
   const [filter, setFilter] = useState<ShipmentStatus | "">("")
@@ -80,10 +103,12 @@ export default function ShipmentsPage() {
   }, [])
 
   const handleCreate = async () => {
+    if (isNationalAdmin && !selectedCenterId) { setError(tc.select_center_label); return }
     setActionLoading("create")
     const result = await createShipmentAction({
       ...newShipment,
       campaign_id: newShipment.campaign_id || undefined,
+      center_id: isNationalAdmin ? selectedCenterId : undefined,
     })
     setActionLoading(null)
     if (result.error) {
@@ -162,6 +187,24 @@ export default function ShipmentsPage() {
         <div className="rounded-xl border border-zinc-200 bg-white p-5 space-y-3">
           <h2 className="font-semibold text-sm text-zinc-900">{t.create_title}</h2>
           <div className="grid grid-cols-2 gap-3">
+            {isNationalAdmin && (
+              <label className="space-y-1 col-span-2">
+                <span className="text-xs text-zinc-500">{tc.select_center_label}</span>
+                {centers.length === 0 ? (
+                  <p className="text-sm text-zinc-400">{tc.no_centers_available}</p>
+                ) : (
+                  <select
+                    className="w-full text-sm border border-zinc-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-zinc-400"
+                    value={selectedCenterId}
+                    onChange={(e) => setSelectedCenterId(e.target.value)}
+                  >
+                    {centers.map((c) => (
+                      <option key={c.id} value={c.id}>{c.name}</option>
+                    ))}
+                  </select>
+                )}
+              </label>
+            )}
             <label className="space-y-1 col-span-2">
               <span className="text-xs text-zinc-500">{t.field_campaign}</span>
               <select
@@ -199,7 +242,7 @@ export default function ShipmentsPage() {
             </label>
           </div>
           <div className="flex gap-2">
-            <button onClick={handleCreate} disabled={actionLoading === "create"}
+            <button onClick={handleCreate} disabled={actionLoading === "create" || (isNationalAdmin && !selectedCenterId)}
               className="px-4 py-2 bg-zinc-900 text-white rounded-lg text-sm hover:bg-zinc-700 disabled:opacity-50">
               {actionLoading === "create" ? t.creating : t.create_btn}
             </button>
