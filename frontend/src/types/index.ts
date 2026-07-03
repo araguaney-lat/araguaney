@@ -58,6 +58,7 @@ export interface Campaign {
   id: string
   name: string
   slug: string | null
+  origin_country: string | null
   destination_country: string | null
   description: string | null
   start_date: string | null

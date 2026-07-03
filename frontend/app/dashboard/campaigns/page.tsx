@@ -10,6 +10,7 @@ import { useDict } from "@/context/DictionaryContext"
 
 const EMPTY_FORM = {
   name: "",
+  origin_country: "",
   destination_country: "",
   description: "",
   start_date: "",
@@ -69,6 +70,7 @@ export default function CampaignsPage() {
     try {
       const created = await createCampaignAction({
         name: form.name.trim(),
+        origin_country: form.origin_country || undefined,
         destination_country: form.destination_country || undefined,
         description: form.description || undefined,
         start_date: form.start_date || undefined,
@@ -76,14 +78,19 @@ export default function CampaignsPage() {
         center_ids: selectedCenterIds.length > 0 ? selectedCenterIds : undefined,
       })
       setCampaigns((cs) => [created, ...cs])
-      setForm(EMPTY_FORM)
-      setSelectedCenterIds([])
-      setShowForm(false)
+      closeForm()
     } catch (err) {
       setError(err instanceof Error ? err.message : dict.dashboard.common.error_unknown)
     } finally {
       setSaving(false)
     }
+  }
+
+  function closeForm() {
+    setForm(EMPTY_FORM)
+    setSelectedCenterIds([])
+    setError(null)
+    setShowForm(false)
   }
 
   async function toggleActive(campaign: Campaign) {
@@ -111,12 +118,12 @@ export default function CampaignsPage() {
           <span className="text-sm text-zinc-500">
             {campaigns.length === 1 ? t.count_one : t.count_other.replace("{count}", String(campaigns.length))}
           </span>
-          {isAdmin && (
+          {isAdmin && !showForm && (
             <button
-              onClick={() => setShowForm((v) => !v)}
+              onClick={() => setShowForm(true)}
               className="rounded-lg bg-zinc-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-zinc-700"
             >
-              {showForm ? t.cancel : t.new}
+              {t.new}
             </button>
           )}
         </div>
@@ -145,6 +152,21 @@ export default function CampaignsPage() {
                 placeholder={t.field_name_placeholder}
                 className="mt-1 w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-400"
               />
+            </div>
+            <div>
+              <label className="text-xs text-zinc-500">{t.field_origin}</label>
+              <select
+                value={form.origin_country}
+                onChange={field("origin_country")}
+                className="mt-1 w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-400"
+              >
+                <option value="">{t.select_country}</option>
+                {COUNTRIES.map((c) => (
+                  <option key={c.code} value={c.code}>
+                    {flagEmoji(c.code)} {c.name}
+                  </option>
+                ))}
+              </select>
             </div>
             <div>
               <label className="text-xs text-zinc-500">{t.field_destination}</label>
@@ -224,7 +246,15 @@ export default function CampaignsPage() {
             )}
           </div>
 
-          <div className="flex justify-end pt-1">
+          <div className="flex justify-end gap-2 pt-1">
+            <button
+              type="button"
+              onClick={closeForm}
+              disabled={saving}
+              className="rounded-lg border border-zinc-200 px-4 py-2 text-sm font-medium text-zinc-600 hover:bg-zinc-50 disabled:opacity-50"
+            >
+              {t.cancel}
+            </button>
             <button
               type="submit"
               disabled={saving}
@@ -263,9 +293,15 @@ export default function CampaignsPage() {
                 </button>
               </div>
 
-              {c.destination_country && (
+              {(c.origin_country || c.destination_country) && (
                 <p className="text-xs font-medium text-zinc-600">
-                  {t.destination_label} {flagEmoji(c.destination_country)} {countryName(c.destination_country)}
+                  {c.origin_country && (
+                    <>{flagEmoji(c.origin_country)} {countryName(c.origin_country)}</>
+                  )}
+                  {c.origin_country && c.destination_country && " → "}
+                  {c.destination_country && (
+                    <>{flagEmoji(c.destination_country)} {countryName(c.destination_country)}</>
+                  )}
                 </p>
               )}
 
