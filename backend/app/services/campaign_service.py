@@ -2,6 +2,7 @@ from uuid import UUID
 
 from app.models.campaign import Campaign
 from app.repositories.campaign_repository import CampaignRepository
+from app.repositories.user_campaign_repository import UserCampaignRepository
 from app.schemas.campaign import CampaignCreate, CampaignUpdate
 from app.services.base import BaseService
 from app.utils.errors import api_error
@@ -39,6 +40,8 @@ class CampaignService(BaseService):
             end_date=data.end_date,
         )
         campaign = repo.save(campaign)
+        if data.center_ids:
+            UserCampaignRepository(self.db).assign_users_from_centers(data.center_ids, campaign.id)
         repo.commit()
         return campaign
 

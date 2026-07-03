@@ -11,6 +11,7 @@ export interface CampaignFormData {
   description?: string
   start_date?: string
   end_date?: string
+  center_ids?: string[]
 }
 
 export async function createCampaignAction(data: CampaignFormData): Promise<Campaign> {
