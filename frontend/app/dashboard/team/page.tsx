@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import Image from "next/image"
 import { useSession } from "next-auth/react"
 import { apiFetch } from "@/lib/api"
-import type { UserOut } from "@/types"
+import type { Center, UserOut } from "@/types"
 import { useDict } from "@/context/DictionaryContext"
 
 const ROLES = ["volunteer", "coordinator"]
@@ -40,9 +40,16 @@ export default function TeamPage() {
   const t = dict.dashboard.team
 
   const { data: session } = useSession()
-  const centerId = session?.centerId
   const token = session?.accessToken ?? ""
-  const isCoordinator = session?.centerRole === "coordinator"
+  const isNationalAdmin = session?.centerRole === "national_admin"
+  const canManage = session?.centerRole === "coordinator" || isNationalAdmin
+
+  // national_admin picks a center from a selector (server-filtered to their
+  // own country_code, see GET /v1/centers); coordinator/volunteer only ever
+  // have their own single center — no selector needed.
+  const [centers, setCenters] = useState<Center[]>([])
+  const [selectedCenterId, setSelectedCenterId] = useState<string>("")
+  const activeCenterId = isNationalAdmin ? selectedCenterId : session?.centerId
 
   const [users, setUsers] = useState<UserOut[]>([])
   const [loading, setLoading] = useState(true)
@@ -54,11 +61,25 @@ export default function TeamPage() {
   const [reinviting, setReinviting] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
 
+  // national_admin: load the center list once, auto-select the first one.
+  useEffect(() => {
+    if (!isNationalAdmin || !token) return
+    apiFetch<Center[]>("/v1/centers", { token })
+      .then((data) => {
+        setCenters(data)
+        if (data.length > 0) setSelectedCenterId((id) => id || data[0].id)
+      })
+      .catch(() => setCenters([]))
+  }, [isNationalAdmin, token])
+
   async function load() {
-    if (!centerId || !token) return
+    if (!activeCenterId || !token) {
+      setLoading(false)
+      return
+    }
     setLoading(true)
     try {
-      const data = await apiFetch<UserOut[]>(`/v1/centers/${centerId}/users`, { token })
+      const data = await apiFetch<UserOut[]>(`/v1/centers/${activeCenterId}/users`, { token })
       setUsers(data)
     } catch {
       setError(dict.dashboard.common.error_unknown)
@@ -67,19 +88,19 @@ export default function TeamPage() {
     }
   }
 
-  useEffect(() => { load() }, [centerId, token]) // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { load() }, [activeCenterId, token]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const field = (k: keyof typeof EMPTY_FORM) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setForm((f) => ({ ...f, [k]: e.target.value }))
 
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault()
-    if (!centerId) return
+    if (!activeCenterId) return
     setSaving(true)
     setError(null)
     setSuccess(null)
     try {
-      const user = await apiFetch<UserOut>(`/v1/centers/${centerId}/users`, {
+      const user = await apiFetch<UserOut>(`/v1/centers/${activeCenterId}/users`, {
         method: "POST",
         body: JSON.stringify({
           email: form.email.trim(),
@@ -101,12 +122,12 @@ export default function TeamPage() {
   }
 
   async function handleReinvite(userId: string) {
-    if (!centerId) return
+    if (!activeCenterId) return
     setReinviting(userId)
     setError(null)
     setSuccess(null)
     try {
-      await apiFetch(`/v1/centers/${centerId}/users/${userId}/reinvite`, {
+      await apiFetch(`/v1/centers/${activeCenterId}/users/${userId}/reinvite`, {
         method: "POST",
         token,
       })
@@ -138,7 +159,7 @@ export default function TeamPage() {
             {users.length === 1 ? t.members_count_one : t.members_count_other.replace("{count}", String(users.length))}
           </p>
         </div>
-        {isCoordinator && (
+        {canManage && (
           <button
             onClick={() => { setShowManage((v) => !v); setShowForm(false); setError(null); setSuccess(null) }}
             className="rounded-lg bg-zinc-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-zinc-700"
@@ -147,6 +168,25 @@ export default function TeamPage() {
           </button>
         )}
       </div>
+
+      {isNationalAdmin && (
+        <div className="mb-6 max-w-xs">
+          <label className="text-xs text-zinc-500">{t.select_center_label}</label>
+          {centers.length === 0 ? (
+            <p className="mt-1 text-sm text-zinc-400">{t.no_centers}</p>
+          ) : (
+            <select
+              value={selectedCenterId}
+              onChange={(e) => setSelectedCenterId(e.target.value)}
+              className="mt-1 w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-400"
+            >
+              {centers.map((c) => (
+                <option key={c.id} value={c.id}>{c.name}</option>
+              ))}
+            </select>
+          )}
+        </div>
+      )}
 
       {loading ? (
         <div className="text-sm text-zinc-400 py-8 text-center">{dict.dashboard.common.loading}</div>
@@ -182,7 +222,7 @@ export default function TeamPage() {
         </div>
       )}
 
-      {isCoordinator && showManage && (
+      {canManage && showManage && (
         <div className="mt-10 pt-8 border-t border-zinc-200">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-base font-semibold text-zinc-900">{t.manage_team}</h2>

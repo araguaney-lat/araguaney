@@ -6,6 +6,7 @@ StrictUUID / StrictDate / StrictDatetime / StrictDecimal
                  — field types for StrictModel input schemas (see note below)
 """
 
+import re
 from datetime import date, datetime
 from decimal import Decimal
 from typing import Annotated
@@ -37,3 +38,12 @@ StrictUUID = Annotated[UUID, Field(strict=False)]
 StrictDate = Annotated[date, Field(strict=False)]
 StrictDatetime = Annotated[datetime, Field(strict=False)]
 StrictDecimal = Annotated[Decimal, Field(strict=False)]
+
+_COUNTRY_CODE_RE = re.compile(r"^[A-Z]{2}$")
+
+
+def validate_country_code(v: str | None) -> str | None:
+    """Shared validator for ISO 3166-1 alpha-2 country code fields."""
+    if v is not None and not _COUNTRY_CODE_RE.match(v):
+        raise ValueError("must be 2 uppercase letters (ISO 3166-1 alpha-2)")
+    return v

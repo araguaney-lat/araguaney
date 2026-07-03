@@ -544,7 +544,10 @@
       "volunteers_heading": "Voluntarios",
       "no_coordinators": "Sin coordinadores asignados.",
       "no_volunteers": "Sin voluntarios registrados.",
-      "manage_team": "Gestionar equipo"
+      "manage_team": "Gestionar equipo",
+      "select_center_label": "Centro",
+      "select_center_placeholder": "— Seleccionar centro —",
+      "no_centers": "No hay centros disponibles."
     },
     "settings": {
       "title": "Configuración",
@@ -629,6 +632,9 @@
       "field_username": "Username *",
       "field_center_id": "Centro ID (UUID)",
       "center_id_placeholder": "UUID del centro (opcional)",
+      "field_country": "País",
+      "country_hint": "Para national_admin: filtra por defecto los centros que ve en Equipo.",
+      "select_country": "— Sin país asignado —",
       "field_temp_password": "Contraseña temporal (opcional)",
       "temp_password_placeholder": "Se genera automáticamente si se deja vacío",
       "creating": "Creando...",

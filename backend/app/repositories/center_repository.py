@@ -13,10 +13,12 @@ class CenterRepository(BaseRepository[Center]):
         super().__init__(db)
         self.model = Center
 
-    def find_all(self, active_only: bool = False) -> list[Center]:
+    def find_all(self, active_only: bool = False, country_code: str | None = None) -> list[Center]:
         stmt = select(Center)
         if active_only:
             stmt = stmt.where(Center.is_active.is_(True))
+        if country_code is not None:
+            stmt = stmt.where(Center.country_code == country_code)
         return list(self.db.execute(stmt).scalars().all())
 
     def find_by_id(self, center_id: UUID) -> Center | None:

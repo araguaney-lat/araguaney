@@ -38,6 +38,11 @@ class User(Base):
     # Domain: acopio tenant membership
     center_id = Column(UUID(as_uuid=True), ForeignKey("centers.id", ondelete="SET NULL"), nullable=True, index=True)
     center_role = Column(String, nullable=True)  # national_admin | coordinator | volunteer
+    # ISO 3166-1 alpha-2. For national_admin, scopes which centers they see
+    # by default (Team page's center selector) — null means "see all" (no
+    # country assigned yet). For coordinator/volunteer this is informational
+    # today; their own center already has its own country_code.
+    country_code = Column(String(2), nullable=True)
 
     # Invitation / forced password change
     must_change_password = Column(Boolean, nullable=False, server_default="false")

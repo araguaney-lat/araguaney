@@ -9,8 +9,8 @@ from app.utils.errors import api_error
 
 class CenterService(BaseService):
 
-    def list_centers(self, active_only: bool = False) -> list[Center]:
-        return CenterRepository(self.db).find_all(active_only=active_only)
+    def list_centers(self, active_only: bool = False, country_code: str | None = None) -> list[Center]:
+        return CenterRepository(self.db).find_all(active_only=active_only, country_code=country_code)
 
     def get_center(self, center_id: UUID) -> Center:
         center = CenterRepository(self.db).find_by_id(center_id)

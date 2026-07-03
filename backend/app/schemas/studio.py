@@ -2,7 +2,9 @@ from datetime import datetime
 from typing import Any
 from uuid import UUID
 
-from app.schemas._base import StrictModel, StrictORMModel, StrictUUID
+from pydantic import field_validator
+
+from app.schemas._base import StrictModel, StrictORMModel, StrictUUID, validate_country_code
 
 
 # ── Audit ─────────────────────────────────────────────────────────────────────
@@ -33,7 +35,13 @@ class StudioUserCreate(StrictModel):
     full_name: str | None = None
     center_id: StrictUUID | None = None
     center_role: str = "volunteer"
+    country_code: str | None = None
     password: str | None = None  # if None, a random temp password is generated
+
+    @field_validator("country_code")
+    @classmethod
+    def validate_country(cls, v: str | None) -> str | None:
+        return validate_country_code(v)
 
 
 class StudioUserPatch(StrictModel):
@@ -41,6 +49,12 @@ class StudioUserPatch(StrictModel):
     center_role: str | None = None
     is_active: bool | None = None
     full_name: str | None = None
+    country_code: str | None = None
+
+    @field_validator("country_code")
+    @classmethod
+    def validate_country(cls, v: str | None) -> str | None:
+        return validate_country_code(v)
 
 
 # ── Requests ──────────────────────────────────────────────────────────────────

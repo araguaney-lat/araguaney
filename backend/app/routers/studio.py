@@ -85,6 +85,7 @@ def create_user(
         must_change_password=True,
         center_id=data.center_id,
         center_role=data.center_role,
+        country_code=data.country_code,
     ))
 
     # Auto-assign to Donaciones Generales
@@ -163,6 +164,8 @@ def patch_user(
         user.is_active = data.is_active
     if data.full_name is not None:
         user.full_name = data.full_name
+    if data.country_code is not None:
+        user.country_code = data.country_code
 
     AuditRepository(db).log(
         "USER_UPDATED",

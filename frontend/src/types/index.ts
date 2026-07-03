@@ -29,6 +29,7 @@ export interface UserOut {
   is_verified: boolean
   center_id: string | null
   center_role: CenterRole | null
+  country_code: string | null
   created_at: string
 }
 
