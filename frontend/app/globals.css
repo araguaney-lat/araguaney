@@ -25,6 +25,116 @@
   --color-blue: #1F5E8C;
   --color-blue-dark: #173E5C;
   --color-blue-bg: #E9F1F8;
+
+  /* Dashboard-scoped theme tokens (see below) — distinct names from the
+     marketing palette above on purpose: those are static/single-theme,
+     these flip between [data-theme="light"|"dark"]. --gold/--blue aren't
+     aliased here (would collide with --color-gold/--color-blue above,
+     which marketing pages consume as literal hex, not as Tailwind classes)
+     — reference them directly via bg-[var(--gold)] etc. instead. */
+  --color-app: var(--app);
+  --color-side: var(--side);
+  --color-sideB: var(--sideB);
+  --color-sTx: var(--sTx);
+  --color-sAct: var(--sAct);
+  --color-sActTx: var(--sActTx);
+  --color-sec: var(--sec);
+  --color-bar: var(--bar);
+  --color-barB: var(--barB);
+  --color-card: var(--card);
+  --color-cardB: var(--cardB);
+  --color-card2: var(--card2);
+  --color-tx: var(--tx);
+  --color-mut: var(--mut);
+  --color-fnt: var(--fnt);
+  --color-line: var(--line);
+  --color-blueSoft: var(--blueSoft);
+  --color-goldSoft: var(--goldSoft);
+  --color-goldB: var(--goldB);
+  --color-inp: var(--inp);
+  --color-inpB: var(--inpB);
+  --color-chip: var(--chip);
+  --color-dDraftB: var(--dDraftB);
+  --color-dDraftT: var(--dDraftT);
+  --color-dSealB: var(--dSealB);
+  --color-dSealT: var(--dSealT);
+  --color-dShipB: var(--dShipB);
+  --color-dShipT: var(--dShipT);
+  --color-dRejB: var(--dRejB);
+  --color-dRejT: var(--dRejT);
+}
+
+/* ---- Dashboard theme tokens — light (default) ---- */
+:root,
+[data-theme="light"] {
+  --app: #F4F1EA;
+  --side: #FBEFC9;
+  --sideB: #EAD9B0;
+  --sTx: #8A6A16;
+  --sAct: #F5DA8A;
+  --sActTx: #3B2A00;
+  --sec: #A98A2E;
+  --bar: #FFFFFF;
+  --barB: #ECE5D6;
+  --card: #FFFFFF;
+  --cardB: #E9E2D4;
+  --card2: #FBF8F1;
+  --tx: #2B2723;
+  --mut: #8A8073;
+  --fnt: #AA9F8D;
+  --line: #EFE9DC;
+  --blue: #1F5E8C;
+  --blueSoft: #E9F1F8;
+  --gold: #D69A00;
+  --goldSoft: #FBEFC9;
+  --goldB: #EAD9B0;
+  --inp: #FBF8F1;
+  --inpB: #E4DAC6;
+  --chip: #F1EBDE;
+  --dDraftB: #FCEFC4;
+  --dDraftT: #8A5A08;
+  --dSealB: #DBF5E4;
+  --dSealT: #177245;
+  --dShipB: #DCEAFB;
+  --dShipT: #1E4FA1;
+  --dRejB: #FBE0E0;
+  --dRejT: #9B1C1C;
+}
+
+/* ---- Dashboard theme tokens — dark ---- */
+[data-theme="dark"] {
+  --app: #121316;
+  --side: #191A1E;
+  --sideB: #2A2B31;
+  --sTx: #9A968C;
+  --sAct: rgba(243, 192, 51, .14);
+  --sActTx: #F3C033;
+  --sec: #6E6A61;
+  --bar: #191A1E;
+  --barB: #2A2B31;
+  --card: #1E1F24;
+  --cardB: #2E2F36;
+  --card2: #232429;
+  --tx: #F1EEE6;
+  --mut: #9A968C;
+  --fnt: #6E6A61;
+  --line: #2A2B31;
+  --blue: #6AACE0;
+  --blueSoft: rgba(106, 172, 224, .14);
+  --gold: #F3C033;
+  --goldSoft: rgba(243, 192, 51, .09);
+  --goldB: rgba(243, 192, 51, .22);
+  --inp: #232429;
+  --inpB: #34353C;
+  --chip: #2A2B31;
+  --dDraftB: rgba(245, 197, 66, .15);
+  --dDraftT: #F0C860;
+  --dSealB: rgba(52, 199, 120, .15);
+  --dSealT: #5FD79B;
+  --dShipB: rgba(106, 172, 224, .16);
+  --dShipT: #8AC5F0;
+  --dRejB: rgba(240, 90, 90, .15);
+  --dRejT: #F09090;
 }
 
 body {

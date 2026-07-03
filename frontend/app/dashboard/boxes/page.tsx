@@ -8,10 +8,10 @@ import { useExportJob } from "@/hooks/useExportJob"
 import { useDict } from "@/context/DictionaryContext"
 
 const STATUS_COLORS: Record<BoxStatus, string> = {
-  DRAFT: "bg-yellow-100 text-yellow-800",
-  SEALED: "bg-green-100 text-green-800",
-  SHIPPED: "bg-blue-100 text-blue-800",
-  REJECTED: "bg-red-100 text-red-800",
+  DRAFT: "bg-dDraftB text-dDraftT",
+  SEALED: "bg-dSealB text-dSealT",
+  SHIPPED: "bg-dShipB text-dShipT",
+  REJECTED: "bg-dRejB text-dRejT",
 }
 
 export default function BoxesPage() {
@@ -84,12 +84,12 @@ export default function BoxesPage() {
   return (
     <div className="max-w-4xl mx-auto">
       <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
-        <h1 className="text-xl font-semibold text-zinc-900">{t.title}</h1>
+        <h1 className="text-xl font-semibold text-tx">{t.title}</h1>
         <div className="flex items-center gap-2">
           <select
             value={filter}
             onChange={(e) => setFilter(e.target.value as BoxStatus | "")}
-            className="rounded-lg border border-zinc-300 px-3 py-1.5 text-sm text-zinc-700 focus:outline-none focus:ring-2 focus:ring-zinc-900"
+            className="rounded-lg border border-inpB bg-inp px-3 py-1.5 text-sm text-tx focus:outline-none focus:ring-2 focus:ring-[var(--gold)]"
           >
             <option value="">{t.filter_all}</option>
             {(["DRAFT", "SEALED", "REJECTED", "SHIPPED"] as BoxStatus[]).map((s) => (
@@ -99,7 +99,7 @@ export default function BoxesPage() {
           <button
             onClick={handleDownloadPdf}
             disabled={labelsExport.isBusy || boxes.length === 0}
-            className="rounded-lg border border-zinc-300 px-3 py-1.5 text-sm text-zinc-700 hover:bg-zinc-50 disabled:opacity-50"
+            className="rounded-lg border border-cardB bg-card px-3 py-1.5 text-sm text-sec hover:bg-card2 disabled:opacity-50"
           >
             {labelsExport.isBusy ? t.generating_pdf : t.download_labels}
           </button>
@@ -107,21 +107,21 @@ export default function BoxesPage() {
       </div>
 
       {draftCount > 0 && (
-        <div className="mb-4 rounded-lg border border-yellow-200 bg-yellow-50 px-4 py-2 text-sm text-yellow-800">
+        <div className="mb-4 rounded-lg bg-dDraftB px-4 py-2 text-sm text-dDraftT">
           {draftCount === 1 ? t.draft_pending_one : t.draft_pending_other.replace("{count}", String(draftCount))}
         </div>
       )}
 
       {error && (
-        <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-700">
+        <div className="mb-4 rounded-lg bg-dRejB px-4 py-2 text-sm text-dRejT">
           {error}
         </div>
       )}
 
       {loading ? (
-        <div className="py-12 text-center text-sm text-zinc-400">{dict.dashboard.common.loading}</div>
+        <div className="py-12 text-center text-sm text-mut">{dict.dashboard.common.loading}</div>
       ) : boxes.length === 0 ? (
-        <div className="rounded-xl border border-zinc-200 bg-white p-8 text-center text-sm text-zinc-500">
+        <div className="rounded-xl border border-cardB bg-card p-8 text-center text-sm text-mut">
           {t.empty}
         </div>
       ) : (
@@ -129,7 +129,7 @@ export default function BoxesPage() {
           {boxes.map((box) => (
             <div
               key={box.id}
-              className="rounded-xl border border-zinc-200 bg-white"
+              className="rounded-xl border border-cardB bg-card"
             >
               <div
                 className="flex flex-wrap items-start gap-3 p-4 cursor-pointer"
@@ -137,18 +137,18 @@ export default function BoxesPage() {
               >
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="font-mono text-sm font-semibold text-zinc-900">{box.code}</span>
+                    <span className="font-mono text-sm font-semibold text-tx">{box.code}</span>
                     <span className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_COLORS[box.status as BoxStatus]}`}>
                       {t.status[box.status as BoxStatus]}
                     </span>
                   </div>
-                  <p className="mt-1 text-xs text-zinc-500">
+                  <p className="mt-1 text-xs text-mut">
                     {box.quantity} {box.unit}
                     {box.batch && ` · ${t.batch_label}: ${box.batch}`}
                     {box.expiry_date && ` · ${t.expiry_label}: ${new Date(box.expiry_date + "T00:00:00").toLocaleDateString()}`}
                   </p>
                   {box.reject_reason && (
-                    <p className="mt-1 text-xs text-red-600 font-medium">⊘ {box.reject_reason}</p>
+                    <p className="mt-1 text-xs text-[var(--dRejT)] font-medium">⊘ {box.reject_reason}</p>
                   )}
                 </div>
 
@@ -157,7 +157,7 @@ export default function BoxesPage() {
                     href={`/b/${box.code}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="rounded border border-zinc-200 px-2 py-1 text-xs text-zinc-600 hover:bg-zinc-50"
+                    className="rounded border border-cardB px-2 py-1 text-xs text-sec hover:bg-card2"
                   >
                     {t.view_card}
                   </a>
@@ -165,7 +165,7 @@ export default function BoxesPage() {
                     <button
                       onClick={() => handleSeal(box.id)}
                       disabled={sealing === box.id}
-                      className="rounded-lg bg-zinc-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-zinc-700 disabled:opacity-60"
+                      className="rounded-lg bg-[var(--gold)] px-3 py-1.5 text-xs font-medium text-[#3B2A00] hover:opacity-90 disabled:opacity-60"
                     >
                       {sealing === box.id ? t.sealing : t.seal}
                     </button>
@@ -174,12 +174,12 @@ export default function BoxesPage() {
               </div>
 
               {expandedBoxId === box.id && (
-                <div className="border-t border-zinc-100 px-4 pb-4 pt-3">
-                  <p className="text-xs font-semibold text-zinc-500 mb-3">{dict.dashboard.common.history}</p>
+                <div className="border-t border-line px-4 pb-4 pt-3">
+                  <p className="text-xs font-semibold text-fnt mb-3">{dict.dashboard.common.history}</p>
                   {boxEvents[box.id] && boxEvents[box.id].length > 0 ? (
                     <StatusTimeline events={boxEvents[box.id]} />
                   ) : (
-                    <p className="text-xs text-zinc-400">{dict.dashboard.common.no_events}</p>
+                    <p className="text-xs text-fnt">{dict.dashboard.common.no_events}</p>
                   )}
                 </div>
               )}
