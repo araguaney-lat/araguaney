@@ -7,6 +7,7 @@ import type { Campaign } from "@/types"
 
 export interface CampaignFormData {
   name: string
+  origin_country?: string
   destination_country?: string
   description?: string
   start_date?: string

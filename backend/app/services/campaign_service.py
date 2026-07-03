@@ -34,6 +34,7 @@ class CampaignService(BaseService):
         campaign = Campaign(
             name=data.name,
             slug=self._unique_slug(repo, data.name),
+            origin_country=data.origin_country,
             destination_country=data.destination_country,
             description=data.description,
             start_date=data.start_date,

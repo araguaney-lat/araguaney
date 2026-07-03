@@ -410,7 +410,7 @@
       "view_members": "Ver miembros →",
       "toggle_deactivate": "Clic para desactivar",
       "toggle_activate": "Clic para activar",
-      "destination_label": "Destino:",
+      "field_origin": "País origen",
       "select_country": "— Seleccionar país —",
       "field_centers": "Centros participantes (opcional)",
       "field_centers_help": "Se agregará automáticamente a todos los usuarios activos de los centros que selecciones como miembros de la campaña.",
