@@ -6,8 +6,14 @@ import { redirect } from "next/navigation"
 import { revalidatePath } from "next/cache"
 import { apiFetch } from "@/lib/api"
 import { CURRENT_TERMS_VERSION } from "@/lib/legal"
+import { getLocale, getDictionary } from "@/lib/i18n"
 
 const API_URL = process.env.API_URL ?? "http://localhost:8000"
+
+async function authDict() {
+  const locale = await getLocale()
+  return (await getDictionary(locale)).auth
+}
 
 function extractError(body: Record<string, unknown>, fallback = "Something went wrong"): string {
   // New error envelope: { error: { code, message, field } }
@@ -50,6 +56,7 @@ export async function loginAction(_: unknown, formData: FormData) {
 }
 
 export async function totpChallengeAction(partial_token: string, code: string) {
+  const t = await authDict()
   const res = await fetch(`${API_URL}/v1/auth/totp/challenge`, {
     method: "POST",
     body: JSON.stringify({ partial_token, code }),
@@ -58,14 +65,14 @@ export async function totpChallengeAction(partial_token: string, code: string) {
 
   if (!res.ok) {
     const data = await res.json().catch(() => ({}))
-    return { error: (data.error?.message as string | undefined) ?? "Código incorrecto." }
+    return { error: (data.error?.message as string | undefined) ?? t.errors.totp_code_incorrect }
   }
 
   const data = await res.json()
   try {
     await signIn("credentials", { accessToken: data.access_token, redirectTo: "/dashboard" })
   } catch (error) {
-    if (error instanceof AuthError) return { error: "Error al iniciar sesión. Intenta de nuevo." }
+    if (error instanceof AuthError) return { error: t.errors.login_session_error }
     throw error
   }
 }
@@ -93,6 +100,7 @@ export async function registerAction(_: unknown, formData: FormData) {
 }
 
 export async function forgotPasswordAction(_: unknown, formData: FormData) {
+  const t = await authDict()
   const email = formData.get("email") as string
 
   const res = await fetch(`${API_URL}/v1/auth/forgot-password`, {
@@ -103,7 +111,7 @@ export async function forgotPasswordAction(_: unknown, formData: FormData) {
 
   if (!res.ok) {
     const data = await res.json().catch(() => ({}))
-    return { error: extractError(data, "No pudimos procesar la solicitud.") }
+    return { error: extractError(data, t.errors.forgot_password_failed) }
   }
 
   // Always a generic success message — the backend intentionally doesn't
@@ -112,12 +120,13 @@ export async function forgotPasswordAction(_: unknown, formData: FormData) {
 }
 
 export async function resetPasswordAction(_: unknown, formData: FormData) {
+  const t = await authDict()
   const token = formData.get("token") as string
   const new_password = formData.get("new_password") as string
   const confirm_password = formData.get("confirm_password") as string
 
-  if (new_password !== confirm_password) return { error: "Las contraseñas no coinciden" }
-  if (new_password.length < 8) return { error: "La contraseña debe tener al menos 8 caracteres" }
+  if (new_password !== confirm_password) return { error: t.errors.passwords_dont_match }
+  if (new_password.length < 8) return { error: t.errors.password_too_short_8 }
 
   const res = await fetch(`${API_URL}/v1/auth/reset-password`, {
     method: "POST",
@@ -127,7 +136,7 @@ export async function resetPasswordAction(_: unknown, formData: FormData) {
 
   if (!res.ok) {
     const data = await res.json().catch(() => ({}))
-    return { error: extractError(data, "El enlace es inválido o expiró.") }
+    return { error: extractError(data, t.errors.reset_link_invalid) }
   }
 
   return { success: true }
@@ -149,15 +158,16 @@ export async function revalidateDashboardAction(): Promise<void> {
 }
 
 export async function changePasswordAction(_: unknown, formData: FormData) {
+  const t = await authDict()
   const session = await auth()
-  if (!session?.accessToken) return { error: "No autenticado" }
+  if (!session?.accessToken) return { error: t.errors.not_authenticated }
 
   const current_password = formData.get("current_password") as string
   const new_password = formData.get("new_password") as string
   const confirm_password = formData.get("confirm_password") as string
 
-  if (new_password !== confirm_password) return { error: "Las contraseñas no coinciden" }
-  if (new_password.length < 8) return { error: "La nueva contraseña debe tener al menos 8 caracteres" }
+  if (new_password !== confirm_password) return { error: t.errors.passwords_dont_match }
+  if (new_password.length < 8) return { error: t.errors.password_too_short_8 }
 
   const res = await fetch(`${API_URL}/v1/auth/me/password`, {
     method: "PATCH",
@@ -170,24 +180,25 @@ export async function changePasswordAction(_: unknown, formData: FormData) {
 
   if (!res.ok) {
     const data = await res.json().catch(() => ({}))
-    return { error: extractError(data, "Error al cambiar contraseña") }
+    return { error: extractError(data, t.errors.change_password_failed) }
   }
 
   const data = await res.json()
   try {
     await signIn("credentials", { accessToken: data.access_token, redirectTo: "/dashboard" })
   } catch (error) {
-    if (error instanceof AuthError) return { error: "Error al actualizar sesión" }
+    if (error instanceof AuthError) return { error: t.errors.session_update_failed }
     throw error
   }
 }
 
 export async function acceptTermsAction(_: unknown, formData: FormData) {
+  const t = await authDict()
   const session = await auth()
-  if (!session?.accessToken) return { error: "No autenticado" }
+  if (!session?.accessToken) return { error: t.errors.not_authenticated }
 
   if (!formData.get("accepted_terms")) {
-    return { error: "Debes aceptar los Términos y el Aviso de Privacidad para continuar." }
+    return { error: t.errors.must_accept_terms }
   }
 
   const res = await fetch(`${API_URL}/v1/auth/me/accept-terms`, {
@@ -201,7 +212,7 @@ export async function acceptTermsAction(_: unknown, formData: FormData) {
 
   if (!res.ok) {
     const data = await res.json().catch(() => ({}))
-    return { error: extractError(data, "Error al registrar la aceptación") }
+    return { error: extractError(data, t.errors.accept_terms_failed) }
   }
 
   // Force NextAuth to rebuild the session from a fresh /me — otherwise the
@@ -210,7 +221,7 @@ export async function acceptTermsAction(_: unknown, formData: FormData) {
   try {
     await signIn("credentials", { accessToken: session.accessToken, redirectTo: "/dashboard" })
   } catch (error) {
-    if (error instanceof AuthError) return { error: "Error al actualizar la sesión" }
+    if (error instanceof AuthError) return { error: t.errors.accept_terms_session_failed }
     throw error
   }
 }

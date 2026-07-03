@@ -121,7 +121,8 @@
       "users": "Usuarios",
       "audit": "Auditoría",
       "team": "Equipo",
-      "admin_section": "Administración"
+      "admin_section": "Administración",
+      "ops_section": "Operaciones"
     },
     "role": {
       "national_admin": "Admin Nacional",
@@ -887,5 +888,100 @@
     "necesidades_description": "Consulta el inventario disponible en los centros de acopio activos: categorías, cantidades y stock actualizado cada 5 minutos.",
     "contacto_title": "Contacto",
     "contacto_description": "Contáctanos para sumar tu centro de acopio a la coordinación nacional de ayuda humanitaria."
+  },
+  "auth": {
+    "login": {
+      "mobile_tagline": "Panel del centro de acopio",
+      "hero_title": "Cada caja cuenta. Cada envío llega.",
+      "hero_subtitle": "Accede al panel de tu centro para registrar donaciones, sellar cajas y preparar envíos con manifiesto.",
+      "hero_no_pii": "Sin datos personales de donantes ni beneficiarios.",
+      "title": "Inicia sesión",
+      "subtitle": "Accede al panel de tu centro de acopio.",
+      "email_label": "Correo electrónico",
+      "email_placeholder": "coordinador@centro.org",
+      "password_label": "Contraseña",
+      "forgot_password": "¿Olvidaste tu contraseña?",
+      "error_email_not_verified": "Verifica tu email antes de iniciar sesión.",
+      "error_account_disabled": "Tu cuenta está desactivada.",
+      "error_invalid_credentials": "Credenciales inválidas.",
+      "submitting": "Entrando…",
+      "submit": "Entrar",
+      "no_center_yet": "¿Tu centro aún no usa Araguaney?",
+      "request_access": "Solicita el alta",
+      "accept_terms_prefix": "Al iniciar sesión aceptas los",
+      "accept_terms_and": "y el",
+      "terms_link": "Términos",
+      "privacy_link": "Aviso de Privacidad"
+    },
+    "totp": {
+      "title": "Verificación en dos pasos",
+      "subtitle_totp": "Ingresa el código de 6 dígitos de tu app autenticadora.",
+      "subtitle_backup": "Ingresa uno de tus códigos de respaldo.",
+      "placeholder_totp": "000000",
+      "placeholder_backup": "CÓDIGO DE RESPALDO",
+      "verifying": "Verificando…",
+      "continue": "Continuar",
+      "use_backup_code": "Usar código de respaldo",
+      "use_totp_app": "Usar app autenticadora"
+    },
+    "change_password": {
+      "title": "Cambiar contraseña",
+      "subtitle": "Debes establecer una nueva contraseña antes de continuar.",
+      "current_password": "Contraseña actual",
+      "new_password": "Nueva contraseña",
+      "confirm_password": "Confirmar nueva contraseña",
+      "saving": "Guardando...",
+      "submit": "Cambiar contraseña"
+    },
+    "accept_terms": {
+      "title": "Términos y Aviso de Privacidad",
+      "subtitle": "Actualizamos nuestros documentos legales. Debes aceptarlos para continuar.",
+      "checkbox_prefix": "He leído y acepto los",
+      "checkbox_terms": "Términos y Condiciones",
+      "checkbox_and": "y el",
+      "checkbox_privacy": "Aviso de Privacidad",
+      "saving": "Guardando...",
+      "submit": "Aceptar y continuar"
+    },
+    "forgot_password": {
+      "title": "¿Olvidaste tu contraseña?",
+      "subtitle": "Ingresa tu correo y te enviaremos un enlace para restablecerla.",
+      "email_label": "Correo electrónico",
+      "email_placeholder": "coordinador@centro.org",
+      "sending": "Enviando…",
+      "submit": "Enviar enlace",
+      "back_to_login": "Volver a iniciar sesión",
+      "success_title": "Revisa tu correo",
+      "success_message": "Si ese correo está registrado, te enviamos un enlace para restablecer tu contraseña. Es válido por 1 hora."
+    },
+    "reset_password": {
+      "title": "Restablecer contraseña",
+      "subtitle": "Elige una nueva contraseña para tu cuenta.",
+      "new_password": "Nueva contraseña",
+      "confirm_password": "Confirmar nueva contraseña",
+      "saving": "Guardando…",
+      "submit": "Restablecer contraseña",
+      "loading": "Cargando…",
+      "invalid_title": "Enlace inválido",
+      "invalid_message": "Este enlace no incluye un token de restablecimiento. Solicita uno nuevo.",
+      "request_link": "Solicitar enlace",
+      "success_title": "Contraseña actualizada",
+      "success_message": "Ya puedes iniciar sesión con tu nueva contraseña.",
+      "go_to_login": "Iniciar sesión"
+    },
+    "errors": {
+      "passwords_dont_match": "Las contraseñas no coinciden",
+      "password_too_short_8": "La contraseña debe tener al menos 8 caracteres",
+      "not_authenticated": "No autenticado",
+      "totp_code_incorrect": "Código incorrecto.",
+      "login_session_error": "Error al iniciar sesión. Intenta de nuevo.",
+      "forgot_password_failed": "No pudimos procesar la solicitud.",
+      "reset_link_invalid": "El enlace es inválido o expiró.",
+      "change_password_failed": "Error al cambiar contraseña",
+      "session_update_failed": "Error al actualizar sesión",
+      "must_accept_terms": "Debes aceptar los Términos y el Aviso de Privacidad para continuar.",
+      "accept_terms_failed": "Error al registrar la aceptación",
+      "accept_terms_session_failed": "Error al actualizar la sesión"
+    }
   }
 }

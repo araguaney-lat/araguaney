@@ -58,6 +58,7 @@ type DashboardNav = {
   users: string
   audit: string
   team: string
+  ops_section: string
   settings: string
   logout: string
   admin_section: string
@@ -69,24 +70,31 @@ type DashboardRoleLabels = {
   volunteer: string
 }
 
+// Core / high-frequency items — always at the top, no group header.
 const NAV_ITEMS: NavItem[] = [
   // "Inicio" is a dead redirect to /dashboard/national for national_admin
   // (see app/dashboard/page.tsx) — Panel Nacional is already their home,
   // showing both was a duplicate entry pointing at the same page.
   { href: "/dashboard", labelKey: "home", roles: ["coordinator", "volunteer"], icon: Home },
   { href: "/dashboard/national", labelKey: "national", roles: ["national_admin"], icon: Globe },
-  { href: "/dashboard/intake", labelKey: "intake", roles: ["coordinator", "volunteer"], icon: PackagePlus },
   { href: "/dashboard/boxes", labelKey: "boxes", roles: ["coordinator", "volunteer"], icon: Package },
   { href: "/dashboard/pallets", labelKey: "pallets", roles: ["coordinator"], icon: Layers },
   { href: "/dashboard/shipments", labelKey: "shipments", roles: ["coordinator"], icon: Truck },
-  { href: "/dashboard/transfers", labelKey: "transfers", roles: ["national_admin", "coordinator"], icon: ArrowLeftRight },
+  // national_admin sees "Campañas" grouped under Administración instead
+  // (they're the only role that can create/manage campaigns) — this entry
+  // is coordinator/volunteer-only so it never duplicates that one.
+  { href: "/dashboard/campaigns", labelKey: "campaigns", roles: ["coordinator", "volunteer"], icon: Flag },
   { href: "/dashboard/messages", labelKey: "messages", roles: ["national_admin", "coordinator", "volunteer"], icon: MessageCircle, badgeKey: "messages" },
-  { href: "/dashboard/scan", labelKey: "scan", roles: ["national_admin", "coordinator", "volunteer"], icon: ScanLine },
-  { href: "/dashboard/campaigns", labelKey: "campaigns", roles: ["national_admin", "coordinator", "volunteer"], icon: Flag },
-  { href: "/dashboard/centers", labelKey: "centers", roles: ["national_admin"], icon: Building2 },
   { href: "/dashboard/requests", labelKey: "requests", roles: ["national_admin", "coordinator", "volunteer"], icon: MessageSquare },
-  { href: "/dashboard/reports", labelKey: "reports", roles: ["national_admin", "coordinator", "volunteer"], icon: BarChart2 },
   { href: "/dashboard/team", labelKey: "team", roles: ["coordinator"], icon: Users },
+]
+
+// Operations — day-to-day tools, grouped under its own header.
+const OPS_ITEMS: NavItem[] = [
+  { href: "/dashboard/intake", labelKey: "intake", roles: ["coordinator", "volunteer"], icon: PackagePlus },
+  { href: "/dashboard/scan", labelKey: "scan", roles: ["national_admin", "coordinator", "volunteer"], icon: ScanLine },
+  { href: "/dashboard/transfers", labelKey: "transfers", roles: ["national_admin", "coordinator"], icon: ArrowLeftRight },
+  { href: "/dashboard/reports", labelKey: "reports", roles: ["national_admin", "coordinator", "volunteer"], icon: BarChart2 },
 ]
 
 interface AdminNavItem {
@@ -96,7 +104,10 @@ interface AdminNavItem {
   icon: IconComponent
 }
 
+// Administration — setup/management tools, national_admin only.
 const ADMIN_ITEMS: AdminNavItem[] = [
+  { href: "/dashboard/campaigns", labelKey: "campaigns", roles: ["national_admin"], icon: Flag },
+  { href: "/dashboard/centers", labelKey: "centers", roles: ["national_admin"], icon: Building2 },
   { href: "/dashboard/admin/users", labelKey: "users", roles: ["national_admin"], icon: UserCog },
   { href: "/dashboard/admin/audit", labelKey: "audit", roles: ["national_admin"], icon: ScrollText },
 ]
@@ -150,6 +161,7 @@ export function Sidebar({ centerRole, platformRole, centerName, nav, roleLabels,
   }
 
   const visibleItems = NAV_ITEMS.filter((item) => centerRole && item.roles.includes(centerRole))
+  const visibleOpsItems = OPS_ITEMS.filter((item) => centerRole && item.roles.includes(centerRole))
   const visibleAdminItems = ADMIN_ITEMS.filter((item) => centerRole && item.roles.includes(centerRole))
 
   // Avoid layout shift before hydration
@@ -214,6 +226,31 @@ export function Sidebar({ centerRole, platformRole, centerName, nav, roleLabels,
             />
           )
         })}
+
+        {visibleOpsItems.length > 0 && (
+          <div className="pt-2">
+            {!collapsed && (
+              <p className="px-2 pb-1 text-xs font-semibold uppercase tracking-wider text-amber-600/70">
+                {nav.ops_section}
+              </p>
+            )}
+            {collapsed && <div className="my-1 border-t border-amber-100" />}
+            {visibleOpsItems.map((item) => {
+              const isActive = pathname === item.href
+              const Icon = item.icon
+              return (
+                <NavLink
+                  key={item.href}
+                  href={item.href}
+                  label={nav[item.labelKey]}
+                  icon={<Icon size={17} />}
+                  isActive={isActive}
+                  collapsed={collapsed}
+                />
+              )
+            })}
+          </div>
+        )}
 
         {visibleAdminItems.length > 0 && (
           <div className="pt-2">

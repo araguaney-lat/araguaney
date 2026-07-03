@@ -3,8 +3,11 @@
 import { useActionState } from "react"
 import Link from "next/link"
 import { forgotPasswordAction } from "@/lib/actions"
+import { useDict } from "@/context/DictionaryContext"
 
 export default function ForgotPasswordPage() {
+  const dict = useDict()
+  const t = dict.auth.forgot_password
   const [state, formAction, isPending] = useActionState(forgotPasswordAction, null)
   const success = state && "success" in state && state.success
 
@@ -14,32 +17,32 @@ export default function ForgotPasswordPage() {
         <div className="bg-white rounded-2xl border border-zinc-200 shadow-sm p-8">
           {success ? (
             <div className="text-center">
-              <h1 className="text-xl font-semibold text-zinc-900">Revisa tu correo</h1>
+              <h1 className="text-xl font-semibold text-zinc-900">{t.success_title}</h1>
               <p className="mt-2 text-sm text-zinc-500">
-                Si ese correo está registrado, te enviamos un enlace para restablecer tu contraseña. Es válido por 1 hora.
+                {t.success_message}
               </p>
               <Link href="/login" className="mt-6 inline-block text-sm font-semibold text-amber-700 hover:text-amber-800">
-                Volver a iniciar sesión
+                {t.back_to_login}
               </Link>
             </div>
           ) : (
             <>
               <div className="mb-6 text-center">
-                <h1 className="text-xl font-semibold text-zinc-900">¿Olvidaste tu contraseña?</h1>
+                <h1 className="text-xl font-semibold text-zinc-900">{t.title}</h1>
                 <p className="mt-1 text-sm text-zinc-500">
-                  Ingresa tu correo y te enviaremos un enlace para restablecerla.
+                  {t.subtitle}
                 </p>
               </div>
 
               <form action={formAction} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-zinc-700 mb-1">Correo electrónico</label>
+                  <label className="block text-sm font-medium text-zinc-700 mb-1">{t.email_label}</label>
                   <input
                     name="email"
                     type="email"
                     required
                     autoComplete="email"
-                    placeholder="coordinador@centro.org"
+                    placeholder={t.email_placeholder}
                     className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
                   />
                 </div>
@@ -53,13 +56,13 @@ export default function ForgotPasswordPage() {
                   disabled={isPending}
                   className="w-full rounded-lg bg-amber-400 px-4 py-2.5 text-sm font-semibold text-zinc-900 hover:bg-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-400 disabled:opacity-60 transition-colors"
                 >
-                  {isPending ? "Enviando…" : "Enviar enlace"}
+                  {isPending ? t.sending : t.submit}
                 </button>
               </form>
 
               <p className="mt-6 text-center text-sm text-zinc-500">
                 <Link href="/login" className="font-semibold text-amber-700 hover:text-amber-800">
-                  Volver a iniciar sesión
+                  {t.back_to_login}
                 </Link>
               </p>
             </>

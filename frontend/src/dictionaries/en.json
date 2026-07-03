@@ -121,7 +121,8 @@
       "users": "Users",
       "audit": "Audit",
       "team": "Team",
-      "admin_section": "Administration"
+      "admin_section": "Administration",
+      "ops_section": "Operations"
     },
     "role": {
       "national_admin": "National Admin",
@@ -887,5 +888,100 @@
     "necesidades_description": "Check available inventory across active aid centers: categories, quantities, and stock updated every 5 minutes.",
     "contacto_title": "Contact",
     "contacto_description": "Get in touch to add your aid center to the national humanitarian coordination network."
+  },
+  "auth": {
+    "login": {
+      "mobile_tagline": "Aid center panel",
+      "hero_title": "Every box counts. Every shipment arrives.",
+      "hero_subtitle": "Access your center's panel to register donations, seal boxes, and prepare shipments with a manifest.",
+      "hero_no_pii": "No personal data of donors or recipients.",
+      "title": "Sign in",
+      "subtitle": "Access your aid center's panel.",
+      "email_label": "Email",
+      "email_placeholder": "coordinator@center.org",
+      "password_label": "Password",
+      "forgot_password": "Forgot your password?",
+      "error_email_not_verified": "Verify your email before signing in.",
+      "error_account_disabled": "Your account is disabled.",
+      "error_invalid_credentials": "Invalid credentials.",
+      "submitting": "Signing in…",
+      "submit": "Sign in",
+      "no_center_yet": "Your center doesn't use Araguaney yet?",
+      "request_access": "Request access",
+      "accept_terms_prefix": "By signing in you accept the",
+      "accept_terms_and": "and the",
+      "terms_link": "Terms",
+      "privacy_link": "Privacy Notice"
+    },
+    "totp": {
+      "title": "Two-step verification",
+      "subtitle_totp": "Enter the 6-digit code from your authenticator app.",
+      "subtitle_backup": "Enter one of your backup codes.",
+      "placeholder_totp": "000000",
+      "placeholder_backup": "BACKUP CODE",
+      "verifying": "Verifying…",
+      "continue": "Continue",
+      "use_backup_code": "Use a backup code",
+      "use_totp_app": "Use authenticator app"
+    },
+    "change_password": {
+      "title": "Change password",
+      "subtitle": "You must set a new password before continuing.",
+      "current_password": "Current password",
+      "new_password": "New password",
+      "confirm_password": "Confirm new password",
+      "saving": "Saving...",
+      "submit": "Change password"
+    },
+    "accept_terms": {
+      "title": "Terms and Privacy Notice",
+      "subtitle": "We updated our legal documents. You must accept them to continue.",
+      "checkbox_prefix": "I have read and accept the",
+      "checkbox_terms": "Terms and Conditions",
+      "checkbox_and": "and the",
+      "checkbox_privacy": "Privacy Notice",
+      "saving": "Saving...",
+      "submit": "Accept and continue"
+    },
+    "forgot_password": {
+      "title": "Forgot your password?",
+      "subtitle": "Enter your email and we'll send you a link to reset it.",
+      "email_label": "Email",
+      "email_placeholder": "coordinator@center.org",
+      "sending": "Sending…",
+      "submit": "Send link",
+      "back_to_login": "Back to sign in",
+      "success_title": "Check your email",
+      "success_message": "If that email is registered, we sent you a link to reset your password. It's valid for 1 hour."
+    },
+    "reset_password": {
+      "title": "Reset password",
+      "subtitle": "Choose a new password for your account.",
+      "new_password": "New password",
+      "confirm_password": "Confirm new password",
+      "saving": "Saving…",
+      "submit": "Reset password",
+      "loading": "Loading…",
+      "invalid_title": "Invalid link",
+      "invalid_message": "This link doesn't include a reset token. Request a new one.",
+      "request_link": "Request link",
+      "success_title": "Password updated",
+      "success_message": "You can now sign in with your new password.",
+      "go_to_login": "Sign in"
+    },
+    "errors": {
+      "passwords_dont_match": "Passwords don't match",
+      "password_too_short_8": "Password must be at least 8 characters",
+      "not_authenticated": "Not authenticated",
+      "totp_code_incorrect": "Incorrect code.",
+      "login_session_error": "Error signing in. Please try again.",
+      "forgot_password_failed": "We couldn't process the request.",
+      "reset_link_invalid": "The link is invalid or expired.",
+      "change_password_failed": "Error changing password",
+      "session_update_failed": "Error updating session",
+      "must_accept_terms": "You must accept the Terms and Privacy Notice to continue.",
+      "accept_terms_failed": "Error recording acceptance",
+      "accept_terms_session_failed": "Error updating session"
+    }
   }
 }

@@ -5,12 +5,19 @@ import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { loginAction } from "@/lib/actions"
+import { useDict } from "@/context/DictionaryContext"
+import { useLocale } from "@/context/LocaleContext"
 
 const LOGO = "https://res.cloudinary.com/dtvdqlxtd/image/upload/v1782794310/image_degkq9.png"
 const SESSION_KEY = "araguaney_partial_token"
 
 export default function LoginPage() {
   const router = useRouter()
+  const dict = useDict()
+  const t = dict.auth.login
+  const locale = useLocale()
+  const termsHref = locale === "en" ? "/terms" : "/terminos"
+  const privacyHref = locale === "en" ? "/privacy" : "/aviso-de-privacidad"
   const [state, formAction, isPending] = useActionState(loginAction, null)
 
   useEffect(() => {
@@ -41,21 +48,21 @@ export default function LoginPage() {
         </Link>
 
         <p style={{ margin: "4px 0 0", fontSize: 12.5, color: "#5C4500" }} className="md:hidden">
-          Panel del centro de acopio
+          {t.mobile_tagline}
         </p>
 
         <div style={{ position: "relative" }} className="hidden md:block">
           <Image src={LOGO} alt="" width={150} height={150}
             style={{ marginBottom: 24, filter: "drop-shadow(0 12px 20px rgba(120,86,0,.25))" }} />
           <h2 style={{ fontFamily: "var(--font-source-serif)", margin: "0 0 16px", fontSize: 34, lineHeight: 1.15, fontWeight: 600, color: "#3B2A00", maxWidth: 360 }}>
-            Cada caja cuenta. Cada envío llega.
+            {t.hero_title}
           </h2>
           <p style={{ margin: 0, fontSize: 15, lineHeight: 1.6, color: "#5C4500", maxWidth: 340 }}>
-            Accede al panel de tu centro para registrar donaciones, sellar cajas y preparar envíos con manifiesto.
+            {t.hero_subtitle}
           </p>
         </div>
         <div style={{ fontSize: 12.5, color: "#6B5200", position: "relative" }} className="hidden md:block">
-          Sin datos personales de donantes ni beneficiarios.
+          {t.hero_no_pii}
         </div>
       </div>
 
@@ -65,24 +72,24 @@ export default function LoginPage() {
         <div style={{ maxWidth: 380, width: "100%", margin: "0 auto" }}>
           <h1 style={{ fontFamily: "var(--font-source-serif)", margin: "0 0 6px", fontWeight: 600 }}
             className="text-[26px] md:text-[32px]">
-            Inicia sesión
+            {t.title}
           </h1>
           <p style={{ margin: "0 0 24px", color: "#6E6557" }} className="text-[13.5px] md:text-[14.5px]">
-            Accede al panel de tu centro<span className="hidden md:inline"> de acopio</span>.
+            {t.subtitle}
           </p>
 
           <form action={formAction}>
             <input type="hidden" name="callbackUrl" value="/dashboard" />
 
             <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#52493D", marginBottom: 6 }}>
-              Correo electrónico
+              {t.email_label}
             </label>
             <input
               name="identifier"
               type="email"
               autoComplete="username"
               required
-              placeholder="coordinador@centro.org"
+              placeholder={t.email_placeholder}
               style={{
                 display: "block", width: "100%", height: 46, background: "#fff",
                 border: "1.5px solid #E6DCC8", borderRadius: 10, padding: "0 14px",
@@ -91,7 +98,7 @@ export default function LoginPage() {
             />
 
             <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#52493D", marginBottom: 6 }}>
-              Contraseña
+              {t.password_label}
             </label>
             <input
               name="password"
@@ -107,16 +114,16 @@ export default function LoginPage() {
             />
 
             <div style={{ textAlign: "right", marginBottom: 24 }}>
-              <Link href="/forgot-password" style={{ fontSize: 12.5, color: "#1F5E8C", fontWeight: 600 }}>¿Olvidaste tu contraseña?</Link>
+              <Link href="/forgot-password" style={{ fontSize: 12.5, color: "#1F5E8C", fontWeight: 600 }}>{t.forgot_password}</Link>
             </div>
 
             {state && "error" in state && state.error && (
               <p style={{ fontSize: 13, color: "#c0392b", marginBottom: 12 }}>
                 {state.error === "email_not_verified"
-                  ? "Verifica tu email antes de iniciar sesión."
+                  ? t.error_email_not_verified
                   : state.error === "account_disabled"
-                  ? "Tu cuenta está desactivada."
-                  : "Credenciales inválidas."}
+                  ? t.error_account_disabled
+                  : t.error_invalid_credentials}
               </p>
             )}
 
@@ -132,20 +139,20 @@ export default function LoginPage() {
                 opacity: isPending ? 0.7 : 1, marginBottom: 18,
               }}
             >
-              {isPending ? "Entrando…" : "Entrar"}
+              {isPending ? t.submitting : t.submit}
             </button>
           </form>
 
           <p style={{ margin: 0, fontSize: 12.5, color: "#7A7163", textAlign: "center" }}>
-            ¿Tu centro aún no usa Araguaney?<br className="md:hidden" />
-            {" "}<Link href="/contacto" style={{ color: "#1F5E8C", fontWeight: 600 }}>Solicita el alta</Link>
+            {t.no_center_yet}<br className="md:hidden" />
+            {" "}<Link href="/contacto" style={{ color: "#1F5E8C", fontWeight: 600 }}>{t.request_access}</Link>
           </p>
 
           <p style={{ margin: "18px 0 0", fontSize: 11.5, color: "#9A907E", textAlign: "center", lineHeight: 1.6 }}>
-            Al iniciar sesión aceptas los{" "}
-            <Link href="/terminos" style={{ color: "#7A7163", fontWeight: 600, textDecoration: "underline" }}>Términos</Link>
-            {" "}y el{" "}
-            <Link href="/aviso-de-privacidad" style={{ color: "#7A7163", fontWeight: 600, textDecoration: "underline" }}>Aviso de Privacidad</Link>.
+            {t.accept_terms_prefix}{" "}
+            <Link href={termsHref} style={{ color: "#7A7163", fontWeight: 600, textDecoration: "underline" }}>{t.terms_link}</Link>
+            {" "}{t.accept_terms_and}{" "}
+            <Link href={privacyHref} style={{ color: "#7A7163", fontWeight: 600, textDecoration: "underline" }}>{t.privacy_link}</Link>.
           </p>
         </div>
       </div>
