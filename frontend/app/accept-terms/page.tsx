@@ -3,8 +3,15 @@
 import { useActionState } from "react"
 import Link from "next/link"
 import { acceptTermsAction } from "@/lib/actions"
+import { useDict } from "@/context/DictionaryContext"
+import { useLocale } from "@/context/LocaleContext"
 
 export default function AcceptTermsPage() {
+  const dict = useDict()
+  const t = dict.auth.accept_terms
+  const locale = useLocale()
+  const termsHref = locale === "en" ? "/terms" : "/terminos"
+  const privacyHref = locale === "en" ? "/privacy" : "/aviso-de-privacidad"
   const [state, formAction, isPending] = useActionState(acceptTermsAction, null)
 
   return (
@@ -12,9 +19,9 @@ export default function AcceptTermsPage() {
       <div className="w-full max-w-md">
         <div className="bg-white rounded-2xl border border-zinc-200 shadow-sm p-8">
           <div className="mb-6 text-center">
-            <h1 className="text-xl font-semibold text-zinc-900">Términos y Aviso de Privacidad</h1>
+            <h1 className="text-xl font-semibold text-zinc-900">{t.title}</h1>
             <p className="mt-1 text-sm text-zinc-500">
-              Actualizamos nuestros documentos legales. Debes aceptarlos para continuar.
+              {t.subtitle}
             </p>
           </div>
 
@@ -27,13 +34,13 @@ export default function AcceptTermsPage() {
                 className="mt-0.5 h-4 w-4 shrink-0 rounded border-zinc-300 text-amber-500 focus:ring-amber-400"
               />
               <span>
-                He leído y acepto los{" "}
-                <Link href="/terminos" target="_blank" className="font-semibold text-amber-700 underline">
-                  Términos y Condiciones
+                {t.checkbox_prefix}{" "}
+                <Link href={termsHref} target="_blank" className="font-semibold text-amber-700 underline">
+                  {t.checkbox_terms}
                 </Link>{" "}
-                y el{" "}
-                <Link href="/aviso-de-privacidad" target="_blank" className="font-semibold text-amber-700 underline">
-                  Aviso de Privacidad
+                {t.checkbox_and}{" "}
+                <Link href={privacyHref} target="_blank" className="font-semibold text-amber-700 underline">
+                  {t.checkbox_privacy}
                 </Link>
                 .
               </span>
@@ -50,7 +57,7 @@ export default function AcceptTermsPage() {
               disabled={isPending}
               className="w-full rounded-lg bg-amber-400 px-4 py-2.5 text-sm font-semibold text-zinc-900 hover:bg-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-400 disabled:opacity-60 transition-colors"
             >
-              {isPending ? "Guardando..." : "Aceptar y continuar"}
+              {isPending ? t.saving : t.submit}
             </button>
           </form>
         </div>

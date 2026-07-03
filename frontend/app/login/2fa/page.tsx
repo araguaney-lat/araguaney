@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import Image from "next/image"
 import Link from "next/link"
 import { totpChallengeAction } from "@/lib/actions"
+import { useDict } from "@/context/DictionaryContext"
 
 const LOGO = "https://res.cloudinary.com/dtvdqlxtd/image/upload/v1782794310/image_degkq9.png"
 const SESSION_KEY = "araguaney_partial_token"
@@ -13,6 +14,8 @@ type Mode = "totp" | "backup"
 
 export default function TwoFactorPage() {
   const router = useRouter()
+  const dict = useDict()
+  const t = dict.auth.totp
   const [partialToken, setPartialToken] = useState<string | null>(null)
   const [mode, setMode] = useState<Mode>("totp")
   const [code, setCode] = useState("")
@@ -65,12 +68,10 @@ export default function TwoFactorPage() {
             </svg>
           </div>
           <h1 style={{ fontFamily: "var(--font-source-serif)", fontSize: 22, fontWeight: 600, color: "#1A1410", margin: "0 0 6px" }}>
-            Verificación en dos pasos
+            {t.title}
           </h1>
           <p style={{ fontSize: 13.5, color: "#6E6557", margin: 0 }}>
-            {mode === "totp"
-              ? "Ingresa el código de 6 dígitos de tu app autenticadora."
-              : "Ingresa uno de tus códigos de respaldo."}
+            {mode === "totp" ? t.subtitle_totp : t.subtitle_backup}
           </p>
         </div>
 
@@ -81,7 +82,7 @@ export default function TwoFactorPage() {
             maxLength={mode === "totp" ? 6 : 20}
             value={code}
             onChange={(e) => { setCode(mode === "totp" ? e.target.value.replace(/\D/g, "") : e.target.value.toUpperCase()); setError("") }}
-            placeholder={mode === "totp" ? "000000" : "CÓDIGO DE RESPALDO"}
+            placeholder={mode === "totp" ? t.placeholder_totp : t.placeholder_backup}
             autoFocus
             style={{
               display: "block", width: "100%", height: 52, background: "#fff",
@@ -111,7 +112,7 @@ export default function TwoFactorPage() {
               marginBottom: 16,
             }}
           >
-            {loading ? "Verificando…" : "Continuar"}
+            {loading ? t.verifying : t.continue}
           </button>
         </form>
 
@@ -121,14 +122,14 @@ export default function TwoFactorPage() {
               onClick={() => { setMode("backup"); setCode(""); setError("") }}
               style={{ fontSize: 12.5, color: "#1F5E8C", fontWeight: 600, background: "none", border: "none", cursor: "pointer" }}
             >
-              Usar código de respaldo
+              {t.use_backup_code}
             </button>
           ) : (
             <button
               onClick={() => { setMode("totp"); setCode(""); setError("") }}
               style={{ fontSize: 12.5, color: "#1F5E8C", fontWeight: 600, background: "none", border: "none", cursor: "pointer" }}
             >
-              Usar app autenticadora
+              {t.use_totp_app}
             </button>
           )}
         </div>
