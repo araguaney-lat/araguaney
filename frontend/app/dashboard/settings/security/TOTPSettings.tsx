@@ -61,22 +61,22 @@ export default function TOTPSettings({ initialEnabled }: Props) {
 
   if (step === "backup") {
     return (
-      <div className="rounded-xl border border-green-200 bg-green-50 p-5 space-y-4">
+      <div className="rounded-xl bg-dSealB p-5 space-y-4">
         <div className="flex items-center gap-2">
-          <span className="text-green-600 text-lg">✓</span>
-          <p className="text-sm font-semibold text-green-800">{t.totp_backup_title}</p>
+          <span className="text-dSealT text-lg">✓</span>
+          <p className="text-sm font-semibold text-dSealT">{t.totp_backup_title}</p>
         </div>
-        <p className="text-xs text-green-700">{t.totp_backup_notice}</p>
+        <p className="text-xs text-dSealT">{t.totp_backup_notice}</p>
         <div className="grid grid-cols-2 gap-2">
           {backupCodes.map((c) => (
-            <code key={c} className="block bg-white border border-green-200 rounded px-3 py-1.5 text-xs font-mono text-zinc-800 text-center">
+            <code key={c} className="block bg-card border border-cardB rounded px-3 py-1.5 text-xs font-mono text-tx text-center">
               {c}
             </code>
           ))}
         </div>
         <button
           onClick={() => setStep("idle")}
-          className="w-full rounded-lg bg-green-600 text-white text-sm font-semibold py-2.5 hover:bg-green-700 transition-colors"
+          className="w-full rounded-lg bg-[var(--dSealT)] text-white text-sm font-semibold py-2.5 hover:opacity-90 transition-colors"
         >
           {t.totp_saved_codes}
         </button>
@@ -86,10 +86,10 @@ export default function TOTPSettings({ initialEnabled }: Props) {
 
   if (step === "setup" && setupData) {
     return (
-      <div className="rounded-xl border border-zinc-200 bg-white p-5 space-y-5">
+      <div className="rounded-xl border border-cardB bg-card p-5 space-y-5">
         <div>
-          <p className="text-sm font-semibold text-zinc-800 mb-1">{t.totp_scan_title}</p>
-          <p className="text-xs text-zinc-500">{t.totp_scan_subtitle}</p>
+          <p className="text-sm font-semibold text-tx mb-1">{t.totp_scan_title}</p>
+          <p className="text-xs text-mut">{t.totp_scan_subtitle}</p>
         </div>
 
         <div className="flex justify-center">
@@ -98,20 +98,20 @@ export default function TOTPSettings({ initialEnabled }: Props) {
             alt={t.totp_qr_alt}
             width={180}
             height={180}
-            className="rounded border border-zinc-200"
+            className="rounded border border-cardB"
             unoptimized
           />
         </div>
 
         <details className="text-xs">
-          <summary className="cursor-pointer text-zinc-500 hover:text-zinc-700">{t.totp_manual_entry}</summary>
-          <code className="block mt-2 bg-zinc-100 rounded px-3 py-2 font-mono text-zinc-800 break-all">
+          <summary className="cursor-pointer text-mut hover:text-tx">{t.totp_manual_entry}</summary>
+          <code className="block mt-2 bg-chip rounded px-3 py-2 font-mono text-tx break-all">
             {setupData.secret}
           </code>
         </details>
 
         <div>
-          <label className="block text-xs font-semibold text-zinc-600 mb-1.5">{t.totp_code_label}</label>
+          <label className="block text-xs font-semibold text-mut mb-1.5">{t.totp_code_label}</label>
           <input
             type="text"
             inputMode="numeric"
@@ -119,22 +119,22 @@ export default function TOTPSettings({ initialEnabled }: Props) {
             value={code}
             onChange={(e) => { setCode(e.target.value.replace(/\D/g, "")); setError("") }}
             placeholder={t.totp_code_placeholder}
-            className="w-full border border-zinc-200 rounded-lg px-4 py-2.5 text-sm font-mono text-center tracking-widest focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full border border-inpB bg-inp text-tx rounded-lg px-4 py-2.5 text-sm font-mono text-center tracking-widest focus:outline-none focus:ring-2 focus:ring-[var(--gold)]"
           />
-          {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
+          {error && <p className="text-xs text-[var(--dRejT)] mt-1">{error}</p>}
         </div>
 
         <div className="flex gap-3">
           <button
             onClick={() => { setStep("idle"); setCode(""); setError("") }}
-            className="flex-1 rounded-lg border border-zinc-200 text-zinc-700 text-sm font-semibold py-2.5 hover:bg-zinc-50 transition-colors"
+            className="flex-1 rounded-lg border border-cardB text-mut text-sm font-semibold py-2.5 hover:bg-card2 transition-colors"
           >
             {t.totp_cancel}
           </button>
           <button
             onClick={handleConfirm}
             disabled={loading || code.length !== 6}
-            className="flex-1 rounded-lg bg-blue-600 text-white text-sm font-semibold py-2.5 hover:bg-blue-700 disabled:opacity-50 transition-colors"
+            className="flex-1 rounded-lg bg-[var(--gold)] text-[#3B2A00] text-sm font-semibold py-2.5 hover:opacity-90 disabled:opacity-50 transition-colors"
           >
             {loading ? t.totp_activating : t.totp_activate_btn}
           </button>
@@ -145,29 +145,29 @@ export default function TOTPSettings({ initialEnabled }: Props) {
 
   if (step === "disable") {
     return (
-      <div className="rounded-xl border border-zinc-200 bg-white p-5 space-y-4">
-        <p className="text-sm font-semibold text-zinc-800">{t.totp_disable_title}</p>
-        <p className="text-xs text-zinc-500">{t.totp_disable_subtitle}</p>
+      <div className="rounded-xl border border-cardB bg-card p-5 space-y-4">
+        <p className="text-sm font-semibold text-tx">{t.totp_disable_title}</p>
+        <p className="text-xs text-mut">{t.totp_disable_subtitle}</p>
         <input
           type="text"
           inputMode="numeric"
           value={code}
           onChange={(e) => { setCode(e.target.value); setError("") }}
           placeholder={t.totp_disable_placeholder}
-          className="w-full border border-zinc-200 rounded-lg px-4 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-red-400"
+          className="w-full border border-inpB bg-inp text-tx rounded-lg px-4 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-[var(--dRejT)]"
         />
-        {error && <p className="text-xs text-red-500">{error}</p>}
+        {error && <p className="text-xs text-[var(--dRejT)]">{error}</p>}
         <div className="flex gap-3">
           <button
             onClick={() => { setStep("idle"); setCode(""); setError("") }}
-            className="flex-1 rounded-lg border border-zinc-200 text-zinc-700 text-sm font-semibold py-2.5 hover:bg-zinc-50 transition-colors"
+            className="flex-1 rounded-lg border border-cardB text-mut text-sm font-semibold py-2.5 hover:bg-card2 transition-colors"
           >
             {t.totp_cancel}
           </button>
           <button
             onClick={handleDisable}
             disabled={loading}
-            className="flex-1 rounded-lg bg-red-600 text-white text-sm font-semibold py-2.5 hover:bg-red-700 disabled:opacity-50 transition-colors"
+            className="flex-1 rounded-lg bg-[var(--dRejT)] text-white text-sm font-semibold py-2.5 hover:opacity-90 disabled:opacity-50 transition-colors"
           >
             {loading ? t.totp_deactivating : t.totp_deactivate_btn}
           </button>
@@ -177,21 +177,21 @@ export default function TOTPSettings({ initialEnabled }: Props) {
   }
 
   return (
-    <div className="rounded-xl border border-zinc-200 bg-white p-5 flex items-center justify-between">
+    <div className="rounded-xl border border-cardB bg-card p-5 flex items-center justify-between">
       <div>
-        <p className="text-sm font-semibold text-zinc-800">
+        <p className="text-sm font-semibold text-tx">
           2FA {enabled
-            ? <span className="text-green-600">{t.totp_status_enabled_badge}</span>
-            : <span className="text-zinc-400">{t.totp_status_disabled_badge}</span>}
+            ? <span className="text-dSealT">{t.totp_status_enabled_badge}</span>
+            : <span className="text-fnt">{t.totp_status_disabled_badge}</span>}
         </p>
-        <p className="text-xs text-zinc-500 mt-0.5">
+        <p className="text-xs text-mut mt-0.5">
           {enabled ? t.totp_status_enabled_desc : t.totp_status_disabled_desc}
         </p>
       </div>
       {enabled ? (
         <button
           onClick={() => setStep("disable")}
-          className="rounded-lg border border-red-200 text-red-600 text-xs font-semibold px-4 py-2 hover:bg-red-50 transition-colors"
+          className="rounded-lg border border-[var(--dRejT)] text-dRejT text-xs font-semibold px-4 py-2 hover:bg-dRejB transition-colors"
         >
           {t.totp_btn_deactivate}
         </button>
@@ -199,7 +199,7 @@ export default function TOTPSettings({ initialEnabled }: Props) {
         <button
           onClick={handleStartSetup}
           disabled={loading}
-          className="rounded-lg bg-blue-600 text-white text-xs font-semibold px-4 py-2 hover:bg-blue-700 disabled:opacity-50 transition-colors"
+          className="rounded-lg bg-[var(--gold)] text-[#3B2A00] text-xs font-semibold px-4 py-2 hover:opacity-90 disabled:opacity-50 transition-colors"
         >
           {loading ? "…" : t.totp_btn_activate}
         </button>

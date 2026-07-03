@@ -14,9 +14,9 @@ import { useExportJob } from "@/hooks/useExportJob"
 import { useDict } from "@/context/DictionaryContext"
 
 const STATUS_COLORS: Record<PalletStatus, string> = {
-  OPEN: "bg-yellow-100 text-yellow-800",
-  CLOSED: "bg-green-100 text-green-800",
-  SHIPPED: "bg-blue-100 text-blue-800",
+  OPEN: "bg-dDraftB text-dDraftT",
+  CLOSED: "bg-dSealB text-dSealT",
+  SHIPPED: "bg-dShipB text-dShipT",
 }
 
 export default function PalletsPage() {
@@ -131,13 +131,13 @@ export default function PalletsPage() {
   return (
     <div className="p-6 max-w-6xl mx-auto space-y-6">
       <div className="flex items-center justify-between gap-3 flex-wrap">
-        <h1 className="text-2xl font-bold text-zinc-900">{t.title}</h1>
+        <h1 className="text-2xl font-bold text-tx">{t.title}</h1>
         <div className="flex items-center gap-2">
           {isNationalAdmin && centers.length > 0 && (
             <select
               value={selectedCenterId}
               onChange={(e) => setSelectedCenterId(e.target.value)}
-              className="rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-400"
+              className="rounded-lg border border-inpB bg-inp px-3 py-2 text-sm text-tx focus:outline-none focus:ring-2 focus:ring-[var(--gold)]"
             >
               {centers.map((c) => (
                 <option key={c.id} value={c.id}>{c.name}</option>
@@ -147,7 +147,7 @@ export default function PalletsPage() {
           <button
             onClick={handleCreate}
             disabled={actionLoading === "create" || (isNationalAdmin && !selectedCenterId)}
-            className="px-4 py-2 bg-zinc-900 text-white rounded-lg text-sm font-medium hover:bg-zinc-700 disabled:opacity-50"
+            className="px-4 py-2 bg-[var(--gold)] text-[#3B2A00] rounded-lg text-sm font-medium hover:opacity-90 disabled:opacity-50"
           >
             {actionLoading === "create" ? t.creating : t.new}
           </button>
@@ -155,7 +155,7 @@ export default function PalletsPage() {
       </div>
 
       {error && (
-        <div className="rounded-lg bg-red-50 border border-red-200 p-3 text-sm text-red-700">
+        <div className="rounded-lg bg-dRejB p-3 text-sm text-dRejT">
           {error}
           <button className="ml-2 underline" onClick={() => setError(null)}>{dict.dashboard.common.close}</button>
         </div>
@@ -166,7 +166,7 @@ export default function PalletsPage() {
           <button
             key={s}
             onClick={() => setFilter(s)}
-            className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${filter === s ? "bg-zinc-900 text-white border-zinc-900" : "bg-white text-zinc-600 border-zinc-300 hover:border-zinc-500"}`}
+            className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${filter === s ? "bg-[var(--gold)] text-[#3B2A00] border-[var(--gold)]" : "bg-card text-mut border-cardB hover:border-sec"}`}
           >
             {s === "" ? t.filter_all : t.status[s as PalletStatus]}
           </button>
@@ -177,17 +177,17 @@ export default function PalletsPage() {
         {/* Pallet list */}
         <div className="space-y-2">
           {loading ? (
-            <p className="text-sm text-zinc-400">{dict.dashboard.common.loading}</p>
+            <p className="text-sm text-fnt">{dict.dashboard.common.loading}</p>
           ) : pallets.length === 0 ? (
-            <p className="text-sm text-zinc-400">{t.empty}</p>
+            <p className="text-sm text-fnt">{t.empty}</p>
           ) : pallets.map((pallet) => (
             <div
               key={pallet.id}
               onClick={() => fetchPalletDetail(pallet.id)}
-              className={`rounded-xl border p-4 cursor-pointer transition-colors ${activePallet?.id === pallet.id ? "border-zinc-900 bg-zinc-50" : "border-zinc-200 bg-white hover:border-zinc-400"}`}
+              className={`rounded-xl border p-4 cursor-pointer transition-colors ${activePallet?.id === pallet.id ? "border-[var(--gold)] bg-card" : "border-cardB bg-card hover:border-sec"}`}
             >
               <div className="flex items-center justify-between">
-                <span className="font-mono font-bold text-sm text-zinc-900">{pallet.code}</span>
+                <span className="font-mono font-bold text-sm text-tx">{pallet.code}</span>
                 <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${STATUS_COLORS[pallet.status]}`}>
                   {t.status[pallet.status]}
                 </span>
@@ -197,7 +197,7 @@ export default function PalletsPage() {
                   <button
                     onClick={(e) => { e.stopPropagation(); handleClose(pallet.id) }}
                     disabled={actionLoading === pallet.id}
-                    className="text-xs px-2 py-1 rounded border border-green-300 text-green-700 hover:bg-green-50 disabled:opacity-50"
+                    className="text-xs px-2 py-1 rounded border border-[var(--dSealT)] text-dSealT hover:bg-dSealB disabled:opacity-50"
                   >
                     {actionLoading === pallet.id ? t.closing : t.close}
                   </button>
@@ -205,7 +205,7 @@ export default function PalletsPage() {
                 <button
                   onClick={(e) => { e.stopPropagation(); handleDownloadLabel(pallet.id) }}
                   disabled={labelExport.isBusy}
-                  className="text-xs px-2 py-1 rounded border border-zinc-300 text-zinc-700 hover:bg-zinc-50 disabled:opacity-50"
+                  className="text-xs px-2 py-1 rounded border border-cardB text-mut hover:bg-card2 disabled:opacity-50"
                 >
                   {labelExport.isBusy ? dict.dashboard.common.exporting : t.label_pdf}
                 </button>
@@ -216,10 +216,10 @@ export default function PalletsPage() {
 
         {/* Active pallet detail */}
         {activePallet && (
-          <div className="rounded-xl border border-zinc-200 bg-white p-5 space-y-4">
+          <div className="rounded-xl border border-cardB bg-card p-5 space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="font-mono font-bold text-lg">{activePallet.code}</h2>
-              <button onClick={() => { setActivePallet(null); setPalletEvents([]) }} className="text-zinc-400 hover:text-zinc-700 text-sm">✕</button>
+              <h2 className="font-mono font-bold text-lg text-tx">{activePallet.code}</h2>
+              <button onClick={() => { setActivePallet(null); setPalletEvents([]) }} className="text-fnt hover:text-tx text-sm">✕</button>
             </div>
 
             {activePallet.status === "OPEN" && (
@@ -230,12 +230,12 @@ export default function PalletsPage() {
                   value={boxCodeInput}
                   onChange={(e) => setBoxCodeInput(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleAddBox()}
-                  className="flex-1 text-sm border border-zinc-300 rounded-lg px-3 py-2 font-mono uppercase placeholder:normal-case placeholder:font-sans focus:outline-none focus:ring-2 focus:ring-zinc-400"
+                  className="flex-1 text-sm border border-inpB bg-inp rounded-lg px-3 py-2 font-mono uppercase text-tx placeholder:normal-case placeholder:font-sans focus:outline-none focus:ring-2 focus:ring-[var(--gold)]"
                 />
                 <button
                   onClick={handleAddBox}
                   disabled={!boxCodeInput.trim() || actionLoading === "add-box"}
-                  className="px-3 py-2 bg-zinc-900 text-white rounded-lg text-sm hover:bg-zinc-700 disabled:opacity-50"
+                  className="px-3 py-2 bg-[var(--gold)] text-[#3B2A00] rounded-lg text-sm hover:opacity-90 disabled:opacity-50"
                 >
                   {actionLoading === "add-box" ? "..." : t.add}
                 </button>
@@ -243,19 +243,19 @@ export default function PalletsPage() {
             )}
 
             <div>
-              <p className="text-xs font-semibold text-zinc-500 mb-2">
+              <p className="text-xs font-semibold text-fnt mb-2">
                 {activePallet.boxes.length === 1
                   ? t.box_count_one
                   : t.box_count_other.replace("{count}", String(activePallet.boxes.length))}
               </p>
               {activePallet.boxes.length === 0 ? (
-                <p className="text-sm text-zinc-400">{t.no_boxes}</p>
+                <p className="text-sm text-fnt">{t.no_boxes}</p>
               ) : (
                 <ul className="space-y-1">
                   {activePallet.boxes.map((box) => (
-                    <li key={box.id} className="flex items-center justify-between text-sm border-b border-zinc-100 pb-1">
-                      <span className="font-mono text-xs text-zinc-700">{box.code}</span>
-                      <span className="text-xs text-zinc-500">{box.quantity} {box.unit}</span>
+                    <li key={box.id} className="flex items-center justify-between text-sm border-b border-line pb-1">
+                      <span className="font-mono text-xs text-mut">{box.code}</span>
+                      <span className="text-xs text-mut">{box.quantity} {box.unit}</span>
                     </li>
                   ))}
                 </ul>
@@ -263,8 +263,8 @@ export default function PalletsPage() {
             </div>
 
             {palletEvents.length > 0 && (
-              <div className="border-t border-zinc-100 pt-4">
-                <p className="text-xs font-semibold text-zinc-500 mb-3">{dict.dashboard.common.history}</p>
+              <div className="border-t border-line pt-4">
+                <p className="text-xs font-semibold text-fnt mb-3">{dict.dashboard.common.history}</p>
                 <StatusTimeline events={palletEvents} />
               </div>
             )}

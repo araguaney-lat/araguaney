@@ -15,9 +15,9 @@ import { useExportJob } from "@/hooks/useExportJob"
 import { useDict } from "@/context/DictionaryContext"
 
 const STATUS_COLORS: Record<ShipmentStatus, string> = {
-  OPEN: "bg-yellow-100 text-yellow-800",
-  CLOSED: "bg-green-100 text-green-800",
-  SHIPPED: "bg-blue-100 text-blue-800",
+  OPEN: "bg-dDraftB text-dDraftT",
+  CLOSED: "bg-dSealB text-dSealT",
+  SHIPPED: "bg-dShipB text-dShipT",
 }
 
 export default function ShipmentsPage() {
@@ -167,34 +167,34 @@ export default function ShipmentsPage() {
   return (
     <div className="p-6 max-w-6xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-zinc-900">{t.title}</h1>
+        <h1 className="text-2xl font-bold text-tx">{t.title}</h1>
         <button
           onClick={() => { setShowCreateForm(true); fetchClosedPallets() }}
-          className="px-4 py-2 bg-zinc-900 text-white rounded-lg text-sm font-medium hover:bg-zinc-700"
+          className="px-4 py-2 bg-[var(--gold)] text-[#3B2A00] rounded-lg text-sm font-medium hover:opacity-90"
         >
           {t.new}
         </button>
       </div>
 
       {error && (
-        <div className="rounded-lg bg-red-50 border border-red-200 p-3 text-sm text-red-700">
+        <div className="rounded-lg bg-dRejB p-3 text-sm text-dRejT">
           {error}
           <button className="ml-2 underline" onClick={() => setError(null)}>{dict.dashboard.common.close}</button>
         </div>
       )}
 
       {showCreateForm && (
-        <div className="rounded-xl border border-zinc-200 bg-white p-5 space-y-3">
-          <h2 className="font-semibold text-sm text-zinc-900">{t.create_title}</h2>
+        <div className="rounded-xl border border-cardB bg-card p-5 space-y-3">
+          <h2 className="font-semibold text-sm text-tx">{t.create_title}</h2>
           <div className="grid grid-cols-2 gap-3">
             {isNationalAdmin && (
               <label className="space-y-1 col-span-2">
-                <span className="text-xs text-zinc-500">{tc.select_center_label}</span>
+                <span className="text-xs text-mut">{tc.select_center_label}</span>
                 {centers.length === 0 ? (
-                  <p className="text-sm text-zinc-400">{tc.no_centers_available}</p>
+                  <p className="text-sm text-fnt">{tc.no_centers_available}</p>
                 ) : (
                   <select
-                    className="w-full text-sm border border-zinc-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-zinc-400"
+                    className="w-full text-sm border border-inpB bg-inp text-tx rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--gold)]"
                     value={selectedCenterId}
                     onChange={(e) => setSelectedCenterId(e.target.value)}
                   >
@@ -206,9 +206,9 @@ export default function ShipmentsPage() {
               </label>
             )}
             <label className="space-y-1 col-span-2">
-              <span className="text-xs text-zinc-500">{t.field_campaign}</span>
+              <span className="text-xs text-mut">{t.field_campaign}</span>
               <select
-                className="w-full text-sm border border-zinc-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-zinc-400"
+                className="w-full text-sm border border-inpB bg-inp text-tx rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--gold)]"
                 value={newShipment.campaign_id}
                 onChange={(e) => setNewShipment({ ...newShipment, campaign_id: e.target.value })}
               >
@@ -221,32 +221,32 @@ export default function ShipmentsPage() {
               </select>
             </label>
             <label className="space-y-1">
-              <span className="text-xs text-zinc-500">{t.field_destination}</span>
-              <input className="w-full text-sm border border-zinc-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-zinc-400"
+              <span className="text-xs text-mut">{t.field_destination}</span>
+              <input className="w-full text-sm border border-inpB bg-inp text-tx rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--gold)]"
                 value={newShipment.destination} onChange={(e) => setNewShipment({ ...newShipment, destination: e.target.value })} />
             </label>
             <label className="space-y-1">
-              <span className="text-xs text-zinc-500">{t.field_carrier}</span>
-              <input className="w-full text-sm border border-zinc-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-zinc-400"
+              <span className="text-xs text-mut">{t.field_carrier}</span>
+              <input className="w-full text-sm border border-inpB bg-inp text-tx rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--gold)]"
                 value={newShipment.carrier} onChange={(e) => setNewShipment({ ...newShipment, carrier: e.target.value })} placeholder={t.field_carrier_placeholder} />
             </label>
             <label className="space-y-1">
-              <span className="text-xs text-zinc-500">{t.field_reference}</span>
-              <input className="w-full text-sm border border-zinc-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-zinc-400"
+              <span className="text-xs text-mut">{t.field_reference}</span>
+              <input className="w-full text-sm border border-inpB bg-inp text-tx rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--gold)]"
                 value={newShipment.reference} onChange={(e) => setNewShipment({ ...newShipment, reference: e.target.value })} placeholder={t.field_reference_placeholder} />
             </label>
             <label className="space-y-1">
-              <span className="text-xs text-zinc-500">{t.field_notes}</span>
-              <input className="w-full text-sm border border-zinc-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-zinc-400"
+              <span className="text-xs text-mut">{t.field_notes}</span>
+              <input className="w-full text-sm border border-inpB bg-inp text-tx rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--gold)]"
                 value={newShipment.notes} onChange={(e) => setNewShipment({ ...newShipment, notes: e.target.value })} />
             </label>
           </div>
           <div className="flex gap-2">
             <button onClick={handleCreate} disabled={actionLoading === "create" || (isNationalAdmin && !selectedCenterId)}
-              className="px-4 py-2 bg-zinc-900 text-white rounded-lg text-sm hover:bg-zinc-700 disabled:opacity-50">
+              className="px-4 py-2 bg-[var(--gold)] text-[#3B2A00] rounded-lg text-sm hover:opacity-90 disabled:opacity-50">
               {actionLoading === "create" ? t.creating : t.create_btn}
             </button>
-            <button onClick={() => setShowCreateForm(false)} className="px-4 py-2 text-sm text-zinc-600 hover:text-zinc-900">{t.cancel}</button>
+            <button onClick={() => setShowCreateForm(false)} className="px-4 py-2 text-sm text-mut hover:text-tx">{t.cancel}</button>
           </div>
         </div>
       )}
@@ -254,7 +254,7 @@ export default function ShipmentsPage() {
       <div className="flex gap-2">
         {(["", "OPEN", "CLOSED", "SHIPPED"] as const).map((s) => (
           <button key={s} onClick={() => setFilter(s)}
-            className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${filter === s ? "bg-zinc-900 text-white border-zinc-900" : "bg-white text-zinc-600 border-zinc-300 hover:border-zinc-500"}`}>
+            className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${filter === s ? "bg-[var(--gold)] text-[#3B2A00] border-[var(--gold)]" : "bg-card text-mut border-cardB hover:border-sec"}`}>
             {s === "" ? t.filter_all : t.status[s as ShipmentStatus]}
           </button>
         ))}
@@ -264,41 +264,41 @@ export default function ShipmentsPage() {
         {/* Shipment list */}
         <div className="space-y-2">
           {loading ? (
-            <p className="text-sm text-zinc-400">{dict.dashboard.common.loading}</p>
+            <p className="text-sm text-fnt">{dict.dashboard.common.loading}</p>
           ) : shipments.length === 0 ? (
-            <p className="text-sm text-zinc-400">{t.empty}</p>
+            <p className="text-sm text-fnt">{t.empty}</p>
           ) : shipments.map((shipment) => (
             <div key={shipment.id}
               onClick={() => { fetchShipmentDetail(shipment.id); fetchClosedPallets() }}
-              className={`rounded-xl border p-4 cursor-pointer transition-colors ${activeShipment?.id === shipment.id ? "border-zinc-900 bg-zinc-50" : "border-zinc-200 bg-white hover:border-zinc-400"}`}>
+              className={`rounded-xl border p-4 cursor-pointer transition-colors ${activeShipment?.id === shipment.id ? "border-[var(--gold)] bg-card" : "border-cardB bg-card hover:border-sec"}`}>
               <div className="flex items-center justify-between">
                 <div>
-                  <span className="font-semibold text-sm text-zinc-900">{shipment.destination}</span>
-                  {shipment.reference && <span className="ml-2 text-xs text-zinc-500 font-mono">{shipment.reference}</span>}
+                  <span className="font-semibold text-sm text-tx">{shipment.destination}</span>
+                  {shipment.reference && <span className="ml-2 text-xs text-mut font-mono">{shipment.reference}</span>}
                 </div>
                 <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${STATUS_COLORS[shipment.status]}`}>
                   {t.status[shipment.status]}
                 </span>
               </div>
-              {shipment.carrier && <p className="text-xs text-zinc-400 mt-1">{shipment.carrier}</p>}
+              {shipment.carrier && <p className="text-xs text-fnt mt-1">{shipment.carrier}</p>}
               <div className="mt-2 flex gap-2 flex-wrap">
                 {shipment.status === "OPEN" && (
                   <button onClick={(e) => { e.stopPropagation(); handleClose(shipment.id) }}
                     disabled={actionLoading === shipment.id + "-close"}
-                    className="text-xs px-2 py-1 rounded border border-green-300 text-green-700 hover:bg-green-50 disabled:opacity-50">
+                    className="text-xs px-2 py-1 rounded border border-[var(--dSealT)] text-dSealT hover:bg-dSealB disabled:opacity-50">
                     {actionLoading === shipment.id + "-close" ? t.closing : t.close}
                   </button>
                 )}
                 {shipment.status === "CLOSED" && (
                   <button onClick={(e) => { e.stopPropagation(); handleShip(shipment.id) }}
                     disabled={actionLoading === shipment.id + "-ship"}
-                    className="text-xs px-2 py-1 rounded border border-blue-300 text-blue-700 hover:bg-blue-50 disabled:opacity-50">
+                    className="text-xs px-2 py-1 rounded border border-[var(--blue)] text-[var(--blue)] hover:bg-[var(--blueSoft)] disabled:opacity-50">
                     {actionLoading === shipment.id + "-ship" ? t.dispatching : t.dispatch}
                   </button>
                 )}
                 <button onClick={(e) => { e.stopPropagation(); handleDownloadManifest(shipment.id) }}
                   disabled={manifestExport.isBusy}
-                  className="text-xs px-2 py-1 rounded border border-zinc-300 text-zinc-700 hover:bg-zinc-50 disabled:opacity-50">
+                  className="text-xs px-2 py-1 rounded border border-cardB text-mut hover:bg-card2 disabled:opacity-50">
                   {manifestExport.isBusy ? dict.dashboard.common.exporting : t.manifest_pdf}
                 </button>
               </div>
@@ -308,19 +308,19 @@ export default function ShipmentsPage() {
 
         {/* Active shipment detail */}
         {activeShipment && (
-          <div className="rounded-xl border border-zinc-200 bg-white p-5 space-y-4">
+          <div className="rounded-xl border border-cardB bg-card p-5 space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="font-semibold text-sm text-zinc-900">
+              <h2 className="font-semibold text-sm text-tx">
                 {activeShipment.destination}
-                {activeShipment.reference && <span className="ml-2 font-mono text-xs text-zinc-400">{activeShipment.reference}</span>}
+                {activeShipment.reference && <span className="ml-2 font-mono text-xs text-fnt">{activeShipment.reference}</span>}
               </h2>
-              <button onClick={() => { setActiveShipment(null); setShipmentEvents([]) }} className="text-zinc-400 hover:text-zinc-700 text-sm">✕</button>
+              <button onClick={() => { setActiveShipment(null); setShipmentEvents([]) }} className="text-fnt hover:text-tx text-sm">✕</button>
             </div>
 
             {activeShipment.status === "OPEN" && (
               <div className="flex gap-2">
                 <select value={selectedPalletId} onChange={(e) => setSelectedPalletId(e.target.value)}
-                  className="flex-1 text-sm border border-zinc-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-zinc-400">
+                  className="flex-1 text-sm border border-inpB bg-inp text-tx rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--gold)]">
                   <option value="">{t.select_pallet}</option>
                   {closedPallets
                     .filter((p) => !activeShipment.pallets.some((ap) => ap.id === p.id))
@@ -329,27 +329,27 @@ export default function ShipmentsPage() {
                     ))}
                 </select>
                 <button onClick={handleAddPallet} disabled={!selectedPalletId || actionLoading === "add-pallet"}
-                  className="px-3 py-2 bg-zinc-900 text-white rounded-lg text-sm hover:bg-zinc-700 disabled:opacity-50">
+                  className="px-3 py-2 bg-[var(--gold)] text-[#3B2A00] rounded-lg text-sm hover:opacity-90 disabled:opacity-50">
                   {actionLoading === "add-pallet" ? "..." : t.add_pallet}
                 </button>
               </div>
             )}
 
             <div>
-              <p className="text-xs font-semibold text-zinc-500 mb-2">
+              <p className="text-xs font-semibold text-fnt mb-2">
                 {activeShipment.pallets.length === 1
                   ? t.pallet_count_one
                   : t.pallet_count_other.replace("{count}", String(activeShipment.pallets.length))}
               </p>
               {activeShipment.pallets.length === 0 ? (
-                <p className="text-sm text-zinc-400">{t.no_pallets_empty}</p>
+                <p className="text-sm text-fnt">{t.no_pallets_empty}</p>
               ) : (
                 <ul className="space-y-2">
                   {activeShipment.pallets.map((pallet) => (
-                    <li key={pallet.id} className="border border-zinc-100 rounded-lg p-3">
+                    <li key={pallet.id} className="border border-line rounded-lg p-3">
                       <div className="flex items-center justify-between">
-                        <span className="font-mono text-sm font-bold text-zinc-800">{pallet.code}</span>
-                        <span className="text-xs text-zinc-400">
+                        <span className="font-mono text-sm font-bold text-tx">{pallet.code}</span>
+                        <span className="text-xs text-fnt">
                           {pallet.boxes.length === 1
                             ? t.box_count_one
                             : t.box_count_other.replace("{count}", String(pallet.boxes.length))}
@@ -362,8 +362,8 @@ export default function ShipmentsPage() {
             </div>
 
             {shipmentEvents.length > 0 && (
-              <div className="border-t border-zinc-100 pt-4">
-                <p className="text-xs font-semibold text-zinc-500 mb-3">{dict.dashboard.common.history}</p>
+              <div className="border-t border-line pt-4">
+                <p className="text-xs font-semibold text-fnt mb-3">{dict.dashboard.common.history}</p>
                 <StatusTimeline events={shipmentEvents} />
               </div>
             )}
