@@ -169,8 +169,8 @@ export default function MessagesPage() {
 
   return (
     <div className="flex h-full max-h-[calc(100vh-6rem)] gap-4">
-      {/* Thread list */}
-      <div className="w-80 flex-shrink-0 flex flex-col border border-cardB rounded-xl bg-card overflow-hidden">
+      {/* Thread list — full width on mobile when no thread is open, fixed column on md+ */}
+      <div className={`w-full md:w-80 flex-shrink-0 flex-col border border-cardB rounded-xl bg-card overflow-hidden ${activeThread ? "hidden md:flex" : "flex"}`}>
         <div className="p-3 border-b border-line">
           <div className="flex items-center justify-between mb-2">
             <h1 className="text-sm font-semibold text-tx">{t.title}</h1>
@@ -212,8 +212,8 @@ export default function MessagesPage() {
         </div>
       </div>
 
-      {/* Thread detail */}
-      <div className="flex-1 flex flex-col border border-cardB rounded-xl bg-card overflow-hidden">
+      {/* Thread detail — hidden on mobile until a thread is selected, always shown on md+ */}
+      <div className={`flex-1 flex-col border border-cardB rounded-xl bg-card overflow-hidden ${activeThread ? "flex" : "hidden md:flex"}`}>
         {!activeThread ? (
           <div className="flex-1 flex items-center justify-center text-sm text-fnt">
             {t.select_thread}

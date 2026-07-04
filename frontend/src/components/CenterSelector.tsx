@@ -22,11 +22,11 @@ export function CenterSelector({ token }: CenterSelectorProps) {
 
   return (
     <div className="flex items-center gap-2 px-2 mb-4">
-      <label className="text-xs text-zinc-500">Centro:</label>
+      <label className="text-xs text-mut">Centro:</label>
       <select
         value={selected}
         onChange={(e) => setSelected(e.target.value)}
-        className="flex-1 rounded border border-zinc-200 bg-white px-2 py-1 text-xs text-zinc-900 focus:outline-none"
+        className="flex-1 rounded border border-cardB bg-card px-2 py-1 text-xs text-tx focus:outline-none"
       >
         <option value="all">Todos los centros</option>
         {centers.map((c) => (

@@ -6,119 +6,18 @@ import { usePathname } from "next/navigation"
 import { useEffect, useRef, useState } from "react"
 import { logoutAction } from "@/lib/actions"
 import type { CenterRole } from "@/types"
-import {
-  Home,
-  Globe,
-  PackagePlus,
-  Package,
-  Layers,
-  Truck,
-  ArrowLeftRight,
-  ScanLine,
-  Flag,
-  Building2,
-  MessageCircle,
-  Users,
-  UserCog,
-  ScrollText,
-  BarChart2,
-  LogOut,
-  PanelLeftClose,
-  PanelLeftOpen,
-  Wrench,
-} from "lucide-react"
+import { LogOut, PanelLeftClose, PanelLeftOpen, Wrench } from "lucide-react"
 import { LanguageSwitcher } from "@/components/LanguageSwitcher"
 import { ThemeToggle } from "@/components/ThemeToggle"
 import type { Locale } from "@/lib/i18n"
 import type { Theme } from "@/lib/theme"
-
-type IconComponent = React.ComponentType<{ size?: number; className?: string }>
-
-interface NavItem {
-  href: string
-  labelKey: keyof DashboardNav
-  roles: CenterRole[]
-  icon: IconComponent
-  badgeKey?: string
-}
-
-type DashboardNav = {
-  home: string
-  national: string
-  intake: string
-  boxes: string
-  pallets: string
-  shipments: string
-  transfers: string
-  messages: string
-  scan: string
-  campaigns: string
-  centers: string
-  requests: string
-  reports: string
-  users: string
-  audit: string
-  team: string
-  ops_section: string
-  settings: string
-  logout: string
-  admin_section: string
-}
-
-type DashboardRoleLabels = {
-  national_admin: string
-  coordinator: string
-  volunteer: string
-}
-
-// Core / high-frequency items — always at the top, no group header.
-const NAV_ITEMS: NavItem[] = [
-  // "Inicio" is a dead redirect to /dashboard/national for national_admin
-  // (see app/dashboard/page.tsx) — Panel Nacional is already their home,
-  // showing both was a duplicate entry pointing at the same page.
-  { href: "/dashboard", labelKey: "home", roles: ["coordinator", "volunteer"], icon: Home },
-  { href: "/dashboard/national", labelKey: "national", roles: ["national_admin"], icon: Globe },
-  // Role hierarchy: national_admin sees everything coordinator/volunteer see
-  // (plus their own admin-only tools) — they never lose visibility going up.
-  { href: "/dashboard/boxes", labelKey: "boxes", roles: ["national_admin", "coordinator", "volunteer"], icon: Package },
-  { href: "/dashboard/pallets", labelKey: "pallets", roles: ["national_admin", "coordinator"], icon: Layers },
-  { href: "/dashboard/shipments", labelKey: "shipments", roles: ["national_admin", "coordinator"], icon: Truck },
-  // national_admin sees "Campañas" grouped under Administración instead
-  // (they're the only role that can create/manage campaigns) — this entry
-  // is coordinator/volunteer-only so it never duplicates that one.
-  { href: "/dashboard/campaigns", labelKey: "campaigns", roles: ["coordinator", "volunteer"], icon: Flag },
-  // "Solicitudes" hidden for now — reported not working, revisit before
-  // re-enabling. Left commented (not deleted) so it's easy to restore.
-  // { href: "/dashboard/requests", labelKey: "requests", roles: ["national_admin", "coordinator", "volunteer"], icon: MessageSquare },
-]
-
-// Operations — day-to-day tools, grouped under its own header.
-const OPS_ITEMS: NavItem[] = [
-  { href: "/dashboard/intake", labelKey: "intake", roles: ["national_admin", "coordinator", "volunteer"], icon: PackagePlus },
-  { href: "/dashboard/scan", labelKey: "scan", roles: ["national_admin", "coordinator", "volunteer"], icon: ScanLine },
-  { href: "/dashboard/transfers", labelKey: "transfers", roles: ["national_admin", "coordinator"], icon: ArrowLeftRight },
-  { href: "/dashboard/reports", labelKey: "reports", roles: ["national_admin", "coordinator", "volunteer"], icon: BarChart2 },
-  // Team directory: open to everyone. Coordinator/volunteer see their own
-  // center directly; national_admin gets a center selector (scoped to their
-  // own country_code) — see list_center_users in backend/app/routers/users.py.
-  { href: "/dashboard/team", labelKey: "team", roles: ["national_admin", "coordinator", "volunteer"], icon: Users },
-  { href: "/dashboard/messages", labelKey: "messages", roles: ["national_admin", "coordinator", "volunteer"], icon: MessageCircle, badgeKey: "messages" },
-]
-
-interface AdminNavItem {
-  href: string
-  labelKey: keyof DashboardNav
-  roles: CenterRole[]
-  icon: IconComponent
-}
-
-// Administration — setup/management tools, national_admin only.
-const ADMIN_ITEMS: AdminNavItem[] = [
-  { href: "/dashboard/campaigns", labelKey: "campaigns", roles: ["national_admin"], icon: Flag },
-  { href: "/dashboard/centers", labelKey: "centers", roles: ["national_admin"], icon: Building2 },
-  { href: "/dashboard/admin/users", labelKey: "users", roles: ["national_admin"], icon: UserCog },
-  { href: "/dashboard/admin/audit", labelKey: "audit", roles: ["national_admin"], icon: ScrollText },
-]
+import {
+  NAV_ITEMS,
+  OPS_ITEMS,
+  ADMIN_ITEMS,
+  type DashboardNav,
+  type DashboardRoleLabels,
+} from "@/lib/nav-config"
 
 const LOGO = "https://res.cloudinary.com/dtvdqlxtd/image/upload/v1782794310/image_degkq9.png"
 const STORAGE_KEY = "sidebar_collapsed"

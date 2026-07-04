@@ -122,7 +122,8 @@
       "audit": "Audit",
       "team": "Team",
       "admin_section": "Administration",
-      "ops_section": "Operations"
+      "ops_section": "Operations",
+      "menu": "Menu"
     },
     "role": {
       "national_admin": "National Admin",
