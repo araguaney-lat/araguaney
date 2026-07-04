@@ -35,7 +35,7 @@ export function LanguageSwitcher({ locale, collapsed }: LanguageSwitcherProps) {
     >
       <span className="text-base leading-none">{current.flag}</span>
       {!collapsed && (
-        <span className="text-zinc-500 text-[11px]">{locale.toUpperCase()}</span>
+        <span className="text-mut text-[11px]">{locale.toUpperCase()}</span>
       )}
     </button>
   )

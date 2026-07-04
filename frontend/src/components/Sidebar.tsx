@@ -191,8 +191,6 @@ export function Sidebar({ centerRole, platformRole, centerName, nav, roleLabels,
           >
             <PanelLeftOpen size={16} />
           </button>
-          <ThemeToggle theme={theme} collapsed />
-          <LanguageSwitcher locale={locale} collapsed />
         </div>
       ) : (
         <div className="flex items-center justify-between border-b border-sideB px-3 py-3">
@@ -205,17 +203,13 @@ export function Sidebar({ centerRole, platformRole, centerName, nav, roleLabels,
               )}
             </div>
           </div>
-          <div className="flex items-center gap-1 flex-shrink-0">
-            <ThemeToggle theme={theme} />
-            <LanguageSwitcher locale={locale} />
-            <button
-              onClick={toggle}
-              className="rounded-lg p-1.5 text-sTx hover:bg-sAct hover:text-sActTx transition-colors"
-              title="Colapsar menú"
-            >
-              <PanelLeftClose size={18} />
-            </button>
-          </div>
+          <button
+            onClick={toggle}
+            className="rounded-lg p-1.5 text-sTx hover:bg-sAct hover:text-sActTx transition-colors flex-shrink-0"
+            title="Colapsar menú"
+          >
+            <PanelLeftClose size={18} />
+          </button>
         </div>
       )}
 
@@ -301,6 +295,10 @@ export function Sidebar({ centerRole, platformRole, centerName, nav, roleLabels,
             className="text-violet-600 hover:bg-violet-50 hover:text-violet-700 data-[active=true]:bg-violet-50 data-[active=true]:text-violet-700"
           />
         )}
+        <div className={`flex items-center gap-1 ${collapsed ? "flex-col" : ""}`}>
+          <ThemeToggle theme={theme} collapsed={collapsed} />
+          <LanguageSwitcher locale={locale} collapsed={collapsed} />
+        </div>
         {/* User info — links to profile/settings */}
         {(userName || userEmail) && (
           <Link
