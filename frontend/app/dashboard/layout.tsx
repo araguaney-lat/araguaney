@@ -3,6 +3,7 @@ import { redirect } from "next/navigation"
 import { SessionProvider } from "next-auth/react"
 import { Sidebar } from "@/components/Sidebar"
 import { CenterSelector } from "@/components/CenterSelector"
+import { BottomNav } from "@/components/BottomNav"
 import { DictionaryProvider } from "@/context/DictionaryContext"
 import { ThemeProvider } from "@/context/ThemeContext"
 import { getLocale, getDictionary } from "@/lib/i18n"
@@ -48,7 +49,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
       <DictionaryProvider dict={dict}>
         <ThemeProvider theme={theme}>
           <div data-theme={theme} className="flex h-screen overflow-hidden bg-app text-tx">
-            <div className="flex h-full flex-col">
+            <div className="hidden h-full flex-col md:flex">
               {centerRole === "national_admin" && (
                 <CenterSelector token={session.accessToken} />
               )}
@@ -64,7 +65,18 @@ export default async function DashboardLayout({ children }: { children: React.Re
                 theme={theme}
               />
             </div>
-            <main className="flex-1 overflow-y-auto p-6">{children}</main>
+            <main className="flex-1 overflow-y-auto p-6 pb-24 md:pb-6">{children}</main>
+            <BottomNav
+              centerRole={centerRole}
+              centerSelectorToken={centerRole === "national_admin" ? session.accessToken : null}
+              nav={dict.dashboard.nav}
+              roleLabels={dict.dashboard.role}
+              userName={userName}
+              userEmail={userEmail}
+              userAvatarUrl={userAvatarUrl}
+              locale={locale}
+              theme={theme}
+            />
           </div>
         </ThemeProvider>
       </DictionaryProvider>

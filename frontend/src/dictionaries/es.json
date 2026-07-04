@@ -122,7 +122,8 @@
       "audit": "Auditoría",
       "team": "Equipo",
       "admin_section": "Administración",
-      "ops_section": "Operaciones"
+      "ops_section": "Operaciones",
+      "menu": "Menú"
     },
     "role": {
       "national_admin": "Admin Nacional",
