@@ -3,8 +3,11 @@ import type { Metadata } from "next"
 import HomeNav from "@/components/HomeNav"
 import HomeFooter from "@/components/HomeFooter"
 import { CtaLink } from "@/components/CtaLink"
+import { FaqSection } from "@/components/FaqSection"
 import { getDictionary } from "@/lib/i18n"
 import { DEFAULT_OG_IMAGE } from "@/lib/seo"
+import { JsonLd } from "@/components/JsonLd"
+import { faqSchema, breadcrumbSchema } from "@/lib/structured-data"
 
 const TITLE = "Software para centro de acopio"
 const OG_TITLE = "Software para centro de acopio — Araguaney"
@@ -47,10 +50,39 @@ const DIFERENCIADORES = [
   },
 ]
 
+const FAQ = [
+  {
+    q: "¿Qué es un centro de acopio?",
+    a: "Es un punto físico donde se reciben, clasifican y preparan donaciones en especie para canalizarlas hacia zonas afectadas por una emergencia. No entrega ayuda al beneficiario final: prepara y consolida la carga para su envío.",
+  },
+  {
+    q: "¿Cuánto cuesta el software de Araguaney?",
+    a: "Es gratuito para centros de acopio y coordinaciones humanitarias: registro por ítem, cajas con QR, manifiestos y panel agregado, sin costo de licencia ni límite de cajas.",
+  },
+  {
+    q: "¿Qué diferencia a Araguaney de una hoja de cálculo?",
+    a: "Valida reglas de donación (caducidad, controlados), genera QR y manifiestos automáticamente, registra la trazabilidad de cada caja al envío y suma el stock de varios centros en un panel nacional — cosas que una hoja no hace.",
+  },
+  {
+    q: "¿Se puede usar para cualquier emergencia?",
+    a: "Sí. El estándar es genérico: sismos, inundaciones, incendios o crisis migratorias. No está atado a un evento específico.",
+  },
+]
+
+const STRUCTURED_DATA = [
+  faqSchema(FAQ),
+  breadcrumbSchema([
+    { name: "Inicio", path: "/" },
+    { name: "Centro de acopio", path: "/centro-de-acopio" },
+  ]),
+]
+
 export default async function CentroDeAcopioPage() {
   const dict = await getDictionary("es")
 
   return (
+    <>
+    <JsonLd data={STRUCTURED_DATA} />
     <div style={{ background: "#FBF7EE", minHeight: "100vh", display: "flex", flexDirection: "column" }}>
       <HomeNav dict={dict.nav} locale="es" localeLinks={{}} />
       <div className="h-[56px] md:hidden" />
@@ -168,6 +200,11 @@ export default async function CentroDeAcopioPage() {
         </div>
       </div>
 
+      {/* ── FAQ ── */}
+      <div className="px-5 md:px-[46px] py-12 md:py-[56px]" style={{ borderTop: "1px solid #EFE7D6" }}>
+        <FaqSection items={FAQ} />
+      </div>
+
       {/* ── CTA final + link cruzado ── */}
       <div className="px-5 md:px-[46px] py-12 md:py-[64px] text-center" style={{ background: "#fff", borderTop: "1px solid #EFE7D6" }}>
         <h2
@@ -206,5 +243,6 @@ export default async function CentroDeAcopioPage() {
 
       <HomeFooter dict={dict.footer} />
     </div>
+    </>
   )
 }

@@ -6,9 +6,11 @@ import HomeFooter from "@/components/HomeFooter"
 import { CtaLink } from "@/components/CtaLink"
 import { getLocale, getDictionary } from "@/lib/i18n"
 import { JsonLd } from "@/components/JsonLd"
+import { FaqSection } from "@/components/FaqSection"
 import {
   SOFTWARE_APPLICATION_SCHEMA,
   ORGANIZATION_SCHEMA,
+  faqSchema,
 } from "@/lib/structured-data"
 
 const LOGO =
@@ -35,13 +37,36 @@ export async function generateMetadata(): Promise<Metadata> {
 
 const STRUCTURED_DATA = [SOFTWARE_APPLICATION_SCHEMA, ORGANIZATION_SCHEMA]
 
+// FAQ is Spanish-only, shown on the ES home; its schema is only emitted there.
+const HOME_FAQ = [
+  {
+    q: "¿Qué es Araguaney?",
+    a: "Un software gratuito para centros de acopio y ayuda humanitaria: registra donaciones en especie por ítem, las empaca en cajas homogéneas con QR, las consolida en tarimas y envíos con manifiesto exportable, y suma el stock de todos los centros en un panel nacional.",
+  },
+  {
+    q: "¿Cuánto cuesta usar Araguaney?",
+    a: "Es gratuito para centros de acopio y coordinaciones humanitarias, sin límite de cajas ni costo de licencia.",
+  },
+  {
+    q: "¿Para qué emergencias sirve?",
+    a: "Para cualquiera: sismos, inundaciones, incendios o crisis migratorias. El estándar de registro y envío es el mismo, sin importar el evento.",
+  },
+  {
+    q: "¿Registra datos personales de donantes o beneficiarios?",
+    a: "No. Solo gestiona inventario, trazable de la caja al envío. No guarda datos personales de donantes ni beneficiarios.",
+  },
+]
+
 export default async function HomePage() {
   const locale = await getLocale()
   const dict = await getDictionary(locale)
 
+  const structuredData =
+    locale === "es" ? [...STRUCTURED_DATA, faqSchema(HOME_FAQ)] : STRUCTURED_DATA
+
   return (
     <>
-    <JsonLd data={STRUCTURED_DATA} />
+    <JsonLd data={structuredData} />
     <div
       style={{
         background: "#FBF7EE",
@@ -490,6 +515,13 @@ export default async function HomePage() {
           </div>
         </div>
       </div>
+
+      {/* ── FAQ (solo ES — contenido sin traducir) ── */}
+      {locale === "es" && (
+        <div className="px-5 md:px-[46px] py-12 md:py-[56px]" style={{ background: "#fff", borderTop: "1px solid #EFE7D6" }}>
+          <FaqSection items={HOME_FAQ} />
+        </div>
+      )}
 
       {/* ── Guías (solo ES — contenido sin traducir) ── */}
       {locale === "es" && (

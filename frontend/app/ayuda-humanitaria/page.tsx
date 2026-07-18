@@ -3,8 +3,11 @@ import type { Metadata } from "next"
 import HomeNav from "@/components/HomeNav"
 import HomeFooter from "@/components/HomeFooter"
 import { CtaLink } from "@/components/CtaLink"
+import { FaqSection } from "@/components/FaqSection"
 import { getDictionary } from "@/lib/i18n"
 import { DEFAULT_OG_IMAGE } from "@/lib/seo"
+import { JsonLd } from "@/components/JsonLd"
+import { faqSchema, breadcrumbSchema } from "@/lib/structured-data"
 
 const TITLE = "Software de ayuda humanitaria"
 const OG_TITLE = "Software de ayuda humanitaria — Araguaney"
@@ -26,10 +29,39 @@ const ESCENARIOS = [
   { icon: "🔥", title: "Incendios", desc: "Organiza la respuesta rápida sin perder trazabilidad de lo que se dona y envía." },
 ]
 
+const FAQ = [
+  {
+    q: "¿Para qué tipo de emergencias sirve Araguaney?",
+    a: "Para cualquier escenario de ayuda humanitaria: sismos, inundaciones, incendios o crisis migratorias. El estándar de registro, empaque y envío es el mismo, sin importar el evento.",
+  },
+  {
+    q: "¿Qué es una caja homogénea y por qué importa?",
+    a: "Es una caja con un solo producto, un solo lote y una sola caducidad. Es lo que exige el régimen de envío humanitario para que la carga pueda verificarse en aduana sin abrirse, y no se atore.",
+  },
+  {
+    q: "¿Araguaney gestiona dinero o beneficiarios?",
+    a: "No. Solo gestiona inventario de donaciones en especie, trazable de la caja al envío. No maneja donativos económicos ni registra datos de beneficiarios finales.",
+  },
+  {
+    q: "¿Cuánto cuesta?",
+    a: "Es gratuito para centros de acopio y coordinaciones humanitarias, sin límite de cajas ni costo de licencia.",
+  },
+]
+
+const STRUCTURED_DATA = [
+  faqSchema(FAQ),
+  breadcrumbSchema([
+    { name: "Inicio", path: "/" },
+    { name: "Ayuda humanitaria", path: "/ayuda-humanitaria" },
+  ]),
+]
+
 export default async function AyudaHumanitariaPage() {
   const dict = await getDictionary("es")
 
   return (
+    <>
+    <JsonLd data={STRUCTURED_DATA} />
     <div style={{ background: "#FBF7EE", minHeight: "100vh", display: "flex", flexDirection: "column" }}>
       <HomeNav dict={dict.nav} locale="es" localeLinks={{ en: "/humanitarian-aid" }} />
       <div className="h-[56px] md:hidden" />
@@ -146,6 +178,11 @@ export default async function AyudaHumanitariaPage() {
         </div>
       </div>
 
+      {/* ── FAQ ── */}
+      <div className="px-5 md:px-[46px] py-12 md:py-[56px]" style={{ borderTop: "1px solid #EFE7D6" }}>
+        <FaqSection items={FAQ} />
+      </div>
+
       {/* ── CTA final + link cruzado ── */}
       <div className="px-5 md:px-[46px] py-12 md:py-[64px] text-center" style={{ background: "#fff", borderTop: "1px solid #EFE7D6" }}>
         <h2
@@ -188,5 +225,6 @@ export default async function AyudaHumanitariaPage() {
 
       <HomeFooter dict={dict.footer} />
     </div>
+    </>
   )
 }
