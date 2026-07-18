@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import Link from "next/link"
 import { apiFetch } from "@/lib/api"
 import { getLocale, getDictionary } from "@/lib/i18n"
+import { slugForCategory } from "@/lib/needs-categories"
 import type { PublicNeedsOut } from "@/types"
 
 export const revalidate = 300
@@ -70,30 +71,41 @@ export default async function NecesidadesPage() {
           </div>
         ) : (
           <div className="space-y-3">
-            {data.by_category.map((row) => (
-              <div
-                key={row.category}
-                className="flex items-center justify-between rounded-xl border border-zinc-200 bg-white px-5 py-4"
-              >
-                <div className="flex items-center gap-3">
-                  <span className="text-xl" aria-hidden>
-                    {CATEGORY_EMOJI[row.category] ?? "📦"}
-                  </span>
-                  <div>
-                    <p className="font-medium text-zinc-900">
-                      {CATEGORY_LABELS[row.category] ?? row.category}
-                    </p>
-                    <p className="text-xs text-zinc-500">{row.box_count.toLocaleString()} cajas</p>
+            {data.by_category.map((row) => {
+              const slug = slugForCategory(row.category)
+              const inner = (
+                <>
+                  <div className="flex items-center gap-3">
+                    <span className="text-xl" aria-hidden>
+                      {CATEGORY_EMOJI[row.category] ?? "📦"}
+                    </span>
+                    <div>
+                      <p className="font-medium text-zinc-900">
+                        {CATEGORY_LABELS[row.category] ?? row.category}
+                      </p>
+                      <p className="text-xs text-zinc-500">{row.box_count.toLocaleString()} cajas</p>
+                    </div>
                   </div>
+                  <div className="text-right">
+                    <p className="text-lg font-bold text-zinc-900">
+                      {row.total_units.toLocaleString()}
+                    </p>
+                    <p className="text-xs text-zinc-500">unidades</p>
+                  </div>
+                </>
+              )
+              const className =
+                "flex items-center justify-between rounded-xl border border-zinc-200 bg-white px-5 py-4"
+              return slug ? (
+                <Link key={row.category} href={`/necesidades/${slug}`} className={`${className} transition-colors hover:border-zinc-300`}>
+                  {inner}
+                </Link>
+              ) : (
+                <div key={row.category} className={className}>
+                  {inner}
                 </div>
-                <div className="text-right">
-                  <p className="text-lg font-bold text-zinc-900">
-                    {row.total_units.toLocaleString()}
-                  </p>
-                  <p className="text-xs text-zinc-500">unidades</p>
-                </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         )}
 

@@ -5,7 +5,8 @@ import HomeFooter from "@/components/HomeFooter"
 import { CtaLink } from "@/components/CtaLink"
 import { FaqSection } from "@/components/FaqSection"
 import { getDictionary } from "@/lib/i18n"
-import { DEFAULT_OG_IMAGE } from "@/lib/seo"
+import { ogImageUrl } from "@/lib/seo"
+import { Breadcrumbs } from "@/components/Breadcrumbs"
 import { JsonLd } from "@/components/JsonLd"
 import { articleSchema, faqSchema, breadcrumbSchema } from "@/lib/structured-data"
 
@@ -13,13 +14,14 @@ const PATH = "/guias/software-gratis-para-gestionar-donaciones-ong"
 const TITLE = "Software gratis para gestionar donaciones en una ONG"
 const DESCRIPTION =
   "Qué buscar en un software para gestionar donaciones en especie sin costo: registro por ítem, trazabilidad, manifiesto y agregación entre centros."
+const OG_IMAGE = ogImageUrl(TITLE, "Guía")
 
 export const metadata: Metadata = {
   title: TITLE,
   description: DESCRIPTION,
   alternates: { canonical: PATH },
-  openGraph: { title: `${TITLE} — Araguaney`, description: DESCRIPTION, images: [DEFAULT_OG_IMAGE] },
-  twitter: { card: "summary_large_image", title: `${TITLE} — Araguaney`, description: DESCRIPTION, images: [DEFAULT_OG_IMAGE] },
+  openGraph: { title: `${TITLE} — Araguaney`, description: DESCRIPTION, images: [OG_IMAGE] },
+  twitter: { card: "summary_large_image", title: `${TITLE} — Araguaney`, description: DESCRIPTION, images: [OG_IMAGE] },
 }
 
 const CRITERIOS = [
@@ -50,14 +52,16 @@ const FAQ = [
   },
 ]
 
+const CRUMBS = [
+  { name: "Inicio", path: "/" },
+  { name: "Guías", path: "/guias" },
+  { name: TITLE, path: PATH },
+] as const
+
 const STRUCTURED_DATA = [
   articleSchema({ title: TITLE, description: DESCRIPTION, path: PATH }),
   faqSchema(FAQ),
-  breadcrumbSchema([
-    { name: "Inicio", path: "/" },
-    { name: "Guías", path: "/guias" },
-    { name: TITLE, path: PATH },
-  ]),
+  breadcrumbSchema(CRUMBS),
 ]
 
 export default async function SoftwareGratisGuidePage() {
@@ -72,6 +76,10 @@ export default async function SoftwareGratisGuidePage() {
 
         <article className="px-5 md:px-[46px] pt-[26px] md:pt-[56px] pb-16 md:pb-20">
           <div className="max-w-[680px] mx-auto">
+            <div className="mb-4">
+              <Breadcrumbs items={CRUMBS} />
+            </div>
+
             <div
               className="text-[10.5px] md:text-[12px] mb-3"
               style={{

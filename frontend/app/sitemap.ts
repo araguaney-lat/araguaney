@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next"
 import { apiFetch } from "@/lib/api"
 import { SITE_URL } from "@/lib/seo"
+import { NEEDS_CATEGORIES } from "@/lib/needs-categories"
 import type { PublicCampaignListItem } from "@/types"
 
 // Force this route to render at request time instead of during `next build`.
@@ -106,6 +107,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "monthly",
       priority: 0.5,
     },
+    ...NEEDS_CATEGORIES.map((c) => ({
+      url: `${SITE_URL}/necesidades/${c.slug}`,
+      lastModified: now,
+      changeFrequency: "daily" as const,
+      priority: 0.7,
+    })),
     {
       url: `${SITE_URL}/contacto`,
       lastModified: now,

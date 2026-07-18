@@ -4,8 +4,9 @@ import HomeNav from "@/components/HomeNav"
 import HomeFooter from "@/components/HomeFooter"
 import { CtaLink } from "@/components/CtaLink"
 import { FaqSection } from "@/components/FaqSection"
+import { Breadcrumbs } from "@/components/Breadcrumbs"
 import { getDictionary } from "@/lib/i18n"
-import { DEFAULT_OG_IMAGE } from "@/lib/seo"
+import { ogImageUrl } from "@/lib/seo"
 import { JsonLd } from "@/components/JsonLd"
 import { faqSchema, breadcrumbSchema } from "@/lib/structured-data"
 
@@ -13,13 +14,19 @@ const TITLE = "Software para centro de acopio"
 const OG_TITLE = "Software para centro de acopio — Araguaney"
 const DESCRIPTION =
   "Gestión de donaciones en especie para tu centro de acopio: registro por ítem, cajas homogéneas con QR, manifiesto exportable y panel nacional en tiempo real."
+const OG_IMAGE = ogImageUrl("Software para centro de acopio", "Centro de acopio")
+
+const CRUMBS = [
+  { name: "Inicio", path: "/" },
+  { name: "Centro de acopio", path: "/centro-de-acopio" },
+] as const
 
 export const metadata: Metadata = {
   title: TITLE,
   description: DESCRIPTION,
   alternates: { canonical: "/centro-de-acopio" },
-  openGraph: { title: OG_TITLE, description: DESCRIPTION, images: [DEFAULT_OG_IMAGE] },
-  twitter: { card: "summary_large_image", title: OG_TITLE, description: DESCRIPTION, images: [DEFAULT_OG_IMAGE] },
+  openGraph: { title: OG_TITLE, description: DESCRIPTION, images: [OG_IMAGE] },
+  twitter: { card: "summary_large_image", title: OG_TITLE, description: DESCRIPTION, images: [OG_IMAGE] },
 }
 
 const DIFERENCIADORES = [
@@ -71,10 +78,7 @@ const FAQ = [
 
 const STRUCTURED_DATA = [
   faqSchema(FAQ),
-  breadcrumbSchema([
-    { name: "Inicio", path: "/" },
-    { name: "Centro de acopio", path: "/centro-de-acopio" },
-  ]),
+  breadcrumbSchema(CRUMBS),
 ]
 
 export default async function CentroDeAcopioPage() {
@@ -90,6 +94,9 @@ export default async function CentroDeAcopioPage() {
       {/* ── Hero ── */}
       <div className="px-5 md:px-[46px] pt-[26px] md:pt-[64px] pb-10 md:pb-[56px]">
         <div className="max-w-[720px]">
+          <div className="mb-4">
+            <Breadcrumbs items={CRUMBS} />
+          </div>
           <div
             className="text-[10.5px] md:text-[12px] mb-3"
             style={{

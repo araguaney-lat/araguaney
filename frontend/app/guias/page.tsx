@@ -3,21 +3,28 @@ import type { Metadata } from "next"
 import HomeNav from "@/components/HomeNav"
 import HomeFooter from "@/components/HomeFooter"
 import { getDictionary } from "@/lib/i18n"
-import { DEFAULT_OG_IMAGE, absoluteUrl } from "@/lib/seo"
+import { ogImageUrl, absoluteUrl } from "@/lib/seo"
 import { JsonLd } from "@/components/JsonLd"
+import { Breadcrumbs } from "@/components/Breadcrumbs"
 import { breadcrumbSchema, type Schema } from "@/lib/structured-data"
 
 const PATH = "/guias"
 const TITLE = "Guías para centros de acopio y ayuda humanitaria"
 const DESCRIPTION =
   "Guías prácticas para organizar un centro de acopio, saber qué se puede donar y preparar carga humanitaria que pase por aduana sin atorarse."
+const OG_IMAGE = ogImageUrl("Guías para centros de acopio", "Guías")
+
+const CRUMBS = [
+  { name: "Inicio", path: "/" },
+  { name: "Guías", path: PATH },
+] as const
 
 export const metadata: Metadata = {
   title: TITLE,
   description: DESCRIPTION,
   alternates: { canonical: PATH },
-  openGraph: { title: `${TITLE} — Araguaney`, description: DESCRIPTION, images: [DEFAULT_OG_IMAGE] },
-  twitter: { card: "summary_large_image", title: `${TITLE} — Araguaney`, description: DESCRIPTION, images: [DEFAULT_OG_IMAGE] },
+  openGraph: { title: `${TITLE} — Araguaney`, description: DESCRIPTION, images: [OG_IMAGE] },
+  twitter: { card: "summary_large_image", title: `${TITLE} — Araguaney`, description: DESCRIPTION, images: [OG_IMAGE] },
 }
 
 const GUIDES = [
@@ -54,10 +61,7 @@ const GUIDES = [
 ] as const
 
 const STRUCTURED_DATA: Schema[] = [
-  breadcrumbSchema([
-    { name: "Inicio", path: "/" },
-    { name: "Guías", path: PATH },
-  ]),
+  breadcrumbSchema(CRUMBS),
   {
     "@context": "https://schema.org",
     "@type": "ItemList",
@@ -83,6 +87,9 @@ export default async function GuiasIndexPage() {
 
         <div className="px-5 md:px-[46px] pt-[26px] md:pt-[56px] pb-16 md:pb-20 flex-1">
           <div className="max-w-[680px] mx-auto">
+            <div className="mb-4">
+              <Breadcrumbs items={CRUMBS} />
+            </div>
             <div
               className="text-[10.5px] md:text-[12px] mb-3"
               style={{

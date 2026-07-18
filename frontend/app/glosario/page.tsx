@@ -3,21 +3,28 @@ import type { Metadata } from "next"
 import HomeNav from "@/components/HomeNav"
 import HomeFooter from "@/components/HomeFooter"
 import { getDictionary } from "@/lib/i18n"
-import { DEFAULT_OG_IMAGE } from "@/lib/seo"
+import { ogImageUrl } from "@/lib/seo"
 import { JsonLd } from "@/components/JsonLd"
+import { Breadcrumbs } from "@/components/Breadcrumbs"
 import { definedTermSetSchema, breadcrumbSchema, type Schema } from "@/lib/structured-data"
 
 const PATH = "/glosario"
 const TITLE = "Glosario de ayuda humanitaria y centros de acopio"
 const DESCRIPTION =
   "Definiciones claras de los términos clave de la logística humanitaria: centro de acopio, caja homogénea, tarima, manifiesto, INN, UNSPSC, GS1 y más."
+const OG_IMAGE = ogImageUrl("Glosario de ayuda humanitaria", "Glosario")
+
+const CRUMBS = [
+  { name: "Inicio", path: "/" },
+  { name: "Glosario", path: PATH },
+] as const
 
 export const metadata: Metadata = {
   title: TITLE,
   description: DESCRIPTION,
   alternates: { canonical: PATH },
-  openGraph: { title: `${TITLE} — Araguaney`, description: DESCRIPTION, images: [DEFAULT_OG_IMAGE] },
-  twitter: { card: "summary_large_image", title: `${TITLE} — Araguaney`, description: DESCRIPTION, images: [DEFAULT_OG_IMAGE] },
+  openGraph: { title: `${TITLE} — Araguaney`, description: DESCRIPTION, images: [OG_IMAGE] },
+  twitter: { card: "summary_large_image", title: `${TITLE} — Araguaney`, description: DESCRIPTION, images: [OG_IMAGE] },
 }
 
 const TERMS = [
@@ -123,6 +130,9 @@ export default async function GlosarioPage() {
 
         <div className="px-5 md:px-[46px] pt-[26px] md:pt-[56px] pb-16 md:pb-20 flex-1">
           <div className="max-w-[680px] mx-auto">
+            <div className="mb-4">
+              <Breadcrumbs items={CRUMBS} />
+            </div>
             <div
               className="text-[10.5px] md:text-[12px] mb-3"
               style={{

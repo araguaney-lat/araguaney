@@ -3,8 +3,9 @@ import type { Metadata } from "next"
 import HomeNav from "@/components/HomeNav"
 import HomeFooter from "@/components/HomeFooter"
 import { getDictionary } from "@/lib/i18n"
-import { DEFAULT_OG_IMAGE } from "@/lib/seo"
+import { ogImageUrl } from "@/lib/seo"
 import { JsonLd } from "@/components/JsonLd"
+import { Breadcrumbs } from "@/components/Breadcrumbs"
 import {
   articleSchema,
   howToSchema,
@@ -16,13 +17,14 @@ const PATH = "/guias/como-organizar-un-centro-de-acopio"
 const TITLE = "Cómo organizar un centro de acopio"
 const DESCRIPTION =
   "Guía práctica para organizar un centro de acopio desde cero: roles, registro de donaciones, cajas homogéneas, manifiesto y reglas de rechazo."
+const OG_IMAGE = ogImageUrl(TITLE, "Guía")
 
 export const metadata: Metadata = {
   title: TITLE,
   description: DESCRIPTION,
   alternates: { canonical: PATH },
-  openGraph: { title: `${TITLE} — Araguaney`, description: DESCRIPTION, images: [DEFAULT_OG_IMAGE] },
-  twitter: { card: "summary_large_image", title: `${TITLE} — Araguaney`, description: DESCRIPTION, images: [DEFAULT_OG_IMAGE] },
+  openGraph: { title: `${TITLE} — Araguaney`, description: DESCRIPTION, images: [OG_IMAGE] },
+  twitter: { card: "summary_large_image", title: `${TITLE} — Araguaney`, description: DESCRIPTION, images: [OG_IMAGE] },
 }
 
 const FAQ = [
@@ -67,15 +69,17 @@ const HOWTO_STEPS = [
   },
 ] as const
 
+const CRUMBS = [
+  { name: "Inicio", path: "/" },
+  { name: "Guías", path: "/guias" },
+  { name: TITLE, path: PATH },
+] as const
+
 const STRUCTURED_DATA = [
   articleSchema({ title: TITLE, description: DESCRIPTION, path: PATH }),
   howToSchema({ name: TITLE, description: DESCRIPTION, path: PATH, steps: HOWTO_STEPS }),
   faqSchema(FAQ),
-  breadcrumbSchema([
-    { name: "Inicio", path: "/" },
-    { name: "Guías", path: "/guias" },
-    { name: TITLE, path: PATH },
-  ]),
+  breadcrumbSchema(CRUMBS),
 ]
 
 export default async function ComoOrganizarGuidePage() {
@@ -90,6 +94,10 @@ export default async function ComoOrganizarGuidePage() {
 
         <article className="px-5 md:px-[46px] pt-[26px] md:pt-[56px] pb-16 md:pb-20">
           <div className="max-w-[680px] mx-auto">
+            <div className="mb-4">
+              <Breadcrumbs items={CRUMBS} />
+            </div>
+
             <div
               className="text-[10.5px] md:text-[12px] mb-3"
               style={{
