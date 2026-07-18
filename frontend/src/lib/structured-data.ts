@@ -22,6 +22,21 @@ export const ORGANIZATION_SCHEMA: Schema = {
   logo: DEFAULT_OG_IMAGE,
   description:
     "El estándar común para la coordinación de centros de acopio y la logística de ayuda humanitaria.",
+  knowsAbout: [
+    "Centros de acopio",
+    "Donaciones en especie",
+    "Logística humanitaria",
+    "Gestión de inventario de emergencia",
+    "Donación de medicamentos",
+    "Manifiestos y packing lists",
+  ],
+  areaServed: { "@type": "Place", name: "América Latina" },
+  contactPoint: {
+    "@type": "ContactPoint",
+    contactType: "customer support",
+    url: absoluteUrl("/contacto"),
+    availableLanguage: ["es", "en"],
+  },
 }
 
 export const SOFTWARE_APPLICATION_SCHEMA: Schema = {

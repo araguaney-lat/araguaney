@@ -3,30 +3,34 @@ import type { Metadata } from "next"
 import HomeNav from "@/components/HomeNav"
 import HomeFooter from "@/components/HomeFooter"
 import { getDictionary } from "@/lib/i18n"
-import { DEFAULT_OG_IMAGE } from "@/lib/seo"
+import { ogImageUrl } from "@/lib/seo"
 import { JsonLd } from "@/components/JsonLd"
+import { Breadcrumbs } from "@/components/Breadcrumbs"
 import { articleSchema, breadcrumbSchema } from "@/lib/structured-data"
 
 const PATH = "/guias/que-se-puede-donar"
 const TITLE = "Qué se puede donar en un centro de acopio"
 const DESCRIPTION =
   "Categorías aceptadas en un centro de acopio, reglas de la OMS para medicamentos y alimentos, y qué donaciones se rechazan y por qué."
+const OG_IMAGE = ogImageUrl(TITLE, "Guía")
+
+const CRUMBS = [
+  { name: "Inicio", path: "/" },
+  { name: "Guías", path: "/guias" },
+  { name: TITLE, path: PATH },
+] as const
 
 const STRUCTURED_DATA = [
   articleSchema({ title: TITLE, description: DESCRIPTION, path: PATH }),
-  breadcrumbSchema([
-    { name: "Inicio", path: "/" },
-    { name: "Guías", path: "/guias" },
-    { name: TITLE, path: PATH },
-  ]),
+  breadcrumbSchema(CRUMBS),
 ]
 
 export const metadata: Metadata = {
   title: TITLE,
   description: DESCRIPTION,
   alternates: { canonical: PATH },
-  openGraph: { title: `${TITLE} — Araguaney`, description: DESCRIPTION, images: [DEFAULT_OG_IMAGE] },
-  twitter: { card: "summary_large_image", title: `${TITLE} — Araguaney`, description: DESCRIPTION, images: [DEFAULT_OG_IMAGE] },
+  openGraph: { title: `${TITLE} — Araguaney`, description: DESCRIPTION, images: [OG_IMAGE] },
+  twitter: { card: "summary_large_image", title: `${TITLE} — Araguaney`, description: DESCRIPTION, images: [OG_IMAGE] },
 }
 
 const CATEGORIAS = [
@@ -58,6 +62,10 @@ export default async function QueSePuedeDonarGuidePage() {
 
       <article className="px-5 md:px-[46px] pt-[26px] md:pt-[56px] pb-16 md:pb-20">
         <div className="max-w-[680px] mx-auto">
+            <div className="mb-4">
+              <Breadcrumbs items={CRUMBS} />
+            </div>
+
           <div
             className="text-[10.5px] md:text-[12px] mb-3"
             style={{

@@ -4,7 +4,8 @@ import HomeNav from "@/components/HomeNav"
 import HomeFooter from "@/components/HomeFooter"
 import { CtaLink } from "@/components/CtaLink"
 import { getDictionary } from "@/lib/i18n"
-import { DEFAULT_OG_IMAGE } from "@/lib/seo"
+import { ogImageUrl } from "@/lib/seo"
+import { Breadcrumbs } from "@/components/Breadcrumbs"
 import { JsonLd } from "@/components/JsonLd"
 import { articleSchema, howToSchema, breadcrumbSchema } from "@/lib/structured-data"
 
@@ -12,13 +13,14 @@ const PATH = "/guias/como-registrar-voluntarios-en-un-centro-de-acopio"
 const TITLE = "Cómo registrar y organizar voluntarios en un centro de acopio"
 const DESCRIPTION =
   "Cómo estructurar los roles de los voluntarios de un centro de acopio para no perder trazabilidad: quién recibe, quién empaca y quién coordina."
+const OG_IMAGE = ogImageUrl(TITLE, "Guía")
 
 export const metadata: Metadata = {
   title: TITLE,
   description: DESCRIPTION,
   alternates: { canonical: PATH },
-  openGraph: { title: `${TITLE} — Araguaney`, description: DESCRIPTION, images: [DEFAULT_OG_IMAGE] },
-  twitter: { card: "summary_large_image", title: `${TITLE} — Araguaney`, description: DESCRIPTION, images: [DEFAULT_OG_IMAGE] },
+  openGraph: { title: `${TITLE} — Araguaney`, description: DESCRIPTION, images: [OG_IMAGE] },
+  twitter: { card: "summary_large_image", title: `${TITLE} — Araguaney`, description: DESCRIPTION, images: [OG_IMAGE] },
 }
 
 const HOWTO_STEPS = [
@@ -40,14 +42,16 @@ const HOWTO_STEPS = [
   },
 ]
 
+const CRUMBS = [
+  { name: "Inicio", path: "/" },
+  { name: "Guías", path: "/guias" },
+  { name: TITLE, path: PATH },
+] as const
+
 const STRUCTURED_DATA = [
   articleSchema({ title: TITLE, description: DESCRIPTION, path: PATH }),
   howToSchema({ name: TITLE, description: DESCRIPTION, path: PATH, steps: HOWTO_STEPS }),
-  breadcrumbSchema([
-    { name: "Inicio", path: "/" },
-    { name: "Guías", path: "/guias" },
-    { name: TITLE, path: PATH },
-  ]),
+  breadcrumbSchema(CRUMBS),
 ]
 
 export default async function VoluntariosGuidePage() {
@@ -62,6 +66,10 @@ export default async function VoluntariosGuidePage() {
 
         <article className="px-5 md:px-[46px] pt-[26px] md:pt-[56px] pb-16 md:pb-20">
           <div className="max-w-[680px] mx-auto">
+            <div className="mb-4">
+              <Breadcrumbs items={CRUMBS} />
+            </div>
+
             <div
               className="text-[10.5px] md:text-[12px] mb-3"
               style={{

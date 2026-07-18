@@ -4,8 +4,9 @@ import HomeNav from "@/components/HomeNav"
 import HomeFooter from "@/components/HomeFooter"
 import { CtaLink } from "@/components/CtaLink"
 import { FaqSection } from "@/components/FaqSection"
+import { Breadcrumbs } from "@/components/Breadcrumbs"
 import { getDictionary } from "@/lib/i18n"
-import { DEFAULT_OG_IMAGE } from "@/lib/seo"
+import { ogImageUrl } from "@/lib/seo"
 import { JsonLd } from "@/components/JsonLd"
 import { faqSchema, breadcrumbSchema } from "@/lib/structured-data"
 
@@ -13,13 +14,19 @@ const TITLE = "Humanitarian Aid Software"
 const OG_TITLE = "Humanitarian Aid Software — Araguaney"
 const DESCRIPTION =
   "Disaster relief donation software: intake, homogeneous boxes with QR codes, and an exportable manifest for any humanitarian aid scenario — earthquakes, floods, migration crises, and fires."
+const OG_IMAGE = ogImageUrl("Humanitarian aid software", "Humanitarian aid")
+
+const CRUMBS = [
+  { name: "Home", path: "/" },
+  { name: "Humanitarian aid", path: "/humanitarian-aid" },
+] as const
 
 export const metadata: Metadata = {
   title: TITLE,
   description: DESCRIPTION,
   alternates: { canonical: "/humanitarian-aid", languages: { es: "/ayuda-humanitaria" } },
-  openGraph: { title: OG_TITLE, description: DESCRIPTION, images: [DEFAULT_OG_IMAGE] },
-  twitter: { card: "summary_large_image", title: OG_TITLE, description: DESCRIPTION, images: [DEFAULT_OG_IMAGE] },
+  openGraph: { title: OG_TITLE, description: DESCRIPTION, images: [OG_IMAGE] },
+  twitter: { card: "summary_large_image", title: OG_TITLE, description: DESCRIPTION, images: [OG_IMAGE] },
 }
 
 const SCENARIOS = [
@@ -50,10 +57,7 @@ const FAQ = [
 
 const STRUCTURED_DATA = [
   faqSchema(FAQ),
-  breadcrumbSchema([
-    { name: "Home", path: "/" },
-    { name: "Humanitarian aid", path: "/humanitarian-aid" },
-  ]),
+  breadcrumbSchema(CRUMBS),
 ]
 
 export default async function HumanitarianAidPage() {
@@ -69,6 +73,9 @@ export default async function HumanitarianAidPage() {
       {/* ── Hero ── */}
       <div className="px-5 md:px-[46px] pt-[26px] md:pt-[64px] pb-10 md:pb-[56px]">
         <div className="max-w-[720px]">
+          <div className="mb-4">
+            <Breadcrumbs items={CRUMBS} />
+          </div>
           <div
             className="text-[10.5px] md:text-[12px] mb-3"
             style={{

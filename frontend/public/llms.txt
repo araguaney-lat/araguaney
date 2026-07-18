@@ -35,6 +35,18 @@ no solo un evento específico.
 
 - [Glosario de ayuda humanitaria](https://araguaney.lat/glosario): definiciones de los términos clave (caja homogénea, tarima, manifiesto, INN, UNSPSC, GS1, régimen de envío humanitario y más).
 
+## Qué se puede donar por categoría
+
+Reglas y disponibilidad en tiempo real por categoría:
+
+- [Medicamentos](https://araguaney.lat/necesidades/medicamentos): reglas OMS, vida útil ≥ 365 días, INN/lote/caducidad.
+- [Insumos médicos](https://araguaney.lat/necesidades/insumos-medicos): material de curación, protección y aplicación (catálogo IFRC/ICRC).
+- [Alimentos](https://araguaney.lat/necesidades/alimentos): no perecederos, vida útil ≥ 180 días, sellados.
+- [Agua](https://araguaney.lat/necesidades/agua): embotellada o en garrafón, sellada de fábrica.
+- [Higiene](https://araguaney.lat/necesidades/higiene): aseo personal nuevo y sin abrir.
+- [Herramientas](https://araguaney.lat/necesidades/herramientas): remoción de escombros y reconstrucción.
+- [Equipo de rescate](https://araguaney.lat/necesidades/equipo-de-rescate): equipo de emergencia (catálogo IOM).
+
 ## Estándares
 
 Araguaney se apoya en estándares abiertos y reconocidos internacionalmente:

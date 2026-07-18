@@ -4,7 +4,8 @@ import HomeNav from "@/components/HomeNav"
 import HomeFooter from "@/components/HomeFooter"
 import { CtaLink } from "@/components/CtaLink"
 import { getDictionary } from "@/lib/i18n"
-import { DEFAULT_OG_IMAGE } from "@/lib/seo"
+import { ogImageUrl } from "@/lib/seo"
+import { Breadcrumbs } from "@/components/Breadcrumbs"
 import { JsonLd } from "@/components/JsonLd"
 import { articleSchema, howToSchema, breadcrumbSchema } from "@/lib/structured-data"
 
@@ -12,6 +13,7 @@ const PATH = "/guias/como-preparar-carga-humanitaria-para-aduana"
 const TITLE = "Cómo preparar carga humanitaria para aduana"
 const DESCRIPTION =
   "Qué exige el régimen de envío humanitario, qué debe incluir un manifiesto/packing list, y los errores más comunes que atoran un envío en aduana."
+const OG_IMAGE = ogImageUrl(TITLE, "Guía")
 
 const HOWTO_STEPS = [
   {
@@ -28,22 +30,24 @@ const HOWTO_STEPS = [
   },
 ] as const
 
+const CRUMBS = [
+  { name: "Inicio", path: "/" },
+  { name: "Guías", path: "/guias" },
+  { name: TITLE, path: PATH },
+] as const
+
 const STRUCTURED_DATA = [
   articleSchema({ title: TITLE, description: DESCRIPTION, path: PATH }),
   howToSchema({ name: TITLE, description: DESCRIPTION, path: PATH, steps: HOWTO_STEPS }),
-  breadcrumbSchema([
-    { name: "Inicio", path: "/" },
-    { name: "Guías", path: "/guias" },
-    { name: TITLE, path: PATH },
-  ]),
+  breadcrumbSchema(CRUMBS),
 ]
 
 export const metadata: Metadata = {
   title: TITLE,
   description: DESCRIPTION,
   alternates: { canonical: PATH },
-  openGraph: { title: `${TITLE} — Araguaney`, description: DESCRIPTION, images: [DEFAULT_OG_IMAGE] },
-  twitter: { card: "summary_large_image", title: `${TITLE} — Araguaney`, description: DESCRIPTION, images: [DEFAULT_OG_IMAGE] },
+  openGraph: { title: `${TITLE} — Araguaney`, description: DESCRIPTION, images: [OG_IMAGE] },
+  twitter: { card: "summary_large_image", title: `${TITLE} — Araguaney`, description: DESCRIPTION, images: [OG_IMAGE] },
 }
 
 const ERRORES = [
@@ -65,6 +69,10 @@ export default async function AduanaGuidePage() {
 
       <article className="px-5 md:px-[46px] pt-[26px] md:pt-[56px] pb-16 md:pb-20">
         <div className="max-w-[680px] mx-auto">
+            <div className="mb-4">
+              <Breadcrumbs items={CRUMBS} />
+            </div>
+
           <div
             className="text-[10.5px] md:text-[12px] mb-3"
             style={{
