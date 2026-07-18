@@ -27,6 +27,13 @@ no solo un evento específico.
 - [Cómo organizar un centro de acopio](https://araguaney.lat/guias/como-organizar-un-centro-de-acopio): roles, registro por ítem, cajas homogéneas, manifiesto y reglas de rechazo.
 - [Qué se puede donar](https://araguaney.lat/guias/que-se-puede-donar): categorías aceptadas, reglas OMS para medicamentos y alimentos, y qué se rechaza.
 - [Cómo preparar carga humanitaria para aduana](https://araguaney.lat/guias/como-preparar-carga-humanitaria-para-aduana): qué exige el régimen de envío y qué debe incluir el manifiesto.
+- [Cómo registrar y organizar voluntarios](https://araguaney.lat/guias/como-registrar-voluntarios-en-un-centro-de-acopio): roles del equipo y por qué cada voluntario opera con su propia cuenta.
+- [Software gratis para gestionar donaciones en una ONG](https://araguaney.lat/guias/software-gratis-para-gestionar-donaciones-ong): qué buscar en un software gratuito de donaciones en especie.
+- [Sistema de inventario para damnificados](https://araguaney.lat/guias/sistema-de-inventario-para-damnificados): cómo montar un inventario de ayuda que sí sirva en una emergencia.
+
+## Glosario
+
+- [Glosario de ayuda humanitaria](https://araguaney.lat/glosario): definiciones de los términos clave (caja homogénea, tarima, manifiesto, INN, UNSPSC, GS1, régimen de envío humanitario y más).
 
 ## Estándares
 

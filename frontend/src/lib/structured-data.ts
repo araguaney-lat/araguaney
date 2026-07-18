@@ -105,6 +105,32 @@ export function faqSchema(faqs: readonly Faq[]): Schema {
   }
 }
 
+interface DefinedTerm {
+  term: string
+  definition: string
+}
+
+export function definedTermSetSchema(
+  name: string,
+  path: string,
+  terms: readonly DefinedTerm[],
+): Schema {
+  const url = absoluteUrl(path)
+  return {
+    "@context": "https://schema.org",
+    "@type": "DefinedTermSet",
+    name,
+    url,
+    inLanguage: "es",
+    hasDefinedTerm: terms.map((entry) => ({
+      "@type": "DefinedTerm",
+      name: entry.term,
+      description: entry.definition,
+      inDefinedTermSet: url,
+    })),
+  }
+}
+
 interface Crumb {
   name: string
   path: string

@@ -83,6 +83,30 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.6,
     },
     {
+      url: `${SITE_URL}/guias/como-registrar-voluntarios-en-un-centro-de-acopio`,
+      lastModified: now,
+      changeFrequency: "yearly",
+      priority: 0.6,
+    },
+    {
+      url: `${SITE_URL}/guias/software-gratis-para-gestionar-donaciones-ong`,
+      lastModified: now,
+      changeFrequency: "yearly",
+      priority: 0.6,
+    },
+    {
+      url: `${SITE_URL}/guias/sistema-de-inventario-para-damnificados`,
+      lastModified: now,
+      changeFrequency: "yearly",
+      priority: 0.6,
+    },
+    {
+      url: `${SITE_URL}/glosario`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.5,
+    },
+    {
       url: `${SITE_URL}/contacto`,
       lastModified: now,
       changeFrequency: "monthly",

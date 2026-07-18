@@ -36,6 +36,21 @@ const GUIDES = [
     title: "Cómo preparar carga para aduana",
     desc: "Qué exige el régimen de envío humanitario, qué debe incluir un manifiesto/packing list y los errores más comunes que atoran un envío.",
   },
+  {
+    href: "/guias/como-registrar-voluntarios-en-un-centro-de-acopio",
+    title: "Cómo registrar y organizar voluntarios",
+    desc: "Cómo estructurar los roles del equipo — quién recibe, quién empaca y quién coordina — para no perder trazabilidad desde el primer día.",
+  },
+  {
+    href: "/guias/software-gratis-para-gestionar-donaciones-ong",
+    title: "Software gratis para gestionar donaciones",
+    desc: "Qué buscar en un software gratuito para gestionar donaciones en especie: registro por ítem, trazabilidad, manifiesto y agregación entre centros.",
+  },
+  {
+    href: "/guias/sistema-de-inventario-para-damnificados",
+    title: "Sistema de inventario para damnificados",
+    desc: "Cómo montar un inventario de ayuda que sí sirva en una emergencia: registro por ítem, control de caducidad y visibilidad de qué falta.",
+  },
 ] as const
 
 const STRUCTURED_DATA: Schema[] = [
@@ -117,6 +132,13 @@ export default async function GuiasIndexPage() {
                 </Link>
               ))}
             </div>
+
+            <p className="text-[14px] mt-8" style={{ color: "#6E6557" }}>
+              ¿Dudas con un término?{" "}
+              <Link href="/glosario" style={{ color: "#1F5E8C", fontWeight: 600 }}>
+                Consulta el glosario de ayuda humanitaria →
+              </Link>
+            </p>
           </div>
         </div>
 

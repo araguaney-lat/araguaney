@@ -21,10 +21,10 @@ pie title Tareas completadas (298 tareas)
 | 8 | [Mensajería entre usuarios](phase-08-messaging.md) | 22 | 0 | ✅ 100% |
 | 9 | [Reportes de campaña](phase-09-reports.md) | 8 | 0 | ✅ 100% |
 | 10 | [Endurecimiento de seguridad (post-auditoría)](phase-10-security-hardening.md) | 22 | 0 | ✅ 100% |
-| 11 | [SEO y reposicionamiento genérico](phase-11-seo-positioning.md) | 23 | 1 | ✅ 96% |
+| 11 | [SEO y reposicionamiento genérico](phase-11-seo-positioning.md) | 24 | 1 | ✅ 96% |
 | 12 | [Optimización y rendimiento](phase-12-optimization.md) | 29 | 0 | ✅ 100% |
 | 13 | [Compliance y legal](phase-13-compliance-legal.md) | 8 | 10 | 🟡 44% |
-| **Total** | | **272** | **27** | **🟡 91%** |
+| **Total** | | **273** | **27** | **🟡 91%** |
 
 > Envs opcionales (Sentry, Slack, Google Safe Browsing, Encryption Key) se pueden agregar en cualquier momento sin cambios de código.
 
