@@ -47,8 +47,4 @@ jobs:
         run: pip install pip-audit==2.7.3
 
       - name: Audit for known CVEs
-        # TODO(backend): remove --ignore-vuln once weasyprint is bumped 68.1 -> 69.0.
-        # PYSEC-2026-3412 (CSS injection via presentational hints) affects weasyprint
-        # <= 68.1; 69.0 is unaffected. Suppressed here temporarily so unrelated PRs
-        # aren't blocked; the real fix is a dedicated backend dependency-bump PR.
-        run: pip-audit -r requirements.txt --ignore-vuln PYSEC-2026-3412
+        run: pip-audit -r requirements.txt
