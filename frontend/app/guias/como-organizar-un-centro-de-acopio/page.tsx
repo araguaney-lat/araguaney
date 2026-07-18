@@ -4,7 +4,15 @@ import HomeNav from "@/components/HomeNav"
 import HomeFooter from "@/components/HomeFooter"
 import { getDictionary } from "@/lib/i18n"
 import { DEFAULT_OG_IMAGE } from "@/lib/seo"
+import { JsonLd } from "@/components/JsonLd"
+import {
+  articleSchema,
+  howToSchema,
+  faqSchema,
+  breadcrumbSchema,
+} from "@/lib/structured-data"
 
+const PATH = "/guias/como-organizar-un-centro-de-acopio"
 const TITLE = "Cómo organizar un centro de acopio"
 const DESCRIPTION =
   "Guía práctica para organizar un centro de acopio desde cero: roles, registro de donaciones, cajas homogéneas, manifiesto y reglas de rechazo."
@@ -12,7 +20,7 @@ const DESCRIPTION =
 export const metadata: Metadata = {
   title: TITLE,
   description: DESCRIPTION,
-  alternates: { canonical: "/guias/como-organizar-un-centro-de-acopio" },
+  alternates: { canonical: PATH },
   openGraph: { title: `${TITLE} — Araguaney`, description: DESCRIPTION, images: [DEFAULT_OG_IMAGE] },
   twitter: { card: "summary_large_image", title: `${TITLE} — Araguaney`, description: DESCRIPTION, images: [DEFAULT_OG_IMAGE] },
 }
@@ -36,26 +44,46 @@ const FAQ = [
   },
 ]
 
-const FAQ_STRUCTURED_DATA = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  mainEntity: FAQ.map((f) => ({
-    "@type": "Question",
-    name: f.q,
-    acceptedAnswer: { "@type": "Answer", text: f.a },
-  })),
-}
+const HOWTO_STEPS = [
+  {
+    name: "Define roles antes de recibir la primera donación",
+    text: "Con 2-3 voluntarios y un coordinador es suficiente para empezar: alguien recibe y registra, alguien empaca y sella cajas, y el coordinador consolida tarimas y gestiona envíos.",
+  },
+  {
+    name: "Registra cada ítem, no solo bultos",
+    text: "Registra cada donación con su categoría, lote y fecha de caducidad, en vez de contar cajas o bolsas genéricas. Es lo que permite saber después qué hay disponible exactamente.",
+  },
+  {
+    name: "Empaca en cajas homogéneas",
+    text: "Cada caja contiene un solo tipo de producto, un solo lote y una sola caducidad — sin mezclas — y recibe un código QR y una etiqueta al sellarse.",
+  },
+  {
+    name: "Consolida en tarimas y genera el manifiesto",
+    text: "Las cajas selladas se agrupan en tarimas mixtas. Cuando el envío está listo, se genera un manifiesto exportable (packing list) listo para el trámite aduanal.",
+  },
+  {
+    name: "Conoce las reglas de rechazo",
+    text: "Los medicamentos con menos de 365 días de vida útil restante se rechazan (lineamientos de la OMS), igual que las sustancias controladas. Los alimentos requieren al menos 180 días.",
+  },
+] as const
+
+const STRUCTURED_DATA = [
+  articleSchema({ title: TITLE, description: DESCRIPTION, path: PATH }),
+  howToSchema({ name: TITLE, description: DESCRIPTION, path: PATH, steps: HOWTO_STEPS }),
+  faqSchema(FAQ),
+  breadcrumbSchema([
+    { name: "Inicio", path: "/" },
+    { name: "Guías", path: "/guias" },
+    { name: TITLE, path: PATH },
+  ]),
+]
 
 export default async function ComoOrganizarGuidePage() {
   const dict = await getDictionary("es")
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        // eslint-disable-next-line react/no-danger
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(FAQ_STRUCTURED_DATA) }}
-      />
+      <JsonLd data={STRUCTURED_DATA} />
       <div style={{ background: "#FBF7EE", minHeight: "100vh", display: "flex", flexDirection: "column" }}>
         <HomeNav dict={dict.nav} locale="es" localeLinks={{}} />
         <div className="h-[56px] md:hidden" />

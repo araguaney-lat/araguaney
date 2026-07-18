@@ -5,6 +5,8 @@ import HomeNav from "@/components/HomeNav"
 import HomeFooter from "@/components/HomeFooter"
 import { getDictionary } from "@/lib/i18n"
 import { DEFAULT_OG_IMAGE } from "@/lib/seo"
+import { JsonLd } from "@/components/JsonLd"
+import { breadcrumbSchema, eventSchema, type Schema } from "@/lib/structured-data"
 import type { PublicCampaign } from "@/types"
 
 export const revalidate = 300
@@ -86,8 +88,34 @@ export default async function EventoPage({
   // Spanish campaign content when the visitor's locale cookie is "en".
   const dict = await getDictionary("es")
 
+  const path = `/eventos/${campaign.slug}`
+  const description =
+    campaign.description ??
+    `Inventario de ayuda humanitaria disponible para ${campaign.name}, actualizado en tiempo real.`
+  const structuredData: Schema[] = [
+    breadcrumbSchema([
+      { name: "Inicio", path: "/" },
+      { name: campaign.name, path },
+    ]),
+  ]
+  // Event needs a startDate to be valid — only emit it for dated campaigns.
+  if (campaign.start_date) {
+    structuredData.push(
+      eventSchema({
+        name: campaign.name,
+        description,
+        path,
+        startDate: campaign.start_date,
+        endDate: campaign.end_date,
+        destinationCountry: campaign.destination_country,
+      })
+    )
+  }
+
   return (
-    <div style={{ background: "#FBF7EE", minHeight: "100vh", display: "flex", flexDirection: "column" }}>
+    <>
+      <JsonLd data={structuredData} />
+      <div style={{ background: "#FBF7EE", minHeight: "100vh", display: "flex", flexDirection: "column" }}>
       <HomeNav dict={dict.nav} locale="es" localeLinks={{}} />
       <div className="h-[56px] md:hidden" />
 
@@ -205,6 +233,7 @@ export default async function EventoPage({
       </div>
 
       <HomeFooter dict={dict.footer} />
-    </div>
+      </div>
+    </>
   )
 }

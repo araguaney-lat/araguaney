@@ -5,7 +5,11 @@ import HomeNav from "@/components/HomeNav"
 import HomeFooter from "@/components/HomeFooter"
 import { CtaLink } from "@/components/CtaLink"
 import { getLocale, getDictionary } from "@/lib/i18n"
-import { SITE_URL, DEFAULT_OG_IMAGE } from "@/lib/seo"
+import { JsonLd } from "@/components/JsonLd"
+import {
+  SOFTWARE_APPLICATION_SCHEMA,
+  ORGANIZATION_SCHEMA,
+} from "@/lib/structured-data"
 
 const LOGO =
   "https://res.cloudinary.com/dtvdqlxtd/image/upload/v1782794310/image_degkq9.png"
@@ -19,37 +23,17 @@ export async function generateMetadata(): Promise<Metadata> {
     title: home_title,
     description: home_description,
     alternates: { canonical: "/" },
-    openGraph: { title: home_title, description: home_description, images: [DEFAULT_OG_IMAGE] },
+    // Images omitted so the file-convention card (app/opengraph-image.tsx) is used.
+    openGraph: { title: home_title, description: home_description },
     twitter: {
       card: "summary_large_image",
       title: home_title,
       description: home_description,
-      images: [DEFAULT_OG_IMAGE],
     },
   }
 }
 
-const STRUCTURED_DATA = [
-  {
-    "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    name: "Araguaney",
-    applicationCategory: "BusinessApplication",
-    operatingSystem: "Web",
-    description:
-      "In-kind donation management for aid centers: item-level intake, homogeneous boxes with QR codes, pallets and shipments with an exportable manifest.",
-    url: SITE_URL,
-    offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-  },
-  {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    name: "Araguaney",
-    url: SITE_URL,
-    description:
-      "The common standard for donation center coordination and humanitarian aid logistics.",
-  },
-]
+const STRUCTURED_DATA = [SOFTWARE_APPLICATION_SCHEMA, ORGANIZATION_SCHEMA]
 
 export default async function HomePage() {
   const locale = await getLocale()
@@ -57,11 +41,7 @@ export default async function HomePage() {
 
   return (
     <>
-    <script
-      type="application/ld+json"
-      // eslint-disable-next-line react/no-danger
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(STRUCTURED_DATA) }}
-    />
+    <JsonLd data={STRUCTURED_DATA} />
     <div
       style={{
         background: "#FBF7EE",

@@ -4,15 +4,27 @@ import HomeNav from "@/components/HomeNav"
 import HomeFooter from "@/components/HomeFooter"
 import { getDictionary } from "@/lib/i18n"
 import { DEFAULT_OG_IMAGE } from "@/lib/seo"
+import { JsonLd } from "@/components/JsonLd"
+import { articleSchema, breadcrumbSchema } from "@/lib/structured-data"
 
+const PATH = "/guias/que-se-puede-donar"
 const TITLE = "Qué se puede donar en un centro de acopio"
 const DESCRIPTION =
   "Categorías aceptadas en un centro de acopio, reglas de la OMS para medicamentos y alimentos, y qué donaciones se rechazan y por qué."
 
+const STRUCTURED_DATA = [
+  articleSchema({ title: TITLE, description: DESCRIPTION, path: PATH }),
+  breadcrumbSchema([
+    { name: "Inicio", path: "/" },
+    { name: "Guías", path: "/guias" },
+    { name: TITLE, path: PATH },
+  ]),
+]
+
 export const metadata: Metadata = {
   title: TITLE,
   description: DESCRIPTION,
-  alternates: { canonical: "/guias/que-se-puede-donar" },
+  alternates: { canonical: PATH },
   openGraph: { title: `${TITLE} — Araguaney`, description: DESCRIPTION, images: [DEFAULT_OG_IMAGE] },
   twitter: { card: "summary_large_image", title: `${TITLE} — Araguaney`, description: DESCRIPTION, images: [DEFAULT_OG_IMAGE] },
 }
@@ -38,7 +50,9 @@ export default async function QueSePuedeDonarGuidePage() {
   const dict = await getDictionary("es")
 
   return (
-    <div style={{ background: "#FBF7EE", minHeight: "100vh", display: "flex", flexDirection: "column" }}>
+    <>
+      <JsonLd data={STRUCTURED_DATA} />
+      <div style={{ background: "#FBF7EE", minHeight: "100vh", display: "flex", flexDirection: "column" }}>
       <HomeNav dict={dict.nav} locale="es" localeLinks={{}} />
       <div className="h-[56px] md:hidden" />
 
@@ -142,7 +156,8 @@ export default async function QueSePuedeDonarGuidePage() {
       </article>
 
       <HomeFooter dict={dict.footer} />
-    </div>
+      </div>
+    </>
   )
 }
 

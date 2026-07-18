@@ -16,8 +16,17 @@ no solo un evento específico.
 ## Páginas públicas
 
 - [Inicio](https://araguaney.lat/): presentación del producto, cómo funciona y estándares que respalda.
+- [Qué es un centro de acopio](https://araguaney.lat/centro-de-acopio): el estándar completo de registro, empaque y envío.
+- [Ayuda humanitaria](https://araguaney.lat/ayuda-humanitaria): cómo funciona Araguaney para cualquier emergencia.
 - [Qué falta](https://araguaney.lat/necesidades): inventario disponible en los centros de acopio activos, actualizado cada 5 minutos.
 - [Contacto](https://araguaney.lat/contacto): sumar un centro de acopio a la coordinación nacional.
+
+## Guías
+
+- [Guías](https://araguaney.lat/guias): índice de guías prácticas para operar un centro de acopio.
+- [Cómo organizar un centro de acopio](https://araguaney.lat/guias/como-organizar-un-centro-de-acopio): roles, registro por ítem, cajas homogéneas, manifiesto y reglas de rechazo.
+- [Qué se puede donar](https://araguaney.lat/guias/que-se-puede-donar): categorías aceptadas, reglas OMS para medicamentos y alimentos, y qué se rechaza.
+- [Cómo preparar carga humanitaria para aduana](https://araguaney.lat/guias/como-preparar-carga-humanitaria-para-aduana): qué exige el régimen de envío y qué debe incluir el manifiesto.
 
 ## Estándares
 
@@ -25,3 +34,7 @@ Araguaney se apoya en estándares abiertos y reconocidos internacionalmente:
 WHO (donación de medicamentos), IFRC/ICRC (catálogo de materiales), IOM
 (Emergency Relief Items Catalogue), UNSPSC (taxonomía de categorías) y GS1
 (códigos de barras / GTIN).
+
+## Más
+
+- [Versión extendida para IA](https://araguaney.lat/llms-full.txt): explicación completa del modelo de dominio y las reglas de negocio.

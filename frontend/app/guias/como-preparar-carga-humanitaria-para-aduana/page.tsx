@@ -5,15 +5,43 @@ import HomeFooter from "@/components/HomeFooter"
 import { CtaLink } from "@/components/CtaLink"
 import { getDictionary } from "@/lib/i18n"
 import { DEFAULT_OG_IMAGE } from "@/lib/seo"
+import { JsonLd } from "@/components/JsonLd"
+import { articleSchema, howToSchema, breadcrumbSchema } from "@/lib/structured-data"
 
+const PATH = "/guias/como-preparar-carga-humanitaria-para-aduana"
 const TITLE = "Cómo preparar carga humanitaria para aduana"
 const DESCRIPTION =
   "Qué exige el régimen de envío humanitario, qué debe incluir un manifiesto/packing list, y los errores más comunes que atoran un envío en aduana."
 
+const HOWTO_STEPS = [
+  {
+    name: "Empaca cada caja como homogénea",
+    text: "Cada caja debe contener un solo tipo de producto, un solo lote y una sola caducidad. Sin ese orden, la aduana no puede verificar el contenido y el envío se atora.",
+  },
+  {
+    name: "Clasifica con un código reconocido",
+    text: "Asigna a cada caja una clasificación reconocida (IFRC/ICRC o UNSPSC) para que la autoridad aduanal entienda rápido qué se está enviando.",
+  },
+  {
+    name: "Genera el manifiesto caja por caja",
+    text: "El packing list debe listar, por cada caja: código de material, descripción, cantidad, unidad y peso; y a nivel de envío, las tarimas y el peso total consolidado.",
+  },
+] as const
+
+const STRUCTURED_DATA = [
+  articleSchema({ title: TITLE, description: DESCRIPTION, path: PATH }),
+  howToSchema({ name: TITLE, description: DESCRIPTION, path: PATH, steps: HOWTO_STEPS }),
+  breadcrumbSchema([
+    { name: "Inicio", path: "/" },
+    { name: "Guías", path: "/guias" },
+    { name: TITLE, path: PATH },
+  ]),
+]
+
 export const metadata: Metadata = {
   title: TITLE,
   description: DESCRIPTION,
-  alternates: { canonical: "/guias/como-preparar-carga-humanitaria-para-aduana" },
+  alternates: { canonical: PATH },
   openGraph: { title: `${TITLE} — Araguaney`, description: DESCRIPTION, images: [DEFAULT_OG_IMAGE] },
   twitter: { card: "summary_large_image", title: `${TITLE} — Araguaney`, description: DESCRIPTION, images: [DEFAULT_OG_IMAGE] },
 }
@@ -29,7 +57,9 @@ export default async function AduanaGuidePage() {
   const dict = await getDictionary("es")
 
   return (
-    <div style={{ background: "#FBF7EE", minHeight: "100vh", display: "flex", flexDirection: "column" }}>
+    <>
+      <JsonLd data={STRUCTURED_DATA} />
+      <div style={{ background: "#FBF7EE", minHeight: "100vh", display: "flex", flexDirection: "column" }}>
       <HomeNav dict={dict.nav} locale="es" localeLinks={{}} />
       <div className="h-[56px] md:hidden" />
 
@@ -131,7 +161,8 @@ export default async function AduanaGuidePage() {
       </article>
 
       <HomeFooter dict={dict.footer} />
-    </div>
+      </div>
+    </>
   )
 }
 
