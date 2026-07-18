@@ -3,7 +3,7 @@ import { Hanken_Grotesk, Source_Serif_4 } from "next/font/google"
 import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistration"
 import { GoogleAnalytics } from "@/components/GoogleAnalytics"
 import { getLocale, getDictionary } from "@/lib/i18n"
-import { SITE_URL, DEFAULT_OG_IMAGE } from "@/lib/seo"
+import { SITE_URL } from "@/lib/seo"
 import "./globals.css"
 
 const hanken = Hanken_Grotesk({
@@ -36,10 +36,13 @@ export async function generateMetadata(): Promise<Metadata> {
       icon: "/icons/icon.svg",
       apple: "/icons/icon.svg",
     },
+    // Note: openGraph/twitter images intentionally omitted here so the
+    // file-convention card (app/opengraph-image.tsx, app/twitter-image.tsx)
+    // is used as the site-wide default. Pages that set their own
+    // openGraph.images (guides, eventos) override that card for their route.
     openGraph: {
       title: site_title,
       description: site_description,
-      images: [{ url: DEFAULT_OG_IMAGE, width: 1200, height: 630 }],
       type: "website",
       locale: locale === "en" ? "en_US" : "es_MX",
     },
@@ -47,7 +50,6 @@ export async function generateMetadata(): Promise<Metadata> {
       card: "summary_large_image",
       title: site_title,
       description: site_description,
-      images: [DEFAULT_OG_IMAGE],
     },
     verification: process.env.GOOGLE_SITE_VERIFICATION
       ? { google: process.env.GOOGLE_SITE_VERIFICATION }

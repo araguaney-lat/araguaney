@@ -1,0 +1,75 @@
+# Araguaney — versión extendida
+
+> Software para coordinar centros de acopio y preparar envíos de ayuda
+> humanitaria bajo un estándar común. Registra donaciones en especie por ítem,
+> las empaca en cajas homogéneas con QR, las consolida en tarimas y envíos con
+> manifiesto exportable, y agrega el stock de todos los centros en un panel
+> nacional en tiempo real.
+
+## Qué problema resuelve
+
+Cuando ocurre un desastre (sismo, inundación, incendio, crisis migratoria),
+decenas de centros de acopio operan de forma independiente, cada uno con su
+propio método. Eso impide (a) saber qué hay disponible a nivel nacional y (b)
+preparar carga que cumpla el "régimen" de envío humanitario: cajas homogéneas
+más manifiesto detallado. Sin ese orden, los envíos se atoran en aduana.
+
+Araguaney no es "otro inventario más": es el estándar común más la agregación
+nacional. Un mismo lenguaje para todos los centros y un `GROUP BY` que suma el
+stock de todos.
+
+## Modelo de dominio
+
+- **Centro**: cada centro de acopio es un tenant. Su inventario está aislado del
+  de los demás; el panel nacional agrega sobre todos.
+- **ProductType (SKU)**: el tipo de producto, discriminado por atributos. Por
+  ejemplo, ibuprofeno 500 mg y 900 mg son SKU distintos. Categorías: medicamentos,
+  insumos médicos, alimentos, agua, higiene, herramientas, equipo de rescate, otros.
+- **Intake (recepción)**: registro de una donación entrante. Sin datos personales
+  del donante (solo un campo de texto libre opcional, sin PII).
+- **Box (caja homogénea)**: contiene exactamente un tipo de producto, un solo lote
+  y una sola caducidad. Tiene un código QR propio y etiqueta imprimible. Si llega
+  una mezcla, se divide en varias cajas.
+- **Pallet (tarima)**: agrupa cajas selladas. Puede ser mixta (distintos productos).
+  Tiene QR propio.
+- **Shipment (envío)**: agrupa tarimas y genera el manifiesto/packing list exportable.
+- **Eventos de auditoría**: cada cambio de estado de caja, tarima o envío queda
+  registrado (estado anterior → nuevo, usuario, fecha).
+
+## Reglas de negocio
+
+- **Caja homogénea**: una caja = un product_type + un lote + una caducidad. Invariante
+  garantizada por el sistema.
+- **Medicamentos** (lineamientos OMS para donación de medicamentos): vida útil
+  restante ≥ 365 días al capturar; obligatorios INN, lote, forma, concentración y
+  caducidad para sellar; los medicamentos controlados se bloquean en recepción.
+- **Alimentos**: vida útil mínima ≥ 180 días (configurable por producto).
+- **Máquinas de estado**:
+  - Caja: DRAFT → SEALED → SHIPPED (o REJECTED desde DRAFT). Solo cajas SEALED entran a una tarima.
+  - Tarima: OPEN → CLOSED → SHIPPED. Solo tarimas CLOSED entran a un envío.
+  - Envío: OPEN → CLOSED → SHIPPED. Al marcarse SHIPPED se congela todo.
+
+## Estándares y catálogos de referencia
+
+- **WHO / OMS** — Guidelines for Medicine Donations: reglas de donación de medicamentos.
+- **IFRC/ICRC** — catálogo de materiales no alimentarios con especificaciones y código de material.
+- **IOM** — Emergency Relief Items Catalogue: artículos de emergencia alineados a IFRC/ICRC.
+- **UNSPSC (UNDP)** — taxonomía de categorías de producto, en español.
+- **GS1 / GTIN** — validación opcional de códigos de barras.
+- **WHO Model List of Essential Medicines + ATC** y **RxNorm** — normalización de nombres de medicamentos (INN).
+
+## Privacidad
+
+Araguaney no gestiona dinero ni beneficiarios finales, y no registra datos
+personales de donantes ni beneficiarios. Solo inventario, trazable de la caja
+al envío. Esto reduce la superficie de datos sensibles y las obligaciones de
+protección de datos personales.
+
+## Enlaces
+
+- Inicio: https://araguaney.lat/
+- Qué es un centro de acopio: https://araguaney.lat/centro-de-acopio
+- Ayuda humanitaria: https://araguaney.lat/ayuda-humanitaria
+- Qué falta (inventario en tiempo real): https://araguaney.lat/necesidades
+- Guías: https://araguaney.lat/guias
+- Contacto: https://araguaney.lat/contacto
