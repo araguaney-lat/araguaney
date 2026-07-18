@@ -120,6 +120,16 @@ No quemar el dominio en "ayuda Venezuela". Venezuela = entrada de tráfico, no i
 | 21 | Analytics de tráfico | GA4 o alternativa privacy-friendly (Plausible/Umami — alineado con "sin PII"). Medir conversión visita → registro. | 🟡 | ✅ Done (decisión del usuario: GA4 en vez de la opción privacy-first recomendada) — `src/components/GoogleAnalytics.tsx` carga `gtag.js` solo si `NEXT_PUBLIC_GA_MEASUREMENT_ID` está configurado, y **nunca** en `/dashboard` o `/studio` (evita mezclar uso interno autenticado con el funnel de marketing). `anonymize_ip: true` activado. Como las cuentas se crean por invitación de admin (CLAUDE.md §6, no hay registro público), se instrumentó un evento personalizado `cta_click` vía `src/components/CtaLink.tsx` en los CTAs principales de home, los 3 pilares y la guía de aduana — aproxima "intención de entrar" en vez de un signup real. Propiedad GA4 creada, `NEXT_PUBLIC_GA_MEASUREMENT_ID` configurado en Vercel — activo. |
 | 22 | Seguimiento de posiciones (rank tracking) | Monitorear ranking de los head terms (Cluster A) y diferenciadores (Cluster B) en ES y EN. Revisar mensual. | 🟢 | ✅ Done (documentado, sin herramienta paga por decisión del usuario) — proceso mensual: Search Console → Rendimiento → filtrar por cada keyword de Cluster A/B (ES y EN) → registrar posición promedio, impresiones y clics en una hoja de cálculo con una fila por mes. Requiere la tarea 20 completa primero (necesita datos de Search Console). |
 
+### Grupo E — Endurecimiento de visibilidad (rich results + IA)
+
+> Segunda pasada sobre SEO técnico/contenido, aditiva sobre Grupos B y C ya cerrados.
+> Objetivo: maximizar rich snippets en Google y la representación del producto en
+> asistentes de IA (ChatGPT, Claude, Perplexity).
+
+| # | Tarea | Descripción | Prioridad | Estado |
+|---|-------|-------------|-----------|--------|
+| 23 | Rich results + visibilidad en IA | Ampliar structured data, unificar OG, enriquecer `llms.txt` y declarar crawlers de IA. | 🟡 | ✅ Done — (a) `src/lib/structured-data.ts` centraliza builders `Article`/`HowTo`/`FAQPage`/`Event`/`BreadcrumbList`/`ItemList` + `SoftwareApplication`/`Organization`, renderizados vía `<JsonLd>` (`src/components/JsonLd.tsx`); (b) las 3 guías ahora emiten `Article`+`HowTo`+`BreadcrumbList` (antes solo 1 tenía `FAQPage`, que se conserva) — extiende task 12; (c) `/eventos/[slug]` emite `Event` (guardado por `start_date`, con `location`/`endDate` opcionales) + `BreadcrumbList` — extiende task 18; (d) nueva página hub `/guias` con `ItemList`+`BreadcrumbList`, agregada al `sitemap.ts` — refuerza task 19; (e) OG social card branded via `next/og` (`app/opengraph-image.tsx` + `app/twitter-image.tsx`) como default por convención de archivo; layout raíz y home omiten `openGraph.images` para usarla — extiende task 7; (f) `llms.txt` enriquecido (guías, `/centro-de-acopio`, `/ayuda-humanitaria`) + nuevo `public/llms-full.txt` con modelo de dominio y reglas de negocio — extiende task 14b; (g) `robots.ts` declara crawlers de IA (GPTBot, OAI-SearchBot, ClaudeBot, PerplexityBot, Google-Extended, Applebot-Extended, CCBot, etc.) + `host` — extiende task 9. Build de producción y `tsc` verdes; card OG, robots.txt, sitemap y JSON-LD verificados contra el server de producción local. |
+
 ---
 
 ## Dependencias y notas
