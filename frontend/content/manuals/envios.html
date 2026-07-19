@@ -1,0 +1,146 @@
+<div class="doc">
+  <div class="wrap">
+
+    <header>
+      <span class="eyebrow">Módulo · Envíos</span>
+      <h1>Consolidar un envío y generar el manifiesto</h1>
+      <p class="lede">Los pasos 4 y 5, el final del camino. Un envío agrupa tarimas cerradas, produce el manifiesto que la aduana necesita, y al despacharse congela todo su contenido para conservar la trazabilidad.</p>
+      <p class="crumbs">Panel &rsaquo; <b>Envíos</b> &nbsp;·&nbsp; /dashboard/shipments</p>
+    </header>
+
+    <section>
+      <div class="intro-card">
+        <p><b>Qué hace.</b> Reúne tarimas cerradas en un envío con destino y transportista, genera el <b>manifiesto</b> (packing list) exportable, y marca el envío como despachado.</p>
+        <p><b>Por qué es el paso decisivo.</b> Sin cajas homogéneas y un manifiesto detallado, la carga se atora en aduana. Aquí es donde todo el orden previo se convierte en un documento que deja pasar el envío.</p>
+      </div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <span class="eyebrow">El estado del envío</span>
+        <h2>Abierto, cerrado, despachado</h2>
+        <p class="sect-note">Se llena mientras está <span class="hl">OPEN</span>; se fija al pasar a <span class="hl">CLOSED</span>; y al despacharlo (<span class="hl">SHIPPED</span>) arrastra a sus tarimas y cajas al mismo estado.</p>
+      </div>
+      <div class="machine">
+        <p class="desc">Cada transición queda registrada. Despachar es definitivo: congela el contenido completo del envío.</p>
+        <div class="flow">
+          <span class="pill">OPEN</span><span class="arrow">→</span>
+          <span class="pill blue">CLOSED</span><span class="arrow">→</span>
+          <span class="pill green">SHIPPED</span>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <span class="eyebrow">Paso a paso</span>
+        <h2>Del envío al manifiesto</h2>
+      </div>
+      <div class="steps">
+        <div class="step"><span class="n">1</span><div>
+          <h3>Crea el envío</h3>
+          <p>En <b>Envíos</b>, crea uno nuevo con su destino, transportista y referencia. Nace abierto (<b>OPEN</b>).</p>
+        </div></div>
+        <div class="step"><span class="n">2</span><div>
+          <h3>Agrega tarimas cerradas</h3>
+          <p>Suma al envío las tarimas que ya cerraste. Solo entran tarimas <b>cerradas</b> que no estén ya en otro envío.</p>
+          <span class="hint">¿Una tarima no entra? Revisa que esté cerrada y que no pertenezca ya a otro envío.</span>
+        </div></div>
+        <div class="step"><span class="n">3</span><div>
+          <h3>Cierra el envío</h3>
+          <p>Cuando esté completo, ciérralo. Pasa a <b>CLOSED</b>. No se puede cerrar un envío sin tarimas.</p>
+        </div></div>
+        <div class="step"><span class="n">4</span><div>
+          <h3>Genera el manifiesto</h3>
+          <p>Descarga el manifiesto en PDF (packing list) o en Excel con el formato IFRC. Se arma solo a partir de las tarimas y cajas del envío, sin captura extra. La generación corre en segundo plano.</p>
+        </div></div>
+        <div class="step"><span class="n">5</span><div>
+          <h3>Despacha</h3>
+          <p>Marca el envío como <b>despachado</b>. En ese momento todas sus tarimas y cajas pasan a enviadas y el contenido queda congelado. La carga sale con su manifiesto.</p>
+        </div></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <span class="eyebrow">El documento</span>
+        <h2>Qué incluye el manifiesto</h2>
+        <p class="sect-note">Se genera automáticamente porque cada caja ya se registró y selló como homogénea. No hay que recapturar nada.</p>
+      </div>
+      <div class="manifest">
+        <h3>Packing list, caja por caja</h3>
+        <p class="sub">Por cada caja y a nivel de envío consolidado.</p>
+        <div class="mgrid">
+          <div class="mitem">Código de material o clasificación (IFRC/ICRC, UNSPSC)</div>
+          <div class="mitem">Descripción del producto</div>
+          <div class="mitem">Cantidad y unidad</div>
+          <div class="mitem">Lote y caducidad</div>
+          <div class="mitem">Peso por caja</div>
+          <div class="mitem">Tarimas que agrupan las cajas y peso total</div>
+        </div>
+        <div class="formats">
+          <div class="fmt"><b>PDF</b><span>· packing list listo para imprimir</span></div>
+          <div class="fmt"><b>Excel</b><span>· formato IFRC</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <span class="eyebrow">Diagnóstico</span>
+        <h2>Por qué algo no se deja hacer</h2>
+        <p class="sect-note">Los avisos exactos de Araguaney en cada punto del proceso.</p>
+      </div>
+      <div class="reason"><span class="x">✕</span><div>
+        <h3>La tarima no está cerrada</h3>
+        <p>Al envío solo entran tarimas cerradas. Cierra la tarima primero.</p>
+        <span class="msg">Only CLOSED pallets can be added to a shipment</span>
+      </div></div>
+      <div class="reason"><span class="x">✕</span><div>
+        <h3>La tarima ya está en otro envío</h3>
+        <p>Una tarima pertenece a un solo envío. Quítala del otro si de verdad debe cambiar.</p>
+        <span class="msg">Pallet is already assigned to a shipment</span>
+      </div></div>
+      <div class="reason"><span class="x">✕</span><div>
+        <h3>Envío sin tarimas</h3>
+        <p>No se puede cerrar un envío vacío. Agrega al menos una tarima.</p>
+        <span class="msg">Cannot close a shipment with no pallets</span>
+      </div></div>
+      <div class="reason"><span class="x">✕</span><div>
+        <h3>Despachar antes de cerrar</h3>
+        <p>Solo un envío cerrado se puede despachar. Ciérralo primero.</p>
+        <span class="msg">Shipment is 'OPEN'; only CLOSED shipments can be shipped</span>
+      </div></div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <span class="eyebrow">Al despachar</span>
+        <h2>El congelamiento</h2>
+      </div>
+      <div class="freeze">
+        <span class="ic">❄</span>
+        <div>
+          <h3>Todo queda fijo</h3>
+          <p>Cuando marcas el envío como despachado, sus tarimas pasan a enviadas y cada caja dentro también. A partir de ahí nada se edita: el manifiesto refleja exactamente lo que salió, y esa foto se conserva para la trazabilidad.</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <span class="eyebrow">Permisos</span>
+        <h2>Quién consolida envíos</h2>
+      </div>
+      <div class="perm">
+        <p>Crear y cerrar envíos y generar el manifiesto es tarea del <code>coordinator</code> en su centro y del <code>national_admin</code> en cualquiera. La generación del manifiesto está limitada por seguridad (2 por minuto), así que puede tardar unos segundos en picos.</p>
+      </div>
+    </section>
+
+    <div class="foot">
+      <span>Araguaney · Manual del módulo Envíos</span>
+      <span>← Antes: Tarimas &nbsp;·&nbsp; Fin del flujo principal</span>
+    </div>
+
+  </div>
+</div>

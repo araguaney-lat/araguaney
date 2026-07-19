@@ -1,0 +1,176 @@
+<div class="doc">
+  <div class="wrap">
+
+    <header>
+      <span class="eyebrow">Manual · Cómo funciona Araguaney</span>
+      <h1>Del acopio al envío, en orden</h1>
+      <p class="lede">Araguaney le da a todos los centros de acopio un mismo estándar: registrar donaciones por ítem, empacarlas en cajas homogéneas con QR, consolidarlas en tarimas y envíos con manifiesto, y ver el stock de todos los centros en un panel nacional.</p>
+      <div class="meta">
+        <span class="tag">Para volunteers, coordinators y national_admins</span>
+        <span class="tag">Opera en /dashboard</span>
+        <span class="tag">Sin datos personales de donantes</span>
+      </div>
+    </header>
+
+    <section>
+      <div class="sect-head">
+        <span class="eyebrow">El flujo</span>
+        <h2>Cinco pasos, una sola pieza a la vez</h2>
+        <p class="sect-note">Cada donación recorre el mismo camino. Nada salta pasos: una caja no entra a una tarima hasta estar sellada, y una tarima no entra a un envío hasta estar cerrada.</p>
+      </div>
+      <div class="pipe">
+        <div class="stage">
+          <div class="glyph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l2 3h6l2-3h4"/><path d="M5 12V6a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v6"/><path d="M3 12v5a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-5"/></svg></div>
+          <h3>1 · Recepción</h3>
+          <span>Se registra la donación por ítem: producto, cantidad, lote, caducidad.</span>
+        </div>
+        <div class="stage">
+          <div class="glyph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 3 7.5v9L12 21l9-4.5v-9L12 3Z"/><path d="M3 7.5 12 12l9-4.5"/><path d="M12 12v9"/></svg></div>
+          <h3>2 · Caja</h3>
+          <span>Un producto, un lote, una caducidad. Se sella con QR y etiqueta.</span>
+        </div>
+        <div class="stage">
+          <div class="glyph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="5" rx="1"/><rect x="3" y="10" width="18" height="5" rx="1"/><path d="M6 15v4M18 15v4M6 19h12"/></svg></div>
+          <h3>3 · Tarima</h3>
+          <span>Agrupa cajas selladas. Puede ser mixta. También tiene su QR.</span>
+        </div>
+        <div class="stage">
+          <div class="glyph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h11v9H3zM14 9h4l3 3v3h-7z"/><circle cx="7" cy="18" r="1.6"/><circle cx="17.5" cy="18" r="1.6"/></svg></div>
+          <h3>4 · Envío</h3>
+          <span>Agrupa tarimas cerradas. Al despacharse, se congela todo.</span>
+        </div>
+        <div class="stage">
+          <div class="glyph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5"/><path d="M9 13h7M9 17h7"/></svg></div>
+          <h3>5 · Manifiesto</h3>
+          <span>Packing list exportable, caja por caja, listo para aduana.</span>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <span class="eyebrow">Vocabulario</span>
+        <h2>Los seis conceptos base</h2>
+        <p class="sect-note">Todo en Araguaney gira alrededor de estas piezas. Si entiendes estas seis, entiendes la app.</p>
+      </div>
+      <div class="grid">
+        <div class="card"><h3>Centro <span class="k">tenant</span></h3><p>Cada centro de acopio es un espacio aislado. Ves solo tu inventario; el panel nacional suma el de todos.</p></div>
+        <div class="card"><h3>ProductType <span class="k">el SKU</span></h3><p>El tipo de producto, distinguido por sus atributos. Ibuprofeno 500 mg y 900 mg son productos distintos.</p></div>
+        <div class="card"><h3>Recepción <span class="k">intake</span></h3><p>El registro de una donación entrante. Lleva un campo de donante libre opcional, sin datos personales.</p></div>
+        <div class="card"><h3>Caja <span class="k">box</span></h3><p>Homogénea: un producto, un lote, una caducidad. Tiene código QR y etiqueta imprimible.</p></div>
+        <div class="card"><h3>Tarima <span class="k">pallet</span></h3><p>Agrupa cajas selladas para transporte. Puede llevar distintos productos. Con QR propio.</p></div>
+        <div class="card"><h3>Envío <span class="k">shipment</span></h3><p>Agrupa tarimas y genera el manifiesto. Al marcarse como enviado, congela su contenido.</p></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <span class="eyebrow">Estados</span>
+        <h2>Cada pieza tiene su máquina de estado</h2>
+        <p class="sect-note">Los estados avanzan en un solo sentido, y cada cambio queda registrado (quién y cuándo). Una pieza no avanza si la anterior no está lista.</p>
+      </div>
+
+      <div class="machine">
+        <p class="who">Caja</p>
+        <p class="desc">Nace como borrador al registrarse. Solo una caja sellada puede entrar a una tarima.</p>
+        <div class="flow">
+          <span class="pill">DRAFT</span><span class="arrow">→</span>
+          <span class="pill blue">SEALED</span><span class="arrow">→</span>
+          <span class="pill green">SHIPPED</span>
+          <span class="arrow" style="margin-left:6px">·</span>
+          <span class="branch">o</span>
+          <span class="pill red">REJECTED</span>
+          <span class="branch">desde DRAFT si no cumple las reglas</span>
+        </div>
+      </div>
+
+      <div class="machine">
+        <p class="who">Tarima</p>
+        <p class="desc">Se abre, se le agregan cajas selladas y se cierra. Solo una tarima cerrada entra a un envío.</p>
+        <div class="flow">
+          <span class="pill">OPEN</span><span class="arrow">→</span>
+          <span class="pill blue">CLOSED</span><span class="arrow">→</span>
+          <span class="pill green">SHIPPED</span>
+        </div>
+      </div>
+
+      <div class="machine">
+        <p class="who">Envío</p>
+        <p class="desc">Se abre, se le agregan tarimas cerradas y se cierra. Al marcarse enviado, todo queda congelado.</p>
+        <div class="flow">
+          <span class="pill">OPEN</span><span class="arrow">→</span>
+          <span class="pill blue">CLOSED</span><span class="arrow">→</span>
+          <span class="pill green">SHIPPED</span>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <span class="eyebrow">Roles</span>
+        <h2>Quién hace qué</h2>
+        <p class="sect-note">Todos operan en el mismo panel, pero cada rol ve y puede distinto. Tu rol de dominio (center_role) define tu alcance.</p>
+      </div>
+      <div class="role">
+        <div><div class="rname">Voluntario</div><span class="rkey">volunteer</span></div>
+        <ul>
+          <li>Registra recepciones y crea, llena y sella cajas.</li>
+          <li>Imprime etiquetas y QR.</li>
+          <li>Ve sus propias solicitudes. Trabaja solo en su centro.</li>
+        </ul>
+      </div>
+      <div class="role">
+        <div><div class="rname">Coordinador</div><span class="rkey">coordinator</span></div>
+        <ul>
+          <li>Todo lo del voluntario, más crear y cerrar tarimas y envíos.</li>
+          <li>Genera el manifiesto de cada envío.</li>
+          <li>Agrega voluntarios a su centro y reinicia sus contraseñas.</li>
+        </ul>
+      </div>
+      <div class="role">
+        <div><div class="rname">Admin nacional</div><span class="rkey">national_admin</span></div>
+        <ul>
+          <li>Ve el agregado nacional de todos los centros.</li>
+          <li>Crea y edita centros, campañas y cualquier usuario.</li>
+          <li>Gestiona solicitudes y consulta la auditoría.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <span class="eyebrow">Reglas</span>
+        <h2>Lo que el sistema aplica solo</h2>
+        <p class="sect-note">No tienes que recordarlas de memoria: Araguaney las valida al momento de registrar y sellar.</p>
+      </div>
+      <div class="rule"><span class="num">01</span><div><h3>Caja homogénea</h3><p>Una caja referencia un solo producto, un solo lote y una sola caducidad. Si llega una mezcla, se divide en varias cajas.</p></div></div>
+      <div class="rule"><span class="num">02</span><div><h3>Vida útil mínima</h3><p>Medicamentos: al menos 365 días restantes (OMS). Alimentos y agua: al menos 180 días. Por debajo de eso, la caja se rechaza automáticamente.</p></div></div>
+      <div class="rule"><span class="num">03</span><div><h3>Medicamentos completos</h3><p>Para sellar un medicamento hacen falta denominación (INN), forma, concentración y número de lote. Si algo falta, no se sella.</p></div></div>
+      <div class="rule"><span class="num">04</span><div><h3>Controlados bloqueados</h3><p>Un producto marcado como controlado se rechaza en la recepción, sin excepción.</p></div></div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <span class="eyebrow">Navegación</span>
+        <h2>Los módulos del panel</h2>
+        <p class="sect-note">Cada uno tiene su propio manual. Este es el mapa; empieza por Recepción, que es el paso 1.</p>
+      </div>
+      <div class="mods">
+        <div class="mod"><span class="path">/intake</span><div><p>Recepción</p><p>Registrar donaciones entrantes por ítem.</p></div></div>
+        <div class="mod"><span class="path">/boxes</span><div><p>Cajas</p><p>Llenar, sellar e imprimir etiquetas de cajas.</p></div></div>
+        <div class="mod"><span class="path">/pallets</span><div><p>Tarimas</p><p>Agrupar cajas selladas y cerrar tarimas.</p></div></div>
+        <div class="mod"><span class="path">/shipments</span><div><p>Envíos</p><p>Consolidar tarimas y generar manifiestos.</p></div></div>
+        <div class="mod"><span class="path">/catalog</span><div><p>Catálogo</p><p>Los tipos de producto (SKU) y sus atributos.</p></div></div>
+        <div class="mod"><span class="path">/scan</span><div><p>Escanear</p><p>Leer un QR para ubicar una caja o tarima.</p></div></div>
+        <div class="mod"><span class="path">/national</span><div><p>Nacional</p><p>Stock agregado de todos los centros (admin).</p></div></div>
+        <div class="mod"><span class="path">/transfers</span><div><p>Transferencias</p><p>Mover inventario entre centros.</p></div></div>
+      </div>
+    </section>
+
+    <div class="foot">
+      <span>Araguaney · Manual general</span>
+      <span>Estándares: WHO · IFRC/ICRC · IOM · UNSPSC · GS1</span>
+    </div>
+
+  </div>
+</div>

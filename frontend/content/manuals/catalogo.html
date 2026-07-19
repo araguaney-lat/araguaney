@@ -1,0 +1,143 @@
+<div class="doc"><div class="wrap">
+
+  <header>
+    <span class="eyebrow">Módulo · Catálogo</span>
+    <h1>El catálogo de productos</h1>
+    <p class="lede">El catálogo son los tipos de producto (SKU) que puedes registrar en la app. Cada tipo define su categoría y sus atributos, y es lo que hace que dos centros hablen el mismo idioma.</p>
+    <p class="crumbs">Panel › <b>Catálogo</b> · /dashboard/catalog</p>
+  </header>
+
+  <section>
+    <div class="sect-head">
+      <span class="eyebrow">Qué es</span>
+      <h2>Para qué sirve el catálogo</h2>
+      <p class="sect-note">Es la base sobre la que se apoya todo lo demás: sin un tipo de producto no puedes registrar una donación ni sellar una caja.</p>
+    </div>
+    <div class="intro-card">
+      <p><b>Qué hace.</b> Mantiene los tipos de producto que se pueden registrar en toda la operación. Cuando das de alta una donación, siempre eliges un tipo de producto del catálogo.</p>
+      <p><b>Por qué importa.</b> Un <code>ProductType</code> bien definido es lo que permite validar las donaciones (caducidad, medicamentos controlados) y agregar el stock entre centros. Si todos nombran y clasifican igual, el panel nacional puede sumar con un solo <code>GROUP BY</code>.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head">
+      <span class="eyebrow">Estructura</span>
+      <h2>Anatomía de un tipo de producto</h2>
+      <p class="sect-note">Estos son los campos que definen cada tipo de producto. Los medicamentos usan atributos adicionales.</p>
+    </div>
+    <div class="reqs">
+      <div class="rrow">
+        <div class="rk">Nombre</div>
+        <div class="rv">El nombre visible del producto (<code>display_name</code>). Es lo que verás al buscar y al elegir un tipo en la recepción.</div>
+      </div>
+      <div class="rrow">
+        <div class="rk">Categoría</div>
+        <div class="rv">Una de 8: Medicamentos, Insumos médicos, Alimentos, Agua, Higiene, Herramientas, Equipo de rescate y Otros. Determina qué reglas aplican al producto.</div>
+      </div>
+      <div class="rrow">
+        <div class="rk">Atributos de medicamento</div>
+        <div class="rv">Para medicamentos: <code>inn_name</code> (denominación), <code>form</code> (forma) y <code>strength</code> (concentración). Distinguen un medicamento de otro.</div>
+      </div>
+      <div class="rrow">
+        <div class="rk">Controlado</div>
+        <div class="rv"><code>is_controlled</code>: si está activo, el producto se bloquea en la recepción y no se puede recibir.</div>
+      </div>
+      <div class="rrow">
+        <div class="rk">Código de barras</div>
+        <div class="rv"><code>gtin</code>, opcional. Se valida como EAN-8, UPC-A o EAN-13.</div>
+      </div>
+      <div class="rrow">
+        <div class="rk">Vida útil mínima</div>
+        <div class="rv"><code>min_shelf_life_days</code>, opcional. Si no la fijas, se aplica el mínimo propio de la categoría.</div>
+      </div>
+      <div class="rrow">
+        <div class="rk">Unidad por defecto</div>
+        <div class="rv">La unidad que se propone al registrar cantidades (<code>default_unit</code>).</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head">
+      <span class="eyebrow">Regla clave</span>
+      <h2>Un atributo cambia el SKU</h2>
+      <p class="sect-note">Los atributos no son cosmética: definen la identidad del producto.</p>
+    </div>
+    <div class="intro-card">
+      <p><b>Ibuprofeno 500 mg</b> e <b>Ibuprofeno 900 mg</b> son tipos de producto distintos, porque su concentración (<code>strength</code>) difiere.</p>
+      <p>Eso es intencional: permite contar cada uno por separado y evita mezclar productos que no son iguales. Si el atributo cambia, el SKU cambia.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head">
+      <span class="eyebrow">Reutilización</span>
+      <h2>Promover a global</h2>
+      <p class="sect-note">Para que un tipo creado en un centro sirva a toda la red.</p>
+    </div>
+    <div class="intro-card">
+      <p>Un tipo de producto creado dentro de un centro puede <b>promoverse a global</b> para que todos los centros lo reutilicen. Así se evita que cada centro cree su propia versión del mismo producto.</p>
+      <p>Solo el <code>national_admin</code> promueve un tipo de producto a global.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head">
+      <span class="eyebrow">Errores</span>
+      <h2>Cuándo algo falla</h2>
+      <p class="sect-note">Si una acción no funciona, la app te dice por qué. Estos son los avisos más comunes y qué significan.</p>
+    </div>
+    <div>
+      <div class="reason">
+        <div class="x">!</div>
+        <div>
+          <h3>La búsqueda es muy corta</h3>
+          <p>Escribiste muy pocas letras. La búsqueda necesita al menos 2 caracteres para devolver resultados.</p>
+          <span class="msg">Search query must be at least 2 characters</span>
+        </div>
+      </div>
+      <div class="reason">
+        <div class="x">!</div>
+        <div>
+          <h3>Categoría inválida</h3>
+          <p>La categoría elegida no está entre las 8 permitidas. Selecciona una de la lista.</p>
+          <span class="msg">Category must be one of: …</span>
+        </div>
+      </div>
+      <div class="reason">
+        <div class="x">!</div>
+        <div>
+          <h3>Código de barras inválido</h3>
+          <p>El código de barras no tiene un formato válido. Debe ser EAN-8, UPC-A o EAN-13.</p>
+          <span class="msg">GTIN must be a valid EAN-8, UPC-A, or EAN-13</span>
+        </div>
+      </div>
+      <div class="reason">
+        <div class="x">!</div>
+        <div>
+          <h3>No existe</h3>
+          <p>El tipo de producto que buscas no está en el catálogo. Puede haberse eliminado o el enlace estar desactualizado.</p>
+          <span class="msg">Product type not found</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head">
+      <span class="eyebrow">Permisos</span>
+      <h2>Quién puede hacer qué</h2>
+      <p class="sect-note">El catálogo lo consulta todo el equipo operativo; editarlo es tarea del administrador nacional.</p>
+    </div>
+    <div class="perm">
+      <p><b>Buscar y ver el catálogo</b> lo hacen todos los roles operativos: <code>volunteer</code>, <code>coordinator</code> y <code>national_admin</code>.</p>
+      <p><b>Crear y editar</b> tipos de producto y <b>promover a global</b> es tarea del <code>national_admin</code>.</p>
+    </div>
+  </section>
+
+  <div class="foot">
+    <span>Araguaney · Manual del módulo Catálogo</span>
+    <span>Alimenta: Recepción y Cajas</span>
+  </div>
+
+</div></div>

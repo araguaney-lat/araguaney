@@ -1,0 +1,137 @@
+<div class="doc">
+  <div class="wrap">
+
+    <header>
+      <span class="eyebrow">Módulo · Cajas</span>
+      <h1>Sellar una caja</h1>
+      <p class="lede">El paso 2. Una caja nace como borrador en la recepción; sellarla es lo que la vuelve oficial: recibe su código QR y su etiqueta, y queda lista para entrar a una tarima. Solo una caja sellada puede viajar.</p>
+      <p class="crumbs">Panel &rsaquo; <b>Cajas</b> &nbsp;·&nbsp; /dashboard/boxes</p>
+    </header>
+
+    <section>
+      <div class="intro-card">
+        <p><b>Qué hace.</b> Reúne todas las cajas del centro y te deja <b>sellarlas</b> e <b>imprimir sus etiquetas</b>. Puedes filtrar por estado (borrador, selladas, rechazadas, enviadas) para ver justo lo que te toca.</p>
+        <p><b>Por qué importa.</b> El sellado congela el contenido de la caja y le da identidad rastreable. A partir de ahí ya no se edita: lo que se selló es lo que viaja.</p>
+      </div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <span class="eyebrow">El estado de la caja</span>
+        <h2>De borrador a sellada</h2>
+        <p class="sect-note">Sellar mueve la caja de <span class="hl">DRAFT</span> a <span class="hl">SEALED</span>. Ese paso es la puerta de entrada a todo lo que sigue.</p>
+      </div>
+      <div class="machine">
+        <p class="desc">Cada cambio queda registrado con quién y cuándo. El sellado es irreversible: si algo está mal, la caja se maneja aparte, no se "des-sella".</p>
+        <div class="flow">
+          <span class="pill">DRAFT</span><span class="arrow">→</span>
+          <span class="pill blue">SEALED</span><span class="arrow">→</span>
+          <span class="pill green">SHIPPED</span>
+          <span class="arrow" style="margin-left:6px">·</span>
+          <span class="branch">o</span>
+          <span class="pill red">REJECTED</span>
+          <span class="branch">desde la recepción, si no cumplió las reglas</span>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <span class="eyebrow">Paso a paso</span>
+        <h2>Cómo sellar</h2>
+      </div>
+      <div class="steps">
+        <div class="step"><span class="n">1</span><div>
+          <h3>Abre Cajas y filtra por borrador</h3>
+          <p>Entra a <b>Cajas</b> en el menú. Filtra por <b>Borrador</b> para ver solo las que faltan por sellar.</p>
+        </div></div>
+        <div class="step"><span class="n">2</span><div>
+          <h3>Revisa la caja</h3>
+          <p>Confirma que producto, cantidad, lote y caducidad son correctos. Recuerda: una caja es un solo producto, un solo lote, una sola caducidad.</p>
+        </div></div>
+        <div class="step"><span class="n">3</span><div>
+          <h3>Pulsa Sellar</h3>
+          <p>Araguaney valida la caja al instante. Si es un medicamento, revisa que tenga sus datos completos (ver requisitos abajo). Si todo está bien, la caja pasa a <b>Sellada</b>.</p>
+          <span class="hint">Antes de sellar puedes ver una vista previa del QR de la etiqueta.</span>
+        </div></div>
+        <div class="step"><span class="n">4</span><div>
+          <h3>Imprime las etiquetas</h3>
+          <p>Pulsa <b>Descargar etiquetas</b> para generar un PDF tamaño carta con las etiquetas (10 por hoja) de las cajas del filtro. La generación se hace en segundo plano; en cuanto está lista, descargas el PDF.</p>
+        </div></div>
+        <div class="step"><span class="n">5</span><div>
+          <h3>Pega la etiqueta y a la tarima</h3>
+          <p>Pega la etiqueta con su QR en la caja física. Ya sellada, la caja queda disponible para agruparla en una tarima.</p>
+        </div></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <span class="eyebrow">Requisitos</span>
+        <h2>Qué necesita una caja para sellarse</h2>
+        <p class="sect-note">La mayoría de las categorías no piden nada extra al sellar — la caducidad ya se validó en la recepción. Los medicamentos son la excepción.</p>
+      </div>
+      <div class="reqs">
+        <div class="rrow"><div class="rk">Cualquier caja</div><div class="rv">Debe estar en estado borrador (<code>DRAFT</code>). Una caja ya sellada, enviada o rechazada no se puede volver a sellar.</div></div>
+        <div class="rrow"><div class="rk">Medicamentos</div><div class="rv">Además, el tipo de producto debe tener <b>denominación (INN)</b>, <b>forma</b> y <b>concentración</b>; y la caja debe tener <b>lote</b> y <b>caducidad</b>.</div></div>
+        <div class="rrow"><div class="rk">Otras categorías</div><div class="rv">No requieren campos adicionales para sellar (insumos, alimentos, agua, higiene, herramientas, equipo de rescate).</div></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <span class="eyebrow">Diagnóstico</span>
+        <h2>Por qué una caja no se deja sellar</h2>
+        <p class="sect-note">Estos son los avisos exactos de Araguaney. Cada uno te dice qué corregir para poder sellar.</p>
+      </div>
+      <div class="reason"><span class="x">✕</span><div>
+        <h3>No está en borrador</h3>
+        <p>Solo se pueden sellar cajas en borrador. Una ya sellada o enviada no aplica.</p>
+        <span class="msg">Box is in status 'SEALED'; only DRAFT boxes can be sealed</span>
+      </div></div>
+      <div class="reason"><span class="x">✕</span><div>
+        <h3>Faltan datos del medicamento</h3>
+        <p>Al tipo de producto le falta INN, forma o concentración. Complétalos en el Catálogo y vuelve a sellar.</p>
+        <span class="msg">Cannot seal: product type missing required fields: inn_name, form, strength</span>
+      </div></div>
+      <div class="reason"><span class="x">✕</span><div>
+        <h3>Falta el lote</h3>
+        <p>Un medicamento no se sella sin número de lote.</p>
+        <span class="msg">Batch is required to seal a medicine box</span>
+      </div></div>
+      <div class="reason"><span class="x">✕</span><div>
+        <h3>Falta la caducidad</h3>
+        <p>Un medicamento no se sella sin fecha de caducidad.</p>
+        <span class="msg">Expiry date is required to seal a medicine box</span>
+      </div></div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <span class="eyebrow">Después de sellar</span>
+        <h2>Qué gana la caja</h2>
+      </div>
+      <div class="grid">
+        <div class="card"><h3>Código QR + etiqueta</h3><p>Cada caja sellada tiene su QR único. Al escanearlo, cualquiera ve su ficha mínima pública.</p></div>
+        <div class="card"><h3>Lista para tarima</h3><p>Solo las cajas selladas pueden agruparse en una tarima. Es el requisito del siguiente paso.</p></div>
+        <div class="card"><h3>Contenido congelado</h3><p>Ya no se edita. Lo que se selló es lo que aparecerá en el manifiesto del envío.</p></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <span class="eyebrow">Permisos</span>
+        <h2>Quién puede sellar</h2>
+      </div>
+      <div class="perm">
+        <p>Sellan cajas e imprimen etiquetas el <code>volunteer</code> y el <code>coordinator</code> en su propio centro, y el <code>national_admin</code> en cualquier centro. La generación de etiquetas en PDF está limitada por seguridad (rate limit), así que en picos puede tardar unos segundos.</p>
+      </div>
+    </section>
+
+    <div class="foot">
+      <span>Araguaney · Manual del módulo Cajas</span>
+      <span>← Antes: Recepción &nbsp;·&nbsp; Siguiente: Tarimas →</span>
+    </div>
+
+  </div>
+</div>

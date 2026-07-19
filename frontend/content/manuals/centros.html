@@ -1,0 +1,69 @@
+<div class="doc"><div class="wrap">
+
+  <span class="eyebrow">Módulo · Centros</span>
+  <h1>Los centros de acopio</h1>
+  <p class="lede">Cada centro de acopio es un espacio propio (un tenant): su inventario está aislado del de los demás, y el panel nacional los suma a todos.</p>
+  <p class="crumbs">Panel › <b>Centros</b> · /dashboard/centers</p>
+
+  <section>
+    <div class="sect-head">
+      <h2>Qué es este módulo</h2>
+    </div>
+    <div class="intro-card">
+      <p><b>Qué hace.</b> Permite dar de alta y administrar los centros de la coordinación.</p>
+      <p><b>Por qué importa.</b> El centro es la unidad base: todo usuario, caja, tarima y envío pertenece a un centro.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head">
+      <h2>Qué define un centro</h2>
+    </div>
+    <div class="reqs">
+      <div class="rrow">
+        <div class="rk">Nombre</div>
+        <div class="rv">El nombre con el que se identifica el centro de acopio en la coordinación.</div>
+      </div>
+      <div class="rrow">
+        <div class="rk">País</div>
+        <div class="rv">El país donde opera el centro (<code>country_code</code>).</div>
+      </div>
+      <div class="rrow">
+        <div class="rk">Estado</div>
+        <div class="rv">Indica si el centro está activo o inactivo.</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head">
+      <h2>Aislamiento de datos</h2>
+      <p class="sect-note">Este modelo es lo que hace barata la agregación nacional.</p>
+    </div>
+    <div class="grid two">
+      <div class="card">
+        <h3>Cada centro ve lo suyo</h3>
+        <p>Los operadores de un centro solo ven y tocan su propio inventario. Nada de lo que registran se mezcla con el de otros centros.</p>
+      </div>
+      <div class="card">
+        <h3>El nacional los suma</h3>
+        <p>El national_admin, sin centro asignado (<code>center_id</code> NULL), ve el agregado de todos los centros a la vez.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head">
+      <h2>Permisos</h2>
+    </div>
+    <div class="perm">
+      <p>Crear y editar centros es del <code>national_admin</code>. Los <code>volunteer</code> y <code>coordinator</code> operan dentro de su centro, pero no crean centros.</p>
+    </div>
+  </section>
+
+  <div class="foot">
+    <span>Araguaney · Manual del módulo Centros</span>
+    <span>Relacionado: Usuarios · Panel Nacional</span>
+  </div>
+
+</div></div>

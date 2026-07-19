@@ -1,0 +1,113 @@
+<div class="doc"><div class="wrap">
+
+  <header>
+    <span class="eyebrow">Módulo · Solicitudes</span>
+    <h1>Pedir y resolver</h1>
+    <p class="lede">Las solicitudes son un canal con hilo de mensajes para pedir algo o reportar un tema, y darle seguimiento hasta cerrarlo.</p>
+    <p class="crumbs">Panel › <b>Solicitudes</b> · /dashboard/requests</p>
+  </header>
+
+  <section>
+    <div class="sect-head">
+      <h2>En resumen</h2>
+    </div>
+    <div class="intro-card">
+      <p><b>Qué hace.</b> Permite abrir una solicitud con título y descripción, conversar en su hilo y seguir su estado.</p>
+      <p><b>Cuándo se usa.</b> Cuando un operador necesita algo de la coordinación o hay que dejar registro de un pendiente.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head">
+      <h2>El estado de una solicitud</h2>
+      <p class="sect-note">El estado comunica en qué punto va cada solicitud.</p>
+    </div>
+    <div class="machine">
+      <p class="desc">De abierta a cerrada, la solicitud recorre estos estados.</p>
+      <div class="flow">
+        <span class="pill">OPEN</span>
+        <span class="arrow">→</span>
+        <span class="pill blue">IN_PROGRESS</span>
+        <span class="arrow">→</span>
+        <span class="pill green">RESOLVED</span>
+        <span class="arrow">→</span>
+        <span class="pill">CLOSED</span>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head">
+      <h2>Paso a paso</h2>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="n">1</div>
+        <div>
+          <h3>Crea la solicitud</h3>
+          <p>Abre una solicitud con un título claro y una descripción de lo que necesitas o reportas.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="n">2</div>
+        <div>
+          <h3>Conversa en el hilo</h3>
+          <p>Cada respuesta queda registrada en el hilo y notifica por correo a las partes.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="n">3</div>
+        <div>
+          <h3>Sigue el avance</h3>
+          <p>Quien la gestiona actualiza el estado conforme avanza la solicitud.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="n">4</div>
+        <div>
+          <h3>Ciérrala</h3>
+          <p>Al resolverla se cierra; una solicitud cerrada queda como registro.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head">
+      <h2>Reglas del hilo</h2>
+    </div>
+    <div class="reqs" style="padding:4px 18px;">
+      <div class="reason">
+        <div class="x">✕</div>
+        <div>
+          <h3>No se responde una solicitud cerrada</h3>
+          <p>Una vez cerrada, el hilo queda como registro y no admite nuevas respuestas.</p>
+          <span class="msg">Cannot reply to a closed request</span>
+        </div>
+      </div>
+      <div class="reason">
+        <div class="x">✕</div>
+        <div>
+          <h3>Estado inválido</h3>
+          <p>El estado solo puede tomar uno de los valores definidos de la máquina de estados.</p>
+          <span class="msg">Status must be one of ('OPEN', 'IN_PROGRESS', 'RESOLVED', 'CLOSED')</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head">
+      <h2>Permisos</h2>
+    </div>
+    <div class="perm">
+      <p>Cualquier operador crea solicitudes y participa en el hilo de las suyas. Cambiar el estado y gestionarlas es del <code>national_admin</code> (y del <code>coordinator</code> según su alcance). El correo avisa a las partes cuando hay novedades.</p>
+    </div>
+  </section>
+
+  <div class="foot">
+    <span>Araguaney · Manual del módulo Solicitudes</span>
+    <span>Relacionado: Mensajería</span>
+  </div>
+
+</div></div>
