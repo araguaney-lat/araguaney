@@ -537,6 +537,9 @@ export default async function HomePage() {
               Guías
             </h2>
             <div className="flex flex-col gap-2 text-[13.5px]" style={{ fontWeight: 600 }}>
+              <Link href="/como-funciona" style={{ color: "#1F5E8C" }}>
+                Cómo funciona Araguaney, paso a paso →
+              </Link>
               <Link href="/guias/como-organizar-un-centro-de-acopio" style={{ color: "#1F5E8C" }}>
                 Cómo organizar un centro de acopio →
               </Link>
