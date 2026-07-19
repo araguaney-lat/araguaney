@@ -1,0 +1,87 @@
+<div class="doc"><div class="wrap">
+
+  <span class="eyebrow">Módulo · Auditoría</span>
+  <h1>El registro de todo lo que pasa</h1>
+  <p class="lede">La auditoría es la bitácora de solo lectura de las acciones sensibles: quién hizo qué, sobre qué y cuándo.</p>
+  <p class="crumbs">Panel › <b>Auditoría</b> · /dashboard/admin/audit</p>
+
+  <section>
+    <div class="sect-head">
+      <h2>Para qué sirve</h2>
+    </div>
+    <div class="intro-card">
+      <p><b>Qué hace.</b> Deja constancia de las acciones importantes del sistema para la rendición de cuentas. Cada acción sensible queda anotada con su autor, su objeto y su momento.</p>
+      <p><b>Por qué importa.</b> En una operación con muchas manos, poder responder <b>"quién hizo esto"</b> evita señalar a ciegas. El registro sustituye la sospecha por un hecho consultable.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head">
+      <h2>Qué registra cada entrada</h2>
+      <p class="sect-note">Toda entrada de la bitácora reúne los mismos cinco datos, para que cualquier acción sea identificable sin ambigüedad.</p>
+    </div>
+    <div class="reqs">
+      <div class="rrow">
+        <div class="rk">Acción</div>
+        <div class="rv">Lo que se hizo. Por ejemplo, cerrar o despachar un envío.</div>
+      </div>
+      <div class="rrow">
+        <div class="rk">Entidad afectada</div>
+        <div class="rv">Sobre qué recayó la acción: la caja, la tarima, el envío, el usuario…</div>
+      </div>
+      <div class="rrow">
+        <div class="rk">Usuario</div>
+        <div class="rv">Quién la ejecutó.</div>
+      </div>
+      <div class="rrow">
+        <div class="rk">Fecha y hora</div>
+        <div class="rv">El momento exacto en que ocurrió.</div>
+      </div>
+      <div class="rrow">
+        <div class="rk">Contexto</div>
+        <div class="rv">Datos extra del cambio, para entender qué se modificó y con qué valores.</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head">
+      <h2>Dos capas de rastro</h2>
+      <p class="sect-note">El rastro se guarda a dos niveles complementarios: el historial de cada pieza y la vista de todo el sistema.</p>
+    </div>
+    <div class="grid two">
+      <div class="card">
+        <h3>Eventos por pieza</h3>
+        <p>Cada caja, tarima y envío guarda su propio historial de cambios de estado, visible en su ficha. Ahí ves la línea de vida de esa pieza en concreto.</p>
+      </div>
+      <div class="card">
+        <h3>Auditoría transversal</h3>
+        <p>Este módulo reúne las acciones de todo el sistema en un solo lugar. Sirve para mirar la operación completa, no una pieza aislada.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head">
+      <h2>Solo lectura</h2>
+    </div>
+    <div class="intro-card">
+      <p>La auditoría <b>no se edita ni se borra</b> desde la app. Es un registro para consultar, no para modificar. Esa inmutabilidad es justo lo que le da valor como evidencia.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head">
+      <h2>Permisos</h2>
+    </div>
+    <div class="perm">
+      <p>La auditoría de dominio la consulta el <code>national_admin</code>. El superadmin ve además la auditoría general de la plataforma desde el Studio. Los <code>volunteer</code> y <code>coordinator</code> no acceden a la auditoría.</p>
+    </div>
+  </section>
+
+  <div class="foot">
+    <span>Araguaney · Manual del módulo Auditoría</span>
+    <span>Relacionado: cada ficha guarda su historial</span>
+  </div>
+
+</div></div>

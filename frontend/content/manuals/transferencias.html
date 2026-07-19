@@ -1,0 +1,182 @@
+<div class="doc"><div class="wrap">
+
+  <header>
+    <span class="eyebrow">Módulo · Transferencias</span>
+    <h1>Mover inventario entre centros</h1>
+    <p class="lede">Una transferencia mueve cajas selladas de un centro a otro, con aprobación de por medio y trazabilidad de punta a punta.</p>
+    <p class="crumbs">Panel › <b>Transferencias</b> · /dashboard/transfers</p>
+  </header>
+
+  <section>
+    <div class="sect-head"><h2>De un vistazo</h2></div>
+    <div class="intro-card">
+      <p><b>Qué hace.</b> Permite solicitar, aprobar y recibir traslados de cajas entre centros.</p>
+      <p><b>Por qué importa.</b> Deja rebalancear el stock hacia donde hace falta sin perder el rastro de ninguna caja.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head">
+      <h2>El estado de una transferencia</h2>
+      <p class="sect-note">Cada cambio de estado queda registrado con quién lo hizo y cuándo.</p>
+    </div>
+    <div class="machine">
+      <p class="desc">Recorrido normal de una transferencia, desde que se solicita hasta que el destino la recibe.</p>
+      <div class="flow">
+        <span class="pill">REQUESTED</span>
+        <span class="arrow">→</span>
+        <span class="pill blue">APPROVED</span>
+        <span class="arrow">→</span>
+        <span class="pill blue">IN_TRANSIT</span>
+        <span class="arrow">→</span>
+        <span class="pill green">RECEIVED</span>
+      </div>
+      <p class="branch" style="margin-top:12px;">o REJECTED desde REQUESTED</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head"><h2>Paso a paso</h2></div>
+    <div class="steps">
+      <div class="step">
+        <div class="n">1</div>
+        <div>
+          <h3>El origen crea la transferencia</h3>
+          <p>El centro origen elige el centro <span class="hl">destino</span> y selecciona las cajas que quiere mover. Queda en <b>REQUESTED</b>.</p>
+          <span class="hint">Una caja no puede transferirse si está en una tarima o en otra transferencia activa.</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="n">2</div>
+        <div>
+          <h3>Se aprueba (o se rechaza)</h3>
+          <p>En el centro origen se revisa la solicitud y se aprueba (pasa a <b>APPROVED</b>) o se rechaza (pasa a <b>REJECTED</b>).</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="n">3</div>
+        <div>
+          <h3>El origen la marca en tránsito</h3>
+          <p>Una vez aprobada, el origen marca la transferencia en tránsito y pasa a <b>IN_TRANSIT</b>: las cajas ya van en camino.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="n">4</div>
+        <div>
+          <h3>El destino la recibe</h3>
+          <p>El centro destino confirma la recepción y la transferencia pasa a <b>RECEIVED</b>. Las cajas quedan en el destino.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head">
+      <h2>Qué caja se puede transferir</h2>
+      <p class="sect-note">Una caja debe cumplir todas estas condiciones para poder incluirse.</p>
+    </div>
+    <div class="reqs">
+      <div class="rrow">
+        <div class="rk">Sellada</div>
+        <div class="rv">Debe estar en estado <code>SEALED</code>. Las cajas en borrador no se pueden mover.</div>
+      </div>
+      <div class="rrow">
+        <div class="rk">Del centro origen</div>
+        <div class="rv">La caja tiene que pertenecer al centro que crea la transferencia.</div>
+      </div>
+      <div class="rrow">
+        <div class="rk">No en una tarima</div>
+        <div class="rv">Si la caja está asignada a una tarima, no puede transferirse.</div>
+      </div>
+      <div class="rrow">
+        <div class="rk">No en otra transferencia activa</div>
+        <div class="rv">La caja no puede estar ya incluida en otra transferencia en curso.</div>
+      </div>
+      <div class="rrow">
+        <div class="rk">Origen ≠ destino</div>
+        <div class="rv">El centro de origen y el de destino tienen que ser distintos.</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head"><h2>Quién hace cada paso</h2></div>
+    <div class="grid two">
+      <div class="card">
+        <h3>Centro origen</h3>
+        <p>Crea la transferencia, la aprueba o la rechaza, y la marca en tránsito.</p>
+      </div>
+      <div class="card">
+        <h3>Centro destino</h3>
+        <p>Recibe la transferencia y confirma que las cajas llegaron.</p>
+      </div>
+    </div>
+    <p class="sect-note">El <span class="hl">national_admin</span> puede intervenir en cualquiera de los pasos, en cualquier centro.</p>
+  </section>
+
+  <section>
+    <div class="sect-head">
+      <h2>Cuándo algo falla</h2>
+      <p class="sect-note">Estos son los mensajes que verás cuando una transferencia no se puede completar.</p>
+    </div>
+
+    <div class="reason">
+      <div class="x">✕</div>
+      <div>
+        <h3>Mismo centro</h3>
+        <p>Elegiste el mismo centro como origen y como destino.</p>
+        <span class="msg">Origin and destination must differ</span>
+      </div>
+    </div>
+
+    <div class="reason">
+      <div class="x">✕</div>
+      <div>
+        <h3>La caja no está sellada</h3>
+        <p>Intentaste transferir una caja que todavía no está en estado SEALED.</p>
+        <span class="msg">Box … must be SEALED to transfer</span>
+      </div>
+    </div>
+
+    <div class="reason">
+      <div class="x">✕</div>
+      <div>
+        <h3>La caja está en una tarima</h3>
+        <p>La caja ya forma parte de una tarima y no puede moverse por separado.</p>
+        <span class="msg">Box … is assigned to a pallet</span>
+      </div>
+    </div>
+
+    <div class="reason">
+      <div class="x">✕</div>
+      <div>
+        <h3>La caja ya está en otra transferencia</h3>
+        <p>La caja está incluida en otra transferencia activa.</p>
+        <span class="msg">Box … is already in an active transfer</span>
+      </div>
+    </div>
+
+    <div class="reason">
+      <div class="x">✕</div>
+      <div>
+        <h3>Solo el destino recibe</h3>
+        <p>Solo el coordinator del centro destino puede confirmar la recepción.</p>
+        <span class="msg">Only the destination coordinator can receive</span>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head"><h2>Permisos</h2></div>
+    <div class="perm">
+      <p>El <code>coordinator</code> solo puede crear transferencias donde su propio centro esté involucrado. Aprobar, rechazar y enviar lo hace el <code>coordinator</code> del centro <b>origen</b>; recibir lo hace el <code>coordinator</code> del centro <b>destino</b>.</p>
+      <p>El <code>national_admin</code> puede realizar cualquiera de estas acciones en cualquier centro.</p>
+    </div>
+  </section>
+
+  <div class="foot">
+    <span>Araguaney · Manual del módulo Transferencias</span>
+    <span>Relacionado: Cajas</span>
+  </div>
+
+</div></div>

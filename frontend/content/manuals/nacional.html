@@ -1,0 +1,76 @@
+<div class="doc"><div class="wrap">
+
+  <header>
+    <span class="eyebrow">Módulo · Panel Nacional</span>
+    <h1>La vista de todos los centros</h1>
+    <p class="lede">El panel nacional suma el stock de todos los centros conectados y responde, de un vistazo, qué hay, cuánto y dónde.</p>
+    <p class="crumbs">Panel › <b>Nacional</b> · /dashboard/national</p>
+  </header>
+
+  <section>
+    <div class="intro-card">
+      <p><b>Qué hace.</b> Agrega el inventario de la coordinación completa: reúne en una sola vista lo que cada centro tiene registrado.</p>
+      <p><b>Por qué existe.</b> Es el diferencial de Araguaney. No es un inventario más, es el estándar común más la agregación.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head">
+      <h2>Qué agrega</h2>
+      <p class="sect-note">El panel resume el inventario nacional desde cuatro ángulos complementarios.</p>
+    </div>
+    <div class="grid">
+      <div class="card">
+        <h3>Por categoría</h3>
+        <p>Cuánto hay de cada tipo: medicamentos, alimentos, agua y las demás categorías.</p>
+      </div>
+      <div class="card">
+        <h3>Por centro</h3>
+        <p>Cuánto tiene cada centro conectado, para comparar y balancear entre ellos.</p>
+      </div>
+      <div class="card">
+        <h3>Por medicamento (INN)</h3>
+        <p>Los principios activos disponibles a nivel nacional, identificados por su INN.</p>
+      </div>
+      <div class="card">
+        <h3>Totales y peso</h3>
+        <p>Resumen general y peso agregado por campaña o por centro.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head">
+      <h2>Por qué solo lo ve el national_admin</h2>
+    </div>
+    <div class="intro-card">
+      <p>El <code>national_admin</code> no tiene centro asignado: su <code>center_id</code> es nulo. Como su vista no se filtra a un centro, ve todo.</p>
+      <p>Los demás roles sí tienen centro asignado, así que ven solo su propio centro y no el agregado nacional.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head">
+      <h2>De inventario a coordinación</h2>
+    </div>
+    <div class="intro-card">
+      <p>Un inventario aislado ayuda a un centro. La agregación ayuda a una región entera.</p>
+      <p>Como todos los centros usan el mismo estándar, su stock se suma con una sola consulta y permite decidir a nivel nacional.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head">
+      <h2>Permisos</h2>
+    </div>
+    <div class="perm">
+      <p>El panel nacional es exclusivo del <code>national_admin</code>. Los <code>volunteer</code> y <code>coordinator</code> ven el stock de su propio centro, no el agregado.</p>
+    </div>
+  </section>
+
+  <div class="foot">
+    <span>Araguaney · Manual del módulo Panel Nacional</span>
+    <span>Relacionado: Centros · Reportes</span>
+  </div>
+
+</div></div>

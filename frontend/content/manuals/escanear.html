@@ -1,0 +1,83 @@
+<div class="doc"><div class="wrap">
+
+  <span class="eyebrow">Módulo · Escanear</span>
+  <h1>Leer un QR</h1>
+  <p class="lede">Escanear el QR de una caja o una tarima abre su ficha al instante: qué contiene, en qué estado está y su historial.</p>
+  <p class="crumbs">Panel › <b>Escanear</b> · /dashboard/scan</p>
+
+  <div class="intro-card" style="margin-top:34px">
+    <p><b>Qué hace.</b> Busca una caja o tarima por su código QR y muestra su ficha.</p>
+    <p><b>Cómo funciona.</b> Es una búsqueda por código: apuntas al QR, no navegas una lista. Los códigos no son enumerables por diseño.</p>
+  </div>
+
+  <section>
+    <div class="sect-head">
+      <h2>Qué muestra al escanear</h2>
+      <p class="sect-note">Según el QR que leas, la ficha se adapta a lo que es la pieza física.</p>
+    </div>
+    <div class="grid two">
+      <div class="card">
+        <h3>Caja</h3>
+        <p>Producto, cantidad, lote, caducidad, estado y cuándo se selló, más su historial de cambios.</p>
+      </div>
+      <div class="card">
+        <h3>Tarima</h3>
+        <p>Las cajas que agrupa y su estado.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head">
+      <h2>Cómo usarlo</h2>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="n">1</div>
+        <div>
+          <h3>Abre Escanear</h3>
+          <p>Entra al módulo Escanear desde el panel.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="n">2</div>
+        <div>
+          <h3>Apunta la cámara al código</h3>
+          <p>Enfoca el código QR impreso en la etiqueta de la caja o la tarima.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="n">3</div>
+        <div>
+          <h3>Se abre la ficha</h3>
+          <p>Úsala para confirmar qué es la caja o tarima física que tienes enfrente.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head">
+      <h2>La ficha también es pública</h2>
+    </div>
+    <div class="intro-card">
+      <p>La misma ficha mínima es pública en <code>/qr/{code}</code>: cualquiera con el QR la ve sin login.</p>
+      <p>Solo muestra información de inventario, <b>nunca datos personales</b>.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head">
+      <h2>Permisos</h2>
+    </div>
+    <div class="perm">
+      <p>Cualquier operador (<code>volunteer</code>, <code>coordinator</code>, <code>national_admin</code>) puede escanear dentro del panel. La ficha pública por QR no requiere login.</p>
+    </div>
+  </section>
+
+  <div class="foot">
+    <span>Araguaney · Manual del módulo Escanear</span>
+    <span>Relacionado: Cajas · Tarimas</span>
+  </div>
+
+</div></div>

@@ -27,6 +27,12 @@ const nextConfig: NextConfig = {
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }]
   },
+  // The /dashboard/ayuda/[slug] pages read content/manuals/*.html via fs at
+  // request time (the dashboard is auth-gated, so these render dynamically).
+  // The slug is dynamic, so trace the whole folder into the serverless bundle.
+  outputFileTracingIncludes: {
+    "/dashboard/ayuda/[slug]": ["./content/manuals/**"],
+  },
   experimental: {
     // Default Server Action body limit is 1MB — too small for avatar photo uploads
     // (matches the 5MB cap enforced server-side in ProfileService.upload_avatar).

@@ -15,6 +15,7 @@ import {
   UserCog,
   ScrollText,
   BarChart2,
+  HelpCircle,
 } from "lucide-react"
 
 export type IconComponent = React.ComponentType<{ size?: number; className?: string }>
@@ -44,6 +45,7 @@ export type DashboardNav = {
   users: string
   audit: string
   team: string
+  ayuda: string
   ops_section: string
   settings: string
   logout: string
@@ -89,6 +91,7 @@ export const OPS_ITEMS: NavItem[] = [
   // own country_code) — see list_center_users in backend/app/routers/users.py.
   { href: "/dashboard/team", labelKey: "team", roles: ["national_admin", "coordinator", "volunteer"], icon: Users },
   { href: "/dashboard/messages", labelKey: "messages", roles: ["national_admin", "coordinator", "volunteer"], icon: MessageCircle, badgeKey: "messages" },
+  { href: "/dashboard/ayuda", labelKey: "ayuda", roles: ["national_admin", "coordinator", "volunteer"], icon: HelpCircle },
 ]
 
 export interface AdminNavItem {

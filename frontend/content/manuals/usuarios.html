@@ -1,0 +1,120 @@
+<div class="doc">
+  <div class="wrap">
+
+    <header>
+      <span class="eyebrow">Módulo · Usuarios</span>
+      <h1>Crear y administrar cuentas</h1>
+      <p class="lede">Aquí se dan de alta los operadores, se les asigna rol y centro, y se les reinicia la contraseña cuando hace falta.</p>
+      <p class="crumbs">Panel › <b>Usuarios</b> · /dashboard/admin/users</p>
+    </header>
+
+    <section>
+      <div class="intro-card">
+        <p><b>Qué hace.</b> Crea usuarios, les asigna rol y centro, y gestiona sus accesos a la aplicación.</p>
+        <p><b>Regla base.</b> Quién puede crear a quién depende de tu propio rol.</p>
+      </div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <h2>Quién puede crear a quién</h2>
+        <p class="sect-note">El rol con el que operas determina qué roles puedes asignar y en qué centro.</p>
+      </div>
+      <div class="tscroll">
+        <table class="vtable">
+          <thead>
+            <tr>
+              <th>Quién crea</th>
+              <th>Roles que asigna</th>
+              <th>Centro</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="mono">superadmin</td>
+              <td>national_admin (y cualquiera)</td>
+              <td>cualquier centro o ninguno</td>
+            </tr>
+            <tr>
+              <td class="mono">national_admin</td>
+              <td>volunteer, coordinator</td>
+              <td>cualquier centro</td>
+            </tr>
+            <tr>
+              <td class="mono">coordinator</td>
+              <td>solo volunteer</td>
+              <td>solo su propio centro</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <h2>Flujo de invitación</h2>
+        <p class="sect-note">Del alta a la primera entrada del usuario.</p>
+      </div>
+      <div class="steps">
+        <div class="step">
+          <div class="n">1</div>
+          <div>
+            <h3>El admin crea el usuario</h3>
+            <p>El sistema genera una clave temporal y envía un correo de invitación.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="n">2</div>
+          <div>
+            <h3>El usuario entra con esa clave</h3>
+            <p>El sistema le obliga a cambiar la contraseña (<code>must_change_password</code>).</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="n">3</div>
+          <div>
+            <h3>El usuario administra su acceso</h3>
+            <p>Desde su perfil puede cambiar la contraseña cuando quiera.</p>
+            <span class="hint">Todo usuario nuevo queda asignado automáticamente a la campaña Donaciones Generales.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <h2>Reiniciar contraseña</h2>
+        <p class="sect-note">El botón está por fila en la lista de usuarios; genera una nueva clave temporal y reenvía el correo. El alcance depende de tu rol.</p>
+      </div>
+      <div class="reqs">
+        <div class="rrow">
+          <div class="rk">superadmin</div>
+          <div class="rv">Puede reiniciar la contraseña de <code>cualquier usuario</code>.</div>
+        </div>
+        <div class="rrow">
+          <div class="rk">national_admin</div>
+          <div class="rv">Puede reiniciar <code>coordinators</code> y <code>volunteers</code>. No otros national_admins.</div>
+        </div>
+        <div class="rrow">
+          <div class="rk">coordinator</div>
+          <div class="rv">Solo <code>volunteers</code> de su propio centro.</div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <h2>Permisos</h2>
+      </div>
+      <div class="perm">
+        <p>La gestión de usuarios de dominio la hace el <code>national_admin</code>; el <code>coordinator</code> solo agrega y reinicia volunteers de su propio centro. Los <code>national_admin</code> los crea y gestiona el superadmin desde el Studio.</p>
+      </div>
+    </section>
+
+    <div class="foot">
+      <span>Araguaney · Manual del módulo Usuarios</span>
+      <span>Relacionado: Centros · Campañas</span>
+    </div>
+
+  </div>
+</div>

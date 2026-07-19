@@ -1,0 +1,152 @@
+<div class="doc">
+  <div class="wrap">
+
+    <header>
+      <span class="eyebrow">Módulo · Recepción</span>
+      <h1>Registrar una donación</h1>
+      <p class="lede">La recepción (intake) es el paso 1 y el más usado: aquí entra cada donación a Araguaney, ítem por ítem. Todo lo demás —cajas, tarimas, envíos, manifiestos— nace de lo que se captura aquí.</p>
+      <p class="crumbs">Panel &rsaquo; <b>Recepción</b> &rsaquo; Nueva recepción &nbsp;·&nbsp; /dashboard/intake/new</p>
+    </header>
+
+    <section>
+      <div class="intro-card">
+        <p><b>Qué hace.</b> Convierte una donación que acaba de llegar en una o más <b>cajas homogéneas</b> registradas, cada una con su producto, cantidad, lote y caducidad. Una misma recepción puede generar varias cajas.</p>
+        <p><b>Cuándo se usa.</b> Cada vez que llega algo al centro: una persona recibe, otra registra. Registrar bien aquí es lo que después permite saber qué hay y preparar envíos que pasen aduana.</p>
+      </div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <span class="eyebrow">Paso a paso</span>
+        <h2>Cómo registrar una recepción</h2>
+        <p class="sect-note">Una caja a la vez. Si la misma donación trae dos productos, o el mismo producto en dos lotes, son dos cajas.</p>
+      </div>
+      <div class="steps">
+        <div class="step"><span class="n">1</span><div>
+          <h3>Abre una nueva recepción</h3>
+          <p>Entra a <b>Recepción</b> en el menú y pulsa <b>Nueva recepción</b>. Se abre el formulario con la primera caja lista para llenar.</p>
+        </div></div>
+        <div class="step"><span class="n">2</span><div>
+          <h3>Identifica el producto</h3>
+          <p>Escanea el código de barras o búscalo por nombre. Si el código existe, Araguaney autocompleta el producto. Si el producto no está en el catálogo, se crea como un nuevo tipo de producto.</p>
+          <span class="hint">Si el producto está marcado como controlado, la caja se bloquea aquí mismo: no se acepta.</span>
+        </div></div>
+        <div class="step"><span class="n">3</span><div>
+          <h3>Captura los datos de la caja</h3>
+          <p>Cantidad y unidad, número de lote, fecha de caducidad y, si lo tienes, el peso. Estos datos definen la caja y alimentan el manifiesto más adelante.</p>
+        </div></div>
+        <div class="step"><span class="n">4</span><div>
+          <h3>¿Llegó más? Agrega otra caja</h3>
+          <p>Si la donación trae otro producto, u otro lote o caducidad del mismo, pulsa <b>Agregar caja</b> y repite. Recuerda: nunca se mezcla más de un producto, lote o caducidad en una sola caja.</p>
+        </div></div>
+        <div class="step"><span class="n">5</span><div>
+          <h3>Anota el origen (opcional)</h3>
+          <p>Puedes escribir un <b>donante libre</b> —texto corto, sin datos personales— y notas internas. Araguaney no guarda información personal de donantes ni beneficiarios.</p>
+        </div></div>
+        <div class="step"><span class="n">6</span><div>
+          <h3>Guarda</h3>
+          <p>Al guardar, cada caja se crea y se valida al instante. Según cumpla o no las reglas, queda como borrador lista para sellar, o rechazada con el motivo.</p>
+        </div></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <span class="eyebrow">Referencia</span>
+        <h2>Los campos de cada caja</h2>
+      </div>
+      <div class="fields">
+        <div class="frow"><div class="fk">Código de barras<small>barcode</small></div><div class="fv">Opcional. <span class="opt">Opcional</span> Al escanearlo, autocompleta el producto vía Open Food Facts o GS1.</div></div>
+        <div class="frow"><div class="fk">Producto<small>product_type</small></div><div class="fv">El tipo de producto (SKU). <span class="req">Requerido</span> Define categoría y atributos; distingue, por ejemplo, dos concentraciones del mismo medicamento.</div></div>
+        <div class="frow"><div class="fk">Cantidad y unidad<small>quantity · unit</small></div><div class="fv">Cuántas unidades y en qué medida (piezas, cajas, litros…). <span class="req">Requerido</span></div></div>
+        <div class="frow"><div class="fk">Lote<small>batch</small></div><div class="fv">Identificador de producción impreso por el fabricante. <span class="req">Requerido en medicamentos</span></div></div>
+        <div class="frow"><div class="fk">Caducidad<small>expiry_date</small></div><div class="fv">Fecha de vencimiento. <span class="req">Requerido si la categoría exige vida útil</span> (medicamentos, alimentos, agua).</div></div>
+        <div class="frow"><div class="fk">Peso<small>weight_kg</small></div><div class="fv">Peso en kilogramos. <span class="opt">Opcional</span> Alimenta el peso total del manifiesto.</div></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <span class="eyebrow">Al guardar</span>
+        <h2>Qué le pasa a cada caja</h2>
+        <p class="sect-note">Cada caja se evalúa por separado. En una misma recepción, unas pueden quedar en borrador y otras rechazadas.</p>
+      </div>
+      <div class="outcomes">
+        <div class="outcome">
+          <span class="pill gray">DRAFT</span>
+          <p>Cumple las reglas. Queda como borrador, lista para sellarse en el módulo de Cajas. Al sellar recibe su QR y etiqueta.</p>
+        </div>
+        <div class="outcome">
+          <span class="pill red">REJECTED</span>
+          <p>No cumple alguna regla. Se registra igual —para dejar constancia— pero marcada como rechazada, con el motivo exacto. No avanza a tarima ni envío.</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <span class="eyebrow">Regla de caducidad</span>
+        <h2>Vida útil mínima por categoría</h2>
+        <p class="sect-note">Medida en días restantes entre la fecha de captura y la caducidad. Un tipo de producto puede fijar su propio mínimo; si no, aplica el de su categoría.</p>
+      </div>
+      <div class="tscroll">
+        <table class="vtable">
+          <thead><tr><th>Categoría</th><th>Mínimo de vida útil</th><th>Caducidad</th></tr></thead>
+          <tbody>
+            <tr><td>Medicamentos</td><td class="days">365 días</td><td>Obligatoria</td></tr>
+            <tr><td>Alimentos</td><td class="days">180 días</td><td>Obligatoria</td></tr>
+            <tr><td>Agua</td><td class="days">180 días</td><td>Obligatoria</td></tr>
+            <tr><td>Insumos médicos</td><td class="none">sin mínimo</td><td>No exigida</td></tr>
+            <tr><td>Higiene</td><td class="none">sin mínimo</td><td>No exigida</td></tr>
+            <tr><td>Herramientas</td><td class="none">sin mínimo</td><td>No exigida</td></tr>
+            <tr><td>Equipo de rescate</td><td class="none">sin mínimo</td><td>No exigida</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <span class="eyebrow">Diagnóstico</span>
+        <h2>Por qué una caja se rechaza</h2>
+        <p class="sect-note">Estos son los motivos exactos que muestra Araguaney. El mensaje te dice qué corregir.</p>
+      </div>
+      <div class="reason"><span class="x">✕</span><div>
+        <h3>Producto controlado</h3>
+        <p>El tipo de producto está marcado como controlado. No se acepta en centros de acopio, sin excepción.</p>
+        <span class="msg">Producto controlado: no se acepta en centros de acopio.</span>
+      </div></div>
+      <div class="reason"><span class="x">✕</span><div>
+        <h3>Falta la caducidad</h3>
+        <p>La categoría exige vida útil pero la caja no trae fecha de caducidad.</p>
+        <span class="msg">Fecha de caducidad requerida para categoría MEDICINE.</span>
+      </div></div>
+      <div class="reason"><span class="x">✕</span><div>
+        <h3>Vida útil insuficiente</h3>
+        <p>Quedan menos días de los que exige la categoría (365 medicamentos, 180 alimentos y agua).</p>
+        <span class="msg">Vida útil insuficiente: 120 días restantes, mínimo requerido 365 días.</span>
+      </div></div>
+      <div class="reason"><span class="x">✕</span><div>
+        <h3>Medicamento incompleto</h3>
+        <p>Al tipo de producto le faltan campos obligatorios (INN, forma o concentración), o a la caja le falta el lote.</p>
+        <span class="msg">Número de lote (batch) obligatorio para medicamentos.</span>
+      </div></div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <span class="eyebrow">Permisos</span>
+        <h2>Quién puede registrar</h2>
+      </div>
+      <div class="perm">
+        <p>Registran recepciones el <code>volunteer</code> y el <code>coordinator</code> en su propio centro, y el <code>national_admin</code> en cualquier centro. La recepción se asigna a una campaña; todo usuario nuevo queda en la campaña <b>Donaciones Generales</b> por defecto, y solo puede registrar en campañas de las que es miembro.</p>
+      </div>
+    </section>
+
+    <div class="foot">
+      <span>Araguaney · Manual del módulo Recepción</span>
+      <span>Siguiente paso: sellar la caja →</span>
+    </div>
+
+  </div>
+</div>

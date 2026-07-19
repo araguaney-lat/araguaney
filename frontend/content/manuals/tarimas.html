@@ -1,0 +1,121 @@
+<div class="doc">
+  <div class="wrap">
+
+    <header>
+      <span class="eyebrow">Módulo · Tarimas</span>
+      <h1>Armar una tarima</h1>
+      <p class="lede">El paso 3. Una tarima agrupa cajas ya selladas para moverlas juntas. A diferencia de la caja, la tarima sí es mixta: puede llevar distintos productos. Tiene su propio código QR y, una vez cerrada, entra a un envío.</p>
+      <p class="crumbs">Panel &rsaquo; <b>Tarimas</b> &nbsp;·&nbsp; /dashboard/pallets</p>
+    </header>
+
+    <section>
+      <div class="intro-card">
+        <p><b>Qué hace.</b> Te deja crear tarimas, meterles cajas selladas y cerrarlas. Es el puente entre cajas sueltas y un envío consolidado.</p>
+        <p><b>La regla de oro.</b> Solo entran cajas <b>selladas</b>, de tu centro, que no estén ya en otra tarima. Mientras la tarima esté abierta puedes agregar y quitar; al cerrarla, queda fija.</p>
+      </div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <span class="eyebrow">El estado de la tarima</span>
+        <h2>Abierta, cerrada, enviada</h2>
+        <p class="sect-note">Se llena mientras está <span class="hl">OPEN</span>; se congela al pasar a <span class="hl">CLOSED</span>; y pasa a <span class="hl">SHIPPED</span> automáticamente cuando su envío se despacha.</p>
+      </div>
+      <div class="machine">
+        <p class="desc">Cada cambio queda registrado con quién y cuándo. No hay marcha atrás: una tarima cerrada no se reabre.</p>
+        <div class="flow">
+          <span class="pill">OPEN</span><span class="arrow">→</span>
+          <span class="pill blue">CLOSED</span><span class="arrow">→</span>
+          <span class="pill green">SHIPPED</span>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <span class="eyebrow">Paso a paso</span>
+        <h2>Cómo armar y cerrar una tarima</h2>
+      </div>
+      <div class="steps">
+        <div class="step"><span class="n">1</span><div>
+          <h3>Crea una tarima</h3>
+          <p>En <b>Tarimas</b>, crea una nueva. Nace abierta (<b>OPEN</b>) y con su propio código QR. Puedes agregarle una nota.</p>
+        </div></div>
+        <div class="step"><span class="n">2</span><div>
+          <h3>Agrega cajas selladas</h3>
+          <p>Escanea el QR de cada caja o teclea su código para sumarla a la tarima. Solo acepta cajas selladas de tu centro que no estén ya en otra tarima.</p>
+          <span class="hint">¿Una caja no entra? Casi siempre es porque aún está en borrador: séllala primero.</span>
+        </div></div>
+        <div class="step"><span class="n">3</span><div>
+          <h3>Revisa y ajusta</h3>
+          <p>Mientras la tarima siga abierta puedes quitar cajas que hayas agregado por error. Aprovecha para confirmar que el contenido es el que quieres enviar.</p>
+        </div></div>
+        <div class="step"><span class="n">4</span><div>
+          <h3>Cierra la tarima</h3>
+          <p>Cuando esté completa, ciérrala. Pasa a <b>CLOSED</b> y ya no acepta ni suelta cajas. No se puede cerrar una tarima vacía.</p>
+        </div></div>
+        <div class="step"><span class="n">5</span><div>
+          <h3>Etiqueta e integra al envío</h3>
+          <p>Pega su etiqueta QR. Una tarima cerrada ya puede agregarse a un envío en el siguiente módulo.</p>
+        </div></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <span class="eyebrow">Requisitos</span>
+        <h2>Qué caja puede entrar</h2>
+      </div>
+      <div class="reqs">
+        <div class="rrow"><div class="rk">Estado de la caja</div><div class="rv">Debe estar <b>sellada</b>. Una caja en borrador, rechazada o ya enviada no entra.</div></div>
+        <div class="rrow"><div class="rk">Mismo centro</div><div class="rv">La caja debe pertenecer a tu centro. No se mezclan cajas de otro centro.</div></div>
+        <div class="rrow"><div class="rk">Sin doble asignación</div><div class="rv">Una caja solo puede estar en una tarima a la vez.</div></div>
+        <div class="rrow"><div class="rk">Tarima abierta</div><div class="rv">Solo una tarima <b>OPEN</b> acepta o suelta cajas. Al cerrarla queda fija.</div></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <span class="eyebrow">Diagnóstico</span>
+        <h2>Por qué algo no se deja hacer</h2>
+        <p class="sect-note">Los avisos exactos de Araguaney. El texto te dice qué corregir.</p>
+      </div>
+      <div class="reason"><span class="x">✕</span><div>
+        <h3>La caja no está sellada</h3>
+        <p>Solo entran cajas selladas. Sella la caja en el módulo de Cajas y vuelve a intentar.</p>
+        <span class="msg">Only SEALED boxes can be added to a pallet</span>
+      </div></div>
+      <div class="reason"><span class="x">✕</span><div>
+        <h3>La tarima ya está cerrada</h3>
+        <p>Una tarima cerrada no acepta más cajas. Si necesitas cambios, crea otra tarima.</p>
+        <span class="msg">Only OPEN pallets accept boxes</span>
+      </div></div>
+      <div class="reason"><span class="x">✕</span><div>
+        <h3>La caja ya está en otra tarima</h3>
+        <p>Cada caja va en una sola tarima. Quítala de la otra si de verdad debe cambiar.</p>
+        <span class="msg">Box … is already assigned to a pallet</span>
+      </div></div>
+      <div class="reason"><span class="x">✕</span><div>
+        <h3>Tarima vacía</h3>
+        <p>No se puede cerrar una tarima sin cajas. Agrega al menos una.</p>
+        <span class="msg">Cannot close an empty pallet</span>
+      </div></div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <span class="eyebrow">Permisos</span>
+        <h2>Quién arma tarimas</h2>
+      </div>
+      <div class="perm">
+        <p>Crear y cerrar tarimas es tarea del <code>coordinator</code> en su centro y del <code>national_admin</code> en cualquiera. El <code>volunteer</code> prepara y sella las cajas, pero no cierra tarimas ni envíos.</p>
+      </div>
+    </section>
+
+    <div class="foot">
+      <span>Araguaney · Manual del módulo Tarimas</span>
+      <span>← Antes: Cajas &nbsp;·&nbsp; Siguiente: Envíos →</span>
+    </div>
+
+  </div>
+</div>

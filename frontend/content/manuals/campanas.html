@@ -1,0 +1,88 @@
+<div class="doc"><div class="wrap">
+
+  <header>
+    <span class="eyebrow">Módulo · Campañas</span>
+    <h1>Organizar donaciones por causa</h1>
+    <p class="lede">Una campaña agrupa las donaciones de un evento o una causa —un sismo, una colecta— y le da su propia página pública de "qué falta".</p>
+    <p class="crumbs">Panel › <b>Campañas</b> · /dashboard/campaigns</p>
+  </header>
+
+  <section>
+    <div class="intro-card">
+      <p><b>Qué hace.</b> Te permite crear y administrar campañas: cada una es un contenedor con nombre propio bajo el cual se registran las donaciones.</p>
+      <p><b>Por qué importa.</b> Separa y comunica qué se junta para cada causa sin mezclar inventarios. Así puedes reportar el avance de cada evento por separado y dirigir a la gente a la causa correcta.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head">
+      <span class="eyebrow">Estructura</span>
+      <h2>Qué define una campaña</h2>
+      <p class="sect-note">Tres datos describen a cada campaña. El enlace público se arma solo; tú solo eliges el nombre y el estado.</p>
+    </div>
+    <div class="reqs">
+      <div class="rrow">
+        <div class="rk">Nombre</div>
+        <div class="rv">El título de la causa o el evento. Es lo que ves en el panel y lo que da origen al enlace público.</div>
+      </div>
+      <div class="rrow">
+        <div class="rk">Enlace público</div>
+        <div class="rv">El <code>slug</code> de la campaña. Se genera solo a partir del nombre. Si choca con el de otra campaña, Araguaney le agrega un sufijo para que siga siendo único.</div>
+      </div>
+      <div class="rrow">
+        <div class="rk">Estado</div>
+        <div class="rv">La campaña puede estar <b>activa</b> o <b>inactiva</b>. Controla si sigue en operación o queda cerrada.</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head">
+      <span class="eyebrow">Campaña por defecto</span>
+      <h2>Donaciones Generales</h2>
+    </div>
+    <div class="intro-card">
+      <p><b>Donaciones Generales</b> es la campaña por defecto. Siempre existe y funciona como red de seguridad.</p>
+      <p>Todo usuario nuevo queda asignado a ella automáticamente, y toda recepción que no indique una campaña específica cae ahí. Nada se pierde: si no elegiste campaña, la donación queda registrada en Donaciones Generales.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head">
+      <span class="eyebrow">Página pública</span>
+      <h2>Cada campaña tiene su página pública</h2>
+      <p class="sect-note">El imán de tráfico por evento: un enlace que puedes compartir para que la gente vea qué se necesita.</p>
+    </div>
+    <div class="intro-card">
+      <p>En <code>/eventos/{slug}</code> cualquier persona ve, <b>sin login</b>, el inventario disponible para esa campaña.</p>
+      <p>La página se actualiza cada 5 minutos, así que refleja lo que hay al momento. Comparte ese enlace por redes o mensajería para atraer donaciones a la causa correcta.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head">
+      <span class="eyebrow">Quién puede registrar</span>
+      <h2>Miembros</h2>
+    </div>
+    <div class="intro-card">
+      <p>Solo los <b>miembros</b> de una campaña pueden registrar donaciones en ella. Ser miembro es lo que habilita a una persona a sumar recepciones a esa causa.</p>
+      <p>El <b>coordinator</b> gestiona los miembros de campaña de su propio centro. El <b>national_admin</b> gestiona las campañas y sus miembros a nivel nacional.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head">
+      <span class="eyebrow">Permisos</span>
+      <h2>Quién puede hacer qué</h2>
+    </div>
+    <div class="perm">
+      <p>Crear y editar campañas es tarea del <code>national_admin</code>. El <code>coordinator</code> gestiona los miembros de campaña de su centro, pero no crea ni edita campañas.</p>
+    </div>
+  </section>
+
+  <div class="foot">
+    <span>Araguaney · Manual del módulo Campañas</span>
+    <span>Relacionado: Recepción · Qué falta</span>
+  </div>
+
+</div></div>
