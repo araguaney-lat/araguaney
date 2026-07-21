@@ -1,8 +1,15 @@
 import type { MetadataRoute } from "next"
 import { apiFetch } from "@/lib/api"
 import { SITE_URL, absoluteUrl } from "@/lib/seo"
-import { localizedPath } from "@/lib/routes"
+import { type RouteKey, LOCALES, localizedPath } from "@/lib/routes"
 import { NEEDS_CATEGORIES } from "@/lib/needs-categories"
+
+// hreflang alternates map for a migrated route, for a sitemap entry.
+function langAlternates(key: RouteKey): Record<string, string> {
+  const out: Record<string, string> = {}
+  for (const l of LOCALES) out[l] = absoluteUrl(localizedPath(key, l))
+  return out
+}
 import type { PublicCampaignListItem } from "@/types"
 
 // Force this route to render at request time instead of during `next build`.
@@ -40,42 +47,28 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: now,
       changeFrequency: "weekly",
       priority: 1,
-      alternates: {
-        languages: {
-          es: absoluteUrl(localizedPath("", "es")),
-          en: absoluteUrl(localizedPath("", "en")),
-        },
-      },
+      alternates: { languages: langAlternates("") },
     },
     {
-      url: `${SITE_URL}/centro-de-acopio`,
+      url: absoluteUrl(localizedPath("centro-de-acopio", "es")),
       lastModified: now,
       changeFrequency: "monthly",
       priority: 0.9,
-      alternates: {
-        languages: {
-          es: absoluteUrl(localizedPath("centro-de-acopio", "es")),
-          en: absoluteUrl(localizedPath("centro-de-acopio", "en")),
-        },
-      },
+      alternates: { languages: langAlternates("centro-de-acopio") },
     },
     {
-      url: `${SITE_URL}/como-funciona`,
+      url: absoluteUrl(localizedPath("como-funciona", "es")),
       lastModified: now,
       changeFrequency: "monthly",
       priority: 0.8,
+      alternates: { languages: langAlternates("como-funciona") },
     },
     {
-      url: `${SITE_URL}/ayuda-humanitaria`,
+      url: absoluteUrl(localizedPath("ayuda-humanitaria", "es")),
       lastModified: now,
       changeFrequency: "monthly",
       priority: 0.9,
-    },
-    {
-      url: `${SITE_URL}/humanitarian-aid`,
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.9,
+      alternates: { languages: langAlternates("ayuda-humanitaria") },
     },
     {
       url: `${SITE_URL}/necesidades`,
@@ -138,34 +131,25 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.7,
     })),
     {
-      url: `${SITE_URL}/contacto`,
+      url: absoluteUrl(localizedPath("contacto", "es")),
       lastModified: now,
       changeFrequency: "monthly",
       priority: 0.3,
+      alternates: { languages: langAlternates("contacto") },
     },
     {
-      url: `${SITE_URL}/aviso-de-privacidad`,
+      url: absoluteUrl(localizedPath("aviso-de-privacidad", "es")),
       lastModified: now,
       changeFrequency: "yearly",
       priority: 0.2,
+      alternates: { languages: langAlternates("aviso-de-privacidad") },
     },
     {
-      url: `${SITE_URL}/privacy`,
+      url: absoluteUrl(localizedPath("terminos", "es")),
       lastModified: now,
       changeFrequency: "yearly",
       priority: 0.2,
-    },
-    {
-      url: `${SITE_URL}/terminos`,
-      lastModified: now,
-      changeFrequency: "yearly",
-      priority: 0.2,
-    },
-    {
-      url: `${SITE_URL}/terms`,
-      lastModified: now,
-      changeFrequency: "yearly",
-      priority: 0.2,
+      alternates: { languages: langAlternates("terminos") },
     },
     ...campaigns.map((c) => ({
       url: `${SITE_URL}/eventos/${c.slug}`,
