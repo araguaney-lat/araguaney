@@ -24,7 +24,33 @@ export const ROUTE_SLUGS: Record<string, Record<Locale, string>> = {
   "aviso-de-privacidad": { es: "aviso-de-privacidad", en: "privacy" },
   "terminos": { es: "terminos", en: "terms" },
   "contacto": { es: "contacto", en: "contact" },
-  // More routes migrate here in subs 2b–4 (guías, glosario, categorías, …).
+  "guias": { es: "guias", en: "guides" },
+  "guias/como-organizar-un-centro-de-acopio": {
+    es: "guias/como-organizar-un-centro-de-acopio",
+    en: "guides/how-to-organize-a-collection-center",
+  },
+  "guias/que-se-puede-donar": {
+    es: "guias/que-se-puede-donar",
+    en: "guides/what-can-be-donated",
+  },
+  "guias/como-preparar-carga-humanitaria-para-aduana": {
+    es: "guias/como-preparar-carga-humanitaria-para-aduana",
+    en: "guides/how-to-prepare-humanitarian-cargo-for-customs",
+  },
+  "guias/como-registrar-voluntarios-en-un-centro-de-acopio": {
+    es: "guias/como-registrar-voluntarios-en-un-centro-de-acopio",
+    en: "guides/how-to-register-volunteers",
+  },
+  "guias/software-gratis-para-gestionar-donaciones-ong": {
+    es: "guias/software-gratis-para-gestionar-donaciones-ong",
+    en: "guides/free-donation-software-for-ngos",
+  },
+  "guias/sistema-de-inventario-para-damnificados": {
+    es: "guias/sistema-de-inventario-para-damnificados",
+    en: "guides/inventory-system-for-disaster-relief",
+  },
+  "glosario": { es: "glosario", en: "glossary" },
+  // More routes migrate here in subs 2c–4 (categorías, necesidades, …).
 }
 
 export type RouteKey = keyof typeof ROUTE_SLUGS
