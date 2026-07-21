@@ -4,7 +4,9 @@ import type { Metadata } from "next"
 import HomeNav from "@/components/HomeNav"
 import HomeFooter from "@/components/HomeFooter"
 import { CtaLink } from "@/components/CtaLink"
-import { getLocale, getDictionary } from "@/lib/i18n"
+import { getDictionary } from "@/lib/i18n"
+import { alternates } from "@/lib/seo"
+import { type Locale, localizedPath } from "@/lib/routes"
 import { JsonLd } from "@/components/JsonLd"
 import { FaqSection } from "@/components/FaqSection"
 import {
@@ -16,15 +18,19 @@ import {
 const LOGO =
   "https://res.cloudinary.com/dtvdqlxtd/image/upload/v1782794310/image_degkq9.png"
 
-export async function generateMetadata(): Promise<Metadata> {
-  const locale = await getLocale()
-  const dict = await getDictionary(locale)
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ lang: Locale }>
+}): Promise<Metadata> {
+  const { lang } = await params
+  const dict = await getDictionary(lang)
   const { home_title, home_description } = dict.seo
 
   return {
     title: home_title,
     description: home_description,
-    alternates: { canonical: "/" },
+    alternates: alternates("", lang),
     // Images omitted so the file-convention card (app/opengraph-image.tsx) is used.
     openGraph: { title: home_title, description: home_description },
     twitter: {
@@ -57,8 +63,12 @@ const HOME_FAQ = [
   },
 ]
 
-export default async function HomePage() {
-  const locale = await getLocale()
+export default async function HomePage({
+  params,
+}: {
+  params: Promise<{ lang: Locale }>
+}) {
+  const { lang: locale } = await params
   const dict = await getDictionary(locale)
 
   const structuredData =
@@ -75,7 +85,11 @@ export default async function HomePage() {
         flexDirection: "column",
       }}
     >
-      <HomeNav dict={dict.nav} locale={locale} />
+      <HomeNav
+        dict={dict.nav}
+        locale={locale}
+        localeLinks={{ es: localizedPath("", "es"), en: localizedPath("", "en") }}
+      />
 
       {/* Spacer for fixed mobile nav (56px nav height) */}
       <div className="h-[56px] md:hidden" />
@@ -554,7 +568,7 @@ export default async function HomePage() {
         </div>
       )}
 
-      <HomeFooter dict={dict.footer} />
+      <HomeFooter dict={dict.footer} locale={locale} />
     </div>
     </>
   )

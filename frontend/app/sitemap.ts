@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next"
 import { apiFetch } from "@/lib/api"
-import { SITE_URL } from "@/lib/seo"
+import { SITE_URL, absoluteUrl } from "@/lib/seo"
+import { localizedPath } from "@/lib/routes"
 import { NEEDS_CATEGORIES } from "@/lib/needs-categories"
 import type { PublicCampaignListItem } from "@/types"
 
@@ -34,12 +35,29 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }
 
   return [
-    { url: SITE_URL, lastModified: now, changeFrequency: "weekly", priority: 1 },
+    {
+      url: SITE_URL,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 1,
+      alternates: {
+        languages: {
+          es: absoluteUrl(localizedPath("", "es")),
+          en: absoluteUrl(localizedPath("", "en")),
+        },
+      },
+    },
     {
       url: `${SITE_URL}/centro-de-acopio`,
       lastModified: now,
       changeFrequency: "monthly",
       priority: 0.9,
+      alternates: {
+        languages: {
+          es: absoluteUrl(localizedPath("centro-de-acopio", "es")),
+          en: absoluteUrl(localizedPath("centro-de-acopio", "en")),
+        },
+      },
     },
     {
       url: `${SITE_URL}/como-funciona`,

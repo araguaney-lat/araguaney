@@ -1,16 +1,18 @@
 import "server-only"
-import { cookies } from "next/headers"
+import { cookies, headers } from "next/headers"
+import { type Locale, LOCALES, DEFAULT_LOCALE, isLocale } from "@/lib/routes"
 
-export type Locale = "es" | "en"
-export const LOCALES: Locale[] = ["es", "en"]
-export const DEFAULT_LOCALE: Locale = "es"
+export { type Locale, LOCALES, DEFAULT_LOCALE, isLocale }
+
 export const LOCALE_COOKIE = "locale"
 
-export function isLocale(v: string): v is Locale {
-  return LOCALES.includes(v as Locale)
-}
-
 export async function getLocale(): Promise<Locale> {
+  // Migrated routes: the i18n middleware sets x-locale from the URL. This takes
+  // precedence so the root layout's <html lang> matches the URL, not the cookie.
+  const hdrs = await headers()
+  const fromHeader = hdrs.get("x-locale")
+  if (fromHeader && isLocale(fromHeader)) return fromHeader
+
   const jar = await cookies()
   const val = jar.get(LOCALE_COOKIE)?.value
   return val && isLocale(val) ? val : DEFAULT_LOCALE

@@ -1,8 +1,14 @@
 # Spec — i18n por URL (Fase 11, tarea 11) · Sub-proyecto 1: Infraestructura + slice vertical
 
 **Fecha:** 2026-07-21
-**Estado:** aprobado (diseño)
+**Estado:** aprobado (diseño) · implementado (slice: home + centro-de-acopio)
 **Alcance de ESTE spec:** solo el Sub-proyecto 1. Los subs 2–4 tienen sus propios specs.
+
+> **Nota de implementación:** el slice entregado migra **home + `/centro-de-acopio`**
+> (bilingüe, slug traducido `collection-center`), que ya prueba toda la estructura
+> (prefijo + slug traducido + hreflang + contenido por locale + convivencia). La
+> consolidación de `ayuda-humanitaria`/`humanitarian-aid` se movió al **Sub-proyecto 2**
+> para mantener este PR enfocado.
 
 ---
 
