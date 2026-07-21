@@ -4,15 +4,34 @@ import { useState } from "react"
 import Turnstile from "react-turnstile"
 import { submitContact, type ContactResult } from "@/lib/contact-actions"
 
-const TIPOS = [
-  { value: "alta", label: "Dar de alta un centro" },
-  { value: "voluntario", label: "Sumarme como voluntario" },
-  { value: "consulta", label: "Otra consulta" },
-] as const
+export interface ContactFormLabels {
+  name: string
+  namePlaceholder: string
+  org: string
+  orgPlaceholder: string
+  email: string
+  emailPlaceholder: string
+  helpTitle: string
+  typeAlta: string
+  typeVoluntario: string
+  typeConsulta: string
+  message: string
+  messagePlaceholder: string
+  submit: string
+  submitting: string
+  turnstileError: string
+  successTitle: string
+  successBody: string
+}
 
-type Tipo = (typeof TIPOS)[number]["value"]
+type Tipo = "alta" | "voluntario" | "consulta"
 
-export default function ContactForm() {
+export default function ContactForm({ labels: t }: { labels: ContactFormLabels }) {
+  const types: { value: Tipo; label: string }[] = [
+    { value: "alta", label: t.typeAlta },
+    { value: "voluntario", label: t.typeVoluntario },
+    { value: "consulta", label: t.typeConsulta },
+  ]
   const [tipo, setTipo] = useState<Tipo>("alta")
   const [token, setToken] = useState<string | null>(null)
   const [status, setStatus] = useState<"idle" | "sending" | "done" | "error">("idle")
@@ -27,7 +46,7 @@ export default function ContactForm() {
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     if (!token) {
-      setErrorMsg("Completa la verificación de seguridad.")
+      setErrorMsg(t.turnstileError)
       setStatus("error")
       return
     }
@@ -67,10 +86,10 @@ export default function ContactForm() {
           </svg>
         </div>
         <h2 style={{ fontFamily: "var(--font-source-serif)", fontSize: 22, fontWeight: 600, color: "#2B2723", margin: 0 }}>
-          Mensaje enviado
+          {t.successTitle}
         </h2>
         <p style={{ fontSize: 14.5, color: "#5C5347", lineHeight: 1.6, margin: 0 }}>
-          Nos pondremos en contacto contigo en menos de 48 horas hábiles.
+          {t.successBody}
         </p>
       </div>
     )
@@ -78,11 +97,11 @@ export default function ContactForm() {
 
   return (
     <form onSubmit={handleSubmit} className="max-w-[440px]">
-      {/* Nombre + Org */}
+      {/* Name + Org */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-[18px] mb-4 md:mb-[18px]">
         {[
-          { name: "nombre", label: "Nombre", placeholder: "Tu nombre" },
-          { name: "organizacion", label: "Organización", placeholder: "Tu fundación" },
+          { name: "nombre", label: t.name, placeholder: t.namePlaceholder },
+          { name: "organizacion", label: t.org, placeholder: t.orgPlaceholder },
         ].map((f) => (
           <div key={f.name}>
             <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#52493D", marginBottom: 6 }}>
@@ -98,15 +117,15 @@ export default function ContactForm() {
         ))}
       </div>
 
-      {/* Correo */}
+      {/* Email */}
       <div style={{ marginBottom: 14 }}>
         <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#52493D", marginBottom: 6 }}>
-          Correo
+          {t.email}
         </label>
         <input
           name="correo"
           type="email"
-          placeholder="tu@correo.org"
+          placeholder={t.emailPlaceholder}
           required
           style={{ width: "100%", height: 46, background: "#FCFAF4", border: "1.5px solid #E6DCC8", borderRadius: 10, padding: "0 14px", fontSize: 14, color: "#2B2723", outline: "none" }}
         />
@@ -115,10 +134,10 @@ export default function ContactForm() {
       {/* Chips */}
       <div className="hidden md:block" style={{ marginBottom: 14 }}>
         <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#52493D", marginBottom: 7 }}>
-          ¿Cómo podemos ayudarte?
+          {t.helpTitle}
         </label>
         <div className="flex gap-2 flex-wrap">
-          {TIPOS.map((opt) => (
+          {types.map((opt) => (
             <button
               key={opt.value}
               type="button"
@@ -136,14 +155,14 @@ export default function ContactForm() {
         </div>
       </div>
 
-      {/* Mensaje */}
+      {/* Message */}
       <div style={{ marginBottom: 18 }}>
         <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#52493D", marginBottom: 6 }}>
-          Mensaje
+          {t.message}
         </label>
         <textarea
           name="mensaje"
-          placeholder="Cuéntanos sobre tu centro."
+          placeholder={t.messagePlaceholder}
           rows={4}
           required
           minLength={10}
@@ -177,7 +196,7 @@ export default function ContactForm() {
           boxShadow: "0 14px 26px -12px rgba(31,94,140,.7)",
         }}
       >
-        {status === "sending" ? "Enviando…" : "Enviar mensaje"}
+        {status === "sending" ? t.submitting : t.submit}
       </button>
     </form>
   )
