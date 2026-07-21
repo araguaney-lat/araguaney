@@ -27,17 +27,22 @@ Un segmento `[lang]` en la raíz (`app/[lang]/…`) captura **cualquier** primer
 (`/necesidades` → `lang="necesidades"`), chocando con las rutas aún NO migradas. La migración es
 gradual (subs 2–4), así que necesitamos convivencia.
 
-### Solución: árbol interno con prefijo estático + middleware
-- Las páginas migradas viven en un **árbol interno** `app/i18n/[lang]/<slug-canónico>/page.tsx`.
-  El prefijo estático `i18n` **no choca** con rutas planas y solo se alcanza vía *rewrite* del middleware.
-- **Slug canónico = el slug español** (menos renombres; las páginas ya están en slug ES).
-- El **middleware** traduce las URLs públicas → ruta interna:
-  - `/` → rewrite `/i18n/es` · `/centro-de-acopio` → `/i18n/es/centro-de-acopio`
-  - `/en` → `/i18n/en` · `/en/collection-center` → (mapa: slug EN `collection-center` → clave `centro-de-acopio`) → `/i18n/en/centro-de-acopio`
-  - Solo reescribe rutas cuya **clave está migrada** (allowlist del mapa). Las no migradas pasan de largo a su página plana actual.
-  - Acceso directo a `/i18n/*` → 404 (nadie debe ver el namespace interno).
-- **Estático por idioma:** como la ruta interna incluye `[lang]`, Next genera HTML separado para
-  `/i18n/es/…` y `/i18n/en/…` (`generateStaticParams` → `["es","en"]`). Se conserva SSG/ISR.
+### Solución: `app/[lang]/` + precedencia de rutas estáticas + middleware
+En Next, una **ruta explícita** (`app/necesidades/page.tsx`) tiene **precedencia sobre el segmento
+dinámico** `app/[lang]/…`. Por eso las páginas NO migradas siguen sirviéndose de sus páginas planas y
+**no chocan** con `[lang]`. No hace falta namespace interno.
+
+- Las páginas migradas viven en `app/[lang]/<slug-canónico>/page.tsx`. **Slug canónico = slug ES.**
+- `generateStaticParams` → `["es","en"]`, `dynamicParams = false` → Next genera HTML por idioma
+  (`/es/…`, `/en/…`) y cualquier `lang` inválido (p.ej. `/foobar` sin ruta explícita) → 404 natural.
+- El **middleware** reescribe las URLs públicas hacia el árbol `[lang]` canónico:
+  - `/` → rewrite `/es` · `/centro-de-acopio` → `/es/centro-de-acopio`
+  - `/en` → `/en` (ya prefijado) · `/en/collection-center` → (mapa: slug EN → clave) → `/en/centro-de-acopio`
+  - Inyecta `x-locale: <locale>` en el rewrite (para el `<html lang>` del root layout; §8).
+  - Solo reescribe rutas cuya **clave está migrada** (allowlist del mapa). Las no migradas pasan de largo (`next()`) a su página plana.
+  - **Canonicalización:** una forma no-canónica bajo prefijo (`/en/centro-de-acopio`, slug ES bajo `/en`) → `redirect` 308 a la canónica (`/en/collection-center`). Evita duplicados.
+- **Convivencia:** el root `app/layout.tsx` sigue envolviendo todo; `app/[lang]/layout.tsx` es un layout
+  anidado solo para las migradas (no emite `<html>`, §8).
 
 ### Por qué no el enfoque "header-based"
 Reescribir todo a una sola página física pasando el locale por header rompe el estático (Next cachea
@@ -72,17 +77,17 @@ isMigrated(key): boolean                     // allowlist para el middleware
 - Lógica i18n:
   1. Detecta locale: primer segmento `en` → en; si no, es.
   2. Quita el prefijo de idioma, resuelve el slug → clave (`resolveSlug`). Si no migrada/no existe → `next()` (pasa a la página plana o 404 natural).
-  3. `rewrite` a `/i18n/<locale>/<clave>`, **inyectando el header `x-locale: <locale>`** (para que el root layout ponga `<html lang>`; ver §8).
-  4. Bloquea acceso directo a `/i18n/*` (404).
+  3. `rewrite` a `/<locale>/<clave>`, **inyectando el header `x-locale: <locale>`** (para que el root layout ponga `<html lang>`; ver §8).
+  4. Forma no-canónica bajo prefijo (`/en/<slug-ES>`) → `redirect` 308 a la canónica (`/en/<slug-EN>`).
 - No toca los redirects de auth ya existentes.
 
-### 3.3 `app/i18n/[lang]/layout.tsx`
+### 3.3 `app/[lang]/layout.tsx`
 - `generateStaticParams` → `[{lang:"es"},{lang:"en"}]`; `dynamicParams = false`.
 - Valida `lang` ∈ LOCALES → si no, `notFound()`.
 - Provee el locale a las páginas hijas vía `params.lang` (no cookie).
 - **NO emite `<html>`** (lo emite el root `app/layout.tsx`; ver §8). Solo pasa `children`.
 
-### 3.4 `app/i18n/[lang]/**` — las 3 páginas del slice
+### 3.4 `app/[lang]/**` — las 3 páginas del slice
 - `page.tsx` (home), `centro-de-acopio/page.tsx`, `ayuda-humanitaria/page.tsx`.
 - Cada una: `async function Page({ params }) { const { lang } = await params; const dict = await getDictionary(lang); … }`.
 - Contenido bilingüe: UI desde `dict`; la prosa que hoy es ES-only se traduce (ver §4).
@@ -122,7 +127,7 @@ Se usa en `metadata.alternates`. `ogImageUrl` se mantiene.
 ---
 
 ## 6. Testing / verificación
-- **Routing:** `/` y `/centro-de-acopio` → 200 ES; `/en` y `/en/collection-center` → 200 EN; `/en/centro-de-acopio` (slug ES bajo prefijo EN) → 404; `/i18n/en/…` directo → 404; `/necesidades` (no migrada) → 200 sin cambios.
+- **Routing:** `/` y `/centro-de-acopio` → 200 ES; `/en` y `/en/collection-center` → 200 EN; `/en/centro-de-acopio` (slug ES bajo prefijo EN) → 308 → `/en/collection-center`; `/necesidades` (no migrada) → 200 sin cambios.
 - **hreflang:** cada una de las 3 emite `canonical` correcto + `link rel=alternate hreflang=es|en|x-default`.
 - **`<html lang>`:** es en ES, en en EN.
 - **Switcher:** desde `/centro-de-acopio` cambia a `/en/collection-center` y viceversa.
@@ -131,7 +136,7 @@ Se usa en `metadata.alternates`. `ogImageUrl` se mantiene.
 - **Sitemap:** agregar las alternas EN de las 3 migradas (o dejar para sub 2 — decisión: agregar las 3 EN ahora para no romper hreflang↔sitemap).
 
 ## 7. Definition of Done (sub-proyecto 1)
-- Infra (`routes.ts`, middleware, `app/i18n/[lang]`, `alternates`) implementada y probada.
+- Infra (`routes.ts`, middleware, `app/[lang]`, `alternates`) implementada y probada.
 - 3 páginas migradas con contenido EN + hreflang, estáticas por locale.
 - Duplicado `humanitarian-aid` consolidado y borrado.
 - Resto del sitio intacto (convivencia verificada).
@@ -140,4 +145,4 @@ Se usa en `metadata.alternates`. `ogImageUrl` se mantiene.
 ## 8. Riesgos
 - **Middleware + rewrites + SSG**: interacción delicada; mitigar con pruebas de routing explícitas.
 - **Matcher del middleware**: debe cubrir las rutas migradas sin capturar las no migradas ni assets (`/_next`, imágenes). Excluir estáticos en el matcher.
-- **Doble `<html>`**: el `app/layout.tsx` raíz ya emite `<html>`. Las páginas bajo `app/i18n/[lang]` heredan ese root layout → NO deben emitir otro `<html>`. El `lang` dinámico se setea en el root layout leyendo el locale del rewrite (header que inyecta el middleware) — ajustar el root layout para leer `x-locale` si viene, si no, cookie.
+- **Doble `<html>`**: el `app/layout.tsx` raíz ya emite `<html>`. Las páginas bajo `app/[lang]` heredan ese root layout → NO deben emitir otro `<html>`. El `lang` dinámico se setea en el root layout leyendo el locale del rewrite (header que inyecta el middleware) — ajustar el root layout para leer `x-locale` si viene, si no, cookie.
