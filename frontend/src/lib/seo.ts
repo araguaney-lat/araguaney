@@ -1,3 +1,11 @@
+import {
+  type Locale,
+  type RouteKey,
+  LOCALES,
+  DEFAULT_LOCALE,
+  localizedPath,
+} from "@/lib/routes"
+
 export const SITE_URL = (
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://araguaney.lat"
 ).replace(/\/$/, "")
@@ -21,4 +29,20 @@ export function ogImageUrl(title: string, eyebrow?: string): string {
   const params = new URLSearchParams({ title })
   if (eyebrow) params.set("eyebrow", eyebrow)
   return absoluteUrl(`/og?${params.toString()}`)
+}
+
+// Canonical + hreflang alternates for a migrated route, for `metadata.alternates`.
+// Emits one `hreflang` per supported locale plus `x-default` (the default locale).
+// Paths are relative; Next resolves them against metadataBase. Generic over
+// LOCALES so a new language is included automatically.
+export function alternates(key: RouteKey, locale: Locale) {
+  const languages: Record<string, string> = {}
+  for (const l of LOCALES) {
+    languages[l] = localizedPath(key, l)
+  }
+  languages["x-default"] = localizedPath(key, DEFAULT_LOCALE)
+  return {
+    canonical: localizedPath(key, locale),
+    languages,
+  }
 }

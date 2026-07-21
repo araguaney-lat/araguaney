@@ -1,0 +1,56 @@
+// Locale constants live here (not in i18n.ts) because this module is imported
+// by the middleware (edge runtime) and client components — it must NOT pull in
+// `server-only`. i18n.ts re-exports these for server code.
+export type Locale = "es" | "en"
+export const LOCALES: Locale[] = ["es", "en"]
+export const DEFAULT_LOCALE: Locale = "es"
+
+export function isLocale(v: string): v is Locale {
+  return (LOCALES as string[]).includes(v)
+}
+
+// ── Central route map ─────────────────────────────────────────────────────────
+// Single source of truth for localized URLs. The KEY is the canonical route id
+// (chosen to equal the Spanish slug). Each key maps to a slug per locale.
+// Adding a language = add its slug to every entry. Adding a route = add a key.
+//
+// Only keys listed here are "migrated" — the i18n middleware rewrites their URLs
+// into the app/[lang] tree; everything else falls through to its flat page.
+export const ROUTE_SLUGS: Record<string, Record<Locale, string>> = {
+  "": { es: "", en: "" }, // home
+  "centro-de-acopio": { es: "centro-de-acopio", en: "collection-center" },
+  // More routes migrate here in subs 2–4 (ayuda-humanitaria, guías, glosario, …).
+}
+
+export type RouteKey = keyof typeof ROUTE_SLUGS
+
+export const ROUTE_KEYS = Object.keys(ROUTE_SLUGS) as RouteKey[]
+
+export function isMigrated(key: string): key is RouteKey {
+  return key in ROUTE_SLUGS
+}
+
+// Build the public, outward-facing path for a route in a locale.
+// es (default) → unprefixed: "/centro-de-acopio", ""→"/".
+// other locale → prefixed:   "/en/collection-center".
+export function localizedPath(key: RouteKey, locale: Locale): string {
+  const slug = ROUTE_SLUGS[key][locale]
+  if (locale === DEFAULT_LOCALE) {
+    return slug ? `/${slug}` : "/"
+  }
+  return slug ? `/${locale}/${slug}` : `/${locale}`
+}
+
+// Reverse lookup: a localized slug (as seen in the URL for that locale) → key.
+// Returns null when the slug isn't a migrated route for that locale.
+export function resolveSlug(locale: Locale, slug: string): RouteKey | null {
+  for (const key of ROUTE_KEYS) {
+    if (ROUTE_SLUGS[key][locale] === slug) return key
+  }
+  return null
+}
+
+// The canonical (Spanish) slug used inside the app/[lang] tree for a key.
+export function canonicalSlug(key: RouteKey): string {
+  return ROUTE_SLUGS[key].es
+}
