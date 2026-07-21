@@ -109,6 +109,12 @@ export const config = {
     "/terms",
     "/contacto",
     "/contact",
+    "/guias",
+    "/guias/:path*",
+    "/guides",
+    "/guides/:path*",
+    "/glosario",
+    "/glossary",
     "/en/:path*",
   ],
 }

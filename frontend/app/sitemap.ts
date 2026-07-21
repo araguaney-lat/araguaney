@@ -77,52 +77,34 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.8,
     },
     {
-      url: `${SITE_URL}/guias`,
+      url: absoluteUrl(localizedPath("guias", "es")),
       lastModified: now,
       changeFrequency: "monthly",
       priority: 0.7,
+      alternates: { languages: langAlternates("guias") },
     },
-    {
-      url: `${SITE_URL}/guias/como-organizar-un-centro-de-acopio`,
+    ...(
+      [
+        "guias/como-organizar-un-centro-de-acopio",
+        "guias/que-se-puede-donar",
+        "guias/como-preparar-carga-humanitaria-para-aduana",
+        "guias/como-registrar-voluntarios-en-un-centro-de-acopio",
+        "guias/software-gratis-para-gestionar-donaciones-ong",
+        "guias/sistema-de-inventario-para-damnificados",
+      ] as const
+    ).map((key) => ({
+      url: absoluteUrl(localizedPath(key, "es")),
       lastModified: now,
-      changeFrequency: "yearly",
+      changeFrequency: "yearly" as const,
       priority: 0.6,
-    },
+      alternates: { languages: langAlternates(key) },
+    })),
     {
-      url: `${SITE_URL}/guias/que-se-puede-donar`,
-      lastModified: now,
-      changeFrequency: "yearly",
-      priority: 0.6,
-    },
-    {
-      url: `${SITE_URL}/guias/como-preparar-carga-humanitaria-para-aduana`,
-      lastModified: now,
-      changeFrequency: "yearly",
-      priority: 0.6,
-    },
-    {
-      url: `${SITE_URL}/guias/como-registrar-voluntarios-en-un-centro-de-acopio`,
-      lastModified: now,
-      changeFrequency: "yearly",
-      priority: 0.6,
-    },
-    {
-      url: `${SITE_URL}/guias/software-gratis-para-gestionar-donaciones-ong`,
-      lastModified: now,
-      changeFrequency: "yearly",
-      priority: 0.6,
-    },
-    {
-      url: `${SITE_URL}/guias/sistema-de-inventario-para-damnificados`,
-      lastModified: now,
-      changeFrequency: "yearly",
-      priority: 0.6,
-    },
-    {
-      url: `${SITE_URL}/glosario`,
+      url: absoluteUrl(localizedPath("glosario", "es")),
       lastModified: now,
       changeFrequency: "monthly",
       priority: 0.5,
+      alternates: { languages: langAlternates("glosario") },
     },
     ...NEEDS_CATEGORIES.map((c) => ({
       url: `${SITE_URL}/necesidades/${c.slug}`,
