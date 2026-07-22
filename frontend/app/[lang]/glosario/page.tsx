@@ -261,7 +261,7 @@ export default async function GlosarioPage({
     { name: c.crumbSelf, path: localizedPath(KEY, locale) },
   ]
   const structuredData = [
-    definedTermSetSchema(c.metaTitle, localizedPath(KEY, locale), c.terms),
+    definedTermSetSchema(c.metaTitle, localizedPath(KEY, locale), c.terms, locale),
     breadcrumbSchema(crumbs),
   ]
 

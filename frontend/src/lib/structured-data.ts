@@ -1,4 +1,5 @@
 import { SITE_URL, DEFAULT_OG_IMAGE, absoluteUrl } from "@/lib/seo"
+import type { Locale } from "@/lib/routes"
 
 // JSON-LD structured-data builders (schema.org). Emitted via <JsonLd /> so
 // Google gets rich results and AI crawlers get machine-readable context.
@@ -55,9 +56,10 @@ interface ArticleInput {
   title: string
   description: string
   path: string
+  locale: Locale
 }
 
-export function articleSchema({ title, description, path }: ArticleInput): Schema {
+export function articleSchema({ title, description, path, locale }: ArticleInput): Schema {
   const url = absoluteUrl(path)
   return {
     "@context": "https://schema.org",
@@ -66,7 +68,7 @@ export function articleSchema({ title, description, path }: ArticleInput): Schem
     description,
     url,
     mainEntityOfPage: url,
-    inLanguage: "es",
+    inLanguage: locale,
     isAccessibleForFree: true,
     image: DEFAULT_OG_IMAGE,
     author: PUBLISHER,
@@ -84,16 +86,17 @@ interface HowToInput {
   description: string
   path: string
   steps: readonly HowToStep[]
+  locale: Locale
 }
 
-export function howToSchema({ name, description, path, steps }: HowToInput): Schema {
+export function howToSchema({ name, description, path, steps, locale }: HowToInput): Schema {
   return {
     "@context": "https://schema.org",
     "@type": "HowTo",
     name,
     description,
     url: absoluteUrl(path),
-    inLanguage: "es",
+    inLanguage: locale,
     step: steps.map((step, index) => ({
       "@type": "HowToStep",
       position: index + 1,
@@ -129,6 +132,7 @@ export function definedTermSetSchema(
   name: string,
   path: string,
   terms: readonly DefinedTerm[],
+  locale: Locale,
 ): Schema {
   const url = absoluteUrl(path)
   return {
@@ -136,7 +140,7 @@ export function definedTermSetSchema(
     "@type": "DefinedTermSet",
     name,
     url,
-    inLanguage: "es",
+    inLanguage: locale,
     hasDefinedTerm: terms.map((entry) => ({
       "@type": "DefinedTerm",
       name: entry.term,

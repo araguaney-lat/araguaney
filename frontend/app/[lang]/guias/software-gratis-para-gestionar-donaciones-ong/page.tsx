@@ -144,7 +144,7 @@ export default async function SoftwareGratisGuidePage({
     { name: c.metaTitle, path: localizedPath(KEY, locale) },
   ]
   const structuredData = [
-    articleSchema({ title: c.metaTitle, description: c.description, path: localizedPath(KEY, locale) }),
+    articleSchema({ title: c.metaTitle, description: c.description, path: localizedPath(KEY, locale), locale }),
     faqSchema(c.faq),
     breadcrumbSchema(crumbs),
   ]
