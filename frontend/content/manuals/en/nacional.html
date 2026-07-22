@@ -1,0 +1,76 @@
+<div class="doc"><div class="wrap">
+
+  <header>
+    <span class="eyebrow">Module · National Dashboard</span>
+    <h1>The view of all centers</h1>
+    <p class="lede">The national dashboard sums the stock of every connected center and answers, at a glance, what there is, how much and where.</p>
+    <p class="crumbs">Panel › <b>National</b> · /dashboard/national</p>
+  </header>
+
+  <section>
+    <div class="intro-card">
+      <p><b>What it does.</b> Aggregates the inventory of the whole coordination: it brings into a single view what each center has recorded.</p>
+      <p><b>Why it exists.</b> It is what sets Araguaney apart. It is not just another inventory, it is the common standard plus the aggregation.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head">
+      <h2>What it aggregates</h2>
+      <p class="sect-note">The dashboard summarizes the national inventory from four complementary angles.</p>
+    </div>
+    <div class="grid">
+      <div class="card">
+        <h3>By category</h3>
+        <p>How much there is of each type: medicines, food, water and the other categories.</p>
+      </div>
+      <div class="card">
+        <h3>By center</h3>
+        <p>How much each connected center has, to compare and balance among them.</p>
+      </div>
+      <div class="card">
+        <h3>By medicine (INN)</h3>
+        <p>The active ingredients available nationally, identified by their INN.</p>
+      </div>
+      <div class="card">
+        <h3>Totals and weight</h3>
+        <p>Overall summary and aggregated weight by campaign or by center.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head">
+      <h2>Why only the national_admin sees it</h2>
+    </div>
+    <div class="intro-card">
+      <p>The <code>national_admin</code> has no center assigned: their <code>center_id</code> is null. Since their view is not filtered to a center, they see everything.</p>
+      <p>The other roles do have a center assigned, so they see only their own center and not the national aggregate.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head">
+      <h2>From inventory to coordination</h2>
+    </div>
+    <div class="intro-card">
+      <p>An isolated inventory helps one center. Aggregation helps an entire region.</p>
+      <p>Because every center uses the same standard, their stock adds up with a single query and makes decisions possible at the national level.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head">
+      <h2>Permissions</h2>
+    </div>
+    <div class="perm">
+      <p>The national dashboard is exclusive to the <code>national_admin</code>. The <code>volunteer</code> and <code>coordinator</code> see the stock of their own center, not the aggregate.</p>
+    </div>
+  </section>
+
+  <div class="foot">
+    <span>Araguaney · National Dashboard module manual</span>
+    <span>Related: Centers · Reports</span>
+  </div>
+
+</div></div>

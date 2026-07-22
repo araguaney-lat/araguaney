@@ -1,0 +1,176 @@
+<div class="doc">
+  <div class="wrap">
+
+    <header>
+      <span class="eyebrow">Manual · How Araguaney works</span>
+      <h1>From collection to shipment, in order</h1>
+      <p class="lede">Araguaney gives every collection center the same standard: record donations item by item, pack them into homogeneous boxes with QR codes, consolidate them into pallets and shipments with a manifest, and see the stock of every center in a national dashboard.</p>
+      <div class="meta">
+        <span class="tag">For volunteers, coordinators and national_admins</span>
+        <span class="tag">Operates in /dashboard</span>
+        <span class="tag">No personal donor data</span>
+      </div>
+    </header>
+
+    <section>
+      <div class="sect-head">
+        <span class="eyebrow">The flow</span>
+        <h2>Five steps, one piece at a time</h2>
+        <p class="sect-note">Every donation follows the same path. Nothing skips steps: a box does not enter a pallet until it is sealed, and a pallet does not enter a shipment until it is closed.</p>
+      </div>
+      <div class="pipe">
+        <div class="stage">
+          <div class="glyph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l2 3h6l2-3h4"/><path d="M5 12V6a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v6"/><path d="M3 12v5a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-5"/></svg></div>
+          <h3>1 · Intake</h3>
+          <span>The donation is recorded item by item: product, quantity, batch, expiry.</span>
+        </div>
+        <div class="stage">
+          <div class="glyph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 3 7.5v9L12 21l9-4.5v-9L12 3Z"/><path d="M3 7.5 12 12l9-4.5"/><path d="M12 12v9"/></svg></div>
+          <h3>2 · Box</h3>
+          <span>One product, one batch, one expiry. Sealed with a QR code and label.</span>
+        </div>
+        <div class="stage">
+          <div class="glyph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="5" rx="1"/><rect x="3" y="10" width="18" height="5" rx="1"/><path d="M6 15v4M18 15v4M6 19h12"/></svg></div>
+          <h3>3 · Pallet</h3>
+          <span>Groups sealed boxes. Can be mixed. It also has its own QR code.</span>
+        </div>
+        <div class="stage">
+          <div class="glyph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h11v9H3zM14 9h4l3 3v3h-7z"/><circle cx="7" cy="18" r="1.6"/><circle cx="17.5" cy="18" r="1.6"/></svg></div>
+          <h3>4 · Shipment</h3>
+          <span>Groups closed pallets. Once dispatched, everything is frozen.</span>
+        </div>
+        <div class="stage">
+          <div class="glyph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5"/><path d="M9 13h7M9 17h7"/></svg></div>
+          <h3>5 · Manifest</h3>
+          <span>Exportable packing list, box by box, ready for customs.</span>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <span class="eyebrow">Vocabulary</span>
+        <h2>The six core concepts</h2>
+        <p class="sect-note">Everything in Araguaney revolves around these pieces. If you understand these six, you understand the app.</p>
+      </div>
+      <div class="grid">
+        <div class="card"><h3>Center <span class="k">tenant</span></h3><p>Each collection center is an isolated space. You see only your inventory; the national dashboard adds up everyone's.</p></div>
+        <div class="card"><h3>ProductType <span class="k">the SKU</span></h3><p>The type of product, distinguished by its attributes. Ibuprofen 500 mg and 900 mg are different products.</p></div>
+        <div class="card"><h3>Intake <span class="k">intake</span></h3><p>The record of an incoming donation. It carries an optional free-text donor field, with no personal data.</p></div>
+        <div class="card"><h3>Box <span class="k">box</span></h3><p>Homogeneous: one product, one batch, one expiry. It has a QR code and a printable label.</p></div>
+        <div class="card"><h3>Pallet <span class="k">pallet</span></h3><p>Groups sealed boxes for transport. It can carry different products. With its own QR code.</p></div>
+        <div class="card"><h3>Shipment <span class="k">shipment</span></h3><p>Groups pallets and generates the manifest. Once marked as shipped, it freezes its contents.</p></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <span class="eyebrow">Statuses</span>
+        <h2>Each piece has its own state machine</h2>
+        <p class="sect-note">Statuses move in a single direction, and every change is recorded (who and when). A piece does not advance if the previous one is not ready.</p>
+      </div>
+
+      <div class="machine">
+        <p class="who">Box</p>
+        <p class="desc">Born as a draft when recorded. Only a sealed box can enter a pallet.</p>
+        <div class="flow">
+          <span class="pill">DRAFT</span><span class="arrow">→</span>
+          <span class="pill blue">SEALED</span><span class="arrow">→</span>
+          <span class="pill green">SHIPPED</span>
+          <span class="arrow" style="margin-left:6px">·</span>
+          <span class="branch">or</span>
+          <span class="pill red">REJECTED</span>
+          <span class="branch">from DRAFT if it does not meet the rules</span>
+        </div>
+      </div>
+
+      <div class="machine">
+        <p class="who">Pallet</p>
+        <p class="desc">It is opened, sealed boxes are added, and it is closed. Only a closed pallet enters a shipment.</p>
+        <div class="flow">
+          <span class="pill">OPEN</span><span class="arrow">→</span>
+          <span class="pill blue">CLOSED</span><span class="arrow">→</span>
+          <span class="pill green">SHIPPED</span>
+        </div>
+      </div>
+
+      <div class="machine">
+        <p class="who">Shipment</p>
+        <p class="desc">It is opened, closed pallets are added, and it is closed. Once marked as shipped, everything is frozen.</p>
+        <div class="flow">
+          <span class="pill">OPEN</span><span class="arrow">→</span>
+          <span class="pill blue">CLOSED</span><span class="arrow">→</span>
+          <span class="pill green">SHIPPED</span>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <span class="eyebrow">Roles</span>
+        <h2>Who does what</h2>
+        <p class="sect-note">Everyone operates in the same panel, but each role sees and can do different things. Your domain role (center_role) defines your scope.</p>
+      </div>
+      <div class="role">
+        <div><div class="rname">Volunteer</div><span class="rkey">volunteer</span></div>
+        <ul>
+          <li>Records intakes and creates, fills and seals boxes.</li>
+          <li>Prints labels and QR codes.</li>
+          <li>Sees their own requests. Works only in their center.</li>
+        </ul>
+      </div>
+      <div class="role">
+        <div><div class="rname">Coordinator</div><span class="rkey">coordinator</span></div>
+        <ul>
+          <li>Everything a volunteer can do, plus creating and closing pallets and shipments.</li>
+          <li>Generates the manifest for each shipment.</li>
+          <li>Adds volunteers to their center and resets their passwords.</li>
+        </ul>
+      </div>
+      <div class="role">
+        <div><div class="rname">National admin</div><span class="rkey">national_admin</span></div>
+        <ul>
+          <li>Sees the national aggregate of all centers.</li>
+          <li>Creates and edits centers, campaigns and any user.</li>
+          <li>Manages requests and reviews the audit log.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <span class="eyebrow">Rules</span>
+        <h2>What the system enforces on its own</h2>
+        <p class="sect-note">You don't have to remember them by heart: Araguaney validates them at the moment of recording and sealing.</p>
+      </div>
+      <div class="rule"><span class="num">01</span><div><h3>Homogeneous box</h3><p>A box references a single product, a single batch and a single expiry. If a mix arrives, it is split into several boxes.</p></div></div>
+      <div class="rule"><span class="num">02</span><div><h3>Minimum shelf life</h3><p>Medicines: at least 365 days remaining (WHO). Food and water: at least 180 days. Below that, the box is rejected automatically.</p></div></div>
+      <div class="rule"><span class="num">03</span><div><h3>Complete medicines</h3><p>To seal a medicine you need the denomination (INN), form, strength and batch number. If anything is missing, it cannot be sealed.</p></div></div>
+      <div class="rule"><span class="num">04</span><div><h3>Controlled items blocked</h3><p>A product marked as controlled is rejected at intake, without exception.</p></div></div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <span class="eyebrow">Navigation</span>
+        <h2>The panel modules</h2>
+        <p class="sect-note">Each one has its own manual. This is the map; start with Intake, which is step 1.</p>
+      </div>
+      <div class="mods">
+        <div class="mod"><span class="path">/intake</span><div><p>Intake</p><p>Record incoming donations item by item.</p></div></div>
+        <div class="mod"><span class="path">/boxes</span><div><p>Boxes</p><p>Fill, seal and print box labels.</p></div></div>
+        <div class="mod"><span class="path">/pallets</span><div><p>Pallets</p><p>Group sealed boxes and close pallets.</p></div></div>
+        <div class="mod"><span class="path">/shipments</span><div><p>Shipments</p><p>Consolidate pallets and generate manifests.</p></div></div>
+        <div class="mod"><span class="path">/catalog</span><div><p>Catalog</p><p>Product types (SKUs) and their attributes.</p></div></div>
+        <div class="mod"><span class="path">/scan</span><div><p>Scan</p><p>Read a QR code to locate a box or pallet.</p></div></div>
+        <div class="mod"><span class="path">/national</span><div><p>National</p><p>Aggregate stock of all centers (admin).</p></div></div>
+        <div class="mod"><span class="path">/transfers</span><div><p>Transfers</p><p>Move inventory between centers.</p></div></div>
+      </div>
+    </section>
+
+    <div class="foot">
+      <span>Araguaney · General manual</span>
+      <span>Standards: WHO · IFRC/ICRC · IOM · UNSPSC · GS1</span>
+    </div>
+
+  </div>
+</div>

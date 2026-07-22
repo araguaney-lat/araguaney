@@ -1,0 +1,143 @@
+<div class="doc"><div class="wrap">
+
+  <header>
+    <span class="eyebrow">Module · Catalog</span>
+    <h1>The product catalog</h1>
+    <p class="lede">The catalog is the product types (SKUs) you can register in the app. Each type defines its category and its attributes, and it is what makes two centers speak the same language.</p>
+    <p class="crumbs">Panel › <b>Catalog</b> · /dashboard/catalog</p>
+  </header>
+
+  <section>
+    <div class="sect-head">
+      <span class="eyebrow">What it is</span>
+      <h2>What the catalog is for</h2>
+      <p class="sect-note">It is the foundation everything else rests on: without a product type you cannot register a donation or seal a box.</p>
+    </div>
+    <div class="intro-card">
+      <p><b>What it does.</b> It maintains the product types that can be registered across the whole operation. When you enter a donation, you always choose a product type from the catalog.</p>
+      <p><b>Why it matters.</b> A well-defined <code>ProductType</code> is what makes it possible to validate donations (expiry, controlled medicines) and aggregate stock across centers. If everyone names and classifies things the same way, the national dashboard can total them up with a single <code>GROUP BY</code>.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head">
+      <span class="eyebrow">Structure</span>
+      <h2>Anatomy of a product type</h2>
+      <p class="sect-note">These are the fields that define each product type. Medicines use additional attributes.</p>
+    </div>
+    <div class="reqs">
+      <div class="rrow">
+        <div class="rk">Name</div>
+        <div class="rv">The product's visible name (<code>display_name</code>). It is what you see when searching and when choosing a type at intake.</div>
+      </div>
+      <div class="rrow">
+        <div class="rk">Category</div>
+        <div class="rv">One of 8: Medicines, Medical supplies, Food, Water, Hygiene, Tools, Rescue gear and Other. It determines which rules apply to the product.</div>
+      </div>
+      <div class="rrow">
+        <div class="rk">Medicine attributes</div>
+        <div class="rv">For medicines: <code>inn_name</code> (INN), <code>form</code> (form) and <code>strength</code> (strength). They distinguish one medicine from another.</div>
+      </div>
+      <div class="rrow">
+        <div class="rk">Controlled</div>
+        <div class="rv"><code>is_controlled</code>: if enabled, the product is blocked at intake and cannot be received.</div>
+      </div>
+      <div class="rrow">
+        <div class="rk">Barcode</div>
+        <div class="rv"><code>gtin</code>, optional. It is validated as EAN-8, UPC-A or EAN-13.</div>
+      </div>
+      <div class="rrow">
+        <div class="rk">Minimum shelf life</div>
+        <div class="rv"><code>min_shelf_life_days</code>, optional. If you don't set it, the category's own minimum applies.</div>
+      </div>
+      <div class="rrow">
+        <div class="rk">Default unit</div>
+        <div class="rv">The unit proposed when registering quantities (<code>default_unit</code>).</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head">
+      <span class="eyebrow">Key rule</span>
+      <h2>An attribute changes the SKU</h2>
+      <p class="sect-note">Attributes are not cosmetic: they define the product's identity.</p>
+    </div>
+    <div class="intro-card">
+      <p><b>Ibuprofen 500 mg</b> and <b>Ibuprofen 900 mg</b> are different product types, because their strength (<code>strength</code>) differs.</p>
+      <p>That is intentional: it lets you count each one separately and avoids mixing products that are not the same. If the attribute changes, the SKU changes.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head">
+      <span class="eyebrow">Reuse</span>
+      <h2>Promote to global</h2>
+      <p class="sect-note">So a type created at one center serves the whole network.</p>
+    </div>
+    <div class="intro-card">
+      <p>A product type created within a center can be <b>promoted to global</b> so that all centers reuse it. This prevents each center from creating its own version of the same product.</p>
+      <p>Only the <code>national_admin</code> promotes a product type to global.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head">
+      <span class="eyebrow">Errors</span>
+      <h2>When something fails</h2>
+      <p class="sect-note">If an action doesn't work, the app tells you why. These are the most common notices and what they mean.</p>
+    </div>
+    <div>
+      <div class="reason">
+        <div class="x">!</div>
+        <div>
+          <h3>The search is too short</h3>
+          <p>You typed too few letters. The search needs at least 2 characters to return results.</p>
+          <span class="msg">Search query must be at least 2 characters</span>
+        </div>
+      </div>
+      <div class="reason">
+        <div class="x">!</div>
+        <div>
+          <h3>Invalid category</h3>
+          <p>The chosen category is not among the 8 allowed. Select one from the list.</p>
+          <span class="msg">Category must be one of: …</span>
+        </div>
+      </div>
+      <div class="reason">
+        <div class="x">!</div>
+        <div>
+          <h3>Invalid barcode</h3>
+          <p>The barcode does not have a valid format. It must be EAN-8, UPC-A or EAN-13.</p>
+          <span class="msg">GTIN must be a valid EAN-8, UPC-A, or EAN-13</span>
+        </div>
+      </div>
+      <div class="reason">
+        <div class="x">!</div>
+        <div>
+          <h3>It doesn't exist</h3>
+          <p>The product type you are looking for is not in the catalog. It may have been deleted or the link may be out of date.</p>
+          <span class="msg">Product type not found</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head">
+      <span class="eyebrow">Permissions</span>
+      <h2>Who can do what</h2>
+      <p class="sect-note">The whole operational team consults the catalog; editing it is the national admin's job.</p>
+    </div>
+    <div class="perm">
+      <p><b>Searching and viewing the catalog</b> is done by all operational roles: <code>volunteer</code>, <code>coordinator</code> and <code>national_admin</code>.</p>
+      <p><b>Creating and editing</b> product types and <b>promoting to global</b> is the job of the <code>national_admin</code>.</p>
+    </div>
+  </section>
+
+  <div class="foot">
+    <span>Araguaney · Catalog module manual</span>
+    <span>Feeds: Intake and Boxes</span>
+  </div>
+
+</div></div>

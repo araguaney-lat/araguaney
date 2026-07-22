@@ -1,0 +1,83 @@
+<div class="doc"><div class="wrap">
+
+  <span class="eyebrow">Module · Scan</span>
+  <h1>Read a QR</h1>
+  <p class="lede">Scanning the QR of a box or a pallet opens its record instantly: what it contains, what status it is in and its history.</p>
+  <p class="crumbs">Panel › <b>Scan</b> · /dashboard/scan</p>
+
+  <div class="intro-card" style="margin-top:34px">
+    <p><b>What it does.</b> Looks up a box or pallet by its QR code and shows its record.</p>
+    <p><b>How it works.</b> It is a lookup by code: you point at the QR, you do not browse a list. Codes are not enumerable by design.</p>
+  </div>
+
+  <section>
+    <div class="sect-head">
+      <h2>What it shows when you scan</h2>
+      <p class="sect-note">Depending on the QR you read, the record adapts to what the physical item is.</p>
+    </div>
+    <div class="grid two">
+      <div class="card">
+        <h3>Box</h3>
+        <p>Product, quantity, batch, expiry, status and when it was sealed, plus its change history.</p>
+      </div>
+      <div class="card">
+        <h3>Pallet</h3>
+        <p>The boxes it groups and their status.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head">
+      <h2>How to use it</h2>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="n">1</div>
+        <div>
+          <h3>Open Scan</h3>
+          <p>Go to the Scan module from the panel.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="n">2</div>
+        <div>
+          <h3>Point the camera at the code</h3>
+          <p>Focus on the QR code printed on the box or pallet label.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="n">3</div>
+        <div>
+          <h3>The record opens</h3>
+          <p>Use it to confirm what the physical box or pallet in front of you is.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head">
+      <h2>The record is public too</h2>
+    </div>
+    <div class="intro-card">
+      <p>The same minimal record is public at <code>/qr/{code}</code>: anyone with the QR can see it without logging in.</p>
+      <p>It only shows inventory information, <b>never personal data</b>.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head">
+      <h2>Permissions</h2>
+    </div>
+    <div class="perm">
+      <p>Any operator (<code>volunteer</code>, <code>coordinator</code>, <code>national_admin</code>) can scan within the panel. The public QR record does not require a login.</p>
+    </div>
+  </section>
+
+  <div class="foot">
+    <span>Araguaney · Scan module manual</span>
+    <span>Related: Boxes · Pallets</span>
+  </div>
+
+</div></div>

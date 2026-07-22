@@ -1,0 +1,120 @@
+<div class="doc">
+  <div class="wrap">
+
+    <header>
+      <span class="eyebrow">Module · Users</span>
+      <h1>Create and manage accounts</h1>
+      <p class="lede">This is where operators are set up, assigned a role and center, and have their password reset when needed.</p>
+      <p class="crumbs">Panel › <b>Users</b> · /dashboard/admin/users</p>
+    </header>
+
+    <section>
+      <div class="intro-card">
+        <p><b>What it does.</b> Creates users, assigns them a role and center, and manages their access to the application.</p>
+        <p><b>Base rule.</b> Who can create whom depends on your own role.</p>
+      </div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <h2>Who can create whom</h2>
+        <p class="sect-note">The role you operate with determines which roles you can assign and at which center.</p>
+      </div>
+      <div class="tscroll">
+        <table class="vtable">
+          <thead>
+            <tr>
+              <th>Who creates</th>
+              <th>Roles they assign</th>
+              <th>Center</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="mono">superadmin</td>
+              <td>national_admin (and any)</td>
+              <td>any center or none</td>
+            </tr>
+            <tr>
+              <td class="mono">national_admin</td>
+              <td>volunteer, coordinator</td>
+              <td>any center</td>
+            </tr>
+            <tr>
+              <td class="mono">coordinator</td>
+              <td>volunteer only</td>
+              <td>their own center only</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <h2>Invitation flow</h2>
+        <p class="sect-note">From account creation to the user's first sign-in.</p>
+      </div>
+      <div class="steps">
+        <div class="step">
+          <div class="n">1</div>
+          <div>
+            <h3>The admin creates the user</h3>
+            <p>The system generates a temporary password and sends an invitation email.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="n">2</div>
+          <div>
+            <h3>The user signs in with that password</h3>
+            <p>The system requires them to change their password (<code>must_change_password</code>).</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="n">3</div>
+          <div>
+            <h3>The user manages their access</h3>
+            <p>From their profile they can change their password whenever they want.</p>
+            <span class="hint">Every new user is automatically assigned to the “Donaciones Generales” campaign.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <h2>Reset password</h2>
+        <p class="sect-note">The button is per row in the user list; it generates a new temporary password and resends the email. The scope depends on your role.</p>
+      </div>
+      <div class="reqs">
+        <div class="rrow">
+          <div class="rk">superadmin</div>
+          <div class="rv">Can reset the password of <code>any user</code>.</div>
+        </div>
+        <div class="rrow">
+          <div class="rk">national_admin</div>
+          <div class="rv">Can reset <code>coordinators</code> and <code>volunteers</code>. Not other national_admins.</div>
+        </div>
+        <div class="rrow">
+          <div class="rk">coordinator</div>
+          <div class="rv">Only <code>volunteers</code> at their own center.</div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <h2>Permissions</h2>
+      </div>
+      <div class="perm">
+        <p>Domain user management is handled by the <code>national_admin</code>; the <code>coordinator</code> only adds and resets volunteers at their own center. <code>national_admin</code> accounts are created and managed by the superadmin from the Studio.</p>
+      </div>
+    </section>
+
+    <div class="foot">
+      <span>Araguaney · Users module manual</span>
+      <span>Related: Centers · Campaigns</span>
+    </div>
+
+  </div>
+</div>

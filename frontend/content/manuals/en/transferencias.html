@@ -1,0 +1,182 @@
+<div class="doc"><div class="wrap">
+
+  <header>
+    <span class="eyebrow">Module · Transfers</span>
+    <h1>Move inventory between centers</h1>
+    <p class="lede">A transfer moves sealed boxes from one center to another, with approval in between and end-to-end traceability.</p>
+    <p class="crumbs">Panel › <b>Transfers</b> · /dashboard/transfers</p>
+  </header>
+
+  <section>
+    <div class="sect-head"><h2>At a glance</h2></div>
+    <div class="intro-card">
+      <p><b>What it does.</b> Lets you request, approve and receive box transfers between centers.</p>
+      <p><b>Why it matters.</b> It lets you rebalance stock toward where it is needed without losing track of any box.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head">
+      <h2>The state of a transfer</h2>
+      <p class="sect-note">Every status change is recorded with who made it and when.</p>
+    </div>
+    <div class="machine">
+      <p class="desc">Normal path of a transfer, from when it is requested until the destination receives it.</p>
+      <div class="flow">
+        <span class="pill">REQUESTED</span>
+        <span class="arrow">→</span>
+        <span class="pill blue">APPROVED</span>
+        <span class="arrow">→</span>
+        <span class="pill blue">IN_TRANSIT</span>
+        <span class="arrow">→</span>
+        <span class="pill green">RECEIVED</span>
+      </div>
+      <p class="branch" style="margin-top:12px;">or REJECTED from REQUESTED</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head"><h2>Step by step</h2></div>
+    <div class="steps">
+      <div class="step">
+        <div class="n">1</div>
+        <div>
+          <h3>The origin creates the transfer</h3>
+          <p>The origin center chooses the <span class="hl">destination</span> center and selects the boxes it wants to move. It stays in <b>REQUESTED</b>.</p>
+          <span class="hint">A box cannot be transferred if it is on a pallet or in another active transfer.</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="n">2</div>
+        <div>
+          <h3>It is approved (or rejected)</h3>
+          <p>At the origin center the request is reviewed and either approved (moves to <b>APPROVED</b>) or rejected (moves to <b>REJECTED</b>).</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="n">3</div>
+        <div>
+          <h3>The origin marks it in transit</h3>
+          <p>Once approved, the origin marks the transfer in transit and it moves to <b>IN_TRANSIT</b>: the boxes are now on their way.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="n">4</div>
+        <div>
+          <h3>The destination receives it</h3>
+          <p>The destination center confirms receipt and the transfer moves to <b>RECEIVED</b>. The boxes now belong to the destination.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head">
+      <h2>Which box can be transferred</h2>
+      <p class="sect-note">A box must meet all of these conditions to be included.</p>
+    </div>
+    <div class="reqs">
+      <div class="rrow">
+        <div class="rk">Sealed</div>
+        <div class="rv">It must be in <code>SEALED</code> status. Draft boxes cannot be moved.</div>
+      </div>
+      <div class="rrow">
+        <div class="rk">From the origin center</div>
+        <div class="rv">The box must belong to the center that creates the transfer.</div>
+      </div>
+      <div class="rrow">
+        <div class="rk">Not on a pallet</div>
+        <div class="rv">If the box is assigned to a pallet, it cannot be transferred.</div>
+      </div>
+      <div class="rrow">
+        <div class="rk">Not in another active transfer</div>
+        <div class="rv">The box cannot already be included in another transfer in progress.</div>
+      </div>
+      <div class="rrow">
+        <div class="rk">Origin ≠ destination</div>
+        <div class="rv">The origin center and the destination center must be different.</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head"><h2>Who does each step</h2></div>
+    <div class="grid two">
+      <div class="card">
+        <h3>Origin center</h3>
+        <p>Creates the transfer, approves or rejects it, and marks it in transit.</p>
+      </div>
+      <div class="card">
+        <h3>Destination center</h3>
+        <p>Receives the transfer and confirms that the boxes arrived.</p>
+      </div>
+    </div>
+    <p class="sect-note">The <span class="hl">national_admin</span> can step in at any of the steps, in any center.</p>
+  </section>
+
+  <section>
+    <div class="sect-head">
+      <h2>When something fails</h2>
+      <p class="sect-note">These are the messages you will see when a transfer cannot be completed.</p>
+    </div>
+
+    <div class="reason">
+      <div class="x">✕</div>
+      <div>
+        <h3>Same center</h3>
+        <p>You chose the same center as origin and as destination.</p>
+        <span class="msg">Origin and destination must differ</span>
+      </div>
+    </div>
+
+    <div class="reason">
+      <div class="x">✕</div>
+      <div>
+        <h3>The box is not sealed</h3>
+        <p>You tried to transfer a box that is not yet in SEALED status.</p>
+        <span class="msg">Box … must be SEALED to transfer</span>
+      </div>
+    </div>
+
+    <div class="reason">
+      <div class="x">✕</div>
+      <div>
+        <h3>The box is on a pallet</h3>
+        <p>The box is already part of a pallet and cannot be moved separately.</p>
+        <span class="msg">Box … is assigned to a pallet</span>
+      </div>
+    </div>
+
+    <div class="reason">
+      <div class="x">✕</div>
+      <div>
+        <h3>The box is already in another transfer</h3>
+        <p>The box is included in another active transfer.</p>
+        <span class="msg">Box … is already in an active transfer</span>
+      </div>
+    </div>
+
+    <div class="reason">
+      <div class="x">✕</div>
+      <div>
+        <h3>Only the destination receives</h3>
+        <p>Only the coordinator of the destination center can confirm receipt.</p>
+        <span class="msg">Only the destination coordinator can receive</span>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head"><h2>Permissions</h2></div>
+    <div class="perm">
+      <p>The <code>coordinator</code> can only create transfers where their own center is involved. Approving, rejecting and sending is done by the <code>coordinator</code> of the <b>origin</b> center; receiving is done by the <code>coordinator</code> of the <b>destination</b> center.</p>
+      <p>The <code>national_admin</code> can perform any of these actions in any center.</p>
+    </div>
+  </section>
+
+  <div class="foot">
+    <span>Araguaney · Transfers module manual</span>
+    <span>Related: Boxes</span>
+  </div>
+
+</div></div>

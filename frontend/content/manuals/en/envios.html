@@ -1,0 +1,146 @@
+<div class="doc">
+  <div class="wrap">
+
+    <header>
+      <span class="eyebrow">Module · Shipments</span>
+      <h1>Consolidate a shipment and generate the manifest</h1>
+      <p class="lede">Steps 4 and 5, the end of the road. A shipment groups closed pallets, produces the manifest that customs needs, and once dispatched it freezes all its contents to preserve traceability.</p>
+      <p class="crumbs">Panel &rsaquo; <b>Shipments</b> &nbsp;·&nbsp; /dashboard/shipments</p>
+    </header>
+
+    <section>
+      <div class="intro-card">
+        <p><b>What it does.</b> Gathers closed pallets into a shipment with a destination and carrier, generates the exportable <b>manifest</b> (packing list), and marks the shipment as dispatched.</p>
+        <p><b>Why it is the decisive step.</b> Without homogeneous boxes and a detailed manifest, the cargo gets stuck at customs. This is where all the prior order becomes a document that lets the shipment through.</p>
+      </div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <span class="eyebrow">The shipment status</span>
+        <h2>Open, closed, dispatched</h2>
+        <p class="sect-note">It is filled while <span class="hl">OPEN</span>; it is fixed when it moves to <span class="hl">CLOSED</span>; and when dispatched (<span class="hl">SHIPPED</span>) it drags its pallets and boxes into the same status.</p>
+      </div>
+      <div class="machine">
+        <p class="desc">Every transition is recorded. Dispatching is final: it freezes the entire content of the shipment.</p>
+        <div class="flow">
+          <span class="pill">OPEN</span><span class="arrow">→</span>
+          <span class="pill blue">CLOSED</span><span class="arrow">→</span>
+          <span class="pill green">SHIPPED</span>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <span class="eyebrow">Step by step</span>
+        <h2>From the shipment to the manifest</h2>
+      </div>
+      <div class="steps">
+        <div class="step"><span class="n">1</span><div>
+          <h3>Create the shipment</h3>
+          <p>In <b>Shipments</b>, create a new one with its destination, carrier and reference. It is born open (<b>OPEN</b>).</p>
+        </div></div>
+        <div class="step"><span class="n">2</span><div>
+          <h3>Add closed pallets</h3>
+          <p>Add to the shipment the pallets you have already closed. Only <b>closed</b> pallets that are not already in another shipment can be added.</p>
+          <span class="hint">A pallet won't go in? Check that it is closed and that it does not already belong to another shipment.</span>
+        </div></div>
+        <div class="step"><span class="n">3</span><div>
+          <h3>Close the shipment</h3>
+          <p>When it is complete, close it. It moves to <b>CLOSED</b>. A shipment cannot be closed without pallets.</p>
+        </div></div>
+        <div class="step"><span class="n">4</span><div>
+          <h3>Generate the manifest</h3>
+          <p>Download the manifest as a PDF (packing list) or as Excel in the IFRC format. It is assembled solely from the shipment's pallets and boxes, with no extra data entry. Generation runs in the background.</p>
+        </div></div>
+        <div class="step"><span class="n">5</span><div>
+          <h3>Dispatch</h3>
+          <p>Mark the shipment as <b>dispatched</b>. At that moment all its pallets and boxes become shipped and the content is frozen. The cargo leaves with its manifest.</p>
+        </div></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <span class="eyebrow">The document</span>
+        <h2>What the manifest includes</h2>
+        <p class="sect-note">It is generated automatically because each box was already registered and sealed as homogeneous. Nothing needs to be re-entered.</p>
+      </div>
+      <div class="manifest">
+        <h3>Packing list, box by box</h3>
+        <p class="sub">For each box and at the consolidated shipment level.</p>
+        <div class="mgrid">
+          <div class="mitem">Material code or classification (IFRC/ICRC, UNSPSC)</div>
+          <div class="mitem">Product description</div>
+          <div class="mitem">Quantity and unit</div>
+          <div class="mitem">Batch and expiry</div>
+          <div class="mitem">Weight per box</div>
+          <div class="mitem">Pallets that group the boxes and total weight</div>
+        </div>
+        <div class="formats">
+          <div class="fmt"><b>PDF</b><span>· packing list ready to print</span></div>
+          <div class="fmt"><b>Excel</b><span>· IFRC format</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <span class="eyebrow">Diagnostics</span>
+        <h2>Why something won't let you proceed</h2>
+        <p class="sect-note">Araguaney's exact notices at each point of the process.</p>
+      </div>
+      <div class="reason"><span class="x">✕</span><div>
+        <h3>The pallet is not closed</h3>
+        <p>Only closed pallets can be added to a shipment. Close the pallet first.</p>
+        <span class="msg">Only CLOSED pallets can be added to a shipment</span>
+      </div></div>
+      <div class="reason"><span class="x">✕</span><div>
+        <h3>The pallet is already in another shipment</h3>
+        <p>A pallet belongs to a single shipment. Remove it from the other one if it really must change.</p>
+        <span class="msg">Pallet is already assigned to a shipment</span>
+      </div></div>
+      <div class="reason"><span class="x">✕</span><div>
+        <h3>Shipment without pallets</h3>
+        <p>An empty shipment cannot be closed. Add at least one pallet.</p>
+        <span class="msg">Cannot close a shipment with no pallets</span>
+      </div></div>
+      <div class="reason"><span class="x">✕</span><div>
+        <h3>Dispatching before closing</h3>
+        <p>Only a closed shipment can be dispatched. Close it first.</p>
+        <span class="msg">Shipment is 'OPEN'; only CLOSED shipments can be shipped</span>
+      </div></div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <span class="eyebrow">On dispatch</span>
+        <h2>The freeze</h2>
+      </div>
+      <div class="freeze">
+        <span class="ic">❄</span>
+        <div>
+          <h3>Everything is locked</h3>
+          <p>When you mark the shipment as dispatched, its pallets become shipped and every box inside as well. From then on nothing is edited: the manifest reflects exactly what left, and that snapshot is kept for traceability.</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <span class="eyebrow">Permissions</span>
+        <h2>Who consolidates shipments</h2>
+      </div>
+      <div class="perm">
+        <p>Creating and closing shipments and generating the manifest is the job of the <code>coordinator</code> in their center and of the <code>national_admin</code> in any center. Manifest generation is limited for security (2 per minute), so it may take a few seconds during peaks.</p>
+      </div>
+    </section>
+
+    <div class="foot">
+      <span>Araguaney · Shipments module manual</span>
+      <span>← Before: Pallets &nbsp;·&nbsp; End of the main flow</span>
+    </div>
+
+  </div>
+</div>
