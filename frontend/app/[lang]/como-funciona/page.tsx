@@ -286,6 +286,7 @@ export default async function ComoFuncionaPage({
       description: c.description,
       path: localizedPath(KEY, locale),
       steps: c.stages.map((s) => ({ name: s.title, text: s.desc })),
+      locale,
     }),
     breadcrumbSchema(crumbs),
   ]

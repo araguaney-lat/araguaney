@@ -178,8 +178,8 @@ export default async function AduanaGuidePage({
   ]
 
   const structuredData = [
-    articleSchema({ title: c.title, description: c.description, path: selfPath }),
-    howToSchema({ name: c.title, description: c.description, path: selfPath, steps: c.steps }),
+    articleSchema({ title: c.title, description: c.description, path: selfPath, locale }),
+    howToSchema({ name: c.title, description: c.description, path: selfPath, steps: c.steps, locale }),
     breadcrumbSchema(crumbs),
   ]
 

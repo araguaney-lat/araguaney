@@ -150,8 +150,8 @@ export default async function VoluntariosGuidePage({
   ]
 
   const structuredData = [
-    articleSchema({ title: c.metaTitle, description: c.description, path }),
-    howToSchema({ name: c.metaTitle, description: c.description, path, steps: c.steps }),
+    articleSchema({ title: c.metaTitle, description: c.description, path, locale }),
+    howToSchema({ name: c.metaTitle, description: c.description, path, steps: c.steps, locale }),
     breadcrumbSchema(crumbs),
   ]
 

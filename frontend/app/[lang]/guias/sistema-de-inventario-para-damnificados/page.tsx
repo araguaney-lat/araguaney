@@ -151,8 +151,8 @@ export default async function InventarioDamnificadosGuidePage({
     { name: c.metaTitle, path: localizedPath(KEY, locale) },
   ]
   const structuredData = [
-    articleSchema({ title: c.metaTitle, description: c.description, path: localizedPath(KEY, locale) }),
-    howToSchema({ name: c.metaTitle, description: c.description, path: localizedPath(KEY, locale), steps: c.steps }),
+    articleSchema({ title: c.metaTitle, description: c.description, path: localizedPath(KEY, locale), locale }),
+    howToSchema({ name: c.metaTitle, description: c.description, path: localizedPath(KEY, locale), steps: c.steps, locale }),
     breadcrumbSchema(crumbs),
   ]
 

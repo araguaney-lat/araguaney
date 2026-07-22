@@ -239,12 +239,13 @@ export default async function ComoOrganizarGuidePage({
   ]
 
   const structuredData = [
-    articleSchema({ title: c.metaTitle, description: c.description, path: localizedPath(KEY, locale) }),
+    articleSchema({ title: c.metaTitle, description: c.description, path: localizedPath(KEY, locale), locale }),
     howToSchema({
       name: c.metaTitle,
       description: c.description,
       path: localizedPath(KEY, locale),
       steps: c.howToSteps,
+      locale,
     }),
     faqSchema(c.faq),
     breadcrumbSchema(crumbs),
