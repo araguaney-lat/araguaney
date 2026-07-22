@@ -86,6 +86,11 @@ export default async function EventoPage({
   // Campaign name/description are admin-entered Spanish-only data (no i18n at
   // the model level) — fixing the nav to "es" avoids an English nav wrapping
   // Spanish campaign content when the visitor's locale cookie is "en".
+  //
+  // i18n (sub-project 2d): this page is intentionally ES-only and NOT part of the
+  // URL-locale system (routes.ts) — there is no translated content to justify an
+  // /en URL or hreflang. Adding fake alternates for untranslated content would
+  // hurt SEO, so it stays flat with a canonical-only.
   const dict = await getDictionary("es")
 
   const path = `/eventos/${campaign.slug}`

@@ -5,22 +5,55 @@ import { useParams } from "next/navigation"
 import Turnstile from "react-turnstile"
 import type { BoxPublicOut } from "@/types"
 
-const CATEGORY_LABELS: Record<string, string> = {
-  MEDICINE: "Medicamento",
-  MEDICAL_SUPPLY: "Insumo médico",
-  FOOD: "Alimento",
-  WATER: "Agua",
-  HYGIENE: "Higiene",
-  TOOL: "Herramienta",
-  RESCUE_GEAR: "Equipo de rescate",
-  OTHER: "Otro",
-}
+type Loc = "es" | "en"
 
-const STATUS_LABELS: Record<string, string> = {
-  DRAFT: "Borrador",
-  SEALED: "Sellada ✓",
-  SHIPPED: "Enviada",
-  REJECTED: "Rechazada",
+// Scanned from a physical QR (not URL-locale). The box DATA is Spanish
+// (admin/catalog); only the UI LABELS follow the scanner's browser language.
+const LABELS: Record<Loc, {
+  categories: Record<string, string>
+  statuses: Record<string, string>
+  notFound: string
+  qrAlt: string
+  quantity: string
+  expiry: string
+  sealed: string
+  footer: string
+  verifying: string
+  confirmHuman: string
+  loadError: string
+  loading: string
+  dateLocale: string
+}> = {
+  es: {
+    categories: { MEDICINE: "Medicamento", MEDICAL_SUPPLY: "Insumo médico", FOOD: "Alimento", WATER: "Agua", HYGIENE: "Higiene", TOOL: "Herramienta", RESCUE_GEAR: "Equipo de rescate", OTHER: "Otro" },
+    statuses: { DRAFT: "Borrador", SEALED: "Sellada ✓", SHIPPED: "Enviada", REJECTED: "Rechazada" },
+    notFound: "Caja no encontrada",
+    qrAlt: "Código QR",
+    quantity: "Cantidad",
+    expiry: "Caducidad",
+    sealed: "Sellada",
+    footer: "Acopio · Centro coordinador de donaciones humanitarias",
+    verifying: "Verificando acceso…",
+    confirmHuman: "Confirma que eres humano para ver la ficha",
+    loadError: "Error al cargar. Intenta de nuevo.",
+    loading: "Cargando ficha…",
+    dateLocale: "es-MX",
+  },
+  en: {
+    categories: { MEDICINE: "Medicine", MEDICAL_SUPPLY: "Medical supply", FOOD: "Food", WATER: "Water", HYGIENE: "Hygiene", TOOL: "Tool", RESCUE_GEAR: "Rescue gear", OTHER: "Other" },
+    statuses: { DRAFT: "Draft", SEALED: "Sealed ✓", SHIPPED: "Shipped", REJECTED: "Rejected" },
+    notFound: "Box not found",
+    qrAlt: "QR code",
+    quantity: "Quantity",
+    expiry: "Expiry",
+    sealed: "Sealed",
+    footer: "Acopio · Humanitarian donation coordination center",
+    verifying: "Verifying access…",
+    confirmHuman: "Confirm you're human to see the details",
+    loadError: "Couldn't load. Try again.",
+    loading: "Loading…",
+    dateLocale: "en-US",
+  },
 }
 
 const STATUS_COLORS: Record<string, string> = {
@@ -34,6 +67,10 @@ type PageState = "pending" | "loading" | "done" | "error" | "notfound"
 
 export default function BoxPublicFichaPage() {
   const { code } = useParams<{ code: string }>()
+  const [locale] = useState<Loc>(() =>
+    typeof navigator !== "undefined" && navigator.language.toLowerCase().startsWith("en") ? "en" : "es",
+  )
+  const L = LABELS[locale]
   const [pageState, setPageState] = useState<PageState>("pending")
   const [box, setBox] = useState<BoxPublicOut | null>(null)
   const [turnstileKey, setTurnstileKey] = useState(0)
@@ -72,7 +109,7 @@ export default function BoxPublicFichaPage() {
     return (
       <main className="min-h-screen bg-zinc-50 flex items-center justify-center p-4">
         <div className="text-center">
-          <p className="text-zinc-500 text-sm">Caja no encontrada</p>
+          <p className="text-zinc-500 text-sm">{L.notFound}</p>
           <p className="font-mono text-xs text-zinc-400 mt-1">{code}</p>
         </div>
       </main>
@@ -86,7 +123,7 @@ export default function BoxPublicFichaPage() {
           <div className="flex justify-center bg-zinc-50 pt-6 pb-4 border-b border-zinc-100">
             <img
               src={`${publicApiUrl}/b/${code}/qr.png`}
-              alt={`QR código ${code}`}
+              alt={`${L.qrAlt} ${code}`}
               width={140}
               height={140}
               className="rounded"
@@ -97,27 +134,27 @@ export default function BoxPublicFichaPage() {
             <div className="flex items-center justify-between">
               <span className="font-mono text-base font-bold text-zinc-900">{box.code}</span>
               <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${STATUS_COLORS[box.status] ?? "bg-zinc-100 text-zinc-700"}`}>
-                {STATUS_LABELS[box.status] ?? box.status}
+                {L.statuses[box.status] ?? box.status}
               </span>
             </div>
 
             <div>
               <p className="text-sm font-semibold text-zinc-800">{box.display_name}</p>
               <p className="text-xs text-zinc-500 mt-0.5">
-                {CATEGORY_LABELS[box.category] ?? box.category}
+                {L.categories[box.category] ?? box.category}
               </p>
             </div>
 
             <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
               <div>
-                <dt className="text-xs text-zinc-500">Cantidad</dt>
+                <dt className="text-xs text-zinc-500">{L.quantity}</dt>
                 <dd className="font-medium text-zinc-800">{box.quantity} {box.unit}</dd>
               </div>
               {box.expiry_date && (
                 <div>
-                  <dt className="text-xs text-zinc-500">Caducidad</dt>
+                  <dt className="text-xs text-zinc-500">{L.expiry}</dt>
                   <dd className="font-medium text-zinc-800">
-                    {new Date(box.expiry_date + "T00:00:00").toLocaleDateString("es-MX", {
+                    {new Date(box.expiry_date + "T00:00:00").toLocaleDateString(L.dateLocale, {
                       day: "2-digit", month: "short", year: "numeric",
                     })}
                   </dd>
@@ -125,9 +162,9 @@ export default function BoxPublicFichaPage() {
               )}
               {box.sealed_at && (
                 <div className="col-span-2">
-                  <dt className="text-xs text-zinc-500">Sellada</dt>
+                  <dt className="text-xs text-zinc-500">{L.sealed}</dt>
                   <dd className="font-medium text-zinc-800">
-                    {new Date(box.sealed_at).toLocaleString("es-MX", {
+                    {new Date(box.sealed_at).toLocaleString(L.dateLocale, {
                       dateStyle: "short", timeStyle: "short",
                     })}
                   </dd>
@@ -137,7 +174,7 @@ export default function BoxPublicFichaPage() {
           </div>
 
           <div className="px-5 pb-4 text-center">
-            <p className="text-xs text-zinc-400">Acopio · Centro coordinador de donaciones humanitarias</p>
+            <p className="text-xs text-zinc-400">{L.footer}</p>
           </div>
         </div>
       </main>
@@ -148,12 +185,12 @@ export default function BoxPublicFichaPage() {
     <main className="min-h-screen bg-zinc-50 flex items-center justify-center p-4">
       <div className="w-full max-w-sm rounded-2xl border border-zinc-200 bg-white shadow-sm p-6 flex flex-col items-center gap-4">
         <div className="text-center">
-          <p className="text-sm font-semibold text-zinc-700">Verificando acceso…</p>
-          <p className="text-xs text-zinc-400 mt-1">Confirma que eres humano para ver la ficha</p>
+          <p className="text-sm font-semibold text-zinc-700">{L.verifying}</p>
+          <p className="text-xs text-zinc-400 mt-1">{L.confirmHuman}</p>
         </div>
 
         {pageState === "error" && (
-          <p className="text-xs text-red-500">Error al cargar. Intenta de nuevo.</p>
+          <p className="text-xs text-red-500">{L.loadError}</p>
         )}
 
         <Turnstile
@@ -165,7 +202,7 @@ export default function BoxPublicFichaPage() {
         />
 
         {pageState === "loading" && (
-          <p className="text-xs text-zinc-400">Cargando ficha…</p>
+          <p className="text-xs text-zinc-400">{L.loading}</p>
         )}
       </div>
     </main>
