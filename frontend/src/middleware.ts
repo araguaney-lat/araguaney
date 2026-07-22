@@ -12,6 +12,11 @@ import {
   localizedPath,
 } from "@/lib/routes"
 
+// The panel/studio are NOT in the public slug map (sub-3): they keep the same
+// slug and only take a locale PREFIX (/en/dashboard/...). ES stays unprefixed.
+const LOCALE_COOKIE = "locale"
+const PANEL_PREFIX = /^\/en(?=\/dashboard(?:\/|$)|\/studio(?:\/|$))/
+
 // ── i18n: map public URLs onto the app/[lang] tree ────────────────────────────
 // - default locale (es) is unprefixed; others are prefixed (/en/...).
 // - slugs are translated per locale via ROUTE_SLUGS.
@@ -57,25 +62,51 @@ const runAuth = auth((req) => {
   const platformRole = session?.platformRole ?? null
   const { pathname } = req.nextUrl
 
-  const isAuthPage = pathname.startsWith("/login") || pathname.startsWith("/register")
-  const isDashboard = pathname.startsWith("/dashboard")
-  const isStudio = pathname.startsWith("/studio")
+  // Panel URL-locale (sub-3): strip an /en prefix that precedes a panel route so
+  // the auth checks run against the physical path. The prefix is the source of
+  // truth for the locale; a bare (unprefixed) path keeps the cookie-based locale.
+  const hasPanelPrefix = PANEL_PREFIX.test(pathname)
+  const locale: Locale = hasPanelPrefix ? "en" : DEFAULT_LOCALE
+  const logical = hasPanelPrefix ? pathname.replace(PANEL_PREFIX, "") : pathname
+  // Re-apply the current prefix to an in-panel redirect target so navigation
+  // stays inside the same locale.
+  const withPrefix = (p: string) =>
+    hasPanelPrefix && (p.startsWith("/dashboard") || p.startsWith("/studio")) ? `/en${p}` : p
+
+  const isAuthPage = logical.startsWith("/login") || logical.startsWith("/register")
+  const isDashboard = logical.startsWith("/dashboard")
+  const isStudio = logical.startsWith("/studio")
   const isAdminOnly =
-    pathname.startsWith("/dashboard/centers") || pathname.startsWith("/dashboard/admin")
+    logical.startsWith("/dashboard/centers") || logical.startsWith("/dashboard/admin")
 
   if ((isDashboard || isStudio) && !isLoggedIn) {
+    // Preserve the prefixed pathname so post-login returns to the EN URL.
     return NextResponse.redirect(
       new URL(`/login?callbackUrl=${encodeURIComponent(pathname)}`, req.url),
     )
   }
   if (isAuthPage && isLoggedIn) {
-    return NextResponse.redirect(new URL("/dashboard", req.url))
+    // Landing honors the cookie so a returning EN user lands on /en/dashboard.
+    const cookieLocale = req.cookies.get(LOCALE_COOKIE)?.value
+    const landing = cookieLocale === "en" ? "/en/dashboard" : "/dashboard"
+    return NextResponse.redirect(new URL(landing, req.url))
   }
   if (isStudio && platformRole !== "superadmin") {
-    return NextResponse.redirect(new URL("/dashboard", req.url))
+    return NextResponse.redirect(new URL(withPrefix("/dashboard"), req.url))
   }
   if (isAdminOnly && centerRole !== "national_admin") {
-    return NextResponse.redirect(new URL("/dashboard", req.url))
+    return NextResponse.redirect(new URL(withPrefix("/dashboard"), req.url))
+  }
+
+  // Prefixed panel route: rewrite to the physical path, force EN for this render,
+  // and sync the cookie so unprefixed in-panel links keep the same locale.
+  if (hasPanelPrefix) {
+    const url = req.nextUrl.clone()
+    url.pathname = logical
+    const res = NextResponse.rewrite(url)
+    res.headers.set("x-locale", locale)
+    res.cookies.set(LOCALE_COOKIE, locale, { path: "/", maxAge: 60 * 60 * 24 * 365 })
+    return res
   }
 
   return NextResponse.next()
