@@ -9,6 +9,12 @@ import type { PublicNeedsOut } from "@/types"
 
 const KEY = "necesidades"
 
+// Rendered at request time, NOT prerendered at build. Under app/[lang] (which has
+// static params es/en), Next would otherwise try to prerender /es|/en/necesidades
+// at build and fetch the backend — which hangs/fails the Vercel build (same
+// failure mode as app/sitemap.ts). force-dynamic keeps the live-data fetch at
+// request time.
+export const dynamic = "force-dynamic"
 export const revalidate = 300
 
 const CATEGORY_LABELS: Record<Locale, Record<string, string>> = {
@@ -96,6 +102,7 @@ export default async function NecesidadesPage({
   try {
     data = await apiFetch<PublicNeedsOut>("/v1/public/needs", {
       next: { revalidate: 300, tags: ["public-needs"] },
+      signal: AbortSignal.timeout(5000),
     })
   } catch {
     data = null
