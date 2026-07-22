@@ -71,10 +71,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       alternates: { languages: langAlternates("ayuda-humanitaria") },
     },
     {
-      url: `${SITE_URL}/necesidades`,
+      url: absoluteUrl(localizedPath("necesidades", "es")),
       lastModified: now,
       changeFrequency: "hourly",
       priority: 0.8,
+      alternates: { languages: langAlternates("necesidades") },
     },
     {
       url: absoluteUrl(localizedPath("guias", "es")),
@@ -106,12 +107,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.5,
       alternates: { languages: langAlternates("glosario") },
     },
-    ...NEEDS_CATEGORIES.map((c) => ({
-      url: `${SITE_URL}/necesidades/${c.slug}`,
-      lastModified: now,
-      changeFrequency: "daily" as const,
-      priority: 0.7,
-    })),
+    ...NEEDS_CATEGORIES.map((c) => {
+      const key = `necesidades/${c.slug}` as RouteKey
+      return {
+        url: absoluteUrl(localizedPath(key, "es")),
+        lastModified: now,
+        changeFrequency: "daily" as const,
+        priority: 0.7,
+        alternates: { languages: langAlternates(key) },
+      }
+    }),
     {
       url: absoluteUrl(localizedPath("contacto", "es")),
       lastModified: now,

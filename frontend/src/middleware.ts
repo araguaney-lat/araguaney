@@ -115,6 +115,10 @@ export const config = {
     "/guides/:path*",
     "/glosario",
     "/glossary",
+    "/necesidades",
+    "/necesidades/:path*",
+    "/needs",
+    "/needs/:path*",
     "/en/:path*",
   ],
 }

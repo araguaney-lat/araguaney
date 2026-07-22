@@ -50,7 +50,15 @@ export const ROUTE_SLUGS: Record<string, Record<Locale, string>> = {
     en: "guides/inventory-system-for-disaster-relief",
   },
   "glosario": { es: "glosario", en: "glossary" },
-  // More routes migrate here in subs 2c–4 (categorías, necesidades, …).
+  "necesidades": { es: "necesidades", en: "needs" },
+  "necesidades/medicamentos": { es: "necesidades/medicamentos", en: "needs/medicine" },
+  "necesidades/insumos-medicos": { es: "necesidades/insumos-medicos", en: "needs/medical-supplies" },
+  "necesidades/alimentos": { es: "necesidades/alimentos", en: "needs/food" },
+  "necesidades/agua": { es: "necesidades/agua", en: "needs/water" },
+  "necesidades/higiene": { es: "necesidades/higiene", en: "needs/hygiene" },
+  "necesidades/herramientas": { es: "necesidades/herramientas", en: "needs/tools" },
+  "necesidades/equipo-de-rescate": { es: "necesidades/equipo-de-rescate", en: "needs/rescue-gear" },
+  // More routes migrate here in subs 2d–4 (eventos, qr, …).
 }
 
 export type RouteKey = keyof typeof ROUTE_SLUGS
