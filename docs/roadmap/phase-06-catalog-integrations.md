@@ -1,4 +1,4 @@
-### Fase 6 — Catálogos de referencia + lookups en tiempo real ⬜
+### Fase 6 — Catálogos de referencia + lookups en tiempo real ✅
 
 ---
 
@@ -94,11 +94,11 @@ Todos vía `fire_audit(background_tasks, ...)` en los routers:
 | # | Tarea | Descripción | Complejidad | Estado |
 |---|-------|-------------|-------------|--------|
 | 6 | Seed campaña "Donaciones Generales" | Incluida en migración `012`; `is_active=true`, `destination_country=NULL`; sirve como campaña fallback permanente; no se puede desactivar desde el UI (guard en service) | 🟢 | ✅ Hecho |
-| 7 | Seed WHO Essential Medicines | Migración `014_seed_who_medicines` idempotente: ~500 medicamentos con `inn_name`, `form`, `strength`, `category=MEDICINE`, `is_controlled`, `min_shelf_life_days=365`, `campaign_id=NULL` | 🟠 | ⬜ Pendiente |
-| 8 | Seed IOM/IFRC no-food items | Migración `015_seed_iom_nonfood`: ~300 artículos; `campaign_id=NULL` | 🟠 | ⬜ Pendiente |
-| 9 | Seed alimentos frecuentes | Migración `016_seed_common_food`: ~50 alimentos básicos; `category=FOOD`, `min_shelf_life_days=180`, `campaign_id=NULL` | 🟡 | ⬜ Pendiente |
+| 7 | Seed WHO Essential Medicines | Migración `025_seed_who_medicines` idempotente: medicamentos con `inn_name`, `form`, `strength`, `category=MEDICINE`, `is_controlled`, `min_shelf_life_days=365`, `campaign_id=NULL` | 🟠 | ✅ Done — **subset curado real de 154** (WHO EML 23ª ed., en español para consistencia con la UI). 13 controlados marcados (morfina, diazepam, fenobarbital, ketamina, etc. → bloqueados en intake). Datos en `app/seeds/who_medicines.py`. Rev real `025` (el `014` del plan ya estaba tomado por transfers). Id determinista `uuid5` + `ON CONFLICT DO NOTHING`; ampliable a más filas. |
+| 8 | Seed IOM/IFRC no-food items | Migración `026_seed_iom_nonfood`: artículos no-food; `campaign_id=NULL` | 🟠 | ✅ Done — **84 ítems reales** (IFRC/ICRC Emergency Items Catalogue + estándares IOM) en `app/seeds/iom_nonfood.py`: MEDICAL_SUPPLY 22, TOOL 16, HYGIENE 14, RESCUE_GEAR 14, OTHER 10, WATER 8. Rev real `026` (el `015` ya estaba tomado por messaging). |
+| 9 | Seed alimentos frecuentes | Migración `027_seed_common_food`: alimentos básicos; `category=FOOD`, `min_shelf_life_days=180`, `campaign_id=NULL` | 🟡 | ✅ Done — **40 alimentos** no perecederos en `app/seeds/common_food.py`. Rev real `027` (el `016` ya estaba tomado por RLS). Idempotencia y `downgrade` verificados contra Postgres real; 13 tests de contrato en `tests/test_seeds.py`. |
 
-> Seeds idempotentes: `INSERT ... ON CONFLICT (inn_name, form, strength) WHERE campaign_id IS NULL DO NOTHING`.
+> Seeds idempotentes: id determinista `uuid5(namespace, clave_natural)` + `INSERT ... ON CONFLICT (id) DO NOTHING` (no había índice único para el `ON CONFLICT (inn_name, form, strength)` propuesto originalmente). `downgrade` borra solo por esos ids con `campaign_id IS NULL`.
 
 ---
 
