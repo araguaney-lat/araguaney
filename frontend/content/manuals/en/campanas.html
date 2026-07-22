@@ -1,0 +1,88 @@
+<div class="doc"><div class="wrap">
+
+  <header>
+    <span class="eyebrow">Module · Campaigns</span>
+    <h1>Organize donations by cause</h1>
+    <p class="lede">A campaign groups the donations of an event or a cause —an earthquake, a drive— and gives it its own public "what's needed" page.</p>
+    <p class="crumbs">Panel › <b>Campaigns</b> · /dashboard/campaigns</p>
+  </header>
+
+  <section>
+    <div class="intro-card">
+      <p><b>What it does.</b> It lets you create and manage campaigns: each one is a named container under which donations are registered.</p>
+      <p><b>Why it matters.</b> It separates and communicates what is being gathered for each cause without mixing inventories. This way you can report the progress of each event separately and direct people to the right cause.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head">
+      <span class="eyebrow">Structure</span>
+      <h2>What defines a campaign</h2>
+      <p class="sect-note">Three pieces of data describe each campaign. The public link is built automatically; you only choose the name and the status.</p>
+    </div>
+    <div class="reqs">
+      <div class="rrow">
+        <div class="rk">Name</div>
+        <div class="rv">The title of the cause or the event. It is what you see in the panel and what the public link is derived from.</div>
+      </div>
+      <div class="rrow">
+        <div class="rk">Public link</div>
+        <div class="rv">The campaign's <code>slug</code>. It is generated automatically from the name. If it clashes with another campaign's, Araguaney adds a suffix so it stays unique.</div>
+      </div>
+      <div class="rrow">
+        <div class="rk">Status</div>
+        <div class="rv">The campaign can be <b>active</b> or <b>inactive</b>. It controls whether it is still in operation or closed.</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head">
+      <span class="eyebrow">Default campaign</span>
+      <h2>Donaciones Generales</h2>
+    </div>
+    <div class="intro-card">
+      <p><b>Donaciones Generales</b> is the default campaign. It always exists and works as a safety net.</p>
+      <p>Every new user is assigned to it automatically, and any intake that does not specify a particular campaign falls there. Nothing is lost: if you didn't choose a campaign, the donation is registered under Donaciones Generales.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head">
+      <span class="eyebrow">Public page</span>
+      <h2>Each campaign has its public page</h2>
+      <p class="sect-note">The per-event traffic magnet: a link you can share so people see what is needed.</p>
+    </div>
+    <div class="intro-card">
+      <p>At <code>/eventos/{slug}</code> anyone can see, <b>without login</b>, the inventory available for that campaign.</p>
+      <p>The page updates every 5 minutes, so it reflects what is available at the moment. Share that link over social media or messaging to attract donations to the right cause.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head">
+      <span class="eyebrow">Who can register</span>
+      <h2>Members</h2>
+    </div>
+    <div class="intro-card">
+      <p>Only the <b>members</b> of a campaign can register donations in it. Being a member is what enables a person to add intakes to that cause.</p>
+      <p>The <b>coordinator</b> manages the campaign members of their own center. The <b>national_admin</b> manages campaigns and their members at the national level.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head">
+      <span class="eyebrow">Permissions</span>
+      <h2>Who can do what</h2>
+    </div>
+    <div class="perm">
+      <p>Creating and editing campaigns is the job of the <code>national_admin</code>. The <code>coordinator</code> manages the campaign members of their center, but does not create or edit campaigns.</p>
+    </div>
+  </section>
+
+  <div class="foot">
+    <span>Araguaney · Campaigns module manual</span>
+    <span>Related: Intake · What's needed</span>
+  </div>
+
+</div></div>

@@ -1,0 +1,121 @@
+<div class="doc">
+  <div class="wrap">
+
+    <header>
+      <span class="eyebrow">Module · Pallets</span>
+      <h1>Build a pallet</h1>
+      <p class="lede">Step 3. A pallet groups already-sealed boxes to move them together. Unlike a box, a pallet can be mixed: it can carry different products. It has its own QR code and, once closed, it enters a shipment.</p>
+      <p class="crumbs">Panel &rsaquo; <b>Pallets</b> &nbsp;·&nbsp; /dashboard/pallets</p>
+    </header>
+
+    <section>
+      <div class="intro-card">
+        <p><b>What it does.</b> It lets you create pallets, put sealed boxes in them and close them. It is the bridge between loose boxes and a consolidated shipment.</p>
+        <p><b>The golden rule.</b> Only <b>sealed</b> boxes from your center, that are not already in another pallet, can enter. While the pallet is open you can add and remove; once closed, it is fixed.</p>
+      </div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <span class="eyebrow">The pallet status</span>
+        <h2>Open, closed, shipped</h2>
+        <p class="sect-note">It is filled while <span class="hl">OPEN</span>; it is frozen when it moves to <span class="hl">CLOSED</span>; and it moves to <span class="hl">SHIPPED</span> automatically when its shipment is dispatched.</p>
+      </div>
+      <div class="machine">
+        <p class="desc">Every change is recorded with who and when. There is no going back: a closed pallet is not reopened.</p>
+        <div class="flow">
+          <span class="pill">OPEN</span><span class="arrow">→</span>
+          <span class="pill blue">CLOSED</span><span class="arrow">→</span>
+          <span class="pill green">SHIPPED</span>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <span class="eyebrow">Step by step</span>
+        <h2>How to build and close a pallet</h2>
+      </div>
+      <div class="steps">
+        <div class="step"><span class="n">1</span><div>
+          <h3>Create a pallet</h3>
+          <p>In <b>Pallets</b>, create a new one. It is born open (<b>OPEN</b>) and with its own QR code. You can add a note to it.</p>
+        </div></div>
+        <div class="step"><span class="n">2</span><div>
+          <h3>Add sealed boxes</h3>
+          <p>Scan each box's QR code or type its code to add it to the pallet. It only accepts sealed boxes from your center that are not already in another pallet.</p>
+          <span class="hint">A box won't go in? Almost always it's because it is still a draft: seal it first.</span>
+        </div></div>
+        <div class="step"><span class="n">3</span><div>
+          <h3>Review and adjust</h3>
+          <p>While the pallet is still open you can remove boxes you added by mistake. Take the chance to confirm the contents are what you want to ship.</p>
+        </div></div>
+        <div class="step"><span class="n">4</span><div>
+          <h3>Close the pallet</h3>
+          <p>When it's complete, close it. It moves to <b>CLOSED</b> and no longer accepts or releases boxes. An empty pallet cannot be closed.</p>
+        </div></div>
+        <div class="step"><span class="n">5</span><div>
+          <h3>Label it and add it to the shipment</h3>
+          <p>Stick on its QR label. A closed pallet can now be added to a shipment in the next module.</p>
+        </div></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <span class="eyebrow">Requirements</span>
+        <h2>Which box can enter</h2>
+      </div>
+      <div class="reqs">
+        <div class="rrow"><div class="rk">Box status</div><div class="rv">Must be <b>sealed</b>. A box that is a draft, rejected or already shipped does not enter.</div></div>
+        <div class="rrow"><div class="rk">Same center</div><div class="rv">The box must belong to your center. Boxes from another center are not mixed in.</div></div>
+        <div class="rrow"><div class="rk">No double assignment</div><div class="rv">A box can only be in one pallet at a time.</div></div>
+        <div class="rrow"><div class="rk">Open pallet</div><div class="rv">Only an <b>OPEN</b> pallet accepts or releases boxes. Once closed it is fixed.</div></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <span class="eyebrow">Diagnosis</span>
+        <h2>Why something won't work</h2>
+        <p class="sect-note">The exact notices from Araguaney. The text tells you what to correct.</p>
+      </div>
+      <div class="reason"><span class="x">✕</span><div>
+        <h3>The box is not sealed</h3>
+        <p>Only sealed boxes enter. Seal the box in the Boxes module and try again.</p>
+        <span class="msg">Only SEALED boxes can be added to a pallet</span>
+      </div></div>
+      <div class="reason"><span class="x">✕</span><div>
+        <h3>The pallet is already closed</h3>
+        <p>A closed pallet does not accept more boxes. If you need changes, create another pallet.</p>
+        <span class="msg">Only OPEN pallets accept boxes</span>
+      </div></div>
+      <div class="reason"><span class="x">✕</span><div>
+        <h3>The box is already in another pallet</h3>
+        <p>Each box goes in a single pallet. Remove it from the other one if it really must change.</p>
+        <span class="msg">Box … is already assigned to a pallet</span>
+      </div></div>
+      <div class="reason"><span class="x">✕</span><div>
+        <h3>Empty pallet</h3>
+        <p>A pallet cannot be closed without boxes. Add at least one.</p>
+        <span class="msg">Cannot close an empty pallet</span>
+      </div></div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <span class="eyebrow">Permissions</span>
+        <h2>Who builds pallets</h2>
+      </div>
+      <div class="perm">
+        <p>Creating and closing pallets is the job of the <code>coordinator</code> in their center and the <code>national_admin</code> in any center. The <code>volunteer</code> prepares and seals the boxes, but does not close pallets or shipments.</p>
+      </div>
+    </section>
+
+    <div class="foot">
+      <span>Araguaney · Pallets module manual</span>
+      <span>← Before: Boxes &nbsp;·&nbsp; Next: Shipments →</span>
+    </div>
+
+  </div>
+</div>

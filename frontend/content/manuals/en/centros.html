@@ -1,0 +1,69 @@
+<div class="doc"><div class="wrap">
+
+  <span class="eyebrow">Module · Centers</span>
+  <h1>The collection centers</h1>
+  <p class="lede">Each collection center is its own space (a tenant): its inventory is isolated from the others', and the national dashboard totals them all.</p>
+  <p class="crumbs">Panel › <b>Centers</b> · /dashboard/centers</p>
+
+  <section>
+    <div class="sect-head">
+      <h2>What this module is</h2>
+    </div>
+    <div class="intro-card">
+      <p><b>What it does.</b> It lets you register and manage the coordination's centers.</p>
+      <p><b>Why it matters.</b> The center is the base unit: every user, box, pallet and shipment belongs to a center.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head">
+      <h2>What defines a center</h2>
+    </div>
+    <div class="reqs">
+      <div class="rrow">
+        <div class="rk">Name</div>
+        <div class="rv">The name the collection center is identified by within the coordination.</div>
+      </div>
+      <div class="rrow">
+        <div class="rk">Country</div>
+        <div class="rv">The country where the center operates (<code>country_code</code>).</div>
+      </div>
+      <div class="rrow">
+        <div class="rk">Status</div>
+        <div class="rv">Indicates whether the center is active or inactive.</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head">
+      <h2>Data isolation</h2>
+      <p class="sect-note">This model is what makes national aggregation cheap.</p>
+    </div>
+    <div class="grid two">
+      <div class="card">
+        <h3>Each center sees its own</h3>
+        <p>A center's operators only see and touch their own inventory. Nothing they register is mixed with that of other centers.</p>
+      </div>
+      <div class="card">
+        <h3>The national level totals them</h3>
+        <p>The national_admin, with no assigned center (<code>center_id</code> NULL), sees the aggregate of all centers at once.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head">
+      <h2>Permissions</h2>
+    </div>
+    <div class="perm">
+      <p>Creating and editing centers is the <code>national_admin</code>'s. The <code>volunteer</code> and <code>coordinator</code> operate within their center, but do not create centers.</p>
+    </div>
+  </section>
+
+  <div class="foot">
+    <span>Araguaney · Centers module manual</span>
+    <span>Related: Users · National Dashboard</span>
+  </div>
+
+</div></div>

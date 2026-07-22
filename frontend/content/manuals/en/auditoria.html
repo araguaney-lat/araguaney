@@ -1,0 +1,87 @@
+<div class="doc"><div class="wrap">
+
+  <span class="eyebrow">Module · Audit</span>
+  <h1>The record of everything that happens</h1>
+  <p class="lede">The audit is the read-only log of sensitive actions: who did what, to what, and when.</p>
+  <p class="crumbs">Panel › <b>Audit</b> · /dashboard/admin/audit</p>
+
+  <section>
+    <div class="sect-head">
+      <h2>What it is for</h2>
+    </div>
+    <div class="intro-card">
+      <p><b>What it does.</b> Keeps a record of the system's important actions for accountability. Every sensitive action is logged with its author, its object, and its moment.</p>
+      <p><b>Why it matters.</b> In an operation with many hands, being able to answer <b>"who did this"</b> avoids pointing fingers blindly. The record replaces suspicion with a fact you can look up.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head">
+      <h2>What each entry records</h2>
+      <p class="sect-note">Every log entry gathers the same five data points, so any action can be identified without ambiguity.</p>
+    </div>
+    <div class="reqs">
+      <div class="rrow">
+        <div class="rk">Action</div>
+        <div class="rv">What was done. For example, closing or dispatching a shipment.</div>
+      </div>
+      <div class="rrow">
+        <div class="rk">Affected entity</div>
+        <div class="rv">What the action fell on: the box, the pallet, the shipment, the user…</div>
+      </div>
+      <div class="rrow">
+        <div class="rk">User</div>
+        <div class="rv">Who carried it out.</div>
+      </div>
+      <div class="rrow">
+        <div class="rk">Date and time</div>
+        <div class="rv">The exact moment it happened.</div>
+      </div>
+      <div class="rrow">
+        <div class="rk">Context</div>
+        <div class="rv">Extra data about the change, to understand what was modified and with which values.</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head">
+      <h2>Two layers of trail</h2>
+      <p class="sect-note">The trail is kept at two complementary levels: the history of each piece and the view of the whole system.</p>
+    </div>
+    <div class="grid two">
+      <div class="card">
+        <h3>Events per piece</h3>
+        <p>Each box, pallet, and shipment keeps its own history of status changes, visible on its record. There you see the lifeline of that specific piece.</p>
+      </div>
+      <div class="card">
+        <h3>Cross-cutting audit</h3>
+        <p>This module gathers the actions of the whole system in one place. It is for looking at the complete operation, not a single isolated piece.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head">
+      <h2>Read only</h2>
+    </div>
+    <div class="intro-card">
+      <p>The audit <b>cannot be edited or deleted</b> from the app. It is a record to consult, not to modify. That immutability is exactly what gives it value as evidence.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head">
+      <h2>Permissions</h2>
+    </div>
+    <div class="perm">
+      <p>The domain audit is consulted by the <code>national_admin</code>. The superadmin additionally sees the platform's general audit from the Studio. <code>volunteer</code> and <code>coordinator</code> do not access the audit.</p>
+    </div>
+  </section>
+
+  <div class="foot">
+    <span>Araguaney · Audit module manual</span>
+    <span>Related: each record keeps its history</span>
+  </div>
+
+</div></div>

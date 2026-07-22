@@ -1,0 +1,137 @@
+<div class="doc">
+  <div class="wrap">
+
+    <header>
+      <span class="eyebrow">Module · Boxes</span>
+      <h1>Seal a box</h1>
+      <p class="lede">Step 2. A box is born as a draft during intake; sealing it is what makes it official: it receives its QR code and its label, and becomes ready to enter a pallet. Only a sealed box can travel.</p>
+      <p class="crumbs">Panel &rsaquo; <b>Boxes</b> &nbsp;·&nbsp; /dashboard/boxes</p>
+    </header>
+
+    <section>
+      <div class="intro-card">
+        <p><b>What it does.</b> It gathers all the center's boxes and lets you <b>seal them</b> and <b>print their labels</b>. You can filter by status (draft, sealed, rejected, shipped) to see exactly what you need.</p>
+        <p><b>Why it matters.</b> Sealing freezes the box's contents and gives it a traceable identity. From then on it is no longer edited: what was sealed is what travels.</p>
+      </div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <span class="eyebrow">The box status</span>
+        <h2>From draft to sealed</h2>
+        <p class="sect-note">Sealing moves the box from <span class="hl">DRAFT</span> to <span class="hl">SEALED</span>. That step is the gateway to everything that follows.</p>
+      </div>
+      <div class="machine">
+        <p class="desc">Every change is recorded with who and when. Sealing is irreversible: if something is wrong, the box is handled separately, it is not "un-sealed".</p>
+        <div class="flow">
+          <span class="pill">DRAFT</span><span class="arrow">→</span>
+          <span class="pill blue">SEALED</span><span class="arrow">→</span>
+          <span class="pill green">SHIPPED</span>
+          <span class="arrow" style="margin-left:6px">·</span>
+          <span class="branch">or</span>
+          <span class="pill red">REJECTED</span>
+          <span class="branch">from intake, if it did not meet the rules</span>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <span class="eyebrow">Step by step</span>
+        <h2>How to seal</h2>
+      </div>
+      <div class="steps">
+        <div class="step"><span class="n">1</span><div>
+          <h3>Open Boxes and filter by draft</h3>
+          <p>Go to <b>Boxes</b> in the menu. Filter by <b>Draft</b> to see only the ones still to be sealed.</p>
+        </div></div>
+        <div class="step"><span class="n">2</span><div>
+          <h3>Review the box</h3>
+          <p>Confirm that product, quantity, batch and expiry are correct. Remember: a box is a single product, a single batch, a single expiry.</p>
+        </div></div>
+        <div class="step"><span class="n">3</span><div>
+          <h3>Click Seal</h3>
+          <p>Araguaney validates the box instantly. If it is a medicine, it checks that its data is complete (see requirements below). If everything is fine, the box moves to <b>Sealed</b>.</p>
+          <span class="hint">Before sealing you can preview the QR code of the label.</span>
+        </div></div>
+        <div class="step"><span class="n">4</span><div>
+          <h3>Print the labels</h3>
+          <p>Click <b>Download labels</b> to generate a letter-size PDF with the labels (10 per sheet) of the filtered boxes. Generation runs in the background; as soon as it's ready, you download the PDF.</p>
+        </div></div>
+        <div class="step"><span class="n">5</span><div>
+          <h3>Label it and on to the pallet</h3>
+          <p>Stick the label with its QR code on the physical box. Once sealed, the box becomes available to group into a pallet.</p>
+        </div></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <span class="eyebrow">Requirements</span>
+        <h2>What a box needs to be sealed</h2>
+        <p class="sect-note">Most categories require nothing extra at sealing — the expiry was already validated at intake. Medicines are the exception.</p>
+      </div>
+      <div class="reqs">
+        <div class="rrow"><div class="rk">Any box</div><div class="rv">Must be in draft status (<code>DRAFT</code>). A box that is already sealed, shipped or rejected cannot be sealed again.</div></div>
+        <div class="rrow"><div class="rk">Medicines</div><div class="rv">In addition, the product type must have a <b>denomination (INN)</b>, <b>form</b> and <b>strength</b>; and the box must have a <b>batch</b> and <b>expiry</b>.</div></div>
+        <div class="rrow"><div class="rk">Other categories</div><div class="rv">Do not require additional fields to seal (supplies, food, water, hygiene, tools, rescue gear).</div></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <span class="eyebrow">Diagnosis</span>
+        <h2>Why a box won't seal</h2>
+        <p class="sect-note">These are the exact notices from Araguaney. Each one tells you what to correct in order to seal.</p>
+      </div>
+      <div class="reason"><span class="x">✕</span><div>
+        <h3>Not in draft</h3>
+        <p>Only draft boxes can be sealed. One already sealed or shipped does not apply.</p>
+        <span class="msg">Box is in status 'SEALED'; only DRAFT boxes can be sealed</span>
+      </div></div>
+      <div class="reason"><span class="x">✕</span><div>
+        <h3>Missing medicine data</h3>
+        <p>The product type is missing INN, form or strength. Complete them in the Catalog and seal again.</p>
+        <span class="msg">Cannot seal: product type missing required fields: inn_name, form, strength</span>
+      </div></div>
+      <div class="reason"><span class="x">✕</span><div>
+        <h3>Missing batch</h3>
+        <p>A medicine cannot be sealed without a batch number.</p>
+        <span class="msg">Batch is required to seal a medicine box</span>
+      </div></div>
+      <div class="reason"><span class="x">✕</span><div>
+        <h3>Missing expiry</h3>
+        <p>A medicine cannot be sealed without an expiry date.</p>
+        <span class="msg">Expiry date is required to seal a medicine box</span>
+      </div></div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <span class="eyebrow">After sealing</span>
+        <h2>What the box gains</h2>
+      </div>
+      <div class="grid">
+        <div class="card"><h3>QR code + label</h3><p>Every sealed box has its own unique QR code. When scanned, anyone can see its minimal public record.</p></div>
+        <div class="card"><h3>Ready for a pallet</h3><p>Only sealed boxes can be grouped into a pallet. It's the requirement of the next step.</p></div>
+        <div class="card"><h3>Frozen contents</h3><p>No longer edited. What was sealed is what will appear on the shipment manifest.</p></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <span class="eyebrow">Permissions</span>
+        <h2>Who can seal</h2>
+      </div>
+      <div class="perm">
+        <p>Boxes are sealed and labels printed by the <code>volunteer</code> and the <code>coordinator</code> in their own center, and by the <code>national_admin</code> in any center. Label generation into PDF is limited for security (rate limit), so during peaks it can take a few seconds.</p>
+      </div>
+    </section>
+
+    <div class="foot">
+      <span>Araguaney · Boxes module manual</span>
+      <span>← Before: Intake &nbsp;·&nbsp; Next: Pallets →</span>
+    </div>
+
+  </div>
+</div>

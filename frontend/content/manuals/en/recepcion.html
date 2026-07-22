@@ -1,0 +1,152 @@
+<div class="doc">
+  <div class="wrap">
+
+    <header>
+      <span class="eyebrow">Module · Intake</span>
+      <h1>Record a donation</h1>
+      <p class="lede">Intake is step 1 and the most used: this is where every donation enters Araguaney, item by item. Everything else —boxes, pallets, shipments, manifests— is born from what is captured here.</p>
+      <p class="crumbs">Panel &rsaquo; <b>Intake</b> &rsaquo; New intake &nbsp;·&nbsp; /dashboard/intake/new</p>
+    </header>
+
+    <section>
+      <div class="intro-card">
+        <p><b>What it does.</b> It turns a donation that has just arrived into one or more registered <b>homogeneous boxes</b>, each with its product, quantity, batch and expiry. A single intake can generate several boxes.</p>
+        <p><b>When it's used.</b> Every time something arrives at the center: one person receives, another records. Recording well here is what later makes it possible to know what you have and prepare shipments that clear customs.</p>
+      </div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <span class="eyebrow">Step by step</span>
+        <h2>How to record an intake</h2>
+        <p class="sect-note">One box at a time. If the same donation brings two products, or the same product in two batches, that's two boxes.</p>
+      </div>
+      <div class="steps">
+        <div class="step"><span class="n">1</span><div>
+          <h3>Open a new intake</h3>
+          <p>Go to <b>Intake</b> in the menu and click <b>New intake</b>. The form opens with the first box ready to fill.</p>
+        </div></div>
+        <div class="step"><span class="n">2</span><div>
+          <h3>Identify the product</h3>
+          <p>Scan the barcode or search by name. If the code exists, Araguaney autocompletes the product. If the product is not in the catalog, it is created as a new product type.</p>
+          <span class="hint">If the product is marked as controlled, the box is blocked right here: it is not accepted.</span>
+        </div></div>
+        <div class="step"><span class="n">3</span><div>
+          <h3>Capture the box data</h3>
+          <p>Quantity and unit, batch number, expiry date and, if you have it, the weight. This data defines the box and feeds the manifest later on.</p>
+        </div></div>
+        <div class="step"><span class="n">4</span><div>
+          <h3>Did more arrive? Add another box</h3>
+          <p>If the donation brings another product, or another batch or expiry of the same one, click <b>Add box</b> and repeat. Remember: never mix more than one product, batch or expiry in a single box.</p>
+        </div></div>
+        <div class="step"><span class="n">5</span><div>
+          <h3>Note the source (optional)</h3>
+          <p>You can enter a <b>free-text donor</b> —short text, no personal data— and internal notes. Araguaney does not store personal information about donors or beneficiaries.</p>
+        </div></div>
+        <div class="step"><span class="n">6</span><div>
+          <h3>Save</h3>
+          <p>On save, each box is created and validated instantly. Depending on whether it meets the rules, it ends up as a draft ready to seal, or rejected with the reason.</p>
+        </div></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <span class="eyebrow">Reference</span>
+        <h2>The fields of each box</h2>
+      </div>
+      <div class="fields">
+        <div class="frow"><div class="fk">Barcode<small>barcode</small></div><div class="fv">Optional. <span class="opt">Optional</span> When scanned, it autocompletes the product via Open Food Facts or GS1.</div></div>
+        <div class="frow"><div class="fk">Product<small>product_type</small></div><div class="fv">The product type (SKU). <span class="req">Required</span> Defines category and attributes; distinguishes, for example, two strengths of the same medicine.</div></div>
+        <div class="frow"><div class="fk">Quantity and unit<small>quantity · unit</small></div><div class="fv">How many units and in what measure (pieces, boxes, liters…). <span class="req">Required</span></div></div>
+        <div class="frow"><div class="fk">Batch<small>batch</small></div><div class="fv">Production identifier printed by the manufacturer. <span class="req">Required for medicines</span></div></div>
+        <div class="frow"><div class="fk">Expiry<small>expiry_date</small></div><div class="fv">Expiration date. <span class="req">Required if the category demands shelf life</span> (medicines, food, water).</div></div>
+        <div class="frow"><div class="fk">Weight<small>weight_kg</small></div><div class="fv">Weight in kilograms. <span class="opt">Optional</span> Feeds the total weight of the manifest.</div></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <span class="eyebrow">On save</span>
+        <h2>What happens to each box</h2>
+        <p class="sect-note">Each box is evaluated separately. Within the same intake, some may end up as drafts and others rejected.</p>
+      </div>
+      <div class="outcomes">
+        <div class="outcome">
+          <span class="pill gray">DRAFT</span>
+          <p>Meets the rules. It stays as a draft, ready to be sealed in the Boxes module. On sealing it receives its QR code and label.</p>
+        </div>
+        <div class="outcome">
+          <span class="pill red">REJECTED</span>
+          <p>Fails one of the rules. It is recorded anyway —for the record— but marked as rejected, with the exact reason. It does not advance to a pallet or shipment.</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <span class="eyebrow">Expiry rule</span>
+        <h2>Minimum shelf life by category</h2>
+        <p class="sect-note">Measured in days remaining between the capture date and the expiry. A product type can set its own minimum; if not, its category's applies.</p>
+      </div>
+      <div class="tscroll">
+        <table class="vtable">
+          <thead><tr><th>Category</th><th>Minimum shelf life</th><th>Expiry</th></tr></thead>
+          <tbody>
+            <tr><td>Medicines</td><td class="days">365 days</td><td>Required</td></tr>
+            <tr><td>Food</td><td class="days">180 days</td><td>Required</td></tr>
+            <tr><td>Water</td><td class="days">180 days</td><td>Required</td></tr>
+            <tr><td>Medical supplies</td><td class="none">no minimum</td><td>Not required</td></tr>
+            <tr><td>Hygiene</td><td class="none">no minimum</td><td>Not required</td></tr>
+            <tr><td>Tools</td><td class="none">no minimum</td><td>Not required</td></tr>
+            <tr><td>Rescue gear</td><td class="none">no minimum</td><td>Not required</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <span class="eyebrow">Diagnosis</span>
+        <h2>Why a box is rejected</h2>
+        <p class="sect-note">These are the exact reasons Araguaney shows. The message tells you what to correct.</p>
+      </div>
+      <div class="reason"><span class="x">✕</span><div>
+        <h3>Controlled product</h3>
+        <p>The product type is marked as controlled. It is not accepted at collection centers, without exception.</p>
+        <span class="msg">Controlled product: not accepted at collection centers.</span>
+      </div></div>
+      <div class="reason"><span class="x">✕</span><div>
+        <h3>Missing expiry</h3>
+        <p>The category demands shelf life but the box has no expiry date.</p>
+        <span class="msg">Expiry date required for category MEDICINE.</span>
+      </div></div>
+      <div class="reason"><span class="x">✕</span><div>
+        <h3>Insufficient shelf life</h3>
+        <p>Fewer days remain than the category demands (365 medicines, 180 food and water).</p>
+        <span class="msg">Insufficient shelf life: 120 days remaining, minimum required 365 days.</span>
+      </div></div>
+      <div class="reason"><span class="x">✕</span><div>
+        <h3>Incomplete medicine</h3>
+        <p>The product type is missing required fields (INN, form or strength), or the box is missing the batch.</p>
+        <span class="msg">Batch number required for medicines.</span>
+      </div></div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <span class="eyebrow">Permissions</span>
+        <h2>Who can record</h2>
+      </div>
+      <div class="perm">
+        <p>Intakes are recorded by the <code>volunteer</code> and the <code>coordinator</code> in their own center, and by the <code>national_admin</code> in any center. The intake is assigned to a campaign; every new user is placed in the <b>Donaciones Generales</b> campaign by default, and can only record in campaigns they are a member of.</p>
+      </div>
+    </section>
+
+    <div class="foot">
+      <span>Araguaney · Intake module manual</span>
+      <span>Next step: seal the box →</span>
+    </div>
+
+  </div>
+</div>

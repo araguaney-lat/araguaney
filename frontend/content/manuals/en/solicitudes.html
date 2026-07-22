@@ -1,0 +1,113 @@
+<div class="doc"><div class="wrap">
+
+  <header>
+    <span class="eyebrow">Module · Requests</span>
+    <h1>Ask and resolve</h1>
+    <p class="lede">Requests are a channel with a message thread to ask for something or report an issue, and follow it through until it is closed.</p>
+    <p class="crumbs">Panel › <b>Requests</b> · /dashboard/requests</p>
+  </header>
+
+  <section>
+    <div class="sect-head">
+      <h2>In short</h2>
+    </div>
+    <div class="intro-card">
+      <p><b>What it does.</b> Lets you open a request with a title and description, converse in its thread and track its status.</p>
+      <p><b>When it is used.</b> When an operator needs something from the coordination or a pending item needs to be recorded.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head">
+      <h2>The state of a request</h2>
+      <p class="sect-note">The status communicates where each request stands.</p>
+    </div>
+    <div class="machine">
+      <p class="desc">From open to closed, the request goes through these states.</p>
+      <div class="flow">
+        <span class="pill">OPEN</span>
+        <span class="arrow">→</span>
+        <span class="pill blue">IN_PROGRESS</span>
+        <span class="arrow">→</span>
+        <span class="pill green">RESOLVED</span>
+        <span class="arrow">→</span>
+        <span class="pill">CLOSED</span>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head">
+      <h2>Step by step</h2>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="n">1</div>
+        <div>
+          <h3>Create the request</h3>
+          <p>Open a request with a clear title and a description of what you need or are reporting.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="n">2</div>
+        <div>
+          <h3>Converse in the thread</h3>
+          <p>Every reply is recorded in the thread and notifies the parties by email.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="n">3</div>
+        <div>
+          <h3>Follow the progress</h3>
+          <p>Whoever manages it updates the status as the request advances.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="n">4</div>
+        <div>
+          <h3>Close it</h3>
+          <p>Once resolved it is closed; a closed request remains as a record.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head">
+      <h2>Thread rules</h2>
+    </div>
+    <div class="reqs" style="padding:4px 18px;">
+      <div class="reason">
+        <div class="x">✕</div>
+        <div>
+          <h3>You cannot reply to a closed request</h3>
+          <p>Once closed, the thread remains as a record and does not accept new replies.</p>
+          <span class="msg">Cannot reply to a closed request</span>
+        </div>
+      </div>
+      <div class="reason">
+        <div class="x">✕</div>
+        <div>
+          <h3>Invalid status</h3>
+          <p>The status can only take one of the values defined in the state machine.</p>
+          <span class="msg">Status must be one of ('OPEN', 'IN_PROGRESS', 'RESOLVED', 'CLOSED')</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head">
+      <h2>Permissions</h2>
+    </div>
+    <div class="perm">
+      <p>Any operator creates requests and takes part in the thread of their own. Changing the status and managing them belongs to the <code>national_admin</code> (and the <code>coordinator</code> within their scope). Email notifies the parties when there are updates.</p>
+    </div>
+  </section>
+
+  <div class="foot">
+    <span>Araguaney · Requests module manual</span>
+    <span>Related: Messaging</span>
+  </div>
+
+</div></div>
