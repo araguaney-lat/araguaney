@@ -36,7 +36,12 @@ function handleI18n(req: NextRequest): NextResponse | null {
   if (key !== null) {
     const canon = canonicalSlug(key)
     const target = canon ? `/${urlLocale}/${canon}` : `/${urlLocale}`
-    const res = NextResponse.rewrite(new URL(target, req.url))
+    // Clone nextUrl and change ONLY the pathname so the query string survives
+    // (e.g. the ?token=… on /registrar-centro/confirmar). Building the target with
+    // `new URL(target, req.url)` would drop the search params.
+    const url = req.nextUrl.clone()
+    url.pathname = target
+    const res = NextResponse.rewrite(url)
     res.headers.set("x-locale", urlLocale)
     return res
   }
@@ -47,7 +52,9 @@ function handleI18n(req: NextRequest): NextResponse | null {
     for (const l of LOCALES) {
       if (slug !== "" && ROUTE_SLUGS[k][l] === slug) {
         const targetLocale = hasPrefix ? urlLocale : l
-        return NextResponse.redirect(new URL(localizedPath(k, targetLocale), req.url), 308)
+        const dest = new URL(localizedPath(k, targetLocale), req.url)
+        dest.search = req.nextUrl.search // carry ?token=… across the redirect too
+        return NextResponse.redirect(dest, 308)
       }
     }
   }
