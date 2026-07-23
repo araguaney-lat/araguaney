@@ -16,6 +16,7 @@ import {
   ScrollText,
   BarChart2,
   HelpCircle,
+  Inbox,
 } from "lucide-react"
 
 export type IconComponent = React.ComponentType<{ size?: number; className?: string }>
@@ -43,6 +44,7 @@ export type DashboardNav = {
   requests: string
   reports: string
   users: string
+  center_applications: string
   audit: string
   team: string
   ayuda: string
@@ -106,6 +108,7 @@ export const ADMIN_ITEMS: AdminNavItem[] = [
   { href: "/dashboard/campaigns", labelKey: "campaigns", roles: ["national_admin"], icon: Flag },
   { href: "/dashboard/centers", labelKey: "centers", roles: ["national_admin"], icon: Building2 },
   { href: "/dashboard/admin/users", labelKey: "users", roles: ["national_admin"], icon: UserCog },
+  { href: "/dashboard/admin/center-applications", labelKey: "center_applications", roles: ["national_admin"], icon: Inbox },
   { href: "/dashboard/admin/audit", labelKey: "audit", roles: ["national_admin"], icon: ScrollText },
 ]
 

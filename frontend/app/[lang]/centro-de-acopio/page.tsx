@@ -195,7 +195,7 @@ export default async function CollectionCenterPage({
               {c.heroP}
             </p>
             <CtaLink
-              href="/login"
+              href={localizedPath("registrar-centro", locale)}
               ctaLabel="centro_de_acopio_hero"
               className="inline-flex items-center justify-center px-[26px] py-[14px]"
               style={{ background: "#1F5E8C", color: "#fff", fontWeight: 600, fontSize: 15, boxShadow: "0 12px 24px -10px rgba(31,94,140,.6)", borderRadius: 99 }}
@@ -252,7 +252,7 @@ export default async function CollectionCenterPage({
             {c.finalH2}
           </h2>
           <CtaLink
-            href="/login"
+            href={localizedPath("registrar-centro", locale)}
             ctaLabel="centro_de_acopio_final"
             className="inline-flex items-center justify-center px-[26px] py-[14px] mb-4"
             style={{ background: "#1F5E8C", color: "#fff", fontWeight: 600, fontSize: 15, borderRadius: 99, boxShadow: "0 12px 24px -10px rgba(31,94,140,.6)" }}
