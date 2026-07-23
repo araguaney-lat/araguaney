@@ -3,9 +3,9 @@
 ## Progreso general
 
 ```mermaid
-pie title Tareas completadas (288 tareas)
+pie title Tareas completadas (305 tareas)
     "Listas" : 276
-    "Pendientes" : 12
+    "Pendientes" : 29
 ```
 
 | Fase | Nombre | Listas | Pendientes | Progreso |
@@ -24,11 +24,13 @@ pie title Tareas completadas (288 tareas)
 | 11 | [SEO y reposicionamiento genérico](phase-11-seo-positioning.md) | 26 | 0 | ✅ 100% |
 | 12 | [Optimización y rendimiento](phase-12-optimization.md) | 29 | 0 | ✅ 100% |
 | 13 | [Compliance y legal](phase-13-compliance-legal.md) | 8 | 10 | 🟡 44% |
-| **Total** | | **276** | **12** | **✅ 96%** |
+| 14 | [Auto-registro de centros con aprobación](phase-14-center-self-registration.md) | 0 | 17 | 🔜 0% |
+| **Total** | | **276** | **29** | **🟡 90%** |
 
-> **Pendientes (12):** Fase 4 → 2 (spend caps + alertas, requieren plan de pago de infra).
+> **Pendientes (29):** Fase 4 → 2 (spend caps + alertas, requieren plan de pago de infra).
 > Fase 13 → 10 (bloque de donativos/pagos: entidad receptora, asesoría legal/contable,
 > procesador de pagos, T&C de donación, transparencia — gated tras la decisión "¿recibir donativos?").
+> Fase 14 → 17 (auto-registro de centros; en desarrollo, $0 de infra nueva).
 
 > Envs opcionales (Sentry, Slack, Google Safe Browsing, Encryption Key) se pueden agregar en cualquier momento sin cambios de código.
 
