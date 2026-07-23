@@ -11,6 +11,7 @@ import {
   ScrollText,
   Settings,
   LogOut,
+  Inbox,
   PanelLeftClose,
   PanelLeftOpen,
 } from "lucide-react"
@@ -25,6 +26,7 @@ type StudioNavItem = { href: string; labelKey: keyof StudioNav; exact?: boolean;
 const NAV_ITEMS: StudioNavItem[] = [
   { href: "/studio", labelKey: "metrics", exact: true, icon: BarChart2 },
   { href: "/studio/users", labelKey: "users", icon: Users },
+  { href: "/studio/center-applications", labelKey: "center_applications", icon: Inbox },
   { href: "/studio/audit", labelKey: "audit", icon: ScrollText },
   { href: "/studio/settings", labelKey: "settings", icon: Settings },
 ]
@@ -32,6 +34,7 @@ const NAV_ITEMS: StudioNavItem[] = [
 export type StudioNav = {
   metrics: string
   users: string
+  center_applications: string
   audit: string
   settings: string
   logout: string

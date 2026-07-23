@@ -119,6 +119,7 @@
       "requests": "Requests",
       "reports": "Reports",
       "users": "Users",
+      "center_applications": "Center applications",
       "audit": "Audit",
       "team": "Team",
       "ayuda": "Help",
@@ -652,6 +653,26 @@
       "status_active": "Active",
       "status_inactive": "Inactive"
     },
+    "center_applications": {
+      "title": "Center applications",
+      "subtitle": "Review and approve requests to register collection centers.",
+      "count_one": "1 pending application",
+      "count_other": "{count} pending applications",
+      "empty": "No pending applications.",
+      "contact": "Contact",
+      "backing": "Backing",
+      "social": "Link",
+      "message": "Message",
+      "created": "Received",
+      "approve": "Approve",
+      "approving": "Approving…",
+      "reject": "Reject",
+      "rejecting": "Rejecting…",
+      "reject_reason_label": "Rejection reason",
+      "reject_reason_placeholder": "Explain why this application is rejected.",
+      "reject_confirm": "Confirm rejection",
+      "cancel": "Cancel"
+    },
     "admin_audit": {
       "title": "Audit",
       "empty": "No audit records.",
@@ -807,6 +828,7 @@
     "nav": {
       "metrics": "Metrics",
       "users": "Users",
+      "center_applications": "Center applications",
       "audit": "Audit",
       "settings": "Settings",
       "logout": "Sign out",

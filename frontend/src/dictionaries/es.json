@@ -119,6 +119,7 @@
       "requests": "Solicitudes",
       "reports": "Reportes",
       "users": "Usuarios",
+      "center_applications": "Solicitudes de centro",
       "audit": "Auditoría",
       "team": "Equipo",
       "ayuda": "Ayuda",
@@ -652,6 +653,26 @@
       "status_active": "Activo",
       "status_inactive": "Inactivo"
     },
+    "center_applications": {
+      "title": "Solicitudes de centro",
+      "subtitle": "Revisa y aprueba las solicitudes de alta de centros de acopio.",
+      "count_one": "1 solicitud pendiente",
+      "count_other": "{count} solicitudes pendientes",
+      "empty": "No hay solicitudes pendientes.",
+      "contact": "Contacto",
+      "backing": "Respaldo",
+      "social": "Enlace",
+      "message": "Mensaje",
+      "created": "Recibida",
+      "approve": "Aprobar",
+      "approving": "Aprobando…",
+      "reject": "Rechazar",
+      "rejecting": "Rechazando…",
+      "reject_reason_label": "Motivo del rechazo",
+      "reject_reason_placeholder": "Explica por qué se rechaza esta solicitud.",
+      "reject_confirm": "Confirmar rechazo",
+      "cancel": "Cancelar"
+    },
     "admin_audit": {
       "title": "Auditoría",
       "empty": "Sin registros de auditoría.",
@@ -807,6 +828,7 @@
     "nav": {
       "metrics": "Métricas",
       "users": "Usuarios",
+      "center_applications": "Solicitudes de centro",
       "audit": "Auditoría",
       "settings": "Configuración",
       "logout": "Cerrar sesión",

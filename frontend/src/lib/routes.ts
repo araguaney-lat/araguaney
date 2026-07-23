@@ -19,6 +19,11 @@ export function isLocale(v: string): v is Locale {
 export const ROUTE_SLUGS: Record<string, Record<Locale, string>> = {
   "": { es: "", en: "" }, // home
   "centro-de-acopio": { es: "centro-de-acopio", en: "collection-center" },
+  "registrar-centro": { es: "registrar-centro", en: "register-center" },
+  "registrar-centro/confirmar": {
+    es: "registrar-centro/confirmar",
+    en: "register-center/confirm",
+  },
   "ayuda-humanitaria": { es: "ayuda-humanitaria", en: "humanitarian-aid" },
   "como-funciona": { es: "como-funciona", en: "how-it-works" },
   "aviso-de-privacidad": { es: "aviso-de-privacidad", en: "privacy" },
