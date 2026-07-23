@@ -58,7 +58,15 @@ export default function ConfirmCenterApplication({ token, labels: t, homeHref }:
   }[state]
 
   return (
-    <div className="max-w-[460px] w-full flex flex-col items-center text-center gap-4">
+    <div
+      className="max-w-[460px] w-full flex flex-col items-center text-center gap-4 px-7 py-10 md:px-10 md:py-12"
+      style={{
+        background: "#fff",
+        border: "1px solid #EAE1CF",
+        borderRadius: 20,
+        boxShadow: "0 24px 48px -32px rgba(43,39,35,.28)",
+      }}
+    >
       {state === "loading" ? (
         <div
           style={{ width: 40, height: 40, borderRadius: "50%", border: "3px solid #E6DCC8", borderTopColor: "#1F5E8C" }}
@@ -105,15 +113,6 @@ export default function ConfirmCenterApplication({ token, labels: t, homeHref }:
           >
             {t.homeCta}
           </Link>
-          {state === "success" && (
-            <Link
-              href="/login"
-              style={{ background: "#1F5E8C", color: "#fff", borderRadius: 99, fontSize: 13.5, fontWeight: 600 }}
-              className="px-[18px] py-[10px] inline-flex items-center"
-            >
-              {t.loginCta}
-            </Link>
-          )}
         </div>
       )}
     </div>

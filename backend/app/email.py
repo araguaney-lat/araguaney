@@ -73,7 +73,7 @@ def send_invitation_email(to: str, username: str, temp_password: str) -> None:
         subject="Fuiste invitado a Araguaney",
         html=_render(
             "invitation.html",
-            username=username,
+            email=to,  # login is by email, not username — show the email to use
             temp_password=temp_password,
             login_url=f"{site_url}/login",
         ),

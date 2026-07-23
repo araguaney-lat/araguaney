@@ -20,9 +20,9 @@ const CONTENT: Record<Locale, Content> = {
     description: "Confirma tu solicitud de alta de centro de acopio.",
     labels: {
       loading: "Confirmando tu solicitud…",
-      successTitle: "Solicitud confirmada",
+      successTitle: "Correo verificado",
       successBody:
-        "Gracias. Tu solicitud fue confirmada y ahora está en revisión. Te avisaremos por correo cuando tu centro esté activo.",
+        "Tu correo quedó confirmado. Ahora el equipo de Araguaney revisará tu solicitud. Cuando sea aprobada recibirás un correo con una contraseña temporal para acceder a tu centro. No necesitas hacer nada más por ahora.",
       invalidTitle: "Enlace no válido",
       invalidBody:
         "Este enlace de confirmación no es válido, ya fue usado o expiró. Si ya lo confirmaste, tu solicitud sigue en revisión.",
@@ -37,9 +37,9 @@ const CONTENT: Record<Locale, Content> = {
     description: "Confirm your collection center registration request.",
     labels: {
       loading: "Confirming your application…",
-      successTitle: "Application confirmed",
+      successTitle: "Email verified",
       successBody:
-        "Thank you. Your application was confirmed and is now under review. We'll email you once your center is active.",
+        "Your email is confirmed. The Araguaney team will now review your application. Once approved, you'll receive an email with a temporary password to access your center. Nothing else is needed for now.",
       invalidTitle: "Invalid link",
       invalidBody:
         "This confirmation link is invalid, has already been used, or has expired. If you already confirmed it, your application is still under review.",
