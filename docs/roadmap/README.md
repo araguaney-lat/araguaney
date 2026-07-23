@@ -3,9 +3,9 @@
 ## Progreso general
 
 ```mermaid
-pie title Tareas completadas (298 tareas)
-    "Listas" : 271
-    "Pendientes" : 27
+pie title Tareas completadas (288 tareas)
+    "Listas" : 276
+    "Pendientes" : 12
 ```
 
 | Fase | Nombre | Listas | Pendientes | Progreso |
@@ -16,7 +16,7 @@ pie title Tareas completadas (298 tareas)
 | 3 | [Tarima, envío y manifiesto](phase-03-pallet-shipment-manifest.md) | 9 | 0 | ✅ 100% |
 | 4 | [Panel agregado nacional + endurecimiento + OTP + scanning móvil](phase-04-national-dashboard-hardening.md) | 23 | 2 | ✅ 92% |
 | 5 | [Studio — panel de administración + solicitudes](phase-05-studio.md) | 39 | 0 | ✅ 100% |
-| 6 | [Catálogos de referencia + lookups en tiempo real](phase-06-catalog-integrations.md) | 35 | 0 | ✅ 100% |
+| 6 | [Catálogos de referencia + lookups en tiempo real](phase-06-catalog-integrations.md) | 37 | 0 | ✅ 100% |
 | 7 | [Transferencias entre centros](phase-07-transfers.md) | 21 | 0 | ✅ 100% |
 | 8 | [Mensajería entre usuarios](phase-08-messaging.md) | 22 | 0 | ✅ 100% |
 | 9 | [Reportes de campaña](phase-09-reports.md) | 8 | 0 | ✅ 100% |
@@ -24,7 +24,11 @@ pie title Tareas completadas (298 tareas)
 | 11 | [SEO y reposicionamiento genérico](phase-11-seo-positioning.md) | 26 | 0 | ✅ 100% |
 | 12 | [Optimización y rendimiento](phase-12-optimization.md) | 29 | 0 | ✅ 100% |
 | 13 | [Compliance y legal](phase-13-compliance-legal.md) | 8 | 10 | 🟡 44% |
-| **Total** | | **275** | **26** | **🟡 91%** |
+| **Total** | | **276** | **12** | **✅ 96%** |
+
+> **Pendientes (12):** Fase 4 → 2 (spend caps + alertas, requieren plan de pago de infra).
+> Fase 13 → 10 (bloque de donativos/pagos: entidad receptora, asesoría legal/contable,
+> procesador de pagos, T&C de donación, transparencia — gated tras la decisión "¿recibir donativos?").
 
 > Envs opcionales (Sentry, Slack, Google Safe Browsing, Encryption Key) se pueden agregar en cualquier momento sin cambios de código.
 
