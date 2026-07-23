@@ -24,6 +24,7 @@ import app.models.user_campaign   # noqa: F401
 import app.models.transfer        # noqa: F401
 import app.models.messaging       # noqa: F401
 import app.models.export_job      # noqa: F401
+import app.models.center_application  # noqa: F401
 
 config = context.config
 # Use the direct (non-PgBouncer) URL for migrations when available — PgBouncer

@@ -94,6 +94,21 @@ async def send_password_changed_email_task(ctx, to: str) -> None:
     await asyncio.to_thread(send_password_changed_email, to)
 
 
+async def send_center_application_confirm_email_task(ctx, to: str, token: str) -> None:
+    from app.email import send_center_application_confirm_email
+    await asyncio.to_thread(send_center_application_confirm_email, to, token)
+
+
+async def send_center_application_received_email_task(ctx, to: str, center_name: str) -> None:
+    from app.email import send_center_application_received_email
+    await asyncio.to_thread(send_center_application_received_email, to, center_name)
+
+
+async def send_center_application_rejected_email_task(ctx, to: str, center_name: str, reason: str) -> None:
+    from app.email import send_center_application_rejected_email
+    await asyncio.to_thread(send_center_application_rejected_email, to, center_name, reason)
+
+
 async def generate_shipment_manifest_pdf_task(ctx, job_id: str) -> None:
     from app.services.export_generation import run_export_job
     await asyncio.to_thread(run_export_job, job_id)
@@ -177,6 +192,9 @@ def _build_fallbacks() -> dict:
         send_transfer_status_email,
         send_transfer_received_email,
         send_password_changed_email,
+        send_center_application_confirm_email,
+        send_center_application_received_email,
+        send_center_application_rejected_email,
     )
     from app.services.export_generation import run_export_job
 
@@ -193,6 +211,9 @@ def _build_fallbacks() -> dict:
         "send_transfer_status_email_task": send_transfer_status_email,
         "send_transfer_received_email_task": send_transfer_received_email,
         "send_password_changed_email_task": send_password_changed_email,
+        "send_center_application_confirm_email_task": send_center_application_confirm_email,
+        "send_center_application_received_email_task": send_center_application_received_email,
+        "send_center_application_rejected_email_task": send_center_application_rejected_email,
         "generate_shipment_manifest_pdf_task": run_export_job,
         "generate_shipment_manifest_xlsx_task": run_export_job,
         "generate_box_labels_pdf_task": run_export_job,
@@ -234,6 +255,9 @@ class WorkerSettings:
         send_transfer_status_email_task,
         send_transfer_received_email_task,
         send_password_changed_email_task,
+        send_center_application_confirm_email_task,
+        send_center_application_received_email_task,
+        send_center_application_rejected_email_task,
         # Export jobs get a longer per-task timeout than the global 60s: PDF/XLSX
         # generation for a shipment with many pallets (DB queries + reportlab/WeasyPrint
         # + R2 upload, all in one job) can plausibly exceed 60s where an email send can't.

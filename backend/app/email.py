@@ -194,3 +194,31 @@ def send_transfer_received_email(to: str, from_center: str, to_center: str) -> N
             transfers_url=f"{site_url}/dashboard/transfers",
         ),
     )
+
+
+def send_center_application_confirm_email(to: str, token: str) -> None:
+    site_url = settings.frontend_url.split(",")[0].strip()
+    _send(
+        to=to,
+        subject="Confirma tu solicitud de centro de acopio",
+        html=_render(
+            "center_application_confirm.html",
+            confirm_url=f"{site_url}/registrar-centro/confirmar?token={token}",
+        ),
+    )
+
+
+def send_center_application_received_email(to: str, center_name: str) -> None:
+    _send(
+        to=to,
+        subject="Solicitud de centro recibida — en revisión",
+        html=_render("center_application_received.html", center_name=center_name),
+    )
+
+
+def send_center_application_rejected_email(to: str, center_name: str, reason: str) -> None:
+    _send(
+        to=to,
+        subject="Sobre tu solicitud de centro de acopio",
+        html=_render("center_application_rejected.html", center_name=center_name, reason=reason),
+    )

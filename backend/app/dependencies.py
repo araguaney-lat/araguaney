@@ -91,6 +91,22 @@ def require_center_role(current_user: User = Depends(get_current_user)) -> User:
     return current_user
 
 
+def require_application_reviewer(current_user: User = Depends(get_current_user)) -> User:
+    """Center-application queue: national_admin (their country) or superadmin (all)."""
+    if current_user.center_role != "national_admin" and current_user.role != "superadmin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail={"code": "FORBIDDEN", "message": "Reviewer access required", "field": None, "meta": None},
+        )
+    return current_user
+
+
+def reviewer_country_scope(current_user: User) -> str | None:
+    """Country filter for a reviewer: superadmin sees all (None); national_admin
+    is scoped to their own country_code."""
+    return None if current_user.role == "superadmin" else current_user.country_code
+
+
 def tenant_scope(current_user: User = Depends(get_current_user)) -> _uuid.UUID | None:
     """Returns center_id for scoped queries; None for national_admin (sees all)."""
     if current_user.center_role == "national_admin":
