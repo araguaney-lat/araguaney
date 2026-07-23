@@ -53,7 +53,7 @@
 | 11 | Página de confirmación de email | `/registrar-centro/confirmar` — consume el token y muestra estado (confirmado / inválido / ya usado). ES/EN. | 🟡 | ✅ Done |
 | 12 | Panel: cola "Solicitudes de centro" (national_admin) | Sección Administración: lista scoped por país + **aprobar/rechazar** (motivo) + **badge** de pendientes en el nav. | 🟠 | ✅ Done |
 | 13 | Studio: cola para superadmin | La misma cola, viendo todas; aprobar/rechazar. | 🟡 | ✅ Done |
-| 14 | Redirigir CTAs al formulario | Home / `/centro-de-acopio` / contacto apuntan al formulario en vez de `hola@` (que queda solo para dudas generales). | 🟢 | ✅ Done |
+| 14 | Redirigir CTAs al formulario | Home (hero: 2 botones + link de texto; nav: botón dedicado ES/EN, desktop + drawer móvil), `/centro-de-acopio` y contacto apuntan al formulario en vez de `hola@` (que queda solo para dudas generales). Alta en `sitemap.ts` con hreflang. | 🟢 | ✅ Done |
 | 15 | i18n ES/EN | Diccionarios de las páginas nuevas + labels del nav/cola. | 🟡 | ✅ Done |
 
 ### Docs
