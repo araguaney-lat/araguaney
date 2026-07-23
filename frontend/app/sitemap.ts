@@ -57,6 +57,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       alternates: { languages: langAlternates("centro-de-acopio") },
     },
     {
+      url: absoluteUrl(localizedPath("registrar-centro", "es")),
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.9,
+      alternates: { languages: langAlternates("registrar-centro") },
+    },
+    {
       url: absoluteUrl(localizedPath("como-funciona", "es")),
       lastModified: now,
       changeFrequency: "monthly",

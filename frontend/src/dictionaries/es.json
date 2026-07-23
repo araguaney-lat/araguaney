@@ -4,6 +4,7 @@
     "why": "Por qué Araguaney",
     "standards": "Estándares",
     "contact": "Contacto",
+    "register_center": "Registrar centro",
     "login": "Iniciar sesión"
   },
   "hero": {
@@ -13,6 +14,7 @@
     "desc_mobile": "Un mismo estándar para registrar, empacar en cajas homogéneas con QR y enviar con manifiesto.",
     "desc_desktop": "Araguaney conecta a los centros de acopio en un mismo estándar: registra los insumos a nivel de ítem, los empaca en cajas homogéneas con QR y los consolida en envíos con manifiesto exportable.",
     "cta_login": "Iniciar sesión",
+    "cta_register": "Registrar centro",
     "cta_why": "Por qué Araguaney",
     "standards_label_desktop": "Construido sobre estándares globales",
     "standards_label_mobile": "Estándares globales"
