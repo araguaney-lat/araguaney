@@ -4,6 +4,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { useState, useTransition } from "react"
 import { setLocale } from "@/lib/locale-actions"
+import { localizedPath } from "@/lib/routes"
 import type { Locale, Dictionary } from "@/lib/i18n"
 
 const LOGO =
@@ -114,6 +115,18 @@ export default function HomeNav({ dict, locale, localeLinks }: Props) {
                 <span>{other === "en" ? "EN" : "ES"}</span>
               </button>
             ))}
+
+            <Link
+              href={localizedPath("registrar-centro", locale)}
+              className="px-[18px] py-[9px] inline-flex items-center text-[13.5px] font-semibold"
+              style={{
+                background: "#1F5E8C",
+                color: "#fff",
+                borderRadius: 99,
+              }}
+            >
+              {dict.register_center}
+            </Link>
 
             <Link
               href="/login"
@@ -257,12 +270,23 @@ export default function HomeNav({ dict, locale, localeLinks }: Props) {
 
         <div className="px-5 pb-8 pt-5 flex flex-col gap-3">
           <Link
-            href="/login"
+            href={localizedPath("registrar-centro", locale)}
             onClick={() => setOpen(false)}
             className="flex items-center justify-center py-3 text-[14px] font-semibold rounded-full"
             style={{
               background: "#1F5E8C",
               color: "#fff",
+            }}
+          >
+            {dict.register_center}
+          </Link>
+          <Link
+            href="/login"
+            onClick={() => setOpen(false)}
+            className="flex items-center justify-center py-3 text-[14px] font-semibold rounded-full"
+            style={{
+              border: "1.5px solid #1F5E8C",
+              color: "#1F5E8C",
             }}
           >
             {dict.login}

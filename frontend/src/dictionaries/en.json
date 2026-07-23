@@ -4,6 +4,7 @@
     "why": "Why Araguaney",
     "standards": "Standards",
     "contact": "Contact",
+    "register_center": "Register center",
     "login": "Sign in"
   },
   "hero": {
@@ -13,6 +14,7 @@
     "desc_mobile": "One standard to register, pack in homogeneous boxes with QR codes, and ship with a manifest.",
     "desc_desktop": "Araguaney connects aid centers under one standard: registers items with category, batch, and expiry, packs them in homogeneous boxes with QR codes, and consolidates them into shipments with an exportable manifest.",
     "cta_login": "Sign in",
+    "cta_register": "Register center",
     "cta_why": "Why Araguaney",
     "standards_label_desktop": "Built on global standards",
     "standards_label_mobile": "Global standards"

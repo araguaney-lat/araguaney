@@ -163,8 +163,9 @@ export default async function HomePage({
             >
               {dict.hero.cta_login}
             </CtaLink>
-            <Link
-              href="#por-que"
+            <CtaLink
+              href={localizedPath("registrar-centro", locale)}
+              ctaLabel="home_hero_register"
               className="flex items-center justify-center px-6 py-[14px]"
               style={{
                 background: "#fff",
@@ -174,6 +175,17 @@ export default async function HomePage({
                 fontSize: 15,
                 borderRadius: 99,
               }}
+            >
+              {dict.hero.cta_register}
+            </CtaLink>
+          </div>
+
+          {/* Secondary text link */}
+          <div className="mt-[14px] md:mt-[18px]">
+            <Link
+              href="#por-que"
+              className="text-[14px] md:text-[15px] underline underline-offset-4"
+              style={{ color: "#1F5E8C", fontWeight: 600 }}
             >
               {dict.hero.cta_why}
             </Link>
