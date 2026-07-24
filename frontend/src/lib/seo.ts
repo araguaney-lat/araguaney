@@ -22,6 +22,7 @@ export const SITE_URL = (
 // automatically — only rendered when non-empty. See Fase 17 task 5.
 export const BRAND_SAME_AS: readonly string[] = [
   "https://www.linkedin.com/company/araguaney-lat",
+  "https://github.com/araguaney-lat",
 ]
 
 // Public founder attribution for the Organization `founder` (E-E-A-T signal).
