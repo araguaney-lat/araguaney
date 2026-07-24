@@ -37,8 +37,18 @@ correlacionados con lo que los originó, con reenvío; y **avisa por email** al 
 
 | # | Tarea | Estado |
 |---|-------|--------|
-| 13 | Setear `RESEND_WEBHOOK_SECRET` en Railway (backend + worker) | ⬜ Pendiente |
-| 14 | Dar de alta el webhook en Resend → `https://api.araguaney.lat/webhooks/resend` | ⬜ Pendiente |
+| 13 | Setear `RESEND_WEBHOOK_SECRET` en Railway (solo backend — el worker no recibe webhooks) | ✅ Done |
+| 14 | Dar de alta el webhook en Resend → `https://api.araguaney.lat/webhooks/resend` | ✅ Done |
+
+### Docs
+
+| # | Tarea | Estado |
+|---|-------|--------|
+| 15 | Guía de integración portable (`docs/integrations/resend-deliverability.md`) para reusar en bioflow/pet-portal | ✅ Done |
+
+> **Verificado end-to-end en producción:** registro a `bounced@resend.dev` → Resend disparó
+> `email.bounced` → webhook firmado (Svix) procesado (200) → fila visible en `/studio/emails`
+> con botón reenviar.
 
 ---
 
