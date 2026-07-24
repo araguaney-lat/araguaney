@@ -15,38 +15,38 @@ no solo un evento específico.
 
 ## Páginas públicas
 
-- [Inicio](https://araguaney.lat/): presentación del producto, cómo funciona y estándares que respalda.
-- [Cómo funciona](https://araguaney.lat/como-funciona): el flujo completo del acopio al envío (recepción, caja, tarima, envío, manifiesto), la trazabilidad y las reglas de calidad.
-- [Qué es un centro de acopio](https://araguaney.lat/centro-de-acopio): el estándar completo de registro, empaque y envío.
-- [Ayuda humanitaria](https://araguaney.lat/ayuda-humanitaria): cómo funciona Araguaney para cualquier emergencia.
-- [Qué falta](https://araguaney.lat/necesidades): inventario disponible en los centros de acopio activos, actualizado cada 5 minutos.
-- [Contacto](https://araguaney.lat/contacto): sumar un centro de acopio a la coordinación nacional.
+- [Inicio](https://www.araguaney.lat/): presentación del producto, cómo funciona y estándares que respalda.
+- [Cómo funciona](https://www.araguaney.lat/como-funciona): el flujo completo del acopio al envío (recepción, caja, tarima, envío, manifiesto), la trazabilidad y las reglas de calidad.
+- [Qué es un centro de acopio](https://www.araguaney.lat/centro-de-acopio): el estándar completo de registro, empaque y envío.
+- [Ayuda humanitaria](https://www.araguaney.lat/ayuda-humanitaria): cómo funciona Araguaney para cualquier emergencia.
+- [Qué falta](https://www.araguaney.lat/necesidades): inventario disponible en los centros de acopio activos, actualizado cada 5 minutos.
+- [Contacto](https://www.araguaney.lat/contacto): sumar un centro de acopio a la coordinación nacional.
 
 ## Guías
 
-- [Guías](https://araguaney.lat/guias): índice de guías prácticas para operar un centro de acopio.
-- [Cómo organizar un centro de acopio](https://araguaney.lat/guias/como-organizar-un-centro-de-acopio): roles, registro por ítem, cajas homogéneas, manifiesto y reglas de rechazo.
-- [Qué se puede donar](https://araguaney.lat/guias/que-se-puede-donar): categorías aceptadas, reglas OMS para medicamentos y alimentos, y qué se rechaza.
-- [Cómo preparar carga humanitaria para aduana](https://araguaney.lat/guias/como-preparar-carga-humanitaria-para-aduana): qué exige el régimen de envío y qué debe incluir el manifiesto.
-- [Cómo registrar y organizar voluntarios](https://araguaney.lat/guias/como-registrar-voluntarios-en-un-centro-de-acopio): roles del equipo y por qué cada voluntario opera con su propia cuenta.
-- [Software gratis para gestionar donaciones en una ONG](https://araguaney.lat/guias/software-gratis-para-gestionar-donaciones-ong): qué buscar en un software gratuito de donaciones en especie.
-- [Sistema de inventario para damnificados](https://araguaney.lat/guias/sistema-de-inventario-para-damnificados): cómo montar un inventario de ayuda que sí sirva en una emergencia.
+- [Guías](https://www.araguaney.lat/guias): índice de guías prácticas para operar un centro de acopio.
+- [Cómo organizar un centro de acopio](https://www.araguaney.lat/guias/como-organizar-un-centro-de-acopio): roles, registro por ítem, cajas homogéneas, manifiesto y reglas de rechazo.
+- [Qué se puede donar](https://www.araguaney.lat/guias/que-se-puede-donar): categorías aceptadas, reglas OMS para medicamentos y alimentos, y qué se rechaza.
+- [Cómo preparar carga humanitaria para aduana](https://www.araguaney.lat/guias/como-preparar-carga-humanitaria-para-aduana): qué exige el régimen de envío y qué debe incluir el manifiesto.
+- [Cómo registrar y organizar voluntarios](https://www.araguaney.lat/guias/como-registrar-voluntarios-en-un-centro-de-acopio): roles del equipo y por qué cada voluntario opera con su propia cuenta.
+- [Software gratis para gestionar donaciones en una ONG](https://www.araguaney.lat/guias/software-gratis-para-gestionar-donaciones-ong): qué buscar en un software gratuito de donaciones en especie.
+- [Sistema de inventario para damnificados](https://www.araguaney.lat/guias/sistema-de-inventario-para-damnificados): cómo montar un inventario de ayuda que sí sirva en una emergencia.
 
 ## Glosario
 
-- [Glosario de ayuda humanitaria](https://araguaney.lat/glosario): definiciones de los términos clave (caja homogénea, tarima, manifiesto, INN, UNSPSC, GS1, régimen de envío humanitario y más).
+- [Glosario de ayuda humanitaria](https://www.araguaney.lat/glosario): definiciones de los términos clave (caja homogénea, tarima, manifiesto, INN, UNSPSC, GS1, régimen de envío humanitario y más).
 
 ## Qué se puede donar por categoría
 
 Reglas y disponibilidad en tiempo real por categoría:
 
-- [Medicamentos](https://araguaney.lat/necesidades/medicamentos): reglas OMS, vida útil ≥ 365 días, INN/lote/caducidad.
-- [Insumos médicos](https://araguaney.lat/necesidades/insumos-medicos): material de curación, protección y aplicación (catálogo IFRC/ICRC).
-- [Alimentos](https://araguaney.lat/necesidades/alimentos): no perecederos, vida útil ≥ 180 días, sellados.
-- [Agua](https://araguaney.lat/necesidades/agua): embotellada o en garrafón, sellada de fábrica.
-- [Higiene](https://araguaney.lat/necesidades/higiene): aseo personal nuevo y sin abrir.
-- [Herramientas](https://araguaney.lat/necesidades/herramientas): remoción de escombros y reconstrucción.
-- [Equipo de rescate](https://araguaney.lat/necesidades/equipo-de-rescate): equipo de emergencia (catálogo IOM).
+- [Medicamentos](https://www.araguaney.lat/necesidades/medicamentos): reglas OMS, vida útil ≥ 365 días, INN/lote/caducidad.
+- [Insumos médicos](https://www.araguaney.lat/necesidades/insumos-medicos): material de curación, protección y aplicación (catálogo IFRC/ICRC).
+- [Alimentos](https://www.araguaney.lat/necesidades/alimentos): no perecederos, vida útil ≥ 180 días, sellados.
+- [Agua](https://www.araguaney.lat/necesidades/agua): embotellada o en garrafón, sellada de fábrica.
+- [Higiene](https://www.araguaney.lat/necesidades/higiene): aseo personal nuevo y sin abrir.
+- [Herramientas](https://www.araguaney.lat/necesidades/herramientas): remoción de escombros y reconstrucción.
+- [Equipo de rescate](https://www.araguaney.lat/necesidades/equipo-de-rescate): equipo de emergencia (catálogo IOM).
 
 ## Estándares
 
@@ -57,4 +57,4 @@ WHO (donación de medicamentos), IFRC/ICRC (catálogo de materiales), IOM
 
 ## Más
 
-- [Versión extendida para IA](https://araguaney.lat/llms-full.txt): explicación completa del modelo de dominio y las reglas de negocio.
+- [Versión extendida para IA](https://www.araguaney.lat/llms-full.txt): explicación completa del modelo de dominio y las reglas de negocio.

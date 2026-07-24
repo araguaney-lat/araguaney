@@ -67,9 +67,9 @@ protección de datos personales.
 
 ## Enlaces
 
-- Inicio: https://araguaney.lat/
-- Qué es un centro de acopio: https://araguaney.lat/centro-de-acopio
-- Ayuda humanitaria: https://araguaney.lat/ayuda-humanitaria
-- Qué falta (inventario en tiempo real): https://araguaney.lat/necesidades
-- Guías: https://araguaney.lat/guias
-- Contacto: https://araguaney.lat/contacto
+- Inicio: https://www.araguaney.lat/
+- Qué es un centro de acopio: https://www.araguaney.lat/centro-de-acopio
+- Ayuda humanitaria: https://www.araguaney.lat/ayuda-humanitaria
+- Qué falta (inventario en tiempo real): https://www.araguaney.lat/necesidades
+- Guías: https://www.araguaney.lat/guias
+- Contacto: https://www.araguaney.lat/contacto
