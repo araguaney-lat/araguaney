@@ -109,6 +109,30 @@ async def send_center_application_rejected_email_task(ctx, to: str, center_name:
     await asyncio.to_thread(send_center_application_rejected_email, to, center_name, reason)
 
 
+def _send_admin_notice(application_id: str) -> None:
+    """Load the application, resolve its reviewers, and email each one."""
+    from uuid import UUID
+
+    from app.database import SessionLocal
+    from app.email import send_center_application_admin_notice_email
+    from app.models.center_application import CenterApplication
+    from app.repositories.user_repository import UserRepository
+
+    with SessionLocal() as db:
+        application = db.get(CenterApplication, UUID(application_id))
+        if application is None:
+            return
+        center_name = application.center_name
+        country_code = application.country_code
+        recipients = UserRepository(db).find_review_recipients(country_code)
+    for email in recipients:
+        send_center_application_admin_notice_email(email, center_name, country_code)
+
+
+async def send_center_application_admin_notice_task(ctx, application_id: str) -> None:
+    await asyncio.to_thread(_send_admin_notice, application_id)
+
+
 async def generate_shipment_manifest_pdf_task(ctx, job_id: str) -> None:
     from app.services.export_generation import run_export_job
     await asyncio.to_thread(run_export_job, job_id)
@@ -175,6 +199,14 @@ async def purge_audit_logs_cron(ctx) -> None:
     logger.info("Audit log purge: deleted %d rows older than %s days", deleted, retention_days)
 
 
+async def purge_email_failures_cron(ctx) -> None:
+    from app.database import SessionLocal
+    from app.repositories.email_failure_repository import EmailFailureRepository
+    with SessionLocal() as db:
+        deleted = EmailFailureRepository(db).purge_older_than(90)
+    logger.info("Email failure purge: deleted %d rows older than 90 days", deleted)
+
+
 # ── Fallbacks (called directly when Redis is unavailable) ──────────────────────
 # These are the underlying callables, invoked WITHOUT the ARQ ctx argument.
 
@@ -214,6 +246,7 @@ def _build_fallbacks() -> dict:
         "send_center_application_confirm_email_task": send_center_application_confirm_email,
         "send_center_application_received_email_task": send_center_application_received_email,
         "send_center_application_rejected_email_task": send_center_application_rejected_email,
+        "send_center_application_admin_notice_task": _send_admin_notice,
         "generate_shipment_manifest_pdf_task": run_export_job,
         "generate_shipment_manifest_xlsx_task": run_export_job,
         "generate_box_labels_pdf_task": run_export_job,
@@ -258,6 +291,7 @@ class WorkerSettings:
         send_center_application_confirm_email_task,
         send_center_application_received_email_task,
         send_center_application_rejected_email_task,
+        send_center_application_admin_notice_task,
         # Export jobs get a longer per-task timeout than the global 60s: PDF/XLSX
         # generation for a shipment with many pallets (DB queries + reportlab/WeasyPrint
         # + R2 upload, all in one job) can plausibly exceed 60s where an email send can't.
@@ -271,6 +305,7 @@ class WorkerSettings:
     cron_jobs = [
         cron(purge_audit_logs_cron, hour=3, minute=0),
         cron(purge_attachments_cron, hour=4, minute=0),
+        cron(purge_email_failures_cron, hour=4, minute=30),
         # Export jobs expire 1h after DONE (see ExportJobRepository.DOWNLOAD_TTL_SECONDS) —
         # runs hourly, not daily like the other purges, to keep R2/db lean on that timescale.
         cron(purge_export_jobs_cron, minute=15),

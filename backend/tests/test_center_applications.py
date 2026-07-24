@@ -144,7 +144,10 @@ class TestConfirmEmail:
         assert app.status == "PENDING_REVIEW"
         assert app.email_verified_at is not None
         assert app.email_verify_token_hash is None  # single-use
-        assert enqueue.call_args.args[1] == "send_center_application_received_email_task"
+        enqueued = [c.args[1] for c in enqueue.call_args_list]
+        assert "send_center_application_received_email_task" in enqueued
+        # Reviewers are nudged that a confirmed application is ready.
+        assert "send_center_application_admin_notice_task" in enqueued
 
     @patch(f"{_SVC}.CenterApplicationRepository")
     def test_invalid_token_rejected(self, Repo):

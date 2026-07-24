@@ -114,7 +114,37 @@ class CenterApplicationService(BaseService):
             application.contact_email,
             application.center_name,
         )
+        # Nudge the reviewer(s) so a confirmed application doesn't sit unseen.
+        enqueue(
+            background_tasks,
+            "send_center_application_admin_notice_task",
+            str(application.id),
+        )
         return application
+
+    def resend_confirmation_by_email(
+        self, email: str, background_tasks: BackgroundTasks
+    ) -> None:
+        """Regenerate the confirmation token and resend the confirm email for a
+        still-pending (PENDING_EMAIL) application. Used when the first
+        confirmation email bounced."""
+        repo = CenterApplicationRepository(self.db)
+        application = repo.find_pending_email_by_email(email)
+        if application is None:
+            raise api_error(
+                "NOT_FOUND",
+                "No pending-confirmation application for this email",
+                status_code=404,
+            )
+        raw_token = secrets.token_urlsafe(32)
+        application.email_verify_token_hash = _hash_token(raw_token)
+        repo.commit()
+        enqueue(
+            background_tasks,
+            "send_center_application_confirm_email_task",
+            application.contact_email,
+            raw_token,
+        )
 
     # ── Review flow ──────────────────────────────────────────────────────────────
 

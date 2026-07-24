@@ -22,7 +22,7 @@ from app.utils.cloudflare import get_client_ip
 from app.utils.rate_limit import limiter
 
 # ── Routers ────────────────────────────────────────────────────────────────────
-from app.routers import auth, box, campaign, catalog, center, dashboard, exports, intake, messaging, pallet, product_type, report, shipment, transfer, users, studio, requests as requests_router, center_application
+from app.routers import auth, box, campaign, catalog, center, dashboard, exports, intake, messaging, pallet, product_type, report, shipment, transfer, users, studio, requests as requests_router, center_application, email_failures, resend_webhook
 
 # ── Models (ensure tables are registered with SQLAlchemy) ─────────────────────
 from app.models import user as _user_model                  # noqa: F401
@@ -121,7 +121,14 @@ class CloudflareOnlyMiddleware(BaseHTTPMiddleware):
     """
 
     async def dispatch(self, request: Request, call_next) -> Response:
-        if not settings.cloudflare_only or request.url.path == "/health":
+        # /health and third-party webhooks (Resend, etc.) bypass the shared-secret
+        # check: webhook callers can't send the Cloudflare Transform-Rule header,
+        # and they authenticate themselves via their own signature (Svix).
+        if (
+            not settings.cloudflare_only
+            or request.url.path == "/health"
+            or request.url.path.startswith("/webhooks/")
+        ):
             return await call_next(request)
 
         provided = request.headers.get(_CF_AUTH_HEADER, "")
@@ -307,6 +314,9 @@ app.include_router(dashboard.router, prefix=_V1)
 app.include_router(studio.router, prefix=_V1)
 app.include_router(requests_router.router, prefix=_V1)
 app.include_router(center_application.router, prefix=_V1)
+app.include_router(email_failures.router, prefix=_V1)
+# Resend webhook is unversioned (third-party caller with a hardcoded URL).
+app.include_router(resend_webhook.router)
 app.include_router(transfer.router)
 app.include_router(messaging.router)
 app.include_router(catalog.router)
