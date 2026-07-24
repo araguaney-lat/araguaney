@@ -15,6 +15,8 @@ jobs:
         working-directory: frontend
     steps:
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
 
       - uses: actions/setup-node@v7
         with:
@@ -25,8 +27,31 @@ jobs:
       - name: Install dependencies
         run: npm ci --prefer-offline
 
+      # A newly-disclosed transitive CVE shouldn't block a PR that never touched
+      # dependencies. Enforce the audit only when this PR changes package*.json
+      # (or on push to main). Otherwise run it informationally — Dependabot
+      # (.github/dependabot.yml) opens the fix PRs where the CVE actually lives.
+      - name: Detect dependency changes
+        id: deps
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            if git diff --name-only "${{ github.event.pull_request.base.sha }}" HEAD -- package.json package-lock.json | grep -q .; then
+              echo "changed=true" >> "$GITHUB_OUTPUT"
+            else
+              echo "changed=false" >> "$GITHUB_OUTPUT"
+            fi
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Audit for HIGH/CRITICAL CVEs
-        run: npm audit --audit-level=high --omit=dev
+        run: |
+          if [ "${{ steps.deps.outputs.changed }}" = "true" ]; then
+            npm audit --audit-level=high --omit=dev
+          else
+            npm audit --audit-level=high --omit=dev \
+              || echo "::warning::CVE no relacionada con este PR (no cambió package*.json). No bloquea el merge; se atiende vía Dependabot."
+          fi
 
   pip-audit:
     name: pip-audit (backend)
@@ -36,6 +61,8 @@ jobs:
         working-directory: backend
     steps:
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
 
       - uses: actions/setup-python@v6
         with:
@@ -46,5 +73,26 @@ jobs:
       - name: Install pip-audit
         run: pip install pip-audit==2.7.3
 
+      # Same policy as npm-audit: only enforce when this PR touches
+      # requirements.txt (or on push to main); otherwise informational.
+      - name: Detect dependency changes
+        id: deps
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            if git diff --name-only "${{ github.event.pull_request.base.sha }}" HEAD -- requirements.txt | grep -q .; then
+              echo "changed=true" >> "$GITHUB_OUTPUT"
+            else
+              echo "changed=false" >> "$GITHUB_OUTPUT"
+            fi
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Audit for known CVEs
-        run: pip-audit -r requirements.txt
+        run: |
+          if [ "${{ steps.deps.outputs.changed }}" = "true" ]; then
+            pip-audit -r requirements.txt
+          else
+            pip-audit -r requirements.txt \
+              || echo "::warning::CVE no relacionada con este PR (no cambió requirements.txt). No bloquea el merge; se atiende vía Dependabot."
+          fi
