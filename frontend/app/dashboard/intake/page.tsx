@@ -29,29 +29,29 @@ export default async function IntakePage() {
   return (
     <div className="max-w-3xl mx-auto">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-xl font-semibold text-zinc-900">{t.title}</h1>
+        <h1 className="text-xl font-semibold text-tx">{t.title}</h1>
         <Link
           href="/dashboard/intake/new"
-          className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700"
+          className="rounded-lg bg-[var(--blue)] px-4 py-2 text-sm font-medium text-white hover:opacity-90"
         >
           {t.new}
         </Link>
       </div>
 
       {intakes.length === 0 ? (
-        <div className="rounded-xl border border-zinc-200 bg-white p-8 text-center text-sm text-zinc-500">
+        <div className="rounded-xl border border-cardB bg-card p-8 text-center text-sm text-mut">
           {t.empty}
         </div>
       ) : (
         <ul className="space-y-3">
           {intakes.map((intake) => (
-            <li key={intake.id} className="rounded-xl border border-zinc-200 bg-white p-4">
+            <li key={intake.id} className="rounded-xl border border-cardB bg-card p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-zinc-900">
+                  <p className="text-sm font-medium text-tx">
                     {intake.donante_libre || t.anonymous}
                   </p>
-                  <p className="text-xs text-zinc-500 mt-0.5">
+                  <p className="text-xs text-mut mt-0.5">
                     {new Date(intake.created_at).toLocaleString(dateFmt, {
                       dateStyle: "short",
                       timeStyle: "short",
@@ -59,7 +59,7 @@ export default async function IntakePage() {
                   </p>
                 </div>
                 {intake.notes && (
-                  <p className="text-xs text-zinc-400 max-w-xs truncate">{intake.notes}</p>
+                  <p className="text-xs text-fnt max-w-xs truncate">{intake.notes}</p>
                 )}
               </div>
             </li>

@@ -13,7 +13,7 @@ const EMPTY_FORM = { email: "", username: "", full_name: "", center_role: "volun
 function Avatar({ name, avatarUrl, size }: { name: string; avatarUrl: string | null; size: number }) {
   return (
     <span
-      className="flex flex-none items-center justify-center overflow-hidden rounded-full bg-amber-200 font-semibold text-amber-900"
+      className="flex flex-none items-center justify-center overflow-hidden rounded-full bg-dDraftB font-semibold text-dDraftT"
       style={{ width: size, height: size, fontSize: size * 0.4 }}
     >
       {avatarUrl ? (
@@ -28,9 +28,9 @@ function Avatar({ name, avatarUrl, size }: { name: string; avatarUrl: string | n
 function TeamCard({ user }: { user: UserOut }) {
   const name = user.full_name ?? user.username
   return (
-    <div className="flex flex-col items-center gap-2 rounded-xl border border-zinc-200 bg-white p-4 text-center">
+    <div className="flex flex-col items-center gap-2 rounded-xl border border-cardB bg-card p-4 text-center">
       <Avatar name={name} avatarUrl={user.avatar_url} size={56} />
-      <p className="text-sm font-medium text-zinc-900 leading-snug">{name}</p>
+      <p className="text-sm font-medium text-tx leading-snug">{name}</p>
     </div>
   )
 }
@@ -141,10 +141,10 @@ export default function TeamPage() {
 
   const roleBadge = (role: string) => {
     const colors: Record<string, string> = {
-      coordinator: "bg-amber-100 text-amber-700",
-      volunteer: "bg-zinc-100 text-zinc-600",
+      coordinator: "bg-dDraftB text-dDraftT",
+      volunteer: "bg-chip text-mut",
     }
-    return colors[role] ?? "bg-zinc-100 text-zinc-600"
+    return colors[role] ?? "bg-chip text-mut"
   }
 
   const coordinators = users.filter((u) => u.center_role === "coordinator")
@@ -154,15 +154,15 @@ export default function TeamPage() {
     <div className="max-w-4xl">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-semibold text-zinc-900">{t.title}</h1>
-          <p className="text-sm text-zinc-500 mt-0.5">
+          <h1 className="text-2xl font-semibold text-tx">{t.title}</h1>
+          <p className="text-sm text-mut mt-0.5">
             {users.length === 1 ? t.members_count_one : t.members_count_other.replace("{count}", String(users.length))}
           </p>
         </div>
         {canManage && (
           <button
             onClick={() => { setShowManage((v) => !v); setShowForm(false); setError(null); setSuccess(null) }}
-            className="rounded-lg bg-zinc-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-zinc-700"
+            className="rounded-lg bg-[var(--blue)] px-3 py-1.5 text-sm font-medium text-white hover:opacity-90"
           >
             {showManage ? t.cancel : t.manage_team}
           </button>
@@ -171,14 +171,14 @@ export default function TeamPage() {
 
       {isNationalAdmin && (
         <div className="mb-6 max-w-xs">
-          <label className="text-xs text-zinc-500">{t.select_center_label}</label>
+          <label className="text-xs text-mut">{t.select_center_label}</label>
           {centers.length === 0 ? (
-            <p className="mt-1 text-sm text-zinc-400">{t.no_centers}</p>
+            <p className="mt-1 text-sm text-fnt">{t.no_centers}</p>
           ) : (
             <select
               value={selectedCenterId}
               onChange={(e) => setSelectedCenterId(e.target.value)}
-              className="mt-1 w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-400"
+              className="mt-1 w-full rounded-lg border border-cardB px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--gold)]"
             >
               {centers.map((c) => (
                 <option key={c.id} value={c.id}>{c.name}</option>
@@ -189,13 +189,13 @@ export default function TeamPage() {
       )}
 
       {loading ? (
-        <div className="text-sm text-zinc-400 py-8 text-center">{dict.dashboard.common.loading}</div>
+        <div className="text-sm text-fnt py-8 text-center">{dict.dashboard.common.loading}</div>
       ) : (
         <div className="space-y-8">
           <section>
-            <h2 className="text-sm font-semibold text-zinc-700 mb-3">{t.coordinators_heading}</h2>
+            <h2 className="text-sm font-semibold text-mut mb-3">{t.coordinators_heading}</h2>
             {coordinators.length === 0 ? (
-              <p className="text-sm text-zinc-400">{t.no_coordinators}</p>
+              <p className="text-sm text-fnt">{t.no_coordinators}</p>
             ) : (
               <div className="flex flex-wrap gap-3">
                 {coordinators.map((u) => (
@@ -208,9 +208,9 @@ export default function TeamPage() {
           </section>
 
           <section>
-            <h2 className="text-sm font-semibold text-zinc-700 mb-3">{t.volunteers_heading}</h2>
+            <h2 className="text-sm font-semibold text-mut mb-3">{t.volunteers_heading}</h2>
             {volunteers.length === 0 ? (
-              <p className="text-sm text-zinc-400">{t.no_volunteers}</p>
+              <p className="text-sm text-fnt">{t.no_volunteers}</p>
             ) : (
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
                 {volunteers.map((u) => (
@@ -223,76 +223,76 @@ export default function TeamPage() {
       )}
 
       {canManage && showManage && (
-        <div className="mt-10 pt-8 border-t border-zinc-200">
+        <div className="mt-10 pt-8 border-t border-cardB">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-base font-semibold text-zinc-900">{t.manage_team}</h2>
+            <h2 className="text-base font-semibold text-tx">{t.manage_team}</h2>
             <button
               onClick={() => { setShowForm((v) => !v); setError(null); setSuccess(null) }}
-              className="rounded-lg bg-zinc-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-zinc-700"
+              className="rounded-lg bg-[var(--blue)] px-3 py-1.5 text-sm font-medium text-white hover:opacity-90"
             >
               {showForm ? t.cancel : t.invite_btn}
             </button>
           </div>
 
           {error && (
-            <p className="mb-4 rounded-lg bg-red-50 border border-red-200 px-3 py-2 text-xs text-red-700">{error}</p>
+            <p className="mb-4 rounded-lg bg-dRejB border border-dRejB px-3 py-2 text-xs text-dRejT">{error}</p>
           )}
           {success && (
-            <p className="mb-4 rounded-lg bg-green-50 border border-green-200 px-3 py-2 text-xs text-green-700">{success}</p>
+            <p className="mb-4 rounded-lg bg-dSealB border border-dSealB px-3 py-2 text-xs text-dSealT">{success}</p>
           )}
 
           {showForm && (
-            <form onSubmit={handleCreate} className="mb-6 rounded-xl border border-zinc-200 bg-white p-5 space-y-3">
-              <p className="text-sm font-medium text-zinc-700">{t.form_title}</p>
+            <form onSubmit={handleCreate} className="mb-6 rounded-xl border border-cardB bg-card p-5 space-y-3">
+              <p className="text-sm font-medium text-mut">{t.form_title}</p>
               <div className="grid gap-3 sm:grid-cols-2">
                 <div>
-                  <label className="text-xs text-zinc-500">{t.field_email}</label>
+                  <label className="text-xs text-mut">{t.field_email}</label>
                   <input required type="email" value={form.email} onChange={field("email")} placeholder="usuario@centro.org"
-                    className="mt-1 w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-400" />
+                    className="mt-1 w-full rounded-lg border border-cardB px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--gold)]" />
                 </div>
                 <div>
-                  <label className="text-xs text-zinc-500">{t.field_username}</label>
+                  <label className="text-xs text-mut">{t.field_username}</label>
                   <input required value={form.username} onChange={field("username")} placeholder="usuario123"
-                    className="mt-1 w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-400" />
+                    className="mt-1 w-full rounded-lg border border-cardB px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--gold)]" />
                 </div>
                 <div>
-                  <label className="text-xs text-zinc-500">{t.field_full_name}</label>
+                  <label className="text-xs text-mut">{t.field_full_name}</label>
                   <input value={form.full_name} onChange={field("full_name")}
-                    className="mt-1 w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-400" />
+                    className="mt-1 w-full rounded-lg border border-cardB px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--gold)]" />
                 </div>
                 <div>
-                  <label className="text-xs text-zinc-500">{t.field_role}</label>
+                  <label className="text-xs text-mut">{t.field_role}</label>
                   <select value={form.center_role} onChange={field("center_role")}
-                    className="mt-1 w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-400">
+                    className="mt-1 w-full rounded-lg border border-cardB px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--gold)]">
                     {ROLES.map((r) => <option key={r} value={r}>{t.roles[r as keyof typeof t.roles]}</option>)}
                   </select>
                 </div>
               </div>
               <div className="flex justify-end pt-1">
                 <button type="submit" disabled={saving}
-                  className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-50">
+                  className="rounded-lg bg-[var(--blue)] px-4 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-50">
                   {saving ? t.inviting : t.invite_action}
                 </button>
               </div>
             </form>
           )}
 
-          <div className="rounded-xl border border-zinc-200 bg-white overflow-hidden">
+          <div className="rounded-xl border border-cardB bg-card overflow-hidden">
             <table className="w-full text-sm">
-              <thead className="bg-zinc-50 border-b border-zinc-200">
+              <thead className="bg-card2 border-b border-cardB">
                 <tr>
-                  <th className="text-left px-4 py-2.5 text-xs font-medium text-zinc-500">{t.col_member}</th>
-                  <th className="text-left px-4 py-2.5 text-xs font-medium text-zinc-500">{t.col_role}</th>
-                  <th className="text-left px-4 py-2.5 text-xs font-medium text-zinc-500 hidden sm:table-cell">{t.col_status}</th>
+                  <th className="text-left px-4 py-2.5 text-xs font-medium text-mut">{t.col_member}</th>
+                  <th className="text-left px-4 py-2.5 text-xs font-medium text-mut">{t.col_role}</th>
+                  <th className="text-left px-4 py-2.5 text-xs font-medium text-mut hidden sm:table-cell">{t.col_status}</th>
                   <th className="px-4 py-2.5" />
                 </tr>
               </thead>
-              <tbody className="divide-y divide-zinc-100">
+              <tbody className="divide-y divide-line">
                 {users.map((u) => (
-                  <tr key={u.id} className="hover:bg-zinc-50/50">
+                  <tr key={u.id} className="hover:bg-card2/50">
                     <td className="px-4 py-3">
-                      <p className="font-medium text-zinc-900">{u.full_name ?? u.username}</p>
-                      <p className="text-xs text-zinc-500">{u.email}</p>
+                      <p className="font-medium text-tx">{u.full_name ?? u.username}</p>
+                      <p className="text-xs text-mut">{u.email}</p>
                     </td>
                     <td className="px-4 py-3">
                       <span className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${roleBadge(u.center_role ?? "")}`}>
@@ -300,7 +300,7 @@ export default function TeamPage() {
                       </span>
                     </td>
                     <td className="px-4 py-3 hidden sm:table-cell">
-                      <span className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${u.is_active ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
+                      <span className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${u.is_active ? "bg-dSealB text-dSealT" : "bg-dRejB text-dRejT"}`}>
                         {u.is_active ? t.status_active : t.status_inactive}
                       </span>
                     </td>
@@ -308,7 +308,7 @@ export default function TeamPage() {
                       <button
                         onClick={() => handleReinvite(u.id)}
                         disabled={reinviting === u.id || !u.is_active}
-                        className="rounded px-2 py-1 text-xs text-amber-600 hover:bg-amber-50 disabled:opacity-40"
+                        className="rounded px-2 py-1 text-xs text-dDraftT hover:bg-dDraftB disabled:opacity-40"
                       >
                         {reinviting === u.id ? "..." : t.reinvite}
                       </button>
@@ -316,7 +316,7 @@ export default function TeamPage() {
                   </tr>
                 ))}
                 {users.length === 0 && (
-                  <tr><td colSpan={4} className="px-4 py-8 text-center text-zinc-400 text-sm">{t.empty}</td></tr>
+                  <tr><td colSpan={4} className="px-4 py-8 text-center text-fnt text-sm">{t.empty}</td></tr>
                 )}
               </tbody>
             </table>

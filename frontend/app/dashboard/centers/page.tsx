@@ -90,21 +90,21 @@ export default function CentersPage() {
   }
 
   if (status === "loading" || loading) {
-    return <div className="text-sm text-zinc-400 py-8 text-center">{dict.dashboard.common.loading}</div>
+    return <div className="text-sm text-fnt py-8 text-center">{dict.dashboard.common.loading}</div>
   }
 
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-semibold text-zinc-900">{t.title_full}</h1>
+        <h1 className="text-2xl font-semibold text-tx">{t.title_full}</h1>
         <div className="flex items-center gap-3">
-          <span className="text-sm text-zinc-500">
+          <span className="text-sm text-mut">
             {centers.length === 1 ? t.count_one : t.count_other.replace("{count}", String(centers.length))}
           </span>
           {!showForm && (
             <button
               onClick={() => setShowForm(true)}
-              className="rounded-lg bg-zinc-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-zinc-700"
+              className="rounded-lg bg-[var(--blue)] px-3 py-1.5 text-sm font-medium text-white hover:opacity-90"
             >
               {t.new}
             </button>
@@ -115,41 +115,41 @@ export default function CentersPage() {
       {showForm && (
         <form
           onSubmit={handleCreate}
-          className="mb-6 rounded-xl border border-zinc-200 bg-white p-5 space-y-3"
+          className="mb-6 rounded-xl border border-cardB bg-card p-5 space-y-3"
         >
-          <p className="text-sm font-medium text-zinc-700">{t.form_title}</p>
+          <p className="text-sm font-medium text-mut">{t.form_title}</p>
 
           {error && (
-            <p className="rounded-lg bg-red-50 border border-red-200 px-3 py-2 text-xs text-red-700">
+            <p className="rounded-lg bg-dRejB border border-dRejB px-3 py-2 text-xs text-dRejT">
               {error}
             </p>
           )}
 
           <div className="grid gap-3 sm:grid-cols-2">
             <div>
-              <label className="text-xs text-zinc-500">{t.field_name_required}</label>
+              <label className="text-xs text-mut">{t.field_name_required}</label>
               <input
                 required
                 value={form.name}
                 onChange={field("name")}
                 placeholder="Ej. Centro Norte CDMX"
-                className="mt-1 w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-400"
+                className="mt-1 w-full rounded-lg border border-cardB px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--gold)]"
               />
             </div>
             <div>
-              <label className="text-xs text-zinc-500">{t.field_address}</label>
+              <label className="text-xs text-mut">{t.field_address}</label>
               <input
                 value={form.address}
                 onChange={field("address")}
-                className="mt-1 w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-400"
+                className="mt-1 w-full rounded-lg border border-cardB px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--gold)]"
               />
             </div>
             <div>
-              <label className="text-xs text-zinc-500">{t.field_country}</label>
+              <label className="text-xs text-mut">{t.field_country}</label>
               <select
                 value={form.country_code}
                 onChange={field("country_code")}
-                className="mt-1 w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-400"
+                className="mt-1 w-full rounded-lg border border-cardB px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--gold)]"
               >
                 <option value="">{t.select_country}</option>
                 {COUNTRIES.map((c) => (
@@ -160,36 +160,36 @@ export default function CentersPage() {
               </select>
             </div>
             <div>
-              <label className="text-xs text-zinc-500">{t.field_state}</label>
+              <label className="text-xs text-mut">{t.field_state}</label>
               <input
                 value={form.state_name}
                 onChange={field("state_name")}
-                className="mt-1 w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-400"
+                className="mt-1 w-full rounded-lg border border-cardB px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--gold)]"
               />
             </div>
             <div>
-              <label className="text-xs text-zinc-500">{t.field_contact_name}</label>
+              <label className="text-xs text-mut">{t.field_contact_name}</label>
               <input
                 value={form.contact_name}
                 onChange={field("contact_name")}
-                className="mt-1 w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-400"
+                className="mt-1 w-full rounded-lg border border-cardB px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--gold)]"
               />
             </div>
             <div>
-              <label className="text-xs text-zinc-500">{t.field_contact_email}</label>
+              <label className="text-xs text-mut">{t.field_contact_email}</label>
               <input
                 type="email"
                 value={form.contact_email}
                 onChange={field("contact_email")}
-                className="mt-1 w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-400"
+                className="mt-1 w-full rounded-lg border border-cardB px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--gold)]"
               />
             </div>
             <div>
-              <label className="text-xs text-zinc-500">{t.field_contact_phone}</label>
+              <label className="text-xs text-mut">{t.field_contact_phone}</label>
               <input
                 value={form.contact_phone}
                 onChange={field("contact_phone")}
-                className="mt-1 w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-400"
+                className="mt-1 w-full rounded-lg border border-cardB px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--gold)]"
               />
             </div>
           </div>
@@ -199,14 +199,14 @@ export default function CentersPage() {
               type="button"
               onClick={closeForm}
               disabled={saving}
-              className="rounded-lg border border-zinc-200 px-4 py-2 text-sm font-medium text-zinc-600 hover:bg-zinc-50 disabled:opacity-50"
+              className="rounded-lg border border-cardB px-4 py-2 text-sm font-medium text-mut hover:bg-card2 disabled:opacity-50"
             >
               {t.cancel}
             </button>
             <button
               type="submit"
               disabled={saving}
-              className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-50"
+              className="rounded-lg bg-[var(--blue)] px-4 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-50"
             >
               {saving ? t.saving : t.create}
             </button>
@@ -215,21 +215,21 @@ export default function CentersPage() {
       )}
 
       {centers.length === 0 ? (
-        <div className="rounded-xl border border-zinc-200 bg-white p-8 text-center text-sm text-zinc-500">
+        <div className="rounded-xl border border-cardB bg-card p-8 text-center text-sm text-mut">
           {t.empty}
         </div>
       ) : (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {centers.map((c) => (
-            <div key={c.id} className="rounded-xl border border-zinc-200 bg-white p-4">
+            <div key={c.id} className="rounded-xl border border-cardB bg-card p-4">
               <div className="flex items-start justify-between gap-2">
-                <span className="font-medium text-zinc-900 leading-snug">{c.name}</span>
+                <span className="font-medium text-tx leading-snug">{c.name}</span>
                 <button
                   onClick={() => toggleActive(c)}
                   className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium cursor-pointer ${
                     c.is_active
-                      ? "bg-green-100 text-green-700 hover:bg-green-200"
-                      : "bg-zinc-100 text-zinc-500 hover:bg-zinc-200"
+                      ? "bg-dSealB text-dSealT hover:bg-dSealB"
+                      : "bg-chip text-mut hover:bg-chip"
                   }`}
                   title={c.is_active ? t.toggle_deactivate : t.toggle_activate}
                 >
@@ -238,7 +238,7 @@ export default function CentersPage() {
               </div>
 
               {(c.country_code || c.state_name) && (
-                <p className="mt-1.5 text-xs text-zinc-600 font-medium">
+                <p className="mt-1.5 text-xs text-mut font-medium">
                   {c.country_code && <>{flagEmoji(c.country_code)} </>}
                   {[
                     c.state_name,
@@ -250,13 +250,13 @@ export default function CentersPage() {
               )}
 
               {c.address && (
-                <p className="mt-0.5 text-xs text-zinc-500 truncate">{c.address}</p>
+                <p className="mt-0.5 text-xs text-mut truncate">{c.address}</p>
               )}
               {c.contact_name && (
-                <p className="mt-1 text-xs text-zinc-500">{c.contact_name}</p>
+                <p className="mt-1 text-xs text-mut">{c.contact_name}</p>
               )}
               {c.contact_email && (
-                <p className="mt-0.5 text-xs text-zinc-400 truncate">{c.contact_email}</p>
+                <p className="mt-0.5 text-xs text-fnt truncate">{c.contact_email}</p>
               )}
             </div>
           ))}

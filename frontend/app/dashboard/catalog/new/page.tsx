@@ -60,8 +60,8 @@ export default function NewProductTypePage() {
   return (
     <div className="max-w-2xl mx-auto pb-12">
       <div className="mb-6">
-        <h1 className="text-xl font-semibold text-zinc-900">{t.title}</h1>
-        <p className="text-sm text-zinc-500 mt-1">
+        <h1 className="text-xl font-semibold text-tx">{t.title}</h1>
+        <p className="text-sm text-mut mt-1">
           {t.subtitle}
         </p>
       </div>
@@ -74,12 +74,12 @@ export default function NewProductTypePage() {
       <form onSubmit={handleSubmit} className="space-y-5">
         {/* Category */}
         <div>
-          <label className="block text-xs font-medium text-zinc-600 mb-1">{t.category_label}</label>
+          <label className="block text-xs font-medium text-mut mb-1">{t.category_label}</label>
           <select
             value={form.category}
             onChange={(e) => setField("category", e.target.value)}
             required
-            className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-900"
+            className="w-full rounded-lg border border-inpB px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--blue)]"
           >
             {Object.entries(categories).map(([v, l]) => (
               <option key={v} value={v}>{l}</option>
@@ -89,29 +89,29 @@ export default function NewProductTypePage() {
 
         {/* Display name */}
         <div>
-          <label className="block text-xs font-medium text-zinc-600 mb-1">{t.name_label}</label>
+          <label className="block text-xs font-medium text-mut mb-1">{t.name_label}</label>
           <input
             type="text"
             value={form.display_name}
             onChange={(e) => setField("display_name", e.target.value)}
             required
             placeholder={t.name_placeholder}
-            className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-900"
+            className="w-full rounded-lg border border-inpB px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--blue)]"
           />
         </div>
 
         {/* INN — RxNorm autocomplete */}
         {isMedicine && (
           <div>
-            <label className="block text-xs font-medium text-zinc-600 mb-1">
+            <label className="block text-xs font-medium text-mut mb-1">
               {t.inn_label}
-              {isMedicine && <span className="text-red-500 ml-0.5">*</span>}
+              {isMedicine && <span className="text-dRejT ml-0.5">*</span>}
             </label>
             <InnAutocomplete
               value={form.inn_name ?? ""}
               onChange={(v) => setField("inn_name", v)}
             />
-            <p className="mt-1 text-xs text-zinc-400">
+            <p className="mt-1 text-xs text-fnt">
               {t.inn_hint}
             </p>
           </div>
@@ -121,13 +121,13 @@ export default function NewProductTypePage() {
           {/* Strength */}
           {isMedicine && (
             <div>
-              <label className="block text-xs font-medium text-zinc-600 mb-1">{t.strength_label}</label>
+              <label className="block text-xs font-medium text-mut mb-1">{t.strength_label}</label>
               <input
                 type="text"
                 value={form.strength ?? ""}
                 onChange={(e) => setField("strength", e.target.value)}
                 placeholder={t.strength_placeholder}
-                className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-900"
+                className="w-full rounded-lg border border-inpB px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--blue)]"
               />
             </div>
           )}
@@ -135,57 +135,57 @@ export default function NewProductTypePage() {
           {/* Form */}
           {isMedicine && (
             <div>
-              <label className="block text-xs font-medium text-zinc-600 mb-1">{t.form_label}</label>
+              <label className="block text-xs font-medium text-mut mb-1">{t.form_label}</label>
               <input
                 type="text"
                 value={form.form ?? ""}
                 onChange={(e) => setField("form", e.target.value)}
                 placeholder={t.form_placeholder}
-                className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-900"
+                className="w-full rounded-lg border border-inpB px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--blue)]"
               />
             </div>
           )}
 
           {/* Brand */}
           <div>
-            <label className="block text-xs font-medium text-zinc-600 mb-1">{t.brand_label}</label>
+            <label className="block text-xs font-medium text-mut mb-1">{t.brand_label}</label>
             <input
               type="text"
               value={form.brand ?? ""}
               onChange={(e) => setField("brand", e.target.value)}
               placeholder={t.brand_placeholder}
-              className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-900"
+              className="w-full rounded-lg border border-inpB px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--blue)]"
             />
           </div>
 
           {/* Default unit */}
           <div>
-            <label className="block text-xs font-medium text-zinc-600 mb-1">{t.unit_label}</label>
+            <label className="block text-xs font-medium text-mut mb-1">{t.unit_label}</label>
             <input
               type="text"
               value={form.default_unit ?? ""}
               onChange={(e) => setField("default_unit", e.target.value)}
               placeholder={t.unit_placeholder}
-              className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-900"
+              className="w-full rounded-lg border border-inpB px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--blue)]"
             />
           </div>
 
           {/* GTIN */}
           <div>
-            <label className="block text-xs font-medium text-zinc-600 mb-1">{t.gtin_label}</label>
+            <label className="block text-xs font-medium text-mut mb-1">{t.gtin_label}</label>
             <input
               type="text"
               inputMode="numeric"
               value={form.gtin ?? ""}
               onChange={(e) => setField("gtin", e.target.value)}
               placeholder={t.gtin_placeholder}
-              className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-900"
+              className="w-full rounded-lg border border-inpB px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--blue)]"
             />
           </div>
 
           {/* Min shelf life */}
           <div>
-            <label className="block text-xs font-medium text-zinc-600 mb-1">
+            <label className="block text-xs font-medium text-mut mb-1">
               {t.min_shelf_life_label}
             </label>
             <input
@@ -195,27 +195,27 @@ export default function NewProductTypePage() {
               value={form.min_shelf_life_days ?? ""}
               onChange={(e) => setField("min_shelf_life_days", e.target.value ? parseInt(e.target.value, 10) : undefined)}
               placeholder={isMedicine ? "365" : "180"}
-              className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-900"
+              className="w-full rounded-lg border border-inpB px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--blue)]"
             />
           </div>
         </div>
 
         {/* Controlled substance */}
-        <div className="flex items-center gap-3 rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-3">
+        <div className="flex items-center gap-3 rounded-lg border border-cardB bg-card2 px-4 py-3">
           <input
             id="is_controlled"
             type="checkbox"
             checked={form.is_controlled ?? false}
             onChange={(e) => setField("is_controlled", e.target.checked)}
-            className="h-4 w-4 rounded border-zinc-300 text-zinc-900"
+            className="h-4 w-4 rounded border-inpB text-tx"
           />
-          <label htmlFor="is_controlled" className="text-sm text-zinc-700">
+          <label htmlFor="is_controlled" className="text-sm text-mut">
             {t.controlled_label}
           </label>
         </div>
 
         {error && (
-          <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          <div className="rounded-lg border border-dRejB bg-dRejB px-4 py-3 text-sm text-dRejT">
             {error}
           </div>
         )}
@@ -225,21 +225,21 @@ export default function NewProductTypePage() {
             type="submit"
             disabled={submitting || !online}
             title={!online ? t.offline_tooltip : undefined}
-            className="flex-1 rounded-lg bg-zinc-900 py-3 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-60"
+            className="flex-1 rounded-lg bg-[var(--blue)] py-3 text-sm font-medium text-white hover:opacity-90 disabled:opacity-60"
           >
             {submitting ? t.submitting : t.submit}
           </button>
           <button
             type="button"
             onClick={() => router.back()}
-            className="rounded-lg border border-zinc-300 px-4 py-3 text-sm font-medium text-zinc-600 hover:bg-zinc-50"
+            className="rounded-lg border border-inpB px-4 py-3 text-sm font-medium text-mut hover:bg-card2"
           >
             {t.cancel}
           </button>
         </div>
 
         {!online && (
-          <p className="text-xs text-center text-amber-600">
+          <p className="text-xs text-center text-dDraftT">
             {t.offline_notice}
           </p>
         )}

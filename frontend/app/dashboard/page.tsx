@@ -18,32 +18,32 @@ export default async function DashboardPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold text-zinc-900 mb-1">{t.title}</h1>
-      <p className="text-sm text-zinc-500 mb-8">
+      <h1 className="text-2xl font-semibold text-tx mb-1">{t.title}</h1>
+      <p className="text-sm text-mut mb-8">
         {centerRole === "coordinator" ? t.subtitle_coordinator : t.subtitle_volunteer}
       </p>
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
         {centerRole && ["coordinator", "volunteer"].includes(centerRole) && (
           <>
-            <Link href="/dashboard/intake" className="rounded-xl border border-zinc-200 bg-white p-5 hover:border-zinc-300 hover:shadow-sm transition-all">
-              <p className="text-xs text-zinc-500 mb-1">{t.card_intake_label}</p>
-              <p className="font-semibold text-zinc-900">{t.card_intake_action}</p>
+            <Link href="/dashboard/intake" className="rounded-xl border border-cardB bg-card p-5 hover:border-goldB hover:shadow-sm transition-all">
+              <p className="text-xs text-mut mb-1">{t.card_intake_label}</p>
+              <p className="font-semibold text-tx">{t.card_intake_action}</p>
             </Link>
-            <Link href="/dashboard/boxes" className="rounded-xl border border-zinc-200 bg-white p-5 hover:border-zinc-300 hover:shadow-sm transition-all">
-              <p className="text-xs text-zinc-500 mb-1">{t.card_boxes_label}</p>
-              <p className="font-semibold text-zinc-900">{t.card_boxes_action}</p>
+            <Link href="/dashboard/boxes" className="rounded-xl border border-cardB bg-card p-5 hover:border-goldB hover:shadow-sm transition-all">
+              <p className="text-xs text-mut mb-1">{t.card_boxes_label}</p>
+              <p className="font-semibold text-tx">{t.card_boxes_action}</p>
             </Link>
           </>
         )}
         {centerRole === "coordinator" && (
           <>
-            <Link href="/dashboard/pallets" className="rounded-xl border border-zinc-200 bg-white p-5 hover:border-zinc-300 hover:shadow-sm transition-all">
-              <p className="text-xs text-zinc-500 mb-1">{t.card_pallets_label}</p>
-              <p className="font-semibold text-zinc-900">{t.card_pallets_action}</p>
+            <Link href="/dashboard/pallets" className="rounded-xl border border-cardB bg-card p-5 hover:border-goldB hover:shadow-sm transition-all">
+              <p className="text-xs text-mut mb-1">{t.card_pallets_label}</p>
+              <p className="font-semibold text-tx">{t.card_pallets_action}</p>
             </Link>
-            <Link href="/dashboard/shipments" className="rounded-xl border border-zinc-200 bg-white p-5 hover:border-zinc-300 hover:shadow-sm transition-all">
-              <p className="text-xs text-zinc-500 mb-1">{t.card_shipments_label}</p>
-              <p className="font-semibold text-zinc-900">{t.card_shipments_action}</p>
+            <Link href="/dashboard/shipments" className="rounded-xl border border-cardB bg-card p-5 hover:border-goldB hover:shadow-sm transition-all">
+              <p className="text-xs text-mut mb-1">{t.card_shipments_label}</p>
+              <p className="font-semibold text-tx">{t.card_shipments_action}</p>
             </Link>
           </>
         )}
