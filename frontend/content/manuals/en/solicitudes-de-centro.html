@@ -1,0 +1,137 @@
+<div class="doc">
+  <div class="wrap">
+
+    <header>
+      <span class="eyebrow">Module · Center applications</span>
+      <h1>Review and approve new centers</h1>
+      <p class="lede">When a center registers itself from the website, its application lands here for your review. Approving it creates the center and makes its contact a coordinator.</p>
+      <p class="crumbs">Panel › Administration › <b>Center applications</b> · /dashboard/admin/center-applications</p>
+    </header>
+
+    <section>
+      <div class="intro-card">
+        <p><b>What it does.</b> It's the review queue for center self-registration. An application is <u>not</u> a center yet: it only becomes one when you approve it.</p>
+        <p><b>Why it exists.</b> Registration is open, but human review keeps out fake centers. The application is the quarantine.</p>
+      </div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <h2>How an application reaches your queue</h2>
+        <p class="sect-note">The applicant clears two filters before you see it.</p>
+      </div>
+      <div class="steps">
+        <div class="step">
+          <div class="n">1</div>
+          <div>
+            <h3>They register on the web</h3>
+            <p>They fill the public form <code>/register-center</code> (center + contact + trust signals), with an anti-bot Turnstile check.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="n">2</div>
+          <div>
+            <h3>They confirm their email</h3>
+            <p>They get an email and click to verify. Only then does the application move to <code>PENDING_REVIEW</code> and appear in your queue.</p>
+            <span class="hint">If they never confirm, the application stays in <code>PENDING_EMAIL</code> and never reaches you.</span>
+          </div>
+        </div>
+        <div class="step">
+          <div class="n">3</div>
+          <div>
+            <h3>We notify you</h3>
+            <p>You receive an email that an application is ready to review. You also see a badge in the menu.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <h2>What you see and what to review</h2>
+        <p class="sect-note">Each application carries trust signals to help you decide.</p>
+      </div>
+      <div class="tscroll">
+        <table class="vtable">
+          <thead>
+            <tr>
+              <th>Field</th>
+              <th>Purpose</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="mono">Center · Country · State · Address</td>
+              <td>Locate and validate the center.</td>
+            </tr>
+            <tr>
+              <td class="mono">Contact · Email · Phone</td>
+              <td>The operational contact who will become the coordinator.</td>
+            </tr>
+            <tr>
+              <td class="mono">Backing organization</td>
+              <td>Trust signal: who vouches for the center.</td>
+            </tr>
+            <tr>
+              <td class="mono">Social / website</td>
+              <td>Public link to verify the center is real.</td>
+            </tr>
+            <tr>
+              <td class="mono">Message</td>
+              <td>Free-text context the applicant left.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <h2>Approve or reject</h2>
+        <p class="sect-note">Two paths, each with its effect and its automatic email.</p>
+      </div>
+      <div class="reqs">
+        <div class="rrow">
+          <div class="rk">Approve</div>
+          <div class="rv">The <code>Center</code> is created (only now does it enter the national aggregate), the contact becomes the center's <code>coordinator</code> and gets an invitation email with a <b>temporary password</b>. They're assigned to the General Donations campaign.</div>
+        </div>
+        <div class="rrow">
+          <div class="rk">Reject</div>
+          <div class="rv">You write a <b>reason</b>. The applicant gets an email with that reason and can register again fixing whatever is needed.</div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <h2>Which applications you see</h2>
+        <p class="sect-note">Scope depends on your role.</p>
+      </div>
+      <div class="reqs">
+        <div class="rrow">
+          <div class="rk">national_admin</div>
+          <div class="rv">Only applications from <code>your country</code>.</div>
+        </div>
+        <div class="rrow">
+          <div class="rk">superadmin</div>
+          <div class="rv">All of them, from <code>Studio</code> › Center applications. Also gets the notification when a country has no national_admin yet.</div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <h2>If the invitation doesn't arrive</h2>
+      </div>
+      <div class="perm">
+        <p>On approval the invitation with the temporary password is sent. If the email bounces (mistyped address), the superadmin sees it in <code>Studio › Emails</code> and can <b>resend it</b> (generates a new password and resends).</p>
+      </div>
+    </section>
+
+    <div class="foot">
+      <span>Araguaney · Center applications module manual</span>
+      <span>Related: Users · Centers</span>
+    </div>
+
+  </div>
+</div>

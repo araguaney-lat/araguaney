@@ -137,6 +137,14 @@ export const MANUAL_GROUPS: readonly ManualGroup[] = [
         },
       },
       {
+        slug: "solicitudes-de-centro",
+        title: { es: "Solicitudes de centro", en: "Center applications" },
+        blurb: {
+          es: "Revisar y aprobar centros que se registran solos.",
+          en: "Review and approve centers that register themselves.",
+        },
+      },
+      {
         slug: "auditoria",
         title: { es: "Auditoría", en: "Audit" },
         blurb: {

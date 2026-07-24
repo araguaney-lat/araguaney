@@ -1,0 +1,137 @@
+<div class="doc">
+  <div class="wrap">
+
+    <header>
+      <span class="eyebrow">Módulo · Solicitudes de centro</span>
+      <h1>Revisar y aprobar centros nuevos</h1>
+      <p class="lede">Cuando un centro se registra solo desde la web, su solicitud llega aquí para tu revisión. Al aprobarla se crea el centro y su responsable queda como coordinador.</p>
+      <p class="crumbs">Panel › Administración › <b>Solicitudes de centro</b> · /dashboard/admin/center-applications</p>
+    </header>
+
+    <section>
+      <div class="intro-card">
+        <p><b>Qué hace.</b> Es la cola de revisión del auto-registro de centros. Una solicitud <u>no es</u> un centro todavía: solo se convierte en centro cuando la apruebas.</p>
+        <p><b>Por qué existe.</b> El registro es abierto, pero la revisión humana evita centros falsos. La solicitud es la cuarentena.</p>
+      </div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <h2>Cómo llega una solicitud a tu cola</h2>
+        <p class="sect-note">El solicitante pasa por dos filtros antes de que la veas.</p>
+      </div>
+      <div class="steps">
+        <div class="step">
+          <div class="n">1</div>
+          <div>
+            <h3>Se registra en la web</h3>
+            <p>Llena el formulario público <code>/registrar-centro</code> (datos del centro + responsable + señales de confianza), con Turnstile anti-bot.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="n">2</div>
+          <div>
+            <h3>Confirma su correo</h3>
+            <p>Recibe un email y hace clic para verificar. Solo entonces la solicitud pasa a <code>PENDING_REVIEW</code> y aparece en tu cola.</p>
+            <span class="hint">Si no confirma el correo, la solicitud queda en <code>PENDING_EMAIL</code> y nunca te llega.</span>
+          </div>
+        </div>
+        <div class="step">
+          <div class="n">3</div>
+          <div>
+            <h3>Te avisamos</h3>
+            <p>Recibes un correo de aviso de que hay una solicitud lista para revisar. También la ves con un badge en el menú.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <h2>Qué ves y qué revisar</h2>
+        <p class="sect-note">Cada solicitud trae señales de confianza para ayudarte a decidir.</p>
+      </div>
+      <div class="tscroll">
+        <table class="vtable">
+          <thead>
+            <tr>
+              <th>Campo</th>
+              <th>Para qué sirve</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="mono">Centro · País · Estado · Dirección</td>
+              <td>Ubicar y validar el centro.</td>
+            </tr>
+            <tr>
+              <td class="mono">Responsable · Correo · Teléfono</td>
+              <td>El contacto operativo que quedará como coordinador.</td>
+            </tr>
+            <tr>
+              <td class="mono">Organización que respalda</td>
+              <td>Señal de confianza: quién avala al centro.</td>
+            </tr>
+            <tr>
+              <td class="mono">Red social / sitio</td>
+              <td>Enlace público para verificar que el centro es real.</td>
+            </tr>
+            <tr>
+              <td class="mono">Mensaje</td>
+              <td>Contexto libre que dejó el solicitante.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <h2>Aprobar o rechazar</h2>
+        <p class="sect-note">Dos caminos, cada uno con su efecto y su correo automático.</p>
+      </div>
+      <div class="reqs">
+        <div class="rrow">
+          <div class="rk">Aprobar</div>
+          <div class="rv">Se crea el <code>Centro</code> (recién ahora entra al agregado nacional), el responsable queda como <code>coordinator</code> del centro y recibe un correo de invitación con una <b>contraseña temporal</b>. Queda asignado a la campaña Donaciones Generales.</div>
+        </div>
+        <div class="rrow">
+          <div class="rk">Rechazar</div>
+          <div class="rv">Escribes un <b>motivo</b>. El solicitante recibe un correo con ese motivo y puede volver a registrarse corrigiendo lo que haga falta.</div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <h2>Qué solicitudes ves</h2>
+        <p class="sect-note">El alcance depende de tu rol.</p>
+      </div>
+      <div class="reqs">
+        <div class="rrow">
+          <div class="rk">national_admin</div>
+          <div class="rv">Solo las solicitudes de <code>tu país</code>.</div>
+        </div>
+        <div class="rrow">
+          <div class="rk">superadmin</div>
+          <div class="rv">Todas, desde el <code>Studio</code> › Solicitudes de centro. También recibe el aviso si un país aún no tiene national_admin.</div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <h2>Si la invitación no llega</h2>
+      </div>
+      <div class="perm">
+        <p>Al aprobar se envía la invitación con la clave temporal. Si el correo rebota (dirección mal escrita), el superadmin lo ve en <code>Studio › Emails</code> y puede <b>reenviarla</b> (genera una nueva clave y reenvía).</p>
+      </div>
+    </section>
+
+    <div class="foot">
+      <span>Araguaney · Manual del módulo Solicitudes de centro</span>
+      <span>Relacionado: Usuarios · Centros</span>
+    </div>
+
+  </div>
+</div>

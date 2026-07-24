@@ -60,7 +60,7 @@
 
 | # | Tarea | Descripción | Prioridad | Estado |
 |---|-------|-------------|-----------|--------|
-| 16 | Manual "Solicitudes de centro" (ES/EN) | Manual de ayuda del módulo para el national_admin (`/dashboard/ayuda`), en ambos idiomas. | 🟢 | ⬜ Pendiente |
+| 16 | Manual "Solicitudes de centro" (ES/EN) | Manual de ayuda del módulo para el national_admin (`/dashboard/ayuda`), en ambos idiomas. | 🟢 | ✅ Done |
 | 17 | Actualizar roadmap README | Totales del índice al completar la fase. | 🟢 | ✅ Done |
 
 ---
