@@ -6,8 +6,12 @@ import {
   localizedPath,
 } from "@/lib/routes"
 
+// Canonical host is www: production 308-redirects the apex (araguaney.lat) to
+// www.araguaney.lat, and the Google Search Console property is verified on www.
+// Keep this in sync with NEXT_PUBLIC_SITE_URL in Vercel and the redirect at the
+// edge — every canonical/sitemap/robots URL derives from here.
 export const SITE_URL = (
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://araguaney.lat"
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.araguaney.lat"
 ).replace(/\/$/, "")
 
 export function absoluteUrl(path: string): string {
