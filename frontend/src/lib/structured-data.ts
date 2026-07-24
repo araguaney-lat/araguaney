@@ -1,4 +1,11 @@
-import { SITE_URL, DEFAULT_OG_IMAGE, absoluteUrl } from "@/lib/seo"
+import {
+  SITE_URL,
+  DEFAULT_OG_IMAGE,
+  absoluteUrl,
+  BRAND_SAME_AS,
+  BRAND_FOUNDING_YEAR,
+  BRAND_FOUNDER_NAME,
+} from "@/lib/seo"
 import type { Locale } from "@/lib/routes"
 
 // JSON-LD structured-data builders (schema.org). Emitted via <JsonLd /> so
@@ -23,6 +30,8 @@ export const ORGANIZATION_SCHEMA: Schema = {
   logo: DEFAULT_OG_IMAGE,
   description:
     "El estándar común para la coordinación de centros de acopio y la logística de ayuda humanitaria.",
+  foundingDate: BRAND_FOUNDING_YEAR,
+  founder: { "@type": "Person", name: BRAND_FOUNDER_NAME },
   knowsAbout: [
     "Centros de acopio",
     "Donaciones en especie",
@@ -38,6 +47,8 @@ export const ORGANIZATION_SCHEMA: Schema = {
     url: absoluteUrl("/contacto"),
     availableLanguage: ["es", "en"],
   },
+  // Only emitted once at least one official profile / Wikidata entity exists.
+  ...(BRAND_SAME_AS.length > 0 ? { sameAs: [...BRAND_SAME_AS] } : {}),
 }
 
 export const SOFTWARE_APPLICATION_SCHEMA: Schema = {

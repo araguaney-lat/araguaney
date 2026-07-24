@@ -14,6 +14,18 @@ export const SITE_URL = (
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.araguaney.lat"
 ).replace(/\/$/, "")
 
+// Single source of truth for the brand entity's `sameAs` links — the
+// authoritative external profiles Google/AI use to resolve the entity in the
+// knowledge graph. Empty until the accounts exist: add each official URL here
+// (LinkedIn, GitHub, X, Instagram, Crunchbase) and, once created, the Wikidata
+// entity URL (Fase 17 task 6). They flow into the Organization schema
+// automatically — only rendered when non-empty. See Fase 17 task 5.
+export const BRAND_SAME_AS: readonly string[] = []
+
+// Public founder attribution for the Organization `founder` (E-E-A-T signal).
+export const BRAND_FOUNDING_YEAR = "2026"
+export const BRAND_FOUNDER_NAME = "Antony E Delgado Casanova"
+
 export function absoluteUrl(path: string): string {
   return `${SITE_URL}${path.startsWith("/") ? path : `/${path}`}`
 }
