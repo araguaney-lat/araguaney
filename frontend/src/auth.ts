@@ -4,7 +4,11 @@ import Credentials from "next-auth/providers/credentials"
 const API_URL = process.env.API_URL ?? "http://localhost:8000"
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
-  session: { strategy: "jwt" },
+  // Cap the NextAuth session to the backend access token lifetime (24h). Without
+  // this the NextAuth cookie defaults to 30 days and outlives the backend token,
+  // leaving the user "logged in" on a dead token. The exact guard is the
+  // accessTokenExpires check in the jwt callback below.
+  session: { strategy: "jwt", maxAge: 60 * 60 * 24 },
   providers: [
     Credentials({
       credentials: {
@@ -24,6 +28,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           const me = await meRes.json()
           return {
             accessToken: token,
+            accessTokenExpires: _extractExp(token),
             platformRole: me.role ?? null,
             centerRole: me.center_role ?? null,
             centerId: me.center_id ?? null,
@@ -56,6 +61,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         const data = await res.json()
         return {
           accessToken: data.access_token,
+          accessTokenExpires: _extractExp(data.access_token),
           platformRole: data.role ?? null,
           centerRole: data.center_role ?? null,
           centerId: data.center_id ?? null,
@@ -70,6 +76,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     async jwt({ token, user }) {
       if (user) {
         token.accessToken = user.accessToken
+        token.accessTokenExpires = user.accessTokenExpires
         token.platformRole = user.platformRole
         token.centerRole = user.centerRole
         token.centerId = user.centerId
@@ -77,10 +84,18 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token.mustChangePassword = user.mustChangePassword
         token.mustAcceptTerms = user.mustAcceptTerms
       }
+      // No refresh token: once the backend access token's `exp` passes, the
+      // session is dead. Flag it so the middleware bounces the user to /login
+      // instead of leaving them on a broken dashboard with a 401'd token.
+      if (token.accessTokenExpires && Date.now() >= token.accessTokenExpires) {
+        token.error = "AccessTokenExpired"
+      }
       return token
     },
     async session({ session, token }) {
       session.accessToken = token.accessToken
+      session.accessTokenExpires = token.accessTokenExpires
+      session.error = token.error
       session.platformRole = token.platformRole
       session.centerRole = token.centerRole
       session.centerId = token.centerId
@@ -102,5 +117,16 @@ function _extractSub(jwt: string): string {
     return payload.sub ?? ""
   } catch {
     return ""
+  }
+}
+
+// Backend JWT `exp` is in seconds; return it as epoch milliseconds (0 if absent).
+function _extractExp(jwt: string): number {
+  try {
+    const [, b64] = jwt.split(".")
+    const payload = JSON.parse(Buffer.from(b64.replace(/-/g, "+").replace(/_/g, "/"), "base64").toString())
+    return typeof payload.exp === "number" ? payload.exp * 1000 : 0
+  } catch {
+    return 0
   }
 }

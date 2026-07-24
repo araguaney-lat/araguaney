@@ -944,6 +944,7 @@
       "error_email_not_verified": "Verify your email before signing in.",
       "error_account_disabled": "Your account is disabled.",
       "error_invalid_credentials": "Invalid credentials.",
+    "session_expired": "Your session expired. Please sign in again to continue.",
       "submitting": "Signing in…",
       "submit": "Sign in",
       "no_center_yet": "Your center doesn't use Araguaney yet?",

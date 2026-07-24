@@ -22,6 +22,13 @@ async function fetchMe(token: string): Promise<{ full_name?: string | null; user
 export default async function StudioLayout({ children }: { children: React.ReactNode }) {
   const session = await auth()
   if (!session) redirect("/login")
+  // Backend token expired (24h, no refresh) → bounce with a "session expired" notice.
+  if (
+    session.error === "AccessTokenExpired" ||
+    (session.accessTokenExpires && Date.now() >= session.accessTokenExpires)
+  ) {
+    redirect("/login?expired=1")
+  }
   if (session.mustChangePassword) redirect("/change-password")
   if (session.mustAcceptTerms) redirect("/accept-terms")
   if (session.platformRole !== "superadmin") redirect("/dashboard")

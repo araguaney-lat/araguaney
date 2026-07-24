@@ -944,6 +944,7 @@
       "error_email_not_verified": "Verifica tu email antes de iniciar sesión.",
       "error_account_disabled": "Tu cuenta está desactivada.",
       "error_invalid_credentials": "Credenciales inválidas.",
+    "session_expired": "Tu sesión expiró. Inicia sesión de nuevo para continuar.",
       "submitting": "Entrando…",
       "submit": "Entrar",
       "no_center_yet": "¿Tu centro aún no usa Araguaney?",

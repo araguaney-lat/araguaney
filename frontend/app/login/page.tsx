@@ -1,6 +1,6 @@
 "use client"
 
-import { useActionState, useEffect } from "react"
+import { useActionState, useEffect, useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -19,6 +19,14 @@ export default function LoginPage() {
   const termsHref = locale === "en" ? "/terms" : "/terminos"
   const privacyHref = locale === "en" ? "/privacy" : "/aviso-de-privacidad"
   const [state, formAction, isPending] = useActionState(loginAction, null)
+  const [sessionExpired, setSessionExpired] = useState(false)
+
+  // Read the ?expired=1 flag the middleware sets when it bounces an expired
+  // session here. Done in an effect (not useSearchParams) to avoid forcing a
+  // Suspense boundary / client-render deopt on this page.
+  useEffect(() => {
+    setSessionExpired(new URLSearchParams(window.location.search).get("expired") === "1")
+  }, [])
 
   useEffect(() => {
     if (state && "requires_totp" in state && state.requires_totp) {
@@ -77,6 +85,24 @@ export default function LoginPage() {
           <p style={{ margin: "0 0 24px", color: "#6E6557" }} className="text-[13.5px] md:text-[14.5px]">
             {t.subtitle}
           </p>
+
+          {sessionExpired && (
+            <div
+              role="status"
+              style={{
+                marginBottom: 18,
+                padding: "10px 14px",
+                borderRadius: 10,
+                background: "#FBEFC9",
+                border: "1px solid #EAD9B0",
+                color: "#8A6A16",
+                fontSize: 13,
+                fontWeight: 600,
+              }}
+            >
+              {t.session_expired}
+            </div>
+          )}
 
           <form action={formAction}>
             <input type="hidden" name="callbackUrl" value="/dashboard" />
