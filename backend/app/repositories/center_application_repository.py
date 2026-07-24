@@ -25,6 +25,19 @@ class CenterApplicationRepository(BaseRepository[CenterApplication]):
         )
         return self.db.execute(stmt).scalar_one_or_none()
 
+    def find_pending_email_by_email(self, email: str) -> CenterApplication | None:
+        """The still-unconfirmed (PENDING_EMAIL) application for an email, if any."""
+        stmt = (
+            select(CenterApplication)
+            .where(
+                func.lower(CenterApplication.contact_email) == email.strip().lower(),
+                CenterApplication.status == "PENDING_EMAIL",
+            )
+            .order_by(CenterApplication.created_at.desc())
+            .limit(1)
+        )
+        return self.db.execute(stmt).scalars().first()
+
     def has_open_duplicate(self, email: str, center_name: str, country_code: str) -> bool:
         """True if an open application already exists for this email or center+country."""
         email_l = email.strip().lower()

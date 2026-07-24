@@ -29,6 +29,29 @@ class UserRepository(BaseRepository[User]):
             (User.email == identifier) | (User.username == identifier)
         ).first()
 
+    def find_review_recipients(self, country_code: str) -> list[str]:
+        """Emails of who should be notified about a new center application in
+        `country_code`: active national_admins of that country. If that country
+        has no national_admin yet, fall back to active superadmins so nothing
+        goes unreviewed."""
+        admins = (
+            self.db.query(User.email)
+            .filter(
+                User.is_active.is_(True),
+                User.center_role == "national_admin",
+                User.country_code == country_code,
+            )
+            .all()
+        )
+        if admins:
+            return [e for (e,) in admins]
+        supers = (
+            self.db.query(User.email)
+            .filter(User.is_active.is_(True), User.role == "superadmin")
+            .all()
+        )
+        return [e for (e,) in supers]
+
     def email_exists(self, email: str) -> bool:
         return self.db.query(User).filter(User.email == email).first() is not None
 

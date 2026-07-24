@@ -11,6 +11,7 @@ bcrypt==4.3.0
 python-multipart==0.0.32
 requests==2.34.2
 resend==2.34.0
+svix==1.42.0
 httpx==0.28.1
 user-agents==2.2.0
 slowapi==0.1.10

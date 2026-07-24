@@ -29,7 +29,14 @@ def _render(template_name: str, **kwargs: object) -> str:
     return _jinja.get_template(template_name).render(site_url=site_url, **kwargs)
 
 
-def _send(*, to: str | list[str], subject: str, html: str, reply_to: str | None = None) -> None:
+def _send(
+    *,
+    to: str | list[str],
+    subject: str,
+    html: str,
+    reply_to: str | None = None,
+    email_type: str | None = None,
+) -> None:
     if not settings.resend_api_key:
         return
     resend.api_key = settings.resend_api_key
@@ -41,6 +48,12 @@ def _send(*, to: str | list[str], subject: str, html: str, reply_to: str | None 
     }
     if reply_to:
         payload["reply_to"] = reply_to
+    # Tag every email with its type so the Resend webhook can correlate a
+    # bounce/complaint back to what it was (invitation, confirmation, …). The
+    # recipient itself is not a tag (Resend forbids "@") — it comes from the
+    # webhook payload. Tag values must be ASCII [A-Za-z0-9_-].
+    if email_type:
+        payload["tags"] = [{"name": "email_type", "value": email_type}]
     resend.Emails.send(payload)
 
 
@@ -52,6 +65,7 @@ def send_verification_email(to: str, token: str) -> None:
     site_url = settings.frontend_url.split(",")[0].strip()
     _send(
         to=to,
+        email_type="verification",
         subject="Verify your email",
         html=_render("verification.html", verify_url=f"{site_url}/verify?token={token}"),
     )
@@ -61,6 +75,7 @@ def send_password_reset_email(to: str, token: str) -> None:
     site_url = settings.frontend_url.split(",")[0].strip()
     _send(
         to=to,
+        email_type="password_reset",
         subject="Restablece tu contraseña de Araguaney",
         html=_render("password_reset.html", reset_url=f"{site_url}/reset-password?token={token}"),
     )
@@ -70,6 +85,7 @@ def send_invitation_email(to: str, username: str, temp_password: str) -> None:
     site_url = settings.frontend_url.split(",")[0].strip()
     _send(
         to=to,
+        email_type="invitation",
         subject="Fuiste invitado a Araguaney",
         html=_render(
             "invitation.html",
@@ -83,6 +99,7 @@ def send_invitation_email(to: str, username: str, temp_password: str) -> None:
 def send_request_reply_email(to: str, request_title: str, reply_body: str, request_url: str) -> None:
     _send(
         to=to,
+        email_type="request_reply",
         subject=f"Nueva respuesta: {request_title}",
         html=_render(
             "request_reply.html",
@@ -97,6 +114,7 @@ def send_message_private_email(to: str, sender_name: str, title: str) -> None:
     site_url = settings.frontend_url.split(",")[0].strip()
     _send(
         to=to,
+        email_type="message_private",
         subject=f"Nuevo mensaje de {sender_name}: {title}",
         html=_render(
             "message_private.html",
@@ -111,6 +129,7 @@ def send_message_public_email(to: str, title: str, campaign_id: str) -> None:
     site_url = settings.frontend_url.split(",")[0].strip()
     _send(
         to=to,
+        email_type="message_public",
         subject=f"Nuevo mensaje en campaña: {title}",
         html=_render(
             "message_public.html",
@@ -124,6 +143,7 @@ def send_message_reply_email(to: str, thread_title: str, reply_preview: str, sen
     site_url = settings.frontend_url.split(",")[0].strip()
     _send(
         to=to,
+        email_type="message_reply",
         subject=f"Nueva respuesta en: {thread_title}",
         html=_render(
             "message_reply.html",
@@ -139,6 +159,7 @@ def send_transfer_created_email(to: str, from_center: str, to_center: str) -> No
     site_url = settings.frontend_url.split(",")[0].strip()
     _send(
         to=to,
+        email_type="transfer_created",
         subject=f"Nueva transferencia: {from_center} → {to_center}",
         html=_render(
             "transfer_created.html",
@@ -161,6 +182,7 @@ def send_transfer_status_email(
     site_url = settings.frontend_url.split(",")[0].strip()
     _send(
         to=to,
+        email_type="transfer_status",
         subject=f"Transferencia {status_label}: {from_center} → {to_center}",
         html=_render(
             "transfer_status.html",
@@ -177,6 +199,7 @@ def send_password_changed_email(to: str) -> None:
     site_url = settings.frontend_url.split(",")[0].strip()
     _send(
         to=to,
+        email_type="password_changed",
         subject="Tu contraseña de Araguaney fue actualizada",
         html=_render("password_changed.html", login_url=f"{site_url}/login"),
     )
@@ -186,6 +209,7 @@ def send_transfer_received_email(to: str, from_center: str, to_center: str) -> N
     site_url = settings.frontend_url.split(",")[0].strip()
     _send(
         to=to,
+        email_type="transfer_received",
         subject=f"Transferencia recibida: {from_center} → {to_center}",
         html=_render(
             "transfer_received.html",
@@ -200,6 +224,7 @@ def send_center_application_confirm_email(to: str, token: str) -> None:
     site_url = settings.frontend_url.split(",")[0].strip()
     _send(
         to=to,
+        email_type="center_application_confirm",
         subject="Confirma tu solicitud de centro de acopio",
         html=_render(
             "center_application_confirm.html",
@@ -211,6 +236,7 @@ def send_center_application_confirm_email(to: str, token: str) -> None:
 def send_center_application_received_email(to: str, center_name: str) -> None:
     _send(
         to=to,
+        email_type="center_application_received",
         subject="Solicitud de centro recibida — en revisión",
         html=_render("center_application_received.html", center_name=center_name),
     )
@@ -219,6 +245,26 @@ def send_center_application_received_email(to: str, center_name: str) -> None:
 def send_center_application_rejected_email(to: str, center_name: str, reason: str) -> None:
     _send(
         to=to,
+        email_type="center_application_rejected",
         subject="Sobre tu solicitud de centro de acopio",
         html=_render("center_application_rejected.html", center_name=center_name, reason=reason),
+    )
+
+
+def send_center_application_admin_notice_email(
+    to: str, center_name: str, country_code: str
+) -> None:
+    """Notify a reviewer (national_admin / superadmin) that a new center
+    application is ready for review."""
+    site_url = settings.frontend_url.split(",")[0].strip()
+    _send(
+        to=to,
+        email_type="center_application_admin_notice",
+        subject=f"Nueva solicitud de centro pendiente de revisión ({country_code})",
+        html=_render(
+            "center_application_admin_notice.html",
+            center_name=center_name,
+            country_code=country_code,
+            review_url=f"{site_url}/dashboard/admin/center-applications",
+        ),
     )

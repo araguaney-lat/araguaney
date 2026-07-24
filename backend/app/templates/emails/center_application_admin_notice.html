@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="color-scheme" content="light">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nueva solicitud de centro</title>
+</head>
+<body style="margin:0;padding:0;background:#f4f4f5;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f4f5;padding:32px 16px;">
+    <tr>
+      <td align="center">
+        <table width="560" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;overflow:hidden;border:1px solid #e4e4e7;">
+          <tr>
+            <td style="background:#18181b;padding:24px 32px;">
+              <p style="margin:0;font-size:18px;font-weight:700;color:#ffffff;letter-spacing:-0.3px;">Araguaney</p>
+              <p style="margin:4px 0 0;font-size:12px;color:#a1a1aa;">Coordinación de centros de acopio</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:32px;">
+              <p style="margin:0 0 8px;font-size:20px;font-weight:600;color:#18181b;">Nueva solicitud pendiente de revisión</p>
+              <p style="margin:0 0 20px;font-size:14px;color:#52525b;line-height:1.6;">
+                Un centro completó su registro y confirmó su correo. Está esperando tu aprobación para activarse.
+              </p>
+              <table width="100%" cellpadding="0" cellspacing="0" style="background:#fafafa;border:1px solid #f4f4f5;border-radius:8px;margin:0 0 24px;">
+                <tr>
+                  <td style="padding:16px 20px;">
+                    <p style="margin:0 0 4px;font-size:12px;color:#a1a1aa;">Centro</p>
+                    <p style="margin:0 0 14px;font-size:15px;font-weight:600;color:#18181b;">{{ center_name }}</p>
+                    <p style="margin:0 0 4px;font-size:12px;color:#a1a1aa;">País</p>
+                    <p style="margin:0;font-size:15px;font-weight:600;color:#18181b;">{{ country_code }}</p>
+                  </td>
+                </tr>
+              </table>
+              <a href="{{ review_url }}" style="display:inline-block;background:#18181b;color:#ffffff;text-decoration:none;padding:12px 24px;border-radius:8px;font-size:14px;font-weight:600;">
+                Revisar solicitud
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td style="background:#fafafa;border-top:1px solid #f4f4f5;padding:20px 32px;">
+              <p style="margin:0;font-size:12px;color:#a1a1aa;line-height:1.5;">
+                Recibes este aviso porque administras solicitudes de centro para este país en Araguaney.
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

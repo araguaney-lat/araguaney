@@ -40,6 +40,9 @@ class Settings(BaseSettings):
     resend_api_key: str = ""
     mail_from: str = "noreply@yourdomain.com"
     mail_from_name: str = "My App"
+    # Svix signing secret for the Resend webhook (Dashboard → Webhooks). Empty
+    # disables webhook processing (endpoint returns 503).
+    resend_webhook_secret: str = ""
 
     # ── Trusted proxy IPs ─────────────────────────────────────────────────────
     # Set to "*" on Railway (all traffic passes through Railway's proxy)

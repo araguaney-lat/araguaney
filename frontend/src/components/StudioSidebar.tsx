@@ -12,6 +12,7 @@ import {
   Settings,
   LogOut,
   Inbox,
+  MailWarning,
   PanelLeftClose,
   PanelLeftOpen,
 } from "lucide-react"
@@ -27,6 +28,7 @@ const NAV_ITEMS: StudioNavItem[] = [
   { href: "/studio", labelKey: "metrics", exact: true, icon: BarChart2 },
   { href: "/studio/users", labelKey: "users", icon: Users },
   { href: "/studio/center-applications", labelKey: "center_applications", icon: Inbox },
+  { href: "/studio/emails", labelKey: "emails", icon: MailWarning },
   { href: "/studio/audit", labelKey: "audit", icon: ScrollText },
   { href: "/studio/settings", labelKey: "settings", icon: Settings },
 ]
@@ -35,6 +37,7 @@ export type StudioNav = {
   metrics: string
   users: string
   center_applications: string
+  emails: string
   audit: string
   settings: string
   logout: string

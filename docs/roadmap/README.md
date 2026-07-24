@@ -3,9 +3,9 @@
 ## Progreso general
 
 ```mermaid
-pie title Tareas completadas (305 tareas)
-    "Listas" : 292
-    "Pendientes" : 13
+pie title Tareas completadas (319 tareas)
+    "Listas" : 304
+    "Pendientes" : 15
 ```
 
 | Fase | Nombre | Listas | Pendientes | Progreso |
@@ -25,12 +25,14 @@ pie title Tareas completadas (305 tareas)
 | 12 | [Optimización y rendimiento](phase-12-optimization.md) | 29 | 0 | ✅ 100% |
 | 13 | [Compliance y legal](phase-13-compliance-legal.md) | 8 | 10 | 🟡 44% |
 | 14 | [Auto-registro de centros con aprobación](phase-14-center-self-registration.md) | 16 | 1 | ✅ 94% |
-| **Total** | | **292** | **13** | **✅ 96%** |
+| 15 | [Deliverability de emails + aviso de solicitudes](phase-15-email-deliverability.md) | 12 | 2 | ✅ 86% |
+| **Total** | | **304** | **15** | **✅ 95%** |
 
-> **Pendientes (13):** Fase 4 → 2 (spend caps + alertas, requieren plan de pago de infra).
+> **Pendientes (15):** Fase 4 → 2 (spend caps + alertas, requieren plan de pago de infra).
 > Fase 13 → 10 (bloque de donativos/pagos: entidad receptora, asesoría legal/contable,
 > procesador de pagos, T&C de donación, transparencia — gated tras la decisión "¿recibir donativos?").
 > Fase 14 → 1 (manual de ayuda "Solicitudes de centro" ES/EN, pendiente).
+> Fase 15 → 2 (infra manual post-merge: `RESEND_WEBHOOK_SECRET` en Railway + alta del webhook en Resend).
 
 > Envs opcionales (Sentry, Slack, Google Safe Browsing, Encryption Key) se pueden agregar en cualquier momento sin cambios de código.
 
