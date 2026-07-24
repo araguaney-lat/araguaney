@@ -66,7 +66,7 @@ def send_verification_email(to: str, token: str) -> None:
     _send(
         to=to,
         email_type="verification",
-        subject="Verify your email",
+        subject="Verifica tu correo de Araguaney",
         html=_render("verification.html", verify_url=f"{site_url}/verify?token={token}"),
     )
 
