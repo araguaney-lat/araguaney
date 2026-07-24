@@ -3,8 +3,8 @@
 ## Progreso general
 
 ```mermaid
-pie title Tareas completadas (320 tareas)
-    "Listas" : 308
+pie title Tareas completadas (330 tareas)
+    "Listas" : 318
     "Pendientes" : 12
 ```
 
@@ -26,7 +26,8 @@ pie title Tareas completadas (320 tareas)
 | 13 | [Compliance y legal](phase-13-compliance-legal.md) | 8 | 10 | 🟡 44% |
 | 14 | [Auto-registro de centros con aprobación](phase-14-center-self-registration.md) | 17 | 0 | ✅ 100% |
 | 15 | [Deliverability de emails + aviso de solicitudes](phase-15-email-deliverability.md) | 15 | 0 | ✅ 100% |
-| **Total** | | **308** | **12** | **✅ 96%** |
+| 16 | [Rediseño de plantillas de email con marca](phase-16-email-brand-redesign.md) | 10 | 0 | ✅ 100% |
+| **Total** | | **318** | **12** | **✅ 96%** |
 
 > **Pendientes (12) — todos gated por pago/decisión de negocio:** Fase 4 → 2 (spend caps +
 > alertas, requieren plan de pago de infra). Fase 13 → 10 (bloque de donativos/pagos: entidad
