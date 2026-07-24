@@ -3,9 +3,9 @@
 ## Progreso general
 
 ```mermaid
-pie title Tareas completadas (330 tareas)
+pie title Tareas completadas (351 tareas)
     "Listas" : 318
-    "Pendientes" : 12
+    "Pendientes" : 33
 ```
 
 | Fase | Nombre | Listas | Pendientes | Progreso |
@@ -27,12 +27,17 @@ pie title Tareas completadas (330 tareas)
 | 14 | [Auto-registro de centros con aprobación](phase-14-center-self-registration.md) | 17 | 0 | ✅ 100% |
 | 15 | [Deliverability de emails + aviso de solicitudes](phase-15-email-deliverability.md) | 15 | 0 | ✅ 100% |
 | 16 | [Rediseño de plantillas de email con marca](phase-16-email-brand-redesign.md) | 10 | 0 | ✅ 100% |
-| **Total** | | **318** | **12** | **✅ 96%** |
+| 17 | [AEO/GEO + expansión de keywords](phase-17-aeo-keyword-expansion.md) | 0 | 21 | ⬜ 0% |
+| **Total** | | **318** | **33** | **🟡 91%** |
 
-> **Pendientes (12) — todos gated por pago/decisión de negocio:** Fase 4 → 2 (spend caps +
-> alertas, requieren plan de pago de infra). Fase 13 → 10 (bloque de donativos/pagos: entidad
-> receptora, asesoría legal/contable, procesador de pagos, T&C de donación, transparencia —
-> gated tras la decisión "¿recibir donativos?").
+> **Pendientes (33):**
+> - **12 gated por pago/decisión de negocio:** Fase 4 → 2 (spend caps + alertas, requieren plan
+>   de pago de infra). Fase 13 → 10 (bloque de donativos/pagos: entidad receptora, asesoría
+>   legal/contable, procesador de pagos, T&C de donación, transparencia — gated tras la decisión
+>   "¿recibir donativos?").
+> - **21 nuevas (Fase 17 — AEO/GEO + expansión de keywords):** trabajo de posicionamiento
+>   ejecutable sin gate de pago (Bing/IndexNow, entidad/Wikidata, comparativas, escenarios,
+>   frescura, medición de visibilidad en IA).
 
 > Envs opcionales (Sentry, Slack, Google Safe Browsing, Encryption Key) se pueden agregar en cualquier momento sin cambios de código.
 
