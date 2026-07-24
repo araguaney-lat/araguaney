@@ -15,11 +15,11 @@ import { useExportJob } from "@/hooks/useExportJob"
 import { useDict } from "@/context/DictionaryContext"
 
 const STATUS_COLORS: Record<TransferStatus, string> = {
-  REQUESTED: "bg-yellow-100 text-yellow-800",
-  APPROVED: "bg-blue-100 text-blue-800",
-  IN_TRANSIT: "bg-purple-100 text-purple-800",
-  RECEIVED: "bg-green-100 text-green-800",
-  REJECTED: "bg-red-100 text-red-800",
+  REQUESTED: "bg-dDraftB text-dDraftT",
+  APPROVED: "bg-blueSoft text-[var(--blue)]",
+  IN_TRANSIT: "bg-goldSoft text-[var(--gold)]",
+  RECEIVED: "bg-dSealB text-dSealT",
+  REJECTED: "bg-dRejB text-dRejT",
 }
 
 export default function TransfersPage() {
@@ -158,31 +158,31 @@ export default function TransfersPage() {
   return (
     <div className="max-w-6xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold text-zinc-900">{t.title}</h1>
+        <h1 className="text-xl font-semibold text-tx">{t.title}</h1>
         <button
           onClick={() => { setShowCreate(true); fetchSealedBoxes() }}
-          className="px-4 py-2 bg-zinc-900 text-white rounded-lg text-sm font-medium hover:bg-zinc-700"
+          className="px-4 py-2 bg-[var(--blue)] text-white rounded-lg text-sm font-medium hover:opacity-90"
         >
           {t.new}
         </button>
       </div>
 
       {error && (
-        <div className="rounded-lg bg-red-50 border border-red-200 p-3 text-sm text-red-700">
+        <div className="rounded-lg bg-dRejB border border-dRejB p-3 text-sm text-dRejT">
           {error}
           <button className="ml-2 underline" onClick={() => setError(null)}>{dict.dashboard.common.close}</button>
         </div>
       )}
 
       {showCreate && (
-        <div className="rounded-xl border border-zinc-200 bg-white p-5 space-y-4">
-          <h2 className="font-semibold text-sm text-zinc-900">{t.create_title}</h2>
+        <div className="rounded-xl border border-cardB bg-card p-5 space-y-4">
+          <h2 className="font-semibold text-sm text-tx">{t.create_title}</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {myRole === "national_admin" && (
               <label className="space-y-1">
-                <span className="text-xs text-zinc-500">{t.field_from}</span>
+                <span className="text-xs text-mut">{t.field_from}</span>
                 <select
-                  className="w-full text-sm border border-zinc-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-zinc-400"
+                  className="w-full text-sm border border-inpB rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--gold)]"
                   value={newTransfer.from_center_id}
                   onChange={(e) => setNewTransfer({ ...newTransfer, from_center_id: e.target.value, box_ids: [] })}
                 >
@@ -192,9 +192,9 @@ export default function TransfersPage() {
               </label>
             )}
             <label className="space-y-1">
-              <span className="text-xs text-zinc-500">{t.field_to}</span>
+              <span className="text-xs text-mut">{t.field_to}</span>
               <select
-                className="w-full text-sm border border-zinc-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-zinc-400"
+                className="w-full text-sm border border-inpB rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--gold)]"
                 value={newTransfer.to_center_id}
                 onChange={(e) => setNewTransfer({ ...newTransfer, to_center_id: e.target.value })}
               >
@@ -205,9 +205,9 @@ export default function TransfersPage() {
               </select>
             </label>
             <label className="space-y-1 sm:col-span-2">
-              <span className="text-xs text-zinc-500">{t.field_notes}</span>
+              <span className="text-xs text-mut">{t.field_notes}</span>
               <input
-                className="w-full text-sm border border-zinc-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-zinc-400"
+                className="w-full text-sm border border-inpB rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--gold)]"
                 value={newTransfer.notes}
                 onChange={(e) => setNewTransfer({ ...newTransfer, notes: e.target.value })}
               />
@@ -215,10 +215,10 @@ export default function TransfersPage() {
           </div>
 
           <div>
-            <p className="text-xs font-semibold text-zinc-500 mb-2">
+            <p className="text-xs font-semibold text-mut mb-2">
               {t.available_boxes}
               {newTransfer.box_ids.length > 0 && (
-                <span className="ml-2 text-zinc-900">
+                <span className="ml-2 text-tx">
                   {newTransfer.box_ids.length === 1
                     ? t.box_count_one
                     : t.box_count_other.replace("{count}", String(newTransfer.box_ids.length))}
@@ -226,15 +226,15 @@ export default function TransfersPage() {
               )}
             </p>
             {sealedBoxes.length === 0 ? (
-              <p className="text-sm text-zinc-400">{t.no_sealed_boxes}</p>
+              <p className="text-sm text-fnt">{t.no_sealed_boxes}</p>
             ) : (
-              <div className="max-h-48 overflow-y-auto space-y-1 border border-zinc-200 rounded-lg p-2">
+              <div className="max-h-48 overflow-y-auto space-y-1 border border-cardB rounded-lg p-2">
                 {sealedBoxes.map((box) => {
                   const selected = newTransfer.box_ids.includes(box.id)
                   return (
                     <label
                       key={box.id}
-                      className={`flex items-center gap-2 p-2 rounded-lg cursor-pointer text-sm transition-colors ${selected ? "bg-zinc-100" : "hover:bg-zinc-50"}`}
+                      className={`flex items-center gap-2 p-2 rounded-lg cursor-pointer text-sm transition-colors ${selected ? "bg-chip" : "hover:bg-card2"}`}
                     >
                       <input
                         type="checkbox"
@@ -249,8 +249,8 @@ export default function TransfersPage() {
                         }}
                         className="rounded"
                       />
-                      <span className="font-mono text-xs text-zinc-700">{box.code}</span>
-                      <span className="text-xs text-zinc-500">{box.quantity} {box.unit}</span>
+                      <span className="font-mono text-xs text-mut">{box.code}</span>
+                      <span className="text-xs text-mut">{box.quantity} {box.unit}</span>
                     </label>
                   )
                 })}
@@ -262,11 +262,11 @@ export default function TransfersPage() {
             <button
               onClick={handleCreate}
               disabled={!newTransfer.to_center_id || newTransfer.box_ids.length === 0 || actionLoading === "create"}
-              className="px-4 py-2 bg-zinc-900 text-white rounded-lg text-sm hover:bg-zinc-700 disabled:opacity-50"
+              className="px-4 py-2 bg-[var(--blue)] text-white rounded-lg text-sm hover:opacity-90 disabled:opacity-50"
             >
               {actionLoading === "create" ? t.creating : t.create_btn}
             </button>
-            <button onClick={() => setShowCreate(false)} className="px-4 py-2 text-sm text-zinc-600 hover:text-zinc-900">
+            <button onClick={() => setShowCreate(false)} className="px-4 py-2 text-sm text-mut hover:text-tx">
               {t.cancel}
             </button>
           </div>
@@ -278,7 +278,7 @@ export default function TransfersPage() {
           <button
             key={tabKey}
             onClick={() => setTab(tabKey)}
-            className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${tab === tabKey ? "bg-zinc-900 text-white border-zinc-900" : "bg-white text-zinc-600 border-zinc-300 hover:border-zinc-500"}`}
+            className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${tab === tabKey ? "bg-[var(--blue)] text-white border-[var(--blue)]" : "bg-card text-mut border-inpB hover:border-goldB"}`}
           >
             {tabKey === "outgoing" ? t.tab_outgoing : tabKey === "incoming" ? t.tab_incoming : t.tab_all}
           </button>
@@ -288,26 +288,26 @@ export default function TransfersPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div className="space-y-2">
           {loading ? (
-            <p className="text-sm text-zinc-400">{dict.dashboard.common.loading}</p>
+            <p className="text-sm text-fnt">{dict.dashboard.common.loading}</p>
           ) : transfers.length === 0 ? (
-            <p className="text-sm text-zinc-400">{t.empty}</p>
+            <p className="text-sm text-fnt">{t.empty}</p>
           ) : transfers.map((tr) => (
             <div
               key={tr.id}
               onClick={() => fetchDetail(tr.id)}
-              className={`rounded-xl border p-4 cursor-pointer transition-colors ${activeDetail?.id === tr.id ? "border-zinc-900 bg-zinc-50" : "border-zinc-200 bg-white hover:border-zinc-400"}`}
+              className={`rounded-xl border p-4 cursor-pointer transition-colors ${activeDetail?.id === tr.id ? "border-[var(--blue)] bg-card2" : "border-cardB bg-card hover:border-goldB"}`}
             >
               <div className="flex items-center justify-between gap-2 flex-wrap">
-                <div className="text-sm font-medium text-zinc-900">
-                  <span className="text-zinc-500 font-normal">{t.from_label} </span>{centerName(tr.from_center_id)}
-                  <span className="text-zinc-400 mx-1">→</span>
+                <div className="text-sm font-medium text-tx">
+                  <span className="text-mut font-normal">{t.from_label} </span>{centerName(tr.from_center_id)}
+                  <span className="text-fnt mx-1">→</span>
                   {centerName(tr.to_center_id)}
                 </div>
                 <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${STATUS_COLORS[tr.status]}`}>
                   {t.status[tr.status]}
                 </span>
               </div>
-              {tr.notes && <p className="mt-1 text-xs text-zinc-400">{tr.notes}</p>}
+              {tr.notes && <p className="mt-1 text-xs text-fnt">{tr.notes}</p>}
 
               <div
                 className="mt-2 flex gap-2 flex-wrap"
@@ -318,14 +318,14 @@ export default function TransfersPage() {
                     <button
                       onClick={() => handleAction(tr.id, "approve")}
                       disabled={!!actionLoading}
-                      className="text-xs px-2 py-1 rounded border border-green-300 text-green-700 hover:bg-green-50 disabled:opacity-50"
+                      className="text-xs px-2 py-1 rounded border border-dSealB text-dSealT hover:bg-dSealB disabled:opacity-50"
                     >
                       {actionLoading === tr.id + "-approve" ? "…" : t.approve}
                     </button>
                     <button
                       onClick={() => setRejectingId(tr.id)}
                       disabled={!!actionLoading}
-                      className="text-xs px-2 py-1 rounded border border-red-300 text-red-700 hover:bg-red-50 disabled:opacity-50"
+                      className="text-xs px-2 py-1 rounded border border-dRejB text-dRejT hover:bg-dRejB disabled:opacity-50"
                     >
                       {t.reject}
                     </button>
@@ -335,7 +335,7 @@ export default function TransfersPage() {
                   <button
                     onClick={() => handleAction(tr.id, "dispatch")}
                     disabled={!!actionLoading}
-                    className="text-xs px-2 py-1 rounded border border-purple-300 text-purple-700 hover:bg-purple-50 disabled:opacity-50"
+                    className="text-xs px-2 py-1 rounded border border-goldB text-[var(--gold)] hover:bg-goldSoft disabled:opacity-50"
                   >
                     {actionLoading === tr.id + "-dispatch" ? "…" : t.dispatch}
                   </button>
@@ -344,7 +344,7 @@ export default function TransfersPage() {
                   <button
                     onClick={() => handleAction(tr.id, "receive")}
                     disabled={!!actionLoading}
-                    className="text-xs px-2 py-1 rounded border border-blue-300 text-blue-700 hover:bg-blue-50 disabled:opacity-50"
+                    className="text-xs px-2 py-1 rounded border border-[var(--blue)] text-[var(--blue)] hover:bg-blueSoft disabled:opacity-50"
                   >
                     {actionLoading === tr.id + "-receive" ? "…" : t.receive}
                   </button>
@@ -361,7 +361,7 @@ export default function TransfersPage() {
                     placeholder={t.reject_reason_placeholder}
                     value={rejectReason}
                     onChange={(e) => setRejectReason(e.target.value)}
-                    className="flex-1 text-sm border border-zinc-300 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-red-300"
+                    className="flex-1 text-sm border border-inpB rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-red-300"
                   />
                   <button
                     onClick={() => handleReject(tr.id)}
@@ -372,7 +372,7 @@ export default function TransfersPage() {
                   </button>
                   <button
                     onClick={() => { setRejectingId(null); setRejectReason("") }}
-                    className="text-xs text-zinc-500 hover:text-zinc-800"
+                    className="text-xs text-mut hover:text-tx"
                   >
                     {t.cancel}
                   </button>
@@ -383,37 +383,37 @@ export default function TransfersPage() {
         </div>
 
         {activeDetail && (
-          <div className="rounded-xl border border-zinc-200 bg-white p-5 space-y-4">
+          <div className="rounded-xl border border-cardB bg-card p-5 space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-semibold text-zinc-900">
+                <p className="text-sm font-semibold text-tx">
                   {centerName(activeDetail.from_center_id)} → {centerName(activeDetail.to_center_id)}
                 </p>
                 <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${STATUS_COLORS[activeDetail.status]}`}>
                   {t.status[activeDetail.status]}
                 </span>
               </div>
-              <button onClick={() => setActiveDetail(null)} className="text-zinc-400 hover:text-zinc-700 text-sm">✕</button>
+              <button onClick={() => setActiveDetail(null)} className="text-fnt hover:text-mut text-sm">✕</button>
             </div>
 
             {activeDetail.notes && (
-              <p className="text-xs text-zinc-500 border-l-2 border-zinc-200 pl-2">{activeDetail.notes}</p>
+              <p className="text-xs text-mut border-l-2 border-cardB pl-2">{activeDetail.notes}</p>
             )}
 
             <div>
-              <p className="text-xs font-semibold text-zinc-500 mb-2">
+              <p className="text-xs font-semibold text-mut mb-2">
                 {activeDetail.boxes.length === 1
                   ? t.box_count_one
                   : t.box_count_other.replace("{count}", String(activeDetail.boxes.length))}
               </p>
               {activeDetail.boxes.length === 0 ? (
-                <p className="text-sm text-zinc-400">{dict.dashboard.common.no_data}</p>
+                <p className="text-sm text-fnt">{dict.dashboard.common.no_data}</p>
               ) : (
                 <ul className="space-y-1 max-h-40 overflow-y-auto">
                   {activeDetail.boxes.map((box) => (
-                    <li key={box.id} className="flex items-center justify-between text-xs border-b border-zinc-100 pb-1">
-                      <span className="font-mono text-zinc-700">{box.code}</span>
-                      <span className="text-zinc-500">{box.quantity} {box.unit}</span>
+                    <li key={box.id} className="flex items-center justify-between text-xs border-b border-line pb-1">
+                      <span className="font-mono text-mut">{box.code}</span>
+                      <span className="text-mut">{box.quantity} {box.unit}</span>
                     </li>
                   ))}
                 </ul>
@@ -424,15 +424,15 @@ export default function TransfersPage() {
               <button
                 onClick={() => manifestExport.start(`/v1/transfers/${activeDetail.id}/manifest.pdf`)}
                 disabled={manifestExport.isBusy}
-                className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded border border-zinc-300 text-zinc-700 hover:bg-zinc-50 transition-colors disabled:opacity-50"
+                className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded border border-inpB text-mut hover:bg-card2 transition-colors disabled:opacity-50"
               >
                 {manifestExport.isBusy ? dict.dashboard.common.exporting : t.download_manifest}
               </button>
             )}
 
             {activeDetail.events.length > 0 && (
-              <div className="border-t border-zinc-100 pt-4">
-                <p className="text-xs font-semibold text-zinc-500 mb-3">{dict.dashboard.common.history}</p>
+              <div className="border-t border-line pt-4">
+                <p className="text-xs font-semibold text-mut mb-3">{dict.dashboard.common.history}</p>
                 <StatusTimeline events={activeDetail.events.map((e) => ({
                   from_status: e.from_status,
                   to_status: e.to_status,

@@ -67,15 +67,15 @@ export default function CatalogPage() {
       {/* Header */}
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-semibold text-zinc-900">{t.title}</h1>
-          <p className="text-sm text-zinc-500 mt-1">
+          <h1 className="text-xl font-semibold text-tx">{t.title}</h1>
+          <p className="text-sm text-mut mt-1">
             {t.subtitle}
           </p>
         </div>
         {isAdmin && (
           <Link
             href="/dashboard/catalog/new"
-            className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700"
+            className="rounded-lg bg-[var(--blue)] px-4 py-2 text-sm font-medium text-white hover:opacity-90"
           >
             {t.new}
           </Link>
@@ -87,7 +87,7 @@ export default function CatalogPage() {
         <select
           value={categoryFilter}
           onChange={(e) => setCategoryFilter(e.target.value)}
-          className="rounded-lg border border-zinc-300 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-900"
+          className="rounded-lg border border-inpB px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--blue)]"
         >
           <option value="">{t.filter_all_categories}</option>
           {Object.entries(t.category).map(([v, l]) => (
@@ -95,78 +95,78 @@ export default function CatalogPage() {
           ))}
         </select>
 
-        <div className="flex rounded-lg border border-zinc-300 overflow-hidden text-sm">
+        <div className="flex rounded-lg border border-inpB overflow-hidden text-sm">
           {(["all", "global", "campaign"] as const).map((v) => (
             <button
               key={v}
               type="button"
               onClick={() => setScopeFilter(v)}
-              className={`px-3 py-1.5 ${scopeFilter === v ? "bg-zinc-900 text-white" : "bg-white text-zinc-600 hover:bg-zinc-50"}`}
+              className={`px-3 py-1.5 ${scopeFilter === v ? "bg-[var(--blue)] text-white" : "bg-card text-mut hover:bg-card2"}`}
             >
               {v === "all" ? t.filter_all : v === "global" ? t.filter_global : t.filter_campaign}
             </button>
           ))}
         </div>
 
-        <span className="ml-auto self-center text-xs text-zinc-400">
+        <span className="ml-auto self-center text-xs text-fnt">
           {filtered.length === 1 ? t.result_one : t.result_other.replace("{count}", String(filtered.length))}
         </span>
       </div>
 
       {error && (
-        <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        <div className="mb-4 rounded-lg border border-dRejB bg-dRejB px-4 py-3 text-sm text-dRejT">
           {error}
         </div>
       )}
 
       {/* Table */}
       {loading ? (
-        <div className="rounded-xl border border-zinc-200 bg-white p-8 text-center">
-          <p className="text-sm text-zinc-400">{t.loading}</p>
+        <div className="rounded-xl border border-cardB bg-card p-8 text-center">
+          <p className="text-sm text-fnt">{t.loading}</p>
         </div>
       ) : filtered.length === 0 ? (
-        <div className="rounded-xl border border-zinc-200 bg-white p-8 text-center">
-          <p className="text-sm text-zinc-400">{t.empty}</p>
+        <div className="rounded-xl border border-cardB bg-card p-8 text-center">
+          <p className="text-sm text-fnt">{t.empty}</p>
         </div>
       ) : (
-        <div className="rounded-xl border border-zinc-200 bg-white overflow-hidden">
+        <div className="rounded-xl border border-cardB bg-card overflow-hidden">
           <table className="w-full text-sm">
-            <thead className="border-b border-zinc-100 bg-zinc-50">
+            <thead className="border-b border-line bg-card2">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-zinc-500 uppercase tracking-wide">{t.col_product}</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-zinc-500 uppercase tracking-wide">{t.col_category}</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-zinc-500 uppercase tracking-wide">{t.col_scope}</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-mut uppercase tracking-wide">{t.col_product}</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-mut uppercase tracking-wide">{t.col_category}</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-mut uppercase tracking-wide">{t.col_scope}</th>
                 {isAdmin && (
-                  <th className="px-4 py-3 text-right text-xs font-medium text-zinc-500 uppercase tracking-wide">{t.col_actions}</th>
+                  <th className="px-4 py-3 text-right text-xs font-medium text-mut uppercase tracking-wide">{t.col_actions}</th>
                 )}
               </tr>
             </thead>
-            <tbody className="divide-y divide-zinc-100">
+            <tbody className="divide-y divide-line">
               {filtered.map((pt) => (
-                <tr key={pt.id} className="hover:bg-zinc-50">
+                <tr key={pt.id} className="hover:bg-card2">
                   <td className="px-4 py-3">
-                    <p className="font-medium text-zinc-900">{pt.display_name}</p>
-                    <p className="text-xs text-zinc-400">
+                    <p className="font-medium text-tx">{pt.display_name}</p>
+                    <p className="text-xs text-fnt">
                       {pt.inn_name && `${pt.inn_name} · `}
                       {pt.strength && `${pt.strength} · `}
                       {pt.form}
                       {pt.is_controlled && (
-                        <span className="ml-1 rounded bg-red-100 px-1 py-0.5 text-xs font-medium text-red-700">
+                        <span className="ml-1 rounded bg-dRejB px-1 py-0.5 text-xs font-medium text-dRejT">
                           {t.controlled_badge}
                         </span>
                       )}
                     </p>
                   </td>
-                  <td className="px-4 py-3 text-zinc-600">
+                  <td className="px-4 py-3 text-mut">
                     {t.category[pt.category as keyof typeof t.category] ?? pt.category}
                   </td>
                   <td className="px-4 py-3">
                     {pt.campaign_id === null ? (
-                      <span className="inline-flex items-center rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-medium text-blue-700">
+                      <span className="inline-flex items-center rounded-full bg-blueSoft px-2.5 py-0.5 text-xs font-medium text-[var(--blue)]">
                         {t.scope_global}
                       </span>
                     ) : (
-                      <span className="inline-flex items-center rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-700">
+                      <span className="inline-flex items-center rounded-full bg-dDraftB px-2.5 py-0.5 text-xs font-medium text-dDraftT">
                         {campaignName(pt.campaign_id) ?? t.scope_campaign_fallback}
                       </span>
                     )}
@@ -178,7 +178,7 @@ export default function CatalogPage() {
                           type="button"
                           disabled={isPending}
                           onClick={() => handlePromote(pt)}
-                          className="text-xs text-blue-600 hover:text-blue-800 disabled:opacity-50"
+                          className="text-xs text-[var(--blue)] hover:text-[var(--blue)] disabled:opacity-50"
                         >
                           {t.promote_action}
                         </button>

@@ -88,14 +88,14 @@ export default function CenterApplicationsQueue({ initial, labels: t, locale }: 
 
   return (
     <div className="space-y-4">
-      <p className="text-sm text-zinc-500">{count}</p>
+      <p className="text-sm text-mut">{count}</p>
 
       {error && (
-        <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">{error}</p>
+        <p className="rounded-lg border border-dRejB bg-dRejB px-3 py-2 text-xs text-dRejT">{error}</p>
       )}
 
       {apps.length === 0 ? (
-        <div className="rounded-xl border border-zinc-200 bg-white p-8 text-center text-sm text-zinc-400">
+        <div className="rounded-xl border border-cardB bg-card p-8 text-center text-sm text-fnt">
           {t.empty}
         </div>
       ) : (
@@ -109,67 +109,67 @@ export default function CenterApplicationsQueue({ initial, labels: t, locale }: 
               <div key={a.id} style={CARD} className="flex flex-col">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <h3 className="font-semibold text-zinc-900 truncate">{a.center_name}</h3>
-                    <p className="mt-0.5 text-xs text-zinc-500">
+                    <h3 className="font-semibold text-tx truncate">{a.center_name}</h3>
+                    <p className="mt-0.5 text-xs text-mut">
                       {[a.state_name, a.country_code].filter(Boolean).join(" · ")}
                     </p>
                   </div>
-                  <span className="flex-shrink-0 text-xs text-zinc-400">
+                  <span className="flex-shrink-0 text-xs text-fnt">
                     {t.created}: {dateFmt.format(new Date(a.created_at))}
                   </span>
                 </div>
 
                 <dl className="mt-3 space-y-1.5 text-sm">
                   <div>
-                    <dt className="inline text-xs font-medium text-zinc-400">{t.contact}: </dt>
-                    <dd className="inline text-zinc-700">
+                    <dt className="inline text-xs font-medium text-fnt">{t.contact}: </dt>
+                    <dd className="inline text-mut">
                       {a.contact_name} · {a.contact_email}
                       {a.contact_phone ? ` · ${a.contact_phone}` : ""}
                     </dd>
                   </div>
                   {a.backing_org && (
                     <div>
-                      <dt className="inline text-xs font-medium text-zinc-400">{t.backing}: </dt>
-                      <dd className="inline text-zinc-700">{a.backing_org}</dd>
+                      <dt className="inline text-xs font-medium text-fnt">{t.backing}: </dt>
+                      <dd className="inline text-mut">{a.backing_org}</dd>
                     </div>
                   )}
                   {a.address && (
                     <div>
-                      <dd className="text-zinc-600 text-xs">{a.address}</dd>
+                      <dd className="text-mut text-xs">{a.address}</dd>
                     </div>
                   )}
                   {a.social_url && (
                     <div>
-                      <dt className="inline text-xs font-medium text-zinc-400">{t.social}: </dt>
+                      <dt className="inline text-xs font-medium text-fnt">{t.social}: </dt>
                       <a
                         href={a.social_url}
                         target="_blank"
                         rel="noopener noreferrer nofollow"
-                        className="text-sm text-blue-600 underline break-all"
+                        className="text-sm text-[var(--blue)] underline break-all"
                       >
                         {a.social_url}
                       </a>
                     </div>
                   )}
                   {a.message && (
-                    <div className="mt-1 rounded-lg bg-zinc-50 px-3 py-2 text-xs text-zinc-600">
-                      <span className="font-medium text-zinc-400">{t.message}: </span>
+                    <div className="mt-1 rounded-lg bg-card2 px-3 py-2 text-xs text-mut">
+                      <span className="font-medium text-fnt">{t.message}: </span>
                       {a.message}
                     </div>
                   )}
                 </dl>
 
-                <div className="mt-4 pt-3 border-t border-zinc-100">
+                <div className="mt-4 pt-3 border-t border-line">
                   {isRejecting ? (
                     <div className="space-y-2">
-                      <label className="text-xs font-medium text-zinc-500">{t.reject_reason_label}</label>
+                      <label className="text-xs font-medium text-mut">{t.reject_reason_label}</label>
                       <textarea
                         value={reason}
                         onChange={(e) => setReason(e.target.value)}
                         placeholder={t.reject_reason_placeholder}
                         rows={2}
                         maxLength={500}
-                        className="w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-300"
+                        className="w-full rounded-lg border border-cardB px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-300"
                       />
                       <div className="flex justify-end gap-2">
                         <button
@@ -177,7 +177,7 @@ export default function CenterApplicationsQueue({ initial, labels: t, locale }: 
                             setRejectingId(null)
                             setReason("")
                           }}
-                          className="rounded-lg px-3 py-1.5 text-xs text-zinc-500 hover:bg-zinc-100"
+                          className="rounded-lg px-3 py-1.5 text-xs text-mut hover:bg-chip"
                         >
                           {t.cancel}
                         </button>
@@ -199,7 +199,7 @@ export default function CenterApplicationsQueue({ initial, labels: t, locale }: 
                           setError(null)
                         }}
                         disabled={rowBusy}
-                        className="rounded-lg border border-zinc-200 px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50 disabled:opacity-50"
+                        className="rounded-lg border border-cardB px-3 py-1.5 text-xs font-medium text-dRejT hover:bg-dRejB disabled:opacity-50"
                       >
                         {t.reject}
                       </button>

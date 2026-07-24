@@ -11,10 +11,10 @@ import {
 import { useDict } from "@/context/DictionaryContext"
 
 const STATUS_COLORS: Record<string, string> = {
-  OPEN: "bg-amber-100 text-amber-700",
-  IN_PROGRESS: "bg-blue-100 text-blue-700",
-  RESOLVED: "bg-green-100 text-green-700",
-  CLOSED: "bg-zinc-100 text-zinc-500",
+  OPEN: "bg-dDraftB text-dDraftT",
+  IN_PROGRESS: "bg-blueSoft text-[var(--blue)]",
+  RESOLVED: "bg-dSealB text-dSealT",
+  CLOSED: "bg-chip text-mut",
 }
 
 const EMPTY_FORM = { title: "", description: "" }
@@ -86,56 +86,56 @@ export default function DashboardRequestsPage() {
   }
 
   if (status === "loading" || loading) {
-    return <div className="text-sm text-zinc-400 py-8 text-center">{dict.dashboard.common.loading}</div>
+    return <div className="text-sm text-fnt py-8 text-center">{dict.dashboard.common.loading}</div>
   }
 
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-semibold text-zinc-900">{t.title}</h1>
-          <p className="text-sm text-zinc-500 mt-0.5">{t.subtitle}</p>
+          <h1 className="text-2xl font-semibold text-tx">{t.title}</h1>
+          <p className="text-sm text-mut mt-0.5">{t.subtitle}</p>
         </div>
         <button
           onClick={() => setShowForm((v) => !v)}
-          className="rounded-lg bg-zinc-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-zinc-700"
+          className="rounded-lg bg-[var(--blue)] px-3 py-1.5 text-sm font-medium text-white hover:opacity-90"
         >
           {showForm ? t.cancel : t.new}
         </button>
       </div>
 
       {error && (
-        <p className="mb-4 rounded-lg bg-red-50 border border-red-200 px-3 py-2 text-xs text-red-700">{error}</p>
+        <p className="mb-4 rounded-lg bg-dRejB border border-dRejB px-3 py-2 text-xs text-dRejT">{error}</p>
       )}
 
       {showForm && (
-        <form onSubmit={handleCreate} className="mb-6 rounded-xl border border-zinc-200 bg-white p-5 space-y-3">
-          <p className="text-sm font-medium text-zinc-700">{t.form_title}</p>
+        <form onSubmit={handleCreate} className="mb-6 rounded-xl border border-cardB bg-card p-5 space-y-3">
+          <p className="text-sm font-medium text-mut">{t.form_title}</p>
           <div>
-            <label className="text-xs text-zinc-500">{t.field_subject}</label>
+            <label className="text-xs text-mut">{t.field_subject}</label>
             <input
               required
               value={form.title}
               onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
               placeholder={t.subject_placeholder}
-              className="mt-1 w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-400"
+              className="mt-1 w-full rounded-lg border border-cardB px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--gold)]"
             />
           </div>
           <div>
-            <label className="text-xs text-zinc-500">{t.field_description}</label>
+            <label className="text-xs text-mut">{t.field_description}</label>
             <textarea
               value={form.description}
               onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
               rows={3}
               placeholder={t.description_placeholder}
-              className="mt-1 w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-400 resize-none"
+              className="mt-1 w-full rounded-lg border border-cardB px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--gold)] resize-none"
             />
           </div>
           <div className="flex justify-end">
             <button
               type="submit"
               disabled={saving}
-              className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-50"
+              className="rounded-lg bg-[var(--blue)] px-4 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-50"
             >
               {saving ? t.submitting : t.submit}
             </button>
@@ -146,7 +146,7 @@ export default function DashboardRequestsPage() {
       <div className={`grid gap-4 ${selected ? "lg:grid-cols-2" : ""}`}>
         <div className="space-y-2">
           {requests.length === 0 ? (
-            <div className="rounded-xl border border-zinc-200 bg-white p-8 text-center text-sm text-zinc-500">
+            <div className="rounded-xl border border-cardB bg-card p-8 text-center text-sm text-mut">
               {t.empty}
             </div>
           ) : (
@@ -154,20 +154,20 @@ export default function DashboardRequestsPage() {
               <button
                 key={req.id}
                 onClick={() => setSelected(req)}
-                className={`w-full text-left rounded-xl border bg-white p-4 transition-all ${
+                className={`w-full text-left rounded-xl border bg-card p-4 transition-all ${
                   selected?.id === req.id
-                    ? "border-zinc-400 shadow-sm"
-                    : "border-zinc-200 hover:border-zinc-300 hover:shadow-sm"
+                    ? "border-inpB shadow-sm"
+                    : "border-cardB hover:border-goldB hover:shadow-sm"
                 }`}
               >
                 <div className="flex items-start justify-between gap-2">
-                  <p className="font-medium text-zinc-900 leading-snug">{req.title}</p>
+                  <p className="font-medium text-tx leading-snug">{req.title}</p>
                   <span className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_COLORS[req.status]}`}>
                     {t.status[req.status as keyof typeof t.status]}
                   </span>
                 </div>
-                <p className="mt-1 text-xs text-zinc-500 line-clamp-2">{req.description}</p>
-                <p className="mt-2 text-xs text-zinc-400">
+                <p className="mt-1 text-xs text-mut line-clamp-2">{req.description}</p>
+                <p className="mt-2 text-xs text-fnt">
                   {fmt(req.created_at)} · {req.messages.length === 1
                     ? t.messages_count_one
                     : t.messages_count_other.replace("{count}", String(req.messages.length))}
@@ -178,47 +178,47 @@ export default function DashboardRequestsPage() {
         </div>
 
         {selected && (
-          <div className="rounded-xl border border-zinc-200 bg-white overflow-hidden flex flex-col max-h-[calc(100vh-12rem)]">
-            <div className="border-b border-zinc-100 p-4">
+          <div className="rounded-xl border border-cardB bg-card overflow-hidden flex flex-col max-h-[calc(100vh-12rem)]">
+            <div className="border-b border-line p-4">
               <div className="flex items-start justify-between gap-2">
                 <div>
-                  <p className="font-semibold text-zinc-900">{selected.title}</p>
-                  <p className="text-xs text-zinc-500 mt-0.5">{fmt(selected.created_at)}</p>
+                  <p className="font-semibold text-tx">{selected.title}</p>
+                  <p className="text-xs text-mut mt-0.5">{fmt(selected.created_at)}</p>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_COLORS[selected.status]}`}>
                     {t.status[selected.status as keyof typeof t.status]}
                   </span>
-                  <button onClick={() => setSelected(null)} className="text-xs text-zinc-400 hover:text-zinc-600">✕</button>
+                  <button onClick={() => setSelected(null)} className="text-xs text-fnt hover:text-mut">✕</button>
                 </div>
               </div>
-              <p className="mt-2 text-sm text-zinc-600">{selected.description}</p>
+              <p className="mt-2 text-sm text-mut">{selected.description}</p>
             </div>
 
             <div className="flex-1 overflow-y-auto p-4 space-y-3">
               {selected.messages.length === 0 && (
-                <p className="text-xs text-zinc-400 text-center py-4">{t.no_replies}</p>
+                <p className="text-xs text-fnt text-center py-4">{t.no_replies}</p>
               )}
               {selected.messages.map((m) => (
-                <div key={m.id} className="rounded-lg bg-zinc-50 border border-zinc-100 px-3 py-2">
-                  <p className="text-sm text-zinc-800">{m.body}</p>
-                  <p className="mt-1 text-xs text-zinc-400">{fmt(m.created_at)}</p>
+                <div key={m.id} className="rounded-lg bg-card2 border border-line px-3 py-2">
+                  <p className="text-sm text-tx">{m.body}</p>
+                  <p className="mt-1 text-xs text-fnt">{fmt(m.created_at)}</p>
                 </div>
               ))}
             </div>
 
             {selected.status !== "CLOSED" && (
-              <form onSubmit={handleReply} className="border-t border-zinc-100 p-3 flex gap-2">
+              <form onSubmit={handleReply} className="border-t border-line p-3 flex gap-2">
                 <input
                   value={reply}
                   onChange={(e) => setReply(e.target.value)}
                   placeholder={t.reply_placeholder}
-                  className="flex-1 rounded-lg border border-zinc-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-400"
+                  className="flex-1 rounded-lg border border-cardB px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--gold)]"
                 />
                 <button
                   type="submit"
                   disabled={sending || !reply.trim()}
-                  className="rounded-lg bg-zinc-900 px-3 py-2 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-50"
+                  className="rounded-lg bg-[var(--blue)] px-3 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-50"
                 >
                   {sending ? "..." : t.send}
                 </button>

@@ -74,27 +74,27 @@ export function InnAutocomplete({
         onFocus={() => value.length >= 2 && setShowDropdown(true)}
         onBlur={() => setTimeout(() => setShowDropdown(false), 150)}
         placeholder={placeholder}
-        className={`w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-900 ${className}`}
+        className={`w-full rounded-lg border border-inpB px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--blue)] ${className}`}
       />
       {loading && (
-        <p className="mt-1 text-xs text-zinc-400">Buscando en RxNorm…</p>
+        <p className="mt-1 text-xs text-fnt">Buscando en RxNorm…</p>
       )}
       {offline && (
-        <p className="mt-1 text-xs text-amber-600">
+        <p className="mt-1 text-xs text-dDraftT">
           Sin conexión — sugerencias RxNorm no disponibles. Puedes escribir el INN manualmente.
         </p>
       )}
       {showDropdown && suggestions.length > 0 && (
-        <ul className="absolute z-10 mt-1 max-h-48 w-full overflow-y-auto rounded-lg border border-zinc-200 bg-white shadow-md">
+        <ul className="absolute z-10 mt-1 max-h-48 w-full overflow-y-auto rounded-lg border border-cardB bg-card shadow-md">
           {suggestions.map((s) => (
             <li key={s.rxcui}>
               <button
                 type="button"
                 onMouseDown={() => handleSelect(s.name)}
-                className="flex w-full items-center gap-2 px-3 py-2 text-left hover:bg-zinc-50"
+                className="flex w-full items-center gap-2 px-3 py-2 text-left hover:bg-card2"
               >
-                <span className="text-sm text-zinc-900">{s.name}</span>
-                <span className="ml-auto text-xs text-zinc-400">RxCUI {s.rxcui}</span>
+                <span className="text-sm text-tx">{s.name}</span>
+                <span className="ml-auto text-xs text-fnt">RxCUI {s.rxcui}</span>
               </button>
             </li>
           ))}

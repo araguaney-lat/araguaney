@@ -49,7 +49,7 @@ export function CameraScanner({ onResult, onClose, label = "Apunta la cámara al
         <button
           type="button"
           onClick={handleClose}
-          className="rounded-full bg-white/20 px-3 py-1 text-sm text-white hover:bg-white/30"
+          className="rounded-full bg-card/20 px-3 py-1 text-sm text-white hover:bg-card/30"
         >
           Cancelar
         </button>

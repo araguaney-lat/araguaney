@@ -104,24 +104,24 @@ export default function CampaignsPage() {
   }
 
   if (status === "loading" || loading) {
-    return <div className="text-sm text-zinc-400 py-8 text-center">{dict.dashboard.common.loading}</div>
+    return <div className="text-sm text-fnt py-8 text-center">{dict.dashboard.common.loading}</div>
   }
 
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-semibold text-zinc-900">{t.title_full}</h1>
-          <p className="text-sm text-zinc-500 mt-0.5">{t.subtitle}</p>
+          <h1 className="text-2xl font-semibold text-tx">{t.title_full}</h1>
+          <p className="text-sm text-mut mt-0.5">{t.subtitle}</p>
         </div>
         <div className="flex items-center gap-3">
-          <span className="text-sm text-zinc-500">
+          <span className="text-sm text-mut">
             {campaigns.length === 1 ? t.count_one : t.count_other.replace("{count}", String(campaigns.length))}
           </span>
           {isAdmin && !showForm && (
             <button
               onClick={() => setShowForm(true)}
-              className="rounded-lg bg-zinc-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-zinc-700"
+              className="rounded-lg bg-[var(--blue)] px-3 py-1.5 text-sm font-medium text-white hover:opacity-90"
             >
               {t.new}
             </button>
@@ -132,33 +132,33 @@ export default function CampaignsPage() {
       {showForm && isAdmin && (
         <form
           onSubmit={handleCreate}
-          className="mb-6 rounded-xl border border-zinc-200 bg-white p-5 space-y-3"
+          className="mb-6 rounded-xl border border-cardB bg-card p-5 space-y-3"
         >
-          <p className="text-sm font-medium text-zinc-700">{t.form_title}</p>
+          <p className="text-sm font-medium text-mut">{t.form_title}</p>
 
           {error && (
-            <p className="rounded-lg bg-red-50 border border-red-200 px-3 py-2 text-xs text-red-700">
+            <p className="rounded-lg bg-dRejB border border-dRejB px-3 py-2 text-xs text-dRejT">
               {error}
             </p>
           )}
 
           <div className="grid gap-3 sm:grid-cols-2">
             <div className="sm:col-span-2">
-              <label className="text-xs text-zinc-500">{t.field_name_required}</label>
+              <label className="text-xs text-mut">{t.field_name_required}</label>
               <input
                 required
                 value={form.name}
                 onChange={field("name")}
                 placeholder={t.field_name_placeholder}
-                className="mt-1 w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-400"
+                className="mt-1 w-full rounded-lg border border-cardB px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--gold)]"
               />
             </div>
             <div>
-              <label className="text-xs text-zinc-500">{t.field_origin}</label>
+              <label className="text-xs text-mut">{t.field_origin}</label>
               <select
                 value={form.origin_country}
                 onChange={field("origin_country")}
-                className="mt-1 w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-400"
+                className="mt-1 w-full rounded-lg border border-cardB px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--gold)]"
               >
                 <option value="">{t.select_country}</option>
                 {COUNTRIES.map((c) => (
@@ -169,11 +169,11 @@ export default function CampaignsPage() {
               </select>
             </div>
             <div>
-              <label className="text-xs text-zinc-500">{t.field_destination}</label>
+              <label className="text-xs text-mut">{t.field_destination}</label>
               <select
                 value={form.destination_country}
                 onChange={field("destination_country")}
-                className="mt-1 w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-400"
+                className="mt-1 w-full rounded-lg border border-cardB px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--gold)]"
               >
                 <option value="">{t.select_country}</option>
                 {COUNTRIES.map((c) => (
@@ -184,59 +184,59 @@ export default function CampaignsPage() {
               </select>
             </div>
             <div>
-              <label className="text-xs text-zinc-500">{t.field_start_date}</label>
+              <label className="text-xs text-mut">{t.field_start_date}</label>
               <input
                 type="date"
                 value={form.start_date}
                 onChange={field("start_date")}
-                className="mt-1 w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-400"
+                className="mt-1 w-full rounded-lg border border-cardB px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--gold)]"
               />
             </div>
             <div>
-              <label className="text-xs text-zinc-500">{t.field_end_date}</label>
+              <label className="text-xs text-mut">{t.field_end_date}</label>
               <input
                 type="date"
                 value={form.end_date}
                 onChange={field("end_date")}
-                className="mt-1 w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-400"
+                className="mt-1 w-full rounded-lg border border-cardB px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--gold)]"
               />
             </div>
             <div className="sm:col-span-2">
-              <label className="text-xs text-zinc-500">{t.field_description}</label>
+              <label className="text-xs text-mut">{t.field_description}</label>
               <textarea
                 value={form.description}
                 onChange={field("description")}
                 rows={2}
-                className="mt-1 w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-400 resize-none"
+                className="mt-1 w-full rounded-lg border border-cardB px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--gold)] resize-none"
               />
             </div>
           </div>
 
-          <div className="pt-2 border-t border-zinc-100">
-            <label className="text-xs text-zinc-500">{t.field_centers}</label>
-            <p className="text-xs text-zinc-400 mt-0.5 mb-2">{t.field_centers_help}</p>
+          <div className="pt-2 border-t border-line">
+            <label className="text-xs text-mut">{t.field_centers}</label>
+            <p className="text-xs text-fnt mt-0.5 mb-2">{t.field_centers_help}</p>
             {centers.length === 0 ? (
-              <p className="text-xs text-zinc-400">{t.no_centers_available}</p>
+              <p className="text-xs text-fnt">{t.no_centers_available}</p>
             ) : (
               <>
-                <div className="max-h-40 overflow-y-auto rounded-lg border border-zinc-200 divide-y divide-zinc-100">
+                <div className="max-h-40 overflow-y-auto rounded-lg border border-cardB divide-y divide-line">
                   {centers.map((c) => (
                     <label
                       key={c.id}
-                      className="flex items-center gap-2 px-3 py-2 text-sm text-zinc-700 hover:bg-zinc-50 cursor-pointer"
+                      className="flex items-center gap-2 px-3 py-2 text-sm text-mut hover:bg-card2 cursor-pointer"
                     >
                       <input
                         type="checkbox"
                         checked={selectedCenterIds.includes(c.id)}
                         onChange={() => toggleCenter(c.id)}
-                        className="h-4 w-4 rounded border-zinc-300 text-zinc-900 focus:ring-zinc-400"
+                        className="h-4 w-4 rounded border-inpB text-tx focus:ring-[var(--gold)]"
                       />
                       {c.name}
                     </label>
                   ))}
                 </div>
                 {selectedCenterIds.length > 0 && (
-                  <p className="text-xs text-zinc-500 mt-1.5">
+                  <p className="text-xs text-mut mt-1.5">
                     {selectedCenterIds.length === 1
                       ? t.centers_selected_one
                       : t.centers_selected_other.replace("{count}", String(selectedCenterIds.length))}
@@ -251,14 +251,14 @@ export default function CampaignsPage() {
               type="button"
               onClick={closeForm}
               disabled={saving}
-              className="rounded-lg border border-zinc-200 px-4 py-2 text-sm font-medium text-zinc-600 hover:bg-zinc-50 disabled:opacity-50"
+              className="rounded-lg border border-cardB px-4 py-2 text-sm font-medium text-mut hover:bg-card2 disabled:opacity-50"
             >
               {t.cancel}
             </button>
             <button
               type="submit"
               disabled={saving}
-              className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-50"
+              className="rounded-lg bg-[var(--blue)] px-4 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-50"
             >
               {saving ? t.saving : t.create}
             </button>
@@ -267,7 +267,7 @@ export default function CampaignsPage() {
       )}
 
       {campaigns.length === 0 ? (
-        <div className="rounded-xl border border-zinc-200 bg-white p-8 text-center text-sm text-zinc-500">
+        <div className="rounded-xl border border-cardB bg-card p-8 text-center text-sm text-mut">
           {isAdmin ? t.empty_admin : t.empty_user}
         </div>
       ) : (
@@ -275,17 +275,17 @@ export default function CampaignsPage() {
           {campaigns.map((c) => (
             <div
               key={c.id}
-              className="rounded-xl border border-zinc-200 bg-white p-4 flex flex-col gap-2"
+              className="rounded-xl border border-cardB bg-card p-4 flex flex-col gap-2"
             >
               <div className="flex items-start justify-between gap-2">
-                <span className="font-medium text-zinc-900 leading-snug">{c.name}</span>
+                <span className="font-medium text-tx leading-snug">{c.name}</span>
                 <button
                   onClick={() => toggleActive(c)}
                   disabled={!isAdmin}
                   className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${
                     c.is_active
-                      ? "bg-green-100 text-green-700" + (isAdmin ? " hover:bg-green-200 cursor-pointer" : "")
-                      : "bg-zinc-100 text-zinc-500" + (isAdmin ? " hover:bg-zinc-200 cursor-pointer" : "")
+                      ? "bg-dSealB text-dSealT" + (isAdmin ? " hover:bg-dSealB cursor-pointer" : "")
+                      : "bg-chip text-mut" + (isAdmin ? " hover:bg-chip cursor-pointer" : "")
                   }`}
                   title={isAdmin ? (c.is_active ? t.toggle_deactivate : t.toggle_activate) : undefined}
                 >
@@ -294,7 +294,7 @@ export default function CampaignsPage() {
               </div>
 
               {(c.origin_country || c.destination_country) && (
-                <p className="text-xs font-medium text-zinc-600">
+                <p className="text-xs font-medium text-mut">
                   {c.origin_country && (
                     <>{flagEmoji(c.origin_country)} {countryName(c.origin_country)}</>
                   )}
@@ -306,21 +306,21 @@ export default function CampaignsPage() {
               )}
 
               {c.description && (
-                <p className="text-xs text-zinc-500 line-clamp-2">{c.description}</p>
+                <p className="text-xs text-mut line-clamp-2">{c.description}</p>
               )}
 
               {(c.start_date || c.end_date) && (
-                <p className="text-xs text-zinc-400">
+                <p className="text-xs text-fnt">
                   {c.start_date && new Date(c.start_date).toLocaleDateString("es-MX")}
                   {c.start_date && c.end_date && " — "}
                   {c.end_date && new Date(c.end_date).toLocaleDateString("es-MX")}
                 </p>
               )}
 
-              <div className="pt-1 border-t border-zinc-100">
+              <div className="pt-1 border-t border-line">
                 <Link
                   href={`/dashboard/campaigns/${c.id}/members`}
-                  className="text-xs text-zinc-500 hover:text-zinc-800"
+                  className="text-xs text-mut hover:text-tx"
                 >
                   {t.view_members}
                 </Link>
