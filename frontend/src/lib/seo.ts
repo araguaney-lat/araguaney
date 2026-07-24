@@ -20,7 +20,9 @@ export const SITE_URL = (
 // (LinkedIn, GitHub, X, Instagram, Crunchbase) and, once created, the Wikidata
 // entity URL (Fase 17 task 6). They flow into the Organization schema
 // automatically — only rendered when non-empty. See Fase 17 task 5.
-export const BRAND_SAME_AS: readonly string[] = []
+export const BRAND_SAME_AS: readonly string[] = [
+  "https://www.linkedin.com/company/araguaney-lat",
+]
 
 // Public founder attribution for the Organization `founder` (E-E-A-T signal).
 export const BRAND_FOUNDING_YEAR = "2026"
