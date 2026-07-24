@@ -2,7 +2,9 @@ import { auth } from "@/auth"
 import { redirect } from "next/navigation"
 import { StudioSidebar } from "@/components/StudioSidebar"
 import { DictionaryProvider } from "@/context/DictionaryContext"
+import { ThemeProvider } from "@/context/ThemeContext"
 import { getLocale, getDictionary } from "@/lib/i18n"
+import { getTheme } from "@/lib/theme"
 
 const API_URL = process.env.API_URL ?? "http://localhost:8000"
 
@@ -28,6 +30,7 @@ export default async function StudioLayout({ children }: { children: React.React
 
   const locale = await getLocale()
   const dict = await getDictionary(locale)
+  const theme = await getTheme()
 
   const me = await fetchMe(session.accessToken)
   const userName = me?.full_name ?? me?.username ?? null
@@ -35,15 +38,18 @@ export default async function StudioLayout({ children }: { children: React.React
 
   return (
     <DictionaryProvider dict={dict}>
-      <div className="flex h-screen overflow-hidden bg-zinc-50">
-        <StudioSidebar
-          userName={userName}
-          userEmail={userEmail}
-          nav={dict.studio.nav}
-          locale={locale}
-        />
-        <main className="flex-1 overflow-y-auto p-6">{children}</main>
-      </div>
+      <ThemeProvider theme={theme}>
+        <div data-theme={theme} className="flex h-screen overflow-hidden bg-app text-tx">
+          <StudioSidebar
+            userName={userName}
+            userEmail={userEmail}
+            nav={dict.studio.nav}
+            locale={locale}
+            theme={theme}
+          />
+          <main className="flex-1 overflow-y-auto p-6">{children}</main>
+        </div>
+      </ThemeProvider>
     </DictionaryProvider>
   )
 }

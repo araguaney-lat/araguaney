@@ -8,5 +8,6 @@ export async function setTheme(theme: string) {
   if (!isTheme(theme)) return
   const jar = await cookies()
   jar.set(THEME_COOKIE, theme, { path: "/", maxAge: 60 * 60 * 24 * 365 })
-  revalidatePath("/dashboard")
+  // Revalidate the whole app tree so the theme flips in both /dashboard and /studio.
+  revalidatePath("/", "layout")
 }

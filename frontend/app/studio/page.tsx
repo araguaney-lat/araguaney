@@ -43,16 +43,16 @@ export default async function StudioHubPage() {
   return (
     <div className="max-w-4xl">
       <div className="mb-8">
-        <h1 className="text-2xl font-semibold text-zinc-900">{t.title}</h1>
-        <p className="text-sm text-zinc-500 mt-1">{t.subtitle}</p>
+        <h1 className="text-2xl font-semibold text-tx">{t.title}</h1>
+        <p className="text-sm text-mut mt-1">{t.subtitle}</p>
       </div>
 
       {STAT_CARDS.length > 0 && (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
           {STAT_CARDS.map((s) => (
-            <div key={s.label} className="rounded-xl border border-blue-200 bg-blue-50 p-4">
-              <p className="text-2xl font-bold text-blue-900">{s.value}</p>
-              <p className="text-xs text-blue-600/80 mt-0.5">{s.label}</p>
+            <div key={s.label} className="rounded-xl border border-goldB bg-goldSoft p-4">
+              <p className="text-2xl font-bold text-tx">{s.value}</p>
+              <p className="text-xs text-mut mt-0.5">{s.label}</p>
             </div>
           ))}
         </div>
@@ -63,10 +63,10 @@ export default async function StudioHubPage() {
           <Link
             key={link.href}
             href={link.href}
-            className="rounded-xl border border-zinc-200 bg-white p-5 hover:border-zinc-300 hover:shadow-sm transition-all group"
+            className="rounded-xl border border-cardB bg-card p-5 hover:border-goldB hover:shadow-sm transition-all group"
           >
-            <p className="font-semibold text-zinc-900 group-hover:text-zinc-700">{link.label}</p>
-            <p className="text-xs text-zinc-500 mt-1 leading-relaxed">{link.desc}</p>
+            <p className="font-semibold text-tx group-hover:text-[var(--blue)]">{link.label}</p>
+            <p className="text-xs text-mut mt-1 leading-relaxed">{link.desc}</p>
           </Link>
         ))}
       </div>

@@ -20,8 +20,8 @@ export default async function StudioCenterApplicationsPage() {
   return (
     <div className="max-w-5xl">
       <div className="mb-6">
-        <h1 className="text-2xl font-semibold text-zinc-900">{t.title}</h1>
-        <p className="mt-0.5 text-sm text-zinc-500">{t.subtitle}</p>
+        <h1 className="text-2xl font-semibold text-tx">{t.title}</h1>
+        <p className="mt-0.5 text-sm text-mut">{t.subtitle}</p>
       </div>
 
       <CenterApplicationsQueue
