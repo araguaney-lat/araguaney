@@ -64,7 +64,14 @@ function handleI18n(req: NextRequest): NextResponse | null {
 
 const runAuth = auth((req) => {
   const session = req.auth
-  const isLoggedIn = !!session
+  // A NextAuth session can outlive the backend access token (24h, no refresh
+  // token). Treat an expired-token session as logged-out so the user is bounced
+  // to /login instead of sitting on a broken dashboard with a 401'd token.
+  const isExpired =
+    !!session &&
+    (session.error === "AccessTokenExpired" ||
+      (!!session.accessTokenExpires && Date.now() >= session.accessTokenExpires))
+  const isLoggedIn = !!session && !isExpired
   const centerRole = session?.centerRole ?? null
   const platformRole = session?.platformRole ?? null
   const { pathname } = req.nextUrl
@@ -87,10 +94,15 @@ const runAuth = auth((req) => {
     logical.startsWith("/dashboard/centers") || logical.startsWith("/dashboard/admin")
 
   if ((isDashboard || isStudio) && !isLoggedIn) {
-    // Preserve the prefixed pathname so post-login returns to the EN URL.
-    return NextResponse.redirect(
-      new URL(`/login?callbackUrl=${encodeURIComponent(pathname)}`, req.url),
-    )
+    const url = new URL("/login", req.url)
+    if (isExpired) {
+      // Surface a "your session expired" notice instead of a silent bounce.
+      url.searchParams.set("expired", "1")
+    } else {
+      // Preserve the prefixed pathname so post-login returns to the EN URL.
+      url.searchParams.set("callbackUrl", pathname)
+    }
+    return NextResponse.redirect(url)
   }
   if (isAuthPage && isLoggedIn) {
     // Landing honors the cookie so a returning EN user lands on /en/dashboard.
@@ -107,16 +119,24 @@ const runAuth = auth((req) => {
 
   // Prefixed panel route: rewrite to the physical path, force EN for this render,
   // and sync the cookie so unprefixed in-panel links keep the same locale.
+  let res: NextResponse
   if (hasPanelPrefix) {
     const url = req.nextUrl.clone()
     url.pathname = logical
-    const res = NextResponse.rewrite(url)
+    res = NextResponse.rewrite(url)
     res.headers.set("x-locale", locale)
     res.cookies.set(LOCALE_COOKIE, locale, { path: "/", maxAge: 60 * 60 * 24 * 365 })
-    return res
+  } else {
+    res = NextResponse.next()
   }
-
-  return NextResponse.next()
+  // Authenticated shells must never be restored from the browser's back/forward
+  // cache — otherwise a user whose session expired could still see the old
+  // dashboard by pressing "back". no-store disables bfcache for these routes,
+  // forcing a fresh request that re-runs this auth check.
+  if (isDashboard || isStudio) {
+    res.headers.set("Cache-Control", "no-store, must-revalidate")
+  }
+  return res
 })
 
 export default function middleware(req: NextRequest, ctx: unknown) {

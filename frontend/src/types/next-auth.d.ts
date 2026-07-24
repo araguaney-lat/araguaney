@@ -4,6 +4,8 @@ import "next-auth/jwt"
 declare module "next-auth" {
   interface Session {
     accessToken: string
+    accessTokenExpires?: number
+    error?: string
     userId: string
     platformRole: string | null
     centerRole: string | null
@@ -14,6 +16,7 @@ declare module "next-auth" {
 
   interface User {
     accessToken: string
+    accessTokenExpires?: number
     userId: string
     platformRole: string | null
     centerRole: string | null
@@ -26,6 +29,8 @@ declare module "next-auth" {
 declare module "next-auth/jwt" {
   interface JWT {
     accessToken: string
+    accessTokenExpires?: number
+    error?: string
     userId: string
     platformRole: string | null
     centerRole: string | null
