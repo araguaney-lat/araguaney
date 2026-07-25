@@ -10,6 +10,9 @@
 
 > Basado en investigación de mercado y revisión del código (julio 2026). Ver "Hallazgos" abajo.
 
+> **Mantenimiento del día a día:** ver `docs/seo-maintenance.md` — los 3 hábitos recurrentes
+> (apendar a `/novedades`, refrescar `dateModified` trimestral, sumar anclas `sameAs`).
+
 ---
 
 ## Hallazgos de la investigación (julio 2026)
