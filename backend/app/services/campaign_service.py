@@ -1,5 +1,8 @@
 from uuid import UUID
 
+from fastapi import BackgroundTasks
+
+from app.arq_pool import enqueue
 from app.models.campaign import Campaign
 from app.repositories.campaign_repository import CampaignRepository
 from app.repositories.user_campaign_repository import UserCampaignRepository
@@ -29,7 +32,9 @@ class CampaignService(BaseService):
             slug = f"{base}-{suffix}"
         return slug
 
-    def create(self, data: CampaignCreate) -> Campaign:
+    def create(
+        self, data: CampaignCreate, background_tasks: BackgroundTasks | None = None
+    ) -> Campaign:
         repo = CampaignRepository(self.db)
         campaign = Campaign(
             name=data.name,
@@ -44,6 +49,11 @@ class CampaignService(BaseService):
         if data.center_ids:
             UserCampaignRepository(self.db).assign_users_from_centers(data.center_ids, campaign.id)
         repo.commit()
+        # Ping IndexNow so the new event page reaches Bing (and thus ChatGPT/Copilot)
+        # fast — but only for campaigns that are actually public at /eventos/{slug}
+        # (active, non-general), mirroring the public endpoint's own filter.
+        if background_tasks is not None and campaign.is_active and not campaign.is_general:
+            enqueue(background_tasks, "submit_indexnow_task", f"/eventos/{campaign.slug}")
         return campaign
 
     def update(self, campaign_id: UUID, data: CampaignUpdate) -> Campaign:

@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, BackgroundTasks, Depends, Request
 from sqlalchemy.orm import Session
 
 from app.database import get_db
@@ -56,10 +56,11 @@ def get_campaign(
 def create_campaign(
     request: Request,
     data: CampaignCreate,
+    background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
     _: User = Depends(require_national_admin),
 ):
-    return CampaignService(db).create(data)
+    return CampaignService(db).create(data, background_tasks)
 
 
 @router.patch("/{campaign_id}", response_model=CampaignOut)
