@@ -187,6 +187,8 @@ export const config = {
     "/necesidades/:path*",
     "/needs",
     "/needs/:path*",
+    "/escenarios/:path*",
+    "/scenarios/:path*",
     "/en/:path*",
   ],
 }

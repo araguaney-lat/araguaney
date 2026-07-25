@@ -54,6 +54,15 @@ Reglas y disponibilidad en tiempo real por categoría:
 - [Herramientas](https://www.araguaney.lat/necesidades/herramientas): remoción de escombros y reconstrucción.
 - [Equipo de rescate](https://www.araguaney.lat/necesidades/equipo-de-rescate): equipo de emergencia (catálogo IOM).
 
+## Escenarios de emergencia
+
+Landings evergreen por tipo de desastre — qué se necesita y cómo coordinar el acopio:
+
+- [Inundaciones](https://www.araguaney.lat/escenarios/inundaciones): coordinar donaciones tras una inundación (agua, higiene, medicamentos, alimentos).
+- [Incendios](https://www.araguaney.lat/escenarios/incendios): organizar la ayuda tras un incendio (equipo de rescate, herramientas, higiene, insumos médicos).
+- [Crisis migratoria](https://www.araguaney.lat/escenarios/crisis-migratoria): coordinar ayuda en una crisis migratoria (higiene, alimentos, agua, medicamentos).
+- [Sismo](https://www.araguaney.lat/escenarios/sismo): montar el acopio tras un terremoto (equipo de rescate, medicamentos, agua, herramientas).
+
 ## Estándares
 
 Araguaney se apoya en estándares abiertos y reconocidos internacionalmente:

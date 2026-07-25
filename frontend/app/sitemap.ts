@@ -3,6 +3,7 @@ import { apiFetch } from "@/lib/api"
 import { SITE_URL, absoluteUrl } from "@/lib/seo"
 import { type RouteKey, LOCALES, localizedPath } from "@/lib/routes"
 import { NEEDS_CATEGORIES } from "@/lib/needs-categories"
+import { SCENARIOS } from "@/lib/scenarios"
 
 // hreflang alternates map for a migrated route, for a sitemap entry.
 function langAlternates(key: RouteKey): Record<string, string> {
@@ -141,6 +142,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         url: absoluteUrl(localizedPath(key, "es")),
         lastModified: now,
         changeFrequency: "daily" as const,
+        priority: 0.7,
+        alternates: { languages: langAlternates(key) },
+      }
+    }),
+    ...SCENARIOS.map((s) => {
+      const key = `escenarios/${s.slug}` as RouteKey
+      return {
+        url: absoluteUrl(localizedPath(key, "es")),
+        lastModified: now,
+        changeFrequency: "monthly" as const,
         priority: 0.7,
         alternates: { languages: langAlternates(key) },
       }

@@ -69,6 +69,10 @@ export const ROUTE_SLUGS: Record<string, Record<Locale, string>> = {
   "necesidades/higiene": { es: "necesidades/higiene", en: "needs/hygiene" },
   "necesidades/herramientas": { es: "necesidades/herramientas", en: "needs/tools" },
   "necesidades/equipo-de-rescate": { es: "necesidades/equipo-de-rescate", en: "needs/rescue-gear" },
+  "escenarios/inundaciones": { es: "escenarios/inundaciones", en: "scenarios/floods" },
+  "escenarios/incendios": { es: "escenarios/incendios", en: "scenarios/fires" },
+  "escenarios/crisis-migratoria": { es: "escenarios/crisis-migratoria", en: "scenarios/migration-crisis" },
+  "escenarios/sismo": { es: "escenarios/sismo", en: "scenarios/earthquake" },
   // More routes migrate here in subs 2d–4 (eventos, qr, …).
 }
 
