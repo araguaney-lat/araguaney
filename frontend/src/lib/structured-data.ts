@@ -40,7 +40,15 @@ export const ORGANIZATION_SCHEMA: Schema = {
     "Donación de medicamentos",
     "Manifiestos y packing lists",
   ],
-  areaServed: { "@type": "Place", name: "América Latina" },
+  areaServed: [
+    { "@type": "Place", name: "América Latina" },
+    { "@type": "Country", name: "México" },
+    { "@type": "Country", name: "Venezuela" },
+    { "@type": "Country", name: "Colombia" },
+    { "@type": "Country", name: "Chile" },
+    { "@type": "Country", name: "Perú" },
+    { "@type": "Country", name: "Argentina" },
+  ],
   contactPoint: {
     "@type": "ContactPoint",
     contactType: "customer support",
