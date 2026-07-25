@@ -169,6 +169,8 @@ export const config = {
     "/how-it-works",
     "/nosotros",
     "/about",
+    "/preguntas-frecuentes",
+    "/faq",
     "/aviso-de-privacidad",
     "/privacy",
     "/terminos",
