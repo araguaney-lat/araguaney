@@ -37,3 +37,8 @@ export function formatContentDate(iso: string, locale: Locale): string {
 export function updatedLabel(locale: Locale): string {
   return locale === "es" ? "Actualizado" : "Updated"
 }
+
+/** Byline label per locale (links to /nosotros — E-E-A-T author attribution). */
+export function authorByline(locale: Locale): string {
+  return locale === "es" ? "Por el equipo de Araguaney" : "By the Araguaney team"
+}
