@@ -163,6 +163,10 @@ export function faqSchema(faqs: readonly Faq[]): Schema {
   return {
     "@context": "https://schema.org",
     "@type": "FAQPage",
+    // Voice-assistant hint: the FAQ questions/answers are the speakable parts.
+    // Selectors match the classes FaqSection renders (any page showing FAQs via
+    // FaqSection). Harmless where those elements aren't present.
+    speakable: { "@type": "SpeakableSpecification", cssSelector: [".faq-q", ".faq-a"] },
     mainEntity: faqs.map((faq) => ({
       "@type": "Question",
       name: faq.q,
