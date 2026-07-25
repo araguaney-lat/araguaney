@@ -54,7 +54,7 @@ const CONTENT: Record<Locale, Content> = {
     metaTitle: "Software para centro de acopio",
     ogTitle: "Software para centro de acopio — Araguaney",
     description:
-      "Gestión de donaciones en especie para tu centro de acopio: registro por ítem, cajas homogéneas con QR, manifiesto exportable y panel nacional en tiempo real.",
+      "¿Qué es un centro de acopio y qué software necesita? Araguaney estandariza el registro por ítem, las cajas homogéneas con QR, el manifiesto exportable y el panel nacional en tiempo real.",
     ogEyebrow: "Centro de acopio",
     eyebrow: "Software para centros de acopio",
     h1: "El estándar para registrar, empacar y enviar donaciones de tu centro de acopio",
@@ -94,7 +94,7 @@ const CONTENT: Record<Locale, Content> = {
     metaTitle: "Collection center software",
     ogTitle: "Collection center software — Araguaney",
     description:
-      "In-kind donation management for your collection center: item-level intake, homogeneous boxes with QR codes, an exportable manifest, and a national dashboard in real time.",
+      "What is a collection center and what software does it need? Araguaney standardizes item-level intake, homogeneous boxes with QR codes, the exportable manifest, and a national dashboard in real time.",
     ogEyebrow: "Collection center",
     eyebrow: "Collection center software",
     h1: "The standard to register, pack and ship your collection center's donations",

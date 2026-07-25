@@ -79,7 +79,7 @@ const CONTENT: Record<Locale, Content> = {
     metaTitle: "Cómo funciona Araguaney",
     ogTitle: "Cómo funciona Araguaney — Araguaney",
     description:
-      "El flujo completo, del acopio al envío: registrar donaciones por ítem, empacarlas en cajas homogéneas con QR, consolidarlas en tarimas y envíos con manifiesto, y ver el stock nacional en tiempo real.",
+      "¿Cómo funciona Araguaney, del acopio al envío? Registrar donaciones por ítem, empacarlas en cajas homogéneas con QR, consolidarlas en tarimas y envíos con manifiesto, y ver el stock nacional en tiempo real.",
     ogEyebrow: "Cómo funciona",
     heroEyebrow: "Cómo funciona",
     h1: "Que cada donación llegue ordenada",
@@ -154,7 +154,7 @@ const CONTENT: Record<Locale, Content> = {
     metaTitle: "How Araguaney works",
     ogTitle: "How Araguaney works — Araguaney",
     description:
-      "The full flow, from collection to shipping: register donations item by item, pack them into homogeneous boxes with QR codes, consolidate them into pallets and shipments with a manifest, and see national stock in real time.",
+      "How does Araguaney work, from collection to shipping? Register donations item by item, pack them into homogeneous boxes with QR codes, consolidate them into pallets and shipments with a manifest, and see national stock in real time.",
     ogEyebrow: "How it works",
     heroEyebrow: "How it works",
     h1: "That every donation arrives in order",
