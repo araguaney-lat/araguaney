@@ -63,6 +63,19 @@ export const SOFTWARE_APPLICATION_SCHEMA: Schema = {
   offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
 }
 
+// AboutPage for /nosotros — marks it as the entity home and links it to the
+// Organization (which carries sameAs / founder / foundingDate).
+export function aboutPageSchema({ path, locale }: { path: string; locale: Locale }): Schema {
+  const url = absoluteUrl(path)
+  return {
+    "@context": "https://schema.org",
+    "@type": "AboutPage",
+    url,
+    inLanguage: locale,
+    mainEntity: { "@type": "Organization", name: "Araguaney", url: SITE_URL },
+  }
+}
+
 interface ArticleInput {
   title: string
   description: string

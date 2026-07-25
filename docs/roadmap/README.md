@@ -4,8 +4,8 @@
 
 ```mermaid
 pie title Tareas completadas (351 tareas)
-    "Listas" : 325
-    "Pendientes" : 26
+    "Listas" : 326
+    "Pendientes" : 25
 ```
 
 | Fase | Nombre | Listas | Pendientes | Progreso |
@@ -27,8 +27,8 @@ pie title Tareas completadas (351 tareas)
 | 14 | [Auto-registro de centros con aprobación](phase-14-center-self-registration.md) | 17 | 0 | ✅ 100% |
 | 15 | [Deliverability de emails + aviso de solicitudes](phase-15-email-deliverability.md) | 15 | 0 | ✅ 100% |
 | 16 | [Rediseño de plantillas de email con marca](phase-16-email-brand-redesign.md) | 10 | 0 | ✅ 100% |
-| 17 | [AEO/GEO + expansión de keywords](phase-17-aeo-keyword-expansion.md) | 7 | 14 | 🟡 33% |
-| **Total** | | **325** | **26** | **🟡 93%** |
+| 17 | [AEO/GEO + expansión de keywords](phase-17-aeo-keyword-expansion.md) | 8 | 13 | 🟡 38% |
+| **Total** | | **326** | **25** | **🟡 93%** |
 
 > **Pendientes (33):**
 > - **12 gated por pago/decisión de negocio:** Fase 4 → 2 (spend caps + alertas, requieren plan
@@ -38,7 +38,8 @@ pie title Tareas completadas (351 tareas)
 > - **14 nuevas (Fase 17 — AEO/GEO + expansión de keywords):** trabajo de posicionamiento
 >   ejecutable sin gate de pago (entidad/Wikidata, escenarios, medición de visibilidad en IA).
 >   Tasks 1 (Bing), 2 (IndexNow), 3 (`llms.txt` 2026), 4 (host canónico), 5 (señales de
->   entidad), 10 (página comparativa vs Excel) y 15 (frescura/`dateModified`) ✅.
+>   entidad), 7 (`/nosotros` entity home), 10 (página comparativa vs Excel) y 15
+>   (frescura/`dateModified`) ✅.
 
 > Envs opcionales (Sentry, Slack, Google Safe Browsing, Encryption Key) se pueden agregar en cualquier momento sin cambios de código.
 

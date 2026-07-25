@@ -71,6 +71,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       alternates: { languages: langAlternates("como-funciona") },
     },
     {
+      url: absoluteUrl(localizedPath("nosotros", "es")),
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.6,
+      alternates: { languages: langAlternates("nosotros") },
+    },
+    {
       url: absoluteUrl(localizedPath("ayuda-humanitaria", "es")),
       lastModified: now,
       changeFrequency: "monthly",

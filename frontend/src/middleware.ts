@@ -167,6 +167,8 @@ export const config = {
     "/donation-spreadsheet-alternative",
     "/como-funciona",
     "/how-it-works",
+    "/nosotros",
+    "/about",
     "/aviso-de-privacidad",
     "/privacy",
     "/terminos",
