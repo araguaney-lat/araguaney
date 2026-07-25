@@ -79,6 +79,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       alternates: { languages: langAlternates("nosotros") },
     },
     {
+      url: absoluteUrl(localizedPath("centro-de-acopio-mexico", "es")),
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.7,
+      alternates: { languages: langAlternates("centro-de-acopio-mexico") },
+    },
+    {
       url: absoluteUrl(localizedPath("preguntas-frecuentes", "es")),
       lastModified: now,
       changeFrequency: "monthly",

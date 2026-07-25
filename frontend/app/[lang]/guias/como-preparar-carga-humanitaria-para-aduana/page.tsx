@@ -308,6 +308,13 @@ export default async function AduanaGuidePage({
                   : "Guide: how to organize a collection center →"}
               </Link>
             </p>
+            <p className="text-[13.5px] mt-2 text-center" style={{ color: "#6E6557" }}>
+              <Link href={localizedPath("centro-de-acopio-mexico", locale)} style={{ color: "#1F5E8C", fontWeight: 600 }}>
+                {locale === "es"
+                  ? "Centro de acopio en México: COFEPRIS y aduana (SAT) →"
+                  : "Collection center in Mexico: COFEPRIS and customs (SAT) →"}
+              </Link>
+            </p>
           </div>
         </article>
 

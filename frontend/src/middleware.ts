@@ -169,6 +169,8 @@ export const config = {
     "/how-it-works",
     "/nosotros",
     "/about",
+    "/centro-de-acopio-mexico",
+    "/collection-center-mexico",
     "/preguntas-frecuentes",
     "/faq",
     "/aviso-de-privacidad",
