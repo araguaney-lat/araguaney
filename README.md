@@ -1,6 +1,22 @@
 # Araguaney
 
-> Plataforma gratuita para la gestión de Donativos en Centros de Acopio
+> **El estándar común para coordinar centros de acopio y logística de ayuda humanitaria.**
+> App web multi-centro y gratuita: registra donaciones **en especie** por ítem, las empaca en
+> **cajas homogéneas** con QR, las consolida en **tarimas** y **envíos** con manifiesto
+> exportable, y agrega el stock de todos los centros en un **panel nacional** en tiempo real.
+> Sin datos personales de donantes ni beneficiarios — solo inventario, trazable de la caja al envío.
+
+**El flujo:** `Intake` (recepción) → `Box` (caja homogénea + QR) → `Pallet` (tarima) → `Shipment`
+(envío + manifiesto) → panel nacional agregado.
+
+**Público + multi-idioma:** además del panel operativo, sirve un **sitio público bilingüe (ES/EN)**
+optimizado para SEO/AEO — pilares, guías, glosario, "qué falta" (`/necesidades`), landings por
+escenario, FAQ y changelog. Agnóstico de país; funciona para cualquier emergencia (sismos,
+inundaciones, incendios, crisis migratorias).
+
+> Deriva del boilerplate `fastapi-nextjs-boilerplate`. El **qué/por qué** del producto y sus reglas
+> viven en [`CLAUDE.md`](CLAUDE.md); el **roadmap por fases** en [`docs/roadmap/`](docs/roadmap/);
+> el mantenimiento de SEO/AEO en [`docs/seo-maintenance.md`](docs/seo-maintenance.md).
 
 ## Tech Stack
 
@@ -18,6 +34,35 @@
 | Alerts | Slack Bot (`chat.postMessage`) + infra-status enrichment |
 | CI | Dependabot + npm/pip CVE audits (GitHub Actions) |
 | Hosting | Railway (backend + DB + Redis) · Vercel (frontend) |
+| Edge / SEO | Cloudflare (DNS/WAF) · IndexNow (Bing) · Google/Bing sitemaps |
+
+## Domain model
+
+Multi-tenant "pool / row-level": **un solo deploy, una sola DB, `center_id` discrimina por centro**
+(hace trivial la agregación nacional). Todo acceso a datos pasa por el scoping de tenant.
+
+| Entidad | Esencia |
+|---|---|
+| `Center` | El tenant (centro de acopio) |
+| `ProductType` | El SKU — categoría + atributos (p. ej. `strength`) |
+| `Intake` | Recepción de una donación (`donante_libre` opcional, sin PII) |
+| `Box` | Caja **homogénea**: 1 `product_type` + 1 lote + 1 caducidad · QR propio |
+| `Pallet` | Tarima (mixta) que agrupa cajas selladas · QR propio |
+| `Shipment` | Envío que agrupa tarimas · genera el manifiesto/packing list |
+| `Campaign` | Campaña/evento (slug público en `/eventos/{slug}`) |
+| `Transfer` | Transferencia de inventario entre centros |
+
+Máquinas de estado con auditoría (`*_event`): `Box` DRAFT→SEALED→SHIPPED (+REJECTED),
+`Pallet` OPEN→CLOSED→SHIPPED, `Shipment` OPEN→CLOSED→SHIPPED.
+
+## Roles
+
+- **`users.role`** (del boilerplate) gobierna las secciones: `user` → `/dashboard`,
+  `superadmin` → `/studio`, y las rutas públicas sin login.
+- **`center_role`** controla qué ve cada usuario dentro de `/dashboard`:
+  - `volunteer` — intake, cajas, etiquetas (su centro)
+  - `coordinator` — + tarimas, envíos, manifiestos, gestión de su centro
+  - `national_admin` — agregado nacional, centros/campañas, usuarios, auditoría (`center_id = NULL`)
 
 ## Project Structure
 
@@ -45,20 +90,27 @@
 │   ├── Dockerfile
 │   └── requirements.txt
 ├── frontend/
+│   ├── app/                  # Next.js App Router — [lang]/ (público ES/EN i18n),
+│   │                         #   dashboard/, studio/, sitemap.ts, robots.ts, manifest.ts
+│   ├── public/               # Estáticos + llms.txt / llms-full.txt + key IndexNow
 │   └── src/
-│       ├── app/              # Next.js App Router pages
 │       ├── components/       # Shared UI components
-│       ├── lib/
-│       │   ├── actions.ts    # Server actions ("use server")
-│       │   └── api.ts        # apiFetch typed helper
+│       ├── lib/              # actions.ts, api.ts, routes.ts (i18n), seo.ts,
+│       │                     #   structured-data.ts, scenarios.ts, changelog.ts, …
+│       ├── content/          # Copy legal (privacy/terms) por idioma
+│       ├── dictionaries/     # i18n (es.json / en.json)
 │       └── types/            # Shared TypeScript interfaces
 ├── .github/
 │   ├── dependabot.yml        # Grouped weekly dep updates (npm + pip + actions)
 │   └── workflows/
-│       └── security-scan.yml # npm audit + pip-audit on every push/PR
+│       └── security-scan.yml # npm/pip audit — bloquea solo si el PR cambia deps
+├── docs/
+│   ├── roadmap/              # Roadmap por fases (fuente de verdad del avance)
+│   ├── integrations/         # Guías portables (p. ej. Resend deliverability)
+│   ├── seo-maintenance.md    # Runbook de mantenimiento SEO/AEO
+│   └── optional-layers.md    # Capas opcionales del boilerplate
 ├── docker-compose.yml        # Local dev: db + redis + backend + worker + frontend
-├── .env.example              # All env vars documented
-└── ROADMAP.md                # Project roadmap template
+└── .env.example              # All env vars documented
 ```
 
 ## Getting Started
@@ -120,8 +172,12 @@ See `.env.example` for all variables with descriptions.
 | `INTERNAL_API_SECRET` | Shared secret for server-to-server endpoints |
 | `ADMIN_ALLOWED_IPS` | Comma-separated IPs for admin routes (empty = open) |
 | `CLOUDFLARE_ONLY` | `true` to block requests not proxied through Cloudflare |
+| `CLOUDFLARE_SHARED_SECRET` | Header secret paired with a Cloudflare Transform Rule (required if `CLOUDFLARE_ONLY`) |
 | `GOOGLE_SAFE_BROWSING_API_KEY` | URL reputation checks in `url_security` (optional) |
 | `RESEND_API_KEY` | Resend API key for transactional email (optional) |
+| `RESEND_WEBHOOK_SECRET` | Svix signing secret for the Resend webhook (email deliverability view) |
+| `MAIL_FROM` / `MAIL_FROM_NAME` | Sender address + name for transactional email |
+| `INDEXNOW_KEY` | IndexNow token (Bing instant indexing). Must equal `frontend/public/<key>.txt` |
 | `SENTRY_DSN` | Sentry DSN — backend error tracking (optional) |
 | `SLACK_BOT_TOKEN` | Slack Bot OAuth token `xoxb-...` (optional) |
 
@@ -132,6 +188,7 @@ See `.env.example` for all variables with descriptions.
 | `NEXTAUTH_SECRET` | NextAuth signing secret |
 | `API_URL` | FastAPI base URL — server-side calls |
 | `NEXT_PUBLIC_API_URL` | FastAPI base URL — client-side calls |
+| `NEXT_PUBLIC_SITE_URL` | Canonical public host (`https://www.araguaney.lat`) — drives canonicals, sitemap, robots, hreflang |
 | `INTERNAL_API_SECRET` | Same value as backend |
 
 ## Database Migrations
@@ -156,6 +213,32 @@ alembic downgrade -1
 | Database | Railway PostgreSQL addon | Auto-injects `DATABASE_URL` |
 
 ## What's included
+
+**Dominio (Araguaney)**
+- Intake de donaciones por ítem con validación en recepción (caducidad, reglas OMS de
+  medicamentos, bloqueo de controlados) — rechazo en el momento del registro
+- Caja **homogénea** garantizada por esquema (1 producto + 1 lote + 1 caducidad) con QR + etiqueta
+- Tarimas y envíos con **manifiesto / packing list exportable** (PDF/XLSX, encolado en ARQ)
+- **Panel nacional agregado** — stock de todos los centros en tiempo real (un `GROUP BY`)
+- **Transferencias** entre centros · **mensajería** entre usuarios · **reportes** de campaña
+- **Auto-registro de centros** con aprobación (invitación por email, cambio de contraseña forzado)
+- **Deliverability de emails** — webhook de Resend (bounces/quejas) + panel de reenvío
+- Catálogos de referencia (WHO/OMS, IFRC/ICRC, IOM, UNSPSC, GS1) para clasificar el inventario
+
+**Public site & SEO/AEO**
+- Sitio público **bilingüe (ES/EN)** con locale por URL (ES sin prefijo, EN con `/en/...`,
+  slugs traducidos vía `src/lib/routes.ts`) + `hreflang`/canonical
+- Pilares, guías, glosario, `/necesidades` ("qué falta"), landings por **escenario**
+  (`/escenarios/[scenario]`) y por **categoría**, hub `/preguntas-frecuentes`, changelog
+  `/novedades`, `/nosotros`, landing de México (COFEPRIS/SAT)
+- `sitemap.ts` + `robots.ts` (declara crawlers de IA) + `llms.txt` / `llms-full.txt`
+- Structured data (schema.org): `Organization` (con `sameAs`/founder), `SoftwareApplication`,
+  `Article`/`HowTo`/`FAQPage`/`BreadcrumbList`/`Event`, `speakable` — en `src/lib/structured-data.ts`
+- **IndexNow** on-publish: al crear una campaña pública, el backend pinguea Bing (grounding de
+  ChatGPT/Copilot) — ver `app/utils/indexnow.py`
+- Señales de frescura (`dateModified` + fecha visible en guías) y bylines E-E-A-T
+- Host canónico único (`www`), Google Search Console + Bing Webmaster verificados
+- Mantenimiento recurrente: [`docs/seo-maintenance.md`](docs/seo-maintenance.md)
 
 **Auth**
 - JWT auth with token denylist (logout revocation)
