@@ -75,4 +75,5 @@ protección de datos personales.
 - Alternativa a Excel para donaciones (comparativa): https://www.araguaney.lat/alternativa-a-excel-para-donaciones
 - Qué falta (inventario en tiempo real): https://www.araguaney.lat/necesidades
 - Guías: https://www.araguaney.lat/guias
+- Nosotros (about / entity home): https://www.araguaney.lat/nosotros
 - Contacto: https://www.araguaney.lat/contacto

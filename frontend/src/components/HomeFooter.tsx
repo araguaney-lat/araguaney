@@ -1,6 +1,7 @@
 import Image from "next/image"
 import Link from "next/link"
 import type { Dictionary, Locale } from "@/lib/i18n"
+import { localizedPath } from "@/lib/routes"
 
 const LOGO =
   "https://res.cloudinary.com/dtvdqlxtd/image/upload/v1782794310/image_degkq9.png"
@@ -52,6 +53,10 @@ export default function HomeFooter({ dict, locale = "es" }: Props) {
       <div className="flex flex-col gap-2 md:items-end" style={{ maxWidth: 420 }}>
         <div style={{ fontSize: 12, color: "#A89E8C", lineHeight: 1.55 }}>{dict.privacy}</div>
         <div className="flex items-center gap-4">
+          <Link href={localizedPath("nosotros", locale)} style={{ fontSize: 12.5, color: "#E9E2D5", fontWeight: 600 }}>
+            {locale === "es" ? "Nosotros" : "About"}
+          </Link>
+          <span style={{ color: "#5C5347" }}>·</span>
           <Link href={legal.privacy} style={{ fontSize: 12.5, color: "#E9E2D5", fontWeight: 600 }}>
             {dict.privacyLink}
           </Link>

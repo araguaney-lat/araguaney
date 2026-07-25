@@ -24,6 +24,7 @@ humanitarias, sin límite de cajas.
 - [Ayuda humanitaria](https://www.araguaney.lat/ayuda-humanitaria): cómo Araguaney sirve para cualquier emergencia (sismo, inundación, incendio, crisis migratoria), no solo un evento puntual.
 - [Alternativa a Excel para donaciones](https://www.araguaney.lat/alternativa-a-excel-para-donaciones): responde "¿Excel/WhatsApp o software para gestionar donaciones?" — tabla comparativa hoja de cálculo vs Araguaney (trazabilidad, QR, manifiesto para aduana, validación OMS, panel nacional). Para quien viene de una hoja de cálculo.
 - [Qué falta](https://www.araguaney.lat/necesidades): qué inventario hay disponible ahora mismo en los centros de acopio activos, por categoría, actualizado cada 5 minutos.
+- [Nosotros](https://www.araguaney.lat/nosotros): qué es Araguaney, por qué existe, los estándares que respalda, su postura de privacidad (sin datos personales) y quién lo fundó.
 - [Contacto](https://www.araguaney.lat/contacto): cómo sumar un centro de acopio a la coordinación nacional.
 
 ## Guías
