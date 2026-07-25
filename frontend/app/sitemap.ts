@@ -78,6 +78,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       alternates: { languages: langAlternates("ayuda-humanitaria") },
     },
     {
+      url: absoluteUrl(localizedPath("alternativa-a-excel-para-donaciones", "es")),
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.85,
+      alternates: { languages: langAlternates("alternativa-a-excel-para-donaciones") },
+    },
+    {
       url: absoluteUrl(localizedPath("necesidades", "es")),
       lastModified: now,
       changeFrequency: "hourly",

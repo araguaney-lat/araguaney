@@ -163,6 +163,8 @@ export const config = {
     "/register-center/:path*",
     "/ayuda-humanitaria",
     "/humanitarian-aid",
+    "/alternativa-a-excel-para-donaciones",
+    "/donation-spreadsheet-alternative",
     "/como-funciona",
     "/how-it-works",
     "/aviso-de-privacidad",

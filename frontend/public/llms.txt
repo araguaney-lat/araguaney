@@ -19,6 +19,7 @@ no solo un evento específico.
 - [Cómo funciona](https://www.araguaney.lat/como-funciona): el flujo completo del acopio al envío (recepción, caja, tarima, envío, manifiesto), la trazabilidad y las reglas de calidad.
 - [Qué es un centro de acopio](https://www.araguaney.lat/centro-de-acopio): el estándar completo de registro, empaque y envío.
 - [Ayuda humanitaria](https://www.araguaney.lat/ayuda-humanitaria): cómo funciona Araguaney para cualquier emergencia.
+- [Alternativa a Excel para donaciones](https://www.araguaney.lat/alternativa-a-excel-para-donaciones): comparativa entre la hoja de cálculo / WhatsApp y Araguaney (trazabilidad, QR, manifiesto, validación OMS, panel nacional).
 - [Qué falta](https://www.araguaney.lat/necesidades): inventario disponible en los centros de acopio activos, actualizado cada 5 minutos.
 - [Contacto](https://www.araguaney.lat/contacto): sumar un centro de acopio a la coordinación nacional.
 

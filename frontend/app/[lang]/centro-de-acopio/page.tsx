@@ -44,6 +44,7 @@ interface Content {
   crossHumanitarianHref: string
   crossGuideLink: string
   crossGuideHref: string
+  crossCompareLink: string
   crumbHome: string
   crumbSelf: string
 }
@@ -85,6 +86,7 @@ const CONTENT: Record<Locale, Content> = {
     crossHumanitarianHref: "/ayuda-humanitaria",
     crossGuideLink: "Guía: cómo organizar un centro de acopio →",
     crossGuideHref: "/guias/como-organizar-un-centro-de-acopio",
+    crossCompareLink: "¿Usas Excel? Compara la hoja de cálculo con Araguaney →",
     crumbHome: "Inicio",
     crumbSelf: "Centro de acopio",
   },
@@ -124,6 +126,7 @@ const CONTENT: Record<Locale, Content> = {
     crossHumanitarianHref: "/humanitarian-aid",
     crossGuideLink: "Guide: how to organize a collection center →",
     crossGuideHref: "/guias/como-organizar-un-centro-de-acopio",
+    crossCompareLink: "On Excel? Compare the spreadsheet with Araguaney →",
     crumbHome: "Home",
     crumbSelf: "Collection center",
   },
@@ -265,9 +268,14 @@ export default async function CollectionCenterPage({
               {c.crossHumanitarianLink}
             </Link>
           </p>
-          <p className="text-[13.5px]" style={{ color: "#6E6557" }}>
+          <p className="text-[13.5px] mb-2" style={{ color: "#6E6557" }}>
             <Link href={c.crossGuideHref} style={{ color: "#1F5E8C", fontWeight: 600 }}>
               {c.crossGuideLink}
+            </Link>
+          </p>
+          <p className="text-[13.5px]" style={{ color: "#6E6557" }}>
+            <Link href={localizedPath("alternativa-a-excel-para-donaciones", locale)} style={{ color: "#1F5E8C", fontWeight: 600 }}>
+              {c.crossCompareLink}
             </Link>
           </p>
         </div>
