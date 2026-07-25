@@ -6,6 +6,8 @@
 > manifiesto exportable, y agrega el stock de todos los centros en un panel
 > nacional en tiempo real.
 
+> Última actualización: 2026-07-24.
+
 ## Qué problema resuelve
 
 Cuando ocurre un desastre (sismo, inundación, incendio, crisis migratoria),
