@@ -6,7 +6,7 @@ import { CtaLink } from "@/components/CtaLink"
 import { Breadcrumbs } from "@/components/Breadcrumbs"
 import { getDictionary } from "@/lib/i18n"
 import { ogImageUrl, alternates } from "@/lib/seo"
-import { CONTENT_DATES, formatContentDate, updatedLabel } from "@/lib/content-dates"
+import { CONTENT_DATES, formatContentDate, updatedLabel, authorByline } from "@/lib/content-dates"
 import { type Locale, localizedPath } from "@/lib/routes"
 import { JsonLd } from "@/components/JsonLd"
 import { articleSchema, howToSchema, breadcrumbSchema } from "@/lib/structured-data"
@@ -242,6 +242,10 @@ export default async function AduanaGuidePage({
 
             {dates && (
               <p className="text-[12.5px] mb-6" style={{ color: "#8A8073" }}>
+                <Link href={localizedPath("nosotros", locale)} style={{ color: "#906400", fontWeight: 600 }}>
+                  {authorByline(locale)}
+                </Link>
+                {" · "}
                 {updatedLabel(locale)} {formatContentDate(dates.modified, locale)}
               </p>
             )}
