@@ -6,6 +6,7 @@ import { CtaLink } from "@/components/CtaLink"
 import { Breadcrumbs } from "@/components/Breadcrumbs"
 import { getDictionary } from "@/lib/i18n"
 import { ogImageUrl, alternates } from "@/lib/seo"
+import { CONTENT_DATES, formatContentDate, updatedLabel } from "@/lib/content-dates"
 import { type Locale, localizedPath } from "@/lib/routes"
 import { JsonLd } from "@/components/JsonLd"
 import { articleSchema, howToSchema, breadcrumbSchema } from "@/lib/structured-data"
@@ -177,9 +178,25 @@ export default async function AduanaGuidePage({
     { name: c.title, path: selfPath },
   ]
 
+  const dates = CONTENT_DATES[KEY]
   const structuredData = [
-    articleSchema({ title: c.title, description: c.description, path: selfPath, locale }),
-    howToSchema({ name: c.title, description: c.description, path: selfPath, steps: c.steps, locale }),
+    articleSchema({
+      title: c.title,
+      description: c.description,
+      path: selfPath,
+      locale,
+      datePublished: dates?.published,
+      dateModified: dates?.modified,
+    }),
+    howToSchema({
+      name: c.title,
+      description: c.description,
+      path: selfPath,
+      steps: c.steps,
+      locale,
+      datePublished: dates?.published,
+      dateModified: dates?.modified,
+    }),
     breadcrumbSchema(crumbs),
   ]
 
@@ -222,6 +239,12 @@ export default async function AduanaGuidePage({
             >
               {c.title}
             </h1>
+
+            {dates && (
+              <p className="text-[12.5px] mb-6" style={{ color: "#8A8073" }}>
+                {updatedLabel(locale)} {formatContentDate(dates.modified, locale)}
+              </p>
+            )}
 
             <p className="text-[15px] md:text-[17px] mb-8" style={{ color: "#5C5347", lineHeight: 1.65 }}>
               {c.heroP}

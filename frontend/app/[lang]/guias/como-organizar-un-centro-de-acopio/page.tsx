@@ -6,6 +6,7 @@ import { JsonLd } from "@/components/JsonLd"
 import { Breadcrumbs } from "@/components/Breadcrumbs"
 import { getDictionary } from "@/lib/i18n"
 import { ogImageUrl, alternates } from "@/lib/seo"
+import { CONTENT_DATES, formatContentDate, updatedLabel } from "@/lib/content-dates"
 import { type Locale, localizedPath } from "@/lib/routes"
 import {
   articleSchema,
@@ -238,14 +239,24 @@ export default async function ComoOrganizarGuidePage({
     { name: c.metaTitle, path: localizedPath(KEY, locale) },
   ]
 
+  const dates = CONTENT_DATES[KEY]
   const structuredData = [
-    articleSchema({ title: c.metaTitle, description: c.description, path: localizedPath(KEY, locale), locale }),
+    articleSchema({
+      title: c.metaTitle,
+      description: c.description,
+      path: localizedPath(KEY, locale),
+      locale,
+      datePublished: dates?.published,
+      dateModified: dates?.modified,
+    }),
     howToSchema({
       name: c.metaTitle,
       description: c.description,
       path: localizedPath(KEY, locale),
       steps: c.howToSteps,
       locale,
+      datePublished: dates?.published,
+      dateModified: dates?.modified,
     }),
     faqSchema(c.faq),
     breadcrumbSchema(crumbs),
@@ -290,6 +301,12 @@ export default async function ComoOrganizarGuidePage({
             >
               {c.h1}
             </h1>
+
+            {dates && (
+              <p className="text-[12.5px] mb-6" style={{ color: "#8A8073" }}>
+                {updatedLabel(locale)} {formatContentDate(dates.modified, locale)}
+              </p>
+            )}
 
             <p className="text-[15px] md:text-[17px] mb-8" style={{ color: "#5C5347", lineHeight: 1.65 }}>
               {c.intro}

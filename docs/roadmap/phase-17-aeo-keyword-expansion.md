@@ -127,7 +127,7 @@ intención **comercial/comparativa** (fondo de embudo — donde la IA ama tablas
 
 | # | Tarea | Descripción | Prioridad | Estado |
 |---|-------|-------------|-----------|--------|
-| 15 | `dateModified` + fecha visible + cadencia de refresco | `datePublished`/`dateModified` en `Article`/`HowTo` y fecha "Actualizado" visible en guías. Definir refresco trimestral (frescura = 3x citas de IA). | 🟠 | ⬜ |
+| 15 | `dateModified` + fecha visible + cadencia de refresco | `datePublished`/`dateModified` en `Article`/`HowTo` y fecha "Actualizado" visible en guías. Definir refresco trimestral (frescura = 3x citas de IA). | 🟠 | ✅ Done — fuente única `src/lib/content-dates.ts` (`CONTENT_DATES` por `RouteKey` + `formatContentDate`/`updatedLabel`); builders `articleSchema`/`howToSchema` aceptan y emiten `datePublished`/`dateModified`; las **6 guías** emiten ambas fechas y muestran "Actualizado {fecha}" (ES) / "Updated {date}" (EN) bajo el H1. Cadencia: bumpear `modified` al refrescar contenido, **trimestral** (documentado en `content-dates.ts`). Verificado con build + server: fecha visible ES/EN + `datePublished 2026-07-21`/`dateModified 2026-07-24` en el JSON-LD. |
 | 16 | Changelog público `/novedades` | Notas de producto públicas — señal de frescura recurrente + captura de keywords de features. | 🟢 | ⬜ |
 | 17 | Video demo + `VideoObject` | Video corto del flujo acopio→envío (YouTube embebido) con `VideoObject` schema. La IA cita cada vez más contenido en video. | 🟢 | ⬜ |
 | 18 | `speakable` schema | Marcar respuestas/FAQ con `speakable` para asistentes de voz. Bajo costo, complementa el Cluster H. | 🟢 | ⬜ |
