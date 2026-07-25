@@ -7,7 +7,7 @@ import { FaqSection } from "@/components/FaqSection"
 import { Breadcrumbs } from "@/components/Breadcrumbs"
 import { getDictionary } from "@/lib/i18n"
 import { ogImageUrl, alternates } from "@/lib/seo"
-import { type Locale, localizedPath } from "@/lib/routes"
+import { type Locale, type RouteKey, localizedPath } from "@/lib/routes"
 import { JsonLd } from "@/components/JsonLd"
 import { faqSchema, breadcrumbSchema } from "@/lib/structured-data"
 
@@ -17,6 +17,7 @@ interface Scenario {
   icon: string
   title: string
   desc: string
+  routeKey: RouteKey
 }
 interface Faq {
   q: string
@@ -66,10 +67,10 @@ const CONTENT: Record<Locale, Content> = {
     heroCta: "Empezar ahora",
     scenariosH2: "Diseñado para cualquier escenario",
     scenarios: [
-      { icon: "🌎", title: "Sismos", desc: "Coordina la recepción y envío de suministros entre centros tras un terremoto." },
-      { icon: "🌊", title: "Inundaciones", desc: "Registra y clasifica donaciones a medida que llegan desde múltiples puntos de acopio." },
-      { icon: "🧳", title: "Crisis migratorias", desc: "Estandariza el inventario de ayuda para poblaciones desplazadas en tránsito." },
-      { icon: "🔥", title: "Incendios", desc: "Organiza la respuesta rápida sin perder trazabilidad de lo que se dona y envía." },
+      { icon: "🌎", title: "Sismos", desc: "Coordina la recepción y envío de suministros entre centros tras un terremoto.", routeKey: "escenarios/sismo" },
+      { icon: "🌊", title: "Inundaciones", desc: "Registra y clasifica donaciones a medida que llegan desde múltiples puntos de acopio.", routeKey: "escenarios/inundaciones" },
+      { icon: "🧳", title: "Crisis migratorias", desc: "Estandariza el inventario de ayuda para poblaciones desplazadas en tránsito.", routeKey: "escenarios/crisis-migratoria" },
+      { icon: "🔥", title: "Incendios", desc: "Organiza la respuesta rápida sin perder trazabilidad de lo que se dona y envía.", routeKey: "escenarios/incendios" },
     ],
     standardH2: "Un mismo estándar, cualquier emergencia",
     standardP:
@@ -107,10 +108,10 @@ const CONTENT: Record<Locale, Content> = {
     heroCta: "Get started",
     scenariosH2: "Built for any scenario",
     scenarios: [
-      { icon: "🌎", title: "Earthquakes", desc: "Coordinate intake and shipments across centers after a seismic event." },
-      { icon: "🌊", title: "Floods", desc: "Register and classify donations as they arrive from multiple collection points." },
-      { icon: "🧳", title: "Migration crises", desc: "Standardize aid inventory for displaced populations in transit." },
-      { icon: "🔥", title: "Fires", desc: "Organize a fast response without losing traceability of what's donated and shipped." },
+      { icon: "🌎", title: "Earthquakes", desc: "Coordinate intake and shipments across centers after a seismic event.", routeKey: "escenarios/sismo" },
+      { icon: "🌊", title: "Floods", desc: "Register and classify donations as they arrive from multiple collection points.", routeKey: "escenarios/inundaciones" },
+      { icon: "🧳", title: "Migration crises", desc: "Standardize aid inventory for displaced populations in transit.", routeKey: "escenarios/crisis-migratoria" },
+      { icon: "🔥", title: "Fires", desc: "Organize a fast response without losing traceability of what's donated and shipped.", routeKey: "escenarios/incendios" },
     ],
     standardH2: "One standard, any emergency",
     standardP:
@@ -220,17 +221,17 @@ export default async function AyudaHumanitariaPage({
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
               {c.scenarios.map((item) => (
-                <div key={item.title} className="flex gap-4 items-start p-5" style={{ border: "1px solid #EEE6D4", borderRadius: 14, background: "#FCFAF4" }}>
+                <Link key={item.title} href={localizedPath(item.routeKey, locale)} className="flex gap-4 items-start p-5" style={{ border: "1px solid #EEE6D4", borderRadius: 14, background: "#FCFAF4" }}>
                   <span className="text-[26px] flex-none leading-none mt-0.5">{item.icon}</span>
                   <div>
-                    <h3 className="text-[15px] md:text-[16px] mb-1.5" style={{ fontFamily: "var(--font-source-serif)", fontWeight: 600, color: "#2B2723", margin: "0 0 6px" }}>
-                      {item.title}
+                    <h3 className="text-[15px] md:text-[16px] mb-1.5" style={{ fontFamily: "var(--font-source-serif)", fontWeight: 600, color: "#1F5E8C", margin: "0 0 6px" }}>
+                      {item.title} →
                     </h3>
                     <p className="text-[13px] md:text-[14px]" style={{ margin: 0, color: "#6E6557", lineHeight: 1.55 }}>
                       {item.desc}
                     </p>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           </div>
