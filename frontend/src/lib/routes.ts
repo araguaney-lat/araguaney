@@ -33,6 +33,7 @@ export const ROUTE_SLUGS: Record<string, Record<Locale, string>> = {
   "nosotros": { es: "nosotros", en: "about" },
   "centro-de-acopio-mexico": { es: "centro-de-acopio-mexico", en: "collection-center-mexico" },
   "preguntas-frecuentes": { es: "preguntas-frecuentes", en: "faq" },
+  "novedades": { es: "novedades", en: "whats-new" },
   "aviso-de-privacidad": { es: "aviso-de-privacidad", en: "privacy" },
   "terminos": { es: "terminos", en: "terms" },
   "contacto": { es: "contacto", en: "contact" },

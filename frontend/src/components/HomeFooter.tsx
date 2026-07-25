@@ -61,6 +61,10 @@ export default function HomeFooter({ dict, locale = "es" }: Props) {
             {locale === "es" ? "Preguntas frecuentes" : "FAQ"}
           </Link>
           <span style={{ color: "#5C5347" }}>·</span>
+          <Link href={localizedPath("novedades", locale)} style={{ fontSize: 12.5, color: "#E9E2D5", fontWeight: 600 }}>
+            {locale === "es" ? "Novedades" : "What's new"}
+          </Link>
+          <span style={{ color: "#5C5347" }}>·</span>
           <Link href={legal.privacy} style={{ fontSize: 12.5, color: "#E9E2D5", fontWeight: 600 }}>
             {dict.privacyLink}
           </Link>

@@ -27,6 +27,7 @@ humanitarias, sin límite de cajas.
 - [Nosotros](https://www.araguaney.lat/nosotros): qué es Araguaney, por qué existe, los estándares que respalda, su postura de privacidad (sin datos personales) y quién lo fundó.
 - [Preguntas frecuentes](https://www.araguaney.lat/preguntas-frecuentes): respuestas directas sobre producto, donaciones y reglas, operación (acopio→envío) y privacidad. Formato pregunta-respuesta.
 - [Centro de acopio en México](https://www.araguaney.lat/centro-de-acopio-mexico): montar un centro de acopio en México — identificación de medicamentos (COFEPRIS), aduana e importación humanitaria (SAT), y cómo Araguaney ayuda a cumplir.
+- [Novedades](https://www.araguaney.lat/novedades): changelog público con las últimas mejoras del producto (panel nacional, manifiesto, transferencias, mensajería, reportes y más).
 - [Contacto](https://www.araguaney.lat/contacto): cómo sumar un centro de acopio a la coordinación nacional.
 
 ## Guías
