@@ -44,6 +44,12 @@ class Settings(BaseSettings):
     # disables webhook processing (endpoint returns 503).
     resend_webhook_secret: str = ""
 
+    # ── IndexNow (Bing/Yandex instant indexing) ───────────────────────────────
+    # Public token — NOT a secret. Must match the key file served at
+    # {frontend_url}/{indexnow_key}.txt (see frontend/public/). Empty disables
+    # pinging (no-op). See Fase 17 task 2.
+    indexnow_key: str = ""
+
     # ── Trusted proxy IPs ─────────────────────────────────────────────────────
     # Set to "*" on Railway (all traffic passes through Railway's proxy)
     trusted_proxy_ips: str = "127.0.0.1"

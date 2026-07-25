@@ -133,6 +133,11 @@ async def send_center_application_admin_notice_task(ctx, application_id: str) ->
     await asyncio.to_thread(_send_admin_notice, application_id)
 
 
+async def submit_indexnow_task(ctx, path: str) -> None:
+    from app.utils.indexnow import submit_url
+    await submit_url(path)
+
+
 async def generate_shipment_manifest_pdf_task(ctx, job_id: str) -> None:
     from app.services.export_generation import run_export_job
     await asyncio.to_thread(run_export_job, job_id)
@@ -229,9 +234,11 @@ def _build_fallbacks() -> dict:
         send_center_application_rejected_email,
     )
     from app.services.export_generation import run_export_job
+    from app.utils.indexnow import submit_url
 
     return {
         "notify_slack_task": notify_slack,
+        "submit_indexnow_task": submit_url,
         "send_verification_email_task": send_verification_email,
         "send_password_reset_email_task": send_password_reset_email,
         "send_invitation_email_task": send_invitation_email,
@@ -277,6 +284,7 @@ FALLBACKS = _LazyFallbacks()
 class WorkerSettings:
     functions = [
         notify_slack_task,
+        submit_indexnow_task,
         send_verification_email_task,
         send_password_reset_email_task,
         send_invitation_email_task,

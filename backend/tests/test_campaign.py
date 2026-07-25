@@ -101,3 +101,52 @@ class TestCampaignServiceSlugGeneration:
             service = self._service_with_existing_slugs(MockRepo, existing_slugs=set())
             campaign = service.create(CampaignCreate(name="???"))
             assert campaign.slug == "campana"
+
+
+class TestCampaignServiceIndexNow:
+    """create() pings IndexNow for public campaigns only (Fase 17 task 2)."""
+
+    def _service(self, MockRepo, *, is_active=True, is_general=False) -> CampaignService:
+        repo = MockRepo.return_value
+        repo.slug_exists.return_value = False
+
+        def save(campaign):
+            # Mimic the DB server_default state present after commit.
+            campaign.is_active = is_active
+            campaign.is_general = is_general
+            return campaign
+
+        repo.save.side_effect = save
+        repo.commit.return_value = None
+        return CampaignService(db=MagicMock())
+
+    def test_public_campaign_pings_indexnow(self):
+        with patch("app.services.campaign_service.CampaignRepository") as MockRepo, \
+             patch("app.services.campaign_service.enqueue") as mock_enqueue:
+            service = self._service(MockRepo)
+            bg = MagicMock()
+            campaign = service.create(CampaignCreate(name="Sismo MX"), bg)
+            mock_enqueue.assert_called_once_with(
+                bg, "submit_indexnow_task", f"/eventos/{campaign.slug}"
+            )
+
+    def test_general_campaign_does_not_ping(self):
+        with patch("app.services.campaign_service.CampaignRepository") as MockRepo, \
+             patch("app.services.campaign_service.enqueue") as mock_enqueue:
+            service = self._service(MockRepo, is_general=True)
+            service.create(CampaignCreate(name="Donaciones Generales"), MagicMock())
+            mock_enqueue.assert_not_called()
+
+    def test_inactive_campaign_does_not_ping(self):
+        with patch("app.services.campaign_service.CampaignRepository") as MockRepo, \
+             patch("app.services.campaign_service.enqueue") as mock_enqueue:
+            service = self._service(MockRepo, is_active=False)
+            service.create(CampaignCreate(name="Borrador"), MagicMock())
+            mock_enqueue.assert_not_called()
+
+    def test_no_background_tasks_does_not_ping(self):
+        with patch("app.services.campaign_service.CampaignRepository") as MockRepo, \
+             patch("app.services.campaign_service.enqueue") as mock_enqueue:
+            service = self._service(MockRepo)
+            service.create(CampaignCreate(name="Sin background"))
+            mock_enqueue.assert_not_called()
