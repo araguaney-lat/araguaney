@@ -68,9 +68,18 @@ interface ArticleInput {
   description: string
   path: string
   locale: Locale
+  datePublished?: string
+  dateModified?: string
 }
 
-export function articleSchema({ title, description, path, locale }: ArticleInput): Schema {
+export function articleSchema({
+  title,
+  description,
+  path,
+  locale,
+  datePublished,
+  dateModified,
+}: ArticleInput): Schema {
   const url = absoluteUrl(path)
   return {
     "@context": "https://schema.org",
@@ -84,6 +93,9 @@ export function articleSchema({ title, description, path, locale }: ArticleInput
     image: DEFAULT_OG_IMAGE,
     author: PUBLISHER,
     publisher: PUBLISHER,
+    // Freshness signals — Google shows them and AI engines weight recency.
+    ...(datePublished ? { datePublished } : {}),
+    ...(dateModified ? { dateModified } : {}),
   }
 }
 
@@ -98,9 +110,19 @@ interface HowToInput {
   path: string
   steps: readonly HowToStep[]
   locale: Locale
+  datePublished?: string
+  dateModified?: string
 }
 
-export function howToSchema({ name, description, path, steps, locale }: HowToInput): Schema {
+export function howToSchema({
+  name,
+  description,
+  path,
+  steps,
+  locale,
+  datePublished,
+  dateModified,
+}: HowToInput): Schema {
   return {
     "@context": "https://schema.org",
     "@type": "HowTo",
@@ -114,6 +136,8 @@ export function howToSchema({ name, description, path, steps, locale }: HowToInp
       name: step.name,
       text: step.text,
     })),
+    ...(datePublished ? { datePublished } : {}),
+    ...(dateModified ? { dateModified } : {}),
   }
 }
 

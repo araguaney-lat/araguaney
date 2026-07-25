@@ -5,6 +5,7 @@ import HomeFooter from "@/components/HomeFooter"
 import { CtaLink } from "@/components/CtaLink"
 import { getDictionary } from "@/lib/i18n"
 import { ogImageUrl, alternates } from "@/lib/seo"
+import { CONTENT_DATES, formatContentDate, updatedLabel } from "@/lib/content-dates"
 import { Breadcrumbs } from "@/components/Breadcrumbs"
 import { type Locale, localizedPath } from "@/lib/routes"
 import { JsonLd } from "@/components/JsonLd"
@@ -149,9 +150,25 @@ export default async function VoluntariosGuidePage({
     { name: c.metaTitle, path },
   ]
 
+  const dates = CONTENT_DATES[KEY]
   const structuredData = [
-    articleSchema({ title: c.metaTitle, description: c.description, path, locale }),
-    howToSchema({ name: c.metaTitle, description: c.description, path, steps: c.steps, locale }),
+    articleSchema({
+      title: c.metaTitle,
+      description: c.description,
+      path,
+      locale,
+      datePublished: dates?.published,
+      dateModified: dates?.modified,
+    }),
+    howToSchema({
+      name: c.metaTitle,
+      description: c.description,
+      path,
+      steps: c.steps,
+      locale,
+      datePublished: dates?.published,
+      dateModified: dates?.modified,
+    }),
     breadcrumbSchema(crumbs),
   ]
 
@@ -194,6 +211,12 @@ export default async function VoluntariosGuidePage({
             >
               {c.h1}
             </h1>
+
+            {dates && (
+              <p className="text-[12.5px] mb-6" style={{ color: "#8A8073" }}>
+                {updatedLabel(locale)} {formatContentDate(dates.modified, locale)}
+              </p>
+            )}
 
             <p className="text-[15px] md:text-[17px] mb-8" style={{ color: "#5C5347", lineHeight: 1.65 }}>
               {c.intro}
