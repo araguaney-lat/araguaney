@@ -76,4 +76,5 @@ protección de datos personales.
 - Qué falta (inventario en tiempo real): https://www.araguaney.lat/necesidades
 - Guías: https://www.araguaney.lat/guias
 - Nosotros (about / entity home): https://www.araguaney.lat/nosotros
+- Preguntas frecuentes: https://www.araguaney.lat/preguntas-frecuentes
 - Contacto: https://www.araguaney.lat/contacto
