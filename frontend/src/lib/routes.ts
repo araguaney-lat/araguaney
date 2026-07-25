@@ -25,6 +25,10 @@ export const ROUTE_SLUGS: Record<string, Record<Locale, string>> = {
     en: "register-center/confirm",
   },
   "ayuda-humanitaria": { es: "ayuda-humanitaria", en: "humanitarian-aid" },
+  "alternativa-a-excel-para-donaciones": {
+    es: "alternativa-a-excel-para-donaciones",
+    en: "donation-spreadsheet-alternative",
+  },
   "como-funciona": { es: "como-funciona", en: "how-it-works" },
   "aviso-de-privacidad": { es: "aviso-de-privacidad", en: "privacy" },
   "terminos": { es: "terminos", en: "terms" },

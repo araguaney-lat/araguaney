@@ -37,6 +37,7 @@ interface Content {
   ctaHeading: string
   ctaStart: string
   ctaStandard: string
+  relatedCompare: string
   crumbHome: string
   crumbGuides: string
 }
@@ -73,6 +74,7 @@ const CONTENT: Record<Locale, Content> = {
     ctaHeading: "Empieza a gestionar tus donaciones con Araguaney, gratis",
     ctaStart: "Empezar ahora",
     ctaStandard: "Ver el estándar completo",
+    relatedCompare: "¿Vienes de una hoja de cálculo? Mira Excel vs Araguaney lado a lado →",
     crumbHome: "Inicio",
     crumbGuides: "Guías",
   },
@@ -107,6 +109,7 @@ const CONTENT: Record<Locale, Content> = {
     ctaHeading: "Start managing your donations with Araguaney, free",
     ctaStart: "Get started now",
     ctaStandard: "See the full standard",
+    relatedCompare: "Coming from a spreadsheet? See Spreadsheet vs Araguaney side by side →",
     crumbHome: "Home",
     crumbGuides: "Guides",
   },
@@ -235,6 +238,15 @@ export default async function SoftwareGratisGuidePage({
                 </Link>
               </div>
             </div>
+
+            <p className="mt-6 text-[13.5px] text-center" style={{ color: "#6E6557" }}>
+              <Link
+                href={localizedPath("alternativa-a-excel-para-donaciones", locale)}
+                style={{ color: "#1F5E8C", fontWeight: 600 }}
+              >
+                {c.relatedCompare}
+              </Link>
+            </p>
           </div>
         </article>
 

@@ -70,6 +70,7 @@ protección de datos personales.
 - Inicio: https://www.araguaney.lat/
 - Qué es un centro de acopio: https://www.araguaney.lat/centro-de-acopio
 - Ayuda humanitaria: https://www.araguaney.lat/ayuda-humanitaria
+- Alternativa a Excel para donaciones (comparativa): https://www.araguaney.lat/alternativa-a-excel-para-donaciones
 - Qué falta (inventario en tiempo real): https://www.araguaney.lat/necesidades
 - Guías: https://www.araguaney.lat/guias
 - Contacto: https://www.araguaney.lat/contacto
