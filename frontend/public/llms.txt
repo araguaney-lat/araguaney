@@ -5,37 +5,40 @@
 > consolidarlas en tarimas y envíos con manifiesto exportable, y ver el stock
 > agregado de todos los centros en tiempo real.
 
+> Última actualización: 2026-07-24.
+
 Araguaney conecta centros de acopio bajo un mismo estándar: registro de
 donaciones por ítem (categoría, lote, caducidad), cajas homogéneas con QR y
 etiqueta, tarimas y envíos con manifiesto/packing list exportable, y un panel
 nacional agregado. Sin datos personales de donantes ni beneficiarios — solo
 inventario, trazable de la caja al envío. Compatible con escenarios de ayuda
 humanitaria en general (sismos, inundaciones, crisis migratorias, incendios),
-no solo un evento específico.
+no solo un evento específico. Gratis para centros de acopio y coordinaciones
+humanitarias, sin límite de cajas.
 
 ## Páginas públicas
 
-- [Inicio](https://www.araguaney.lat/): presentación del producto, cómo funciona y estándares que respalda.
-- [Cómo funciona](https://www.araguaney.lat/como-funciona): el flujo completo del acopio al envío (recepción, caja, tarima, envío, manifiesto), la trazabilidad y las reglas de calidad.
-- [Qué es un centro de acopio](https://www.araguaney.lat/centro-de-acopio): el estándar completo de registro, empaque y envío.
-- [Ayuda humanitaria](https://www.araguaney.lat/ayuda-humanitaria): cómo funciona Araguaney para cualquier emergencia.
-- [Alternativa a Excel para donaciones](https://www.araguaney.lat/alternativa-a-excel-para-donaciones): comparativa entre la hoja de cálculo / WhatsApp y Araguaney (trazabilidad, QR, manifiesto, validación OMS, panel nacional).
-- [Qué falta](https://www.araguaney.lat/necesidades): inventario disponible en los centros de acopio activos, actualizado cada 5 minutos.
-- [Contacto](https://www.araguaney.lat/contacto): sumar un centro de acopio a la coordinación nacional.
+- [Inicio](https://www.araguaney.lat/): qué es Araguaney, cómo funciona el flujo del acopio al envío y qué estándares (WHO, IFRC/ICRC, IOM, UNSPSC, GS1) respalda. Para quien evalúa la plataforma.
+- [Cómo funciona](https://www.araguaney.lat/como-funciona): responde "¿cómo se pasa de una donación suelta a un envío con manifiesto?" — recepción, caja homogénea, tarima, envío, trazabilidad y reglas de calidad, paso a paso.
+- [Qué es un centro de acopio](https://www.araguaney.lat/centro-de-acopio): qué es un centro de acopio y qué software necesita — el estándar de registro por ítem, empaque en cajas con QR y envío con manifiesto. Para coordinadores y voluntarios.
+- [Ayuda humanitaria](https://www.araguaney.lat/ayuda-humanitaria): cómo Araguaney sirve para cualquier emergencia (sismo, inundación, incendio, crisis migratoria), no solo un evento puntual.
+- [Alternativa a Excel para donaciones](https://www.araguaney.lat/alternativa-a-excel-para-donaciones): responde "¿Excel/WhatsApp o software para gestionar donaciones?" — tabla comparativa hoja de cálculo vs Araguaney (trazabilidad, QR, manifiesto para aduana, validación OMS, panel nacional). Para quien viene de una hoja de cálculo.
+- [Qué falta](https://www.araguaney.lat/necesidades): qué inventario hay disponible ahora mismo en los centros de acopio activos, por categoría, actualizado cada 5 minutos.
+- [Contacto](https://www.araguaney.lat/contacto): cómo sumar un centro de acopio a la coordinación nacional.
 
 ## Guías
 
 - [Guías](https://www.araguaney.lat/guias): índice de guías prácticas para operar un centro de acopio.
-- [Cómo organizar un centro de acopio](https://www.araguaney.lat/guias/como-organizar-un-centro-de-acopio): roles, registro por ítem, cajas homogéneas, manifiesto y reglas de rechazo.
-- [Qué se puede donar](https://www.araguaney.lat/guias/que-se-puede-donar): categorías aceptadas, reglas OMS para medicamentos y alimentos, y qué se rechaza.
-- [Cómo preparar carga humanitaria para aduana](https://www.araguaney.lat/guias/como-preparar-carga-humanitaria-para-aduana): qué exige el régimen de envío y qué debe incluir el manifiesto.
+- [Cómo organizar un centro de acopio](https://www.araguaney.lat/guias/como-organizar-un-centro-de-acopio): cómo montar y operar un centro — roles, registro por ítem, cajas homogéneas, manifiesto y reglas de rechazo.
+- [Qué se puede donar](https://www.araguaney.lat/guias/que-se-puede-donar): qué se acepta y qué se rechaza — categorías, reglas OMS de medicamentos (vida útil, controlados) y de alimentos.
+- [Cómo preparar carga humanitaria para aduana](https://www.araguaney.lat/guias/como-preparar-carga-humanitaria-para-aduana): qué exige el régimen de envío y qué debe incluir el manifiesto/packing list para que la carga no se atore.
 - [Cómo registrar y organizar voluntarios](https://www.araguaney.lat/guias/como-registrar-voluntarios-en-un-centro-de-acopio): roles del equipo y por qué cada voluntario opera con su propia cuenta.
-- [Software gratis para gestionar donaciones en una ONG](https://www.araguaney.lat/guias/software-gratis-para-gestionar-donaciones-ong): qué buscar en un software gratuito de donaciones en especie.
-- [Sistema de inventario para damnificados](https://www.araguaney.lat/guias/sistema-de-inventario-para-damnificados): cómo montar un inventario de ayuda que sí sirva en una emergencia.
+- [Software gratis para gestionar donaciones en una ONG](https://www.araguaney.lat/guias/software-gratis-para-gestionar-donaciones-ong): qué buscar en un software gratuito de donaciones en especie (registro por ítem, trazabilidad, manifiesto, agregación entre centros).
+- [Sistema de inventario para damnificados](https://www.araguaney.lat/guias/sistema-de-inventario-para-damnificados): cómo montar un inventario de ayuda que sí sirva durante una emergencia.
 
 ## Glosario
 
-- [Glosario de ayuda humanitaria](https://www.araguaney.lat/glosario): definiciones de los términos clave (caja homogénea, tarima, manifiesto, INN, UNSPSC, GS1, régimen de envío humanitario y más).
+- [Glosario de ayuda humanitaria](https://www.araguaney.lat/glosario): definiciones de los términos clave del dominio (caja homogénea, tarima, manifiesto, INN, UNSPSC, GS1, régimen de envío humanitario y más).
 
 ## Qué se puede donar por categoría
 
