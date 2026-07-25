@@ -78,6 +78,7 @@ protección de datos personales.
 - Nosotros (about / entity home): https://www.araguaney.lat/nosotros
 - Preguntas frecuentes: https://www.araguaney.lat/preguntas-frecuentes
 - Centro de acopio en México (COFEPRIS, aduana SAT): https://www.araguaney.lat/centro-de-acopio-mexico
+- Novedades (changelog): https://www.araguaney.lat/novedades
 - Escenario · Inundaciones: https://www.araguaney.lat/escenarios/inundaciones
 - Escenario · Incendios: https://www.araguaney.lat/escenarios/incendios
 - Escenario · Crisis migratoria: https://www.araguaney.lat/escenarios/crisis-migratoria

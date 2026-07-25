@@ -4,8 +4,8 @@
 
 ```mermaid
 pie title Tareas completadas (351 tareas)
-    "Listas" : 332
-    "Pendientes" : 19
+    "Listas" : 333
+    "Pendientes" : 18
 ```
 
 | Fase | Nombre | Listas | Pendientes | Progreso |
@@ -27,8 +27,8 @@ pie title Tareas completadas (351 tareas)
 | 14 | [Auto-registro de centros con aprobación](phase-14-center-self-registration.md) | 17 | 0 | ✅ 100% |
 | 15 | [Deliverability de emails + aviso de solicitudes](phase-15-email-deliverability.md) | 15 | 0 | ✅ 100% |
 | 16 | [Rediseño de plantillas de email con marca](phase-16-email-brand-redesign.md) | 10 | 0 | ✅ 100% |
-| 17 | [AEO/GEO + expansión de keywords](phase-17-aeo-keyword-expansion.md) | 14 | 7 | 🟡 67% |
-| **Total** | | **332** | **19** | **🟡 95%** |
+| 17 | [AEO/GEO + expansión de keywords](phase-17-aeo-keyword-expansion.md) | 15 | 6 | 🟡 71% |
+| **Total** | | **333** | **18** | **🟡 95%** |
 
 > **Pendientes (33):**
 > - **12 gated por pago/decisión de negocio:** Fase 4 → 2 (spend caps + alertas, requieren plan
@@ -40,8 +40,8 @@ pie title Tareas completadas (351 tareas)
 >   Tasks 1 (Bing), 2 (IndexNow), 3 (`llms.txt` 2026), 4 (host canónico), 5 (señales de
 >   entidad), 7 (`/nosotros` entity home), 9 (bylines E-E-A-T), 10 (página comparativa vs
 >   Excel), 11 (landings por escenario), 12 (landing MX + `areaServed`), 13 (hub
->   `/preguntas-frecuentes`), 14 (meta en formato pregunta), 15 (frescura/`dateModified`) y
->   18 (`speakable`) ✅.
+>   `/preguntas-frecuentes`), 14 (meta en formato pregunta), 15 (frescura/`dateModified`),
+>   16 (changelog `/novedades`) y 18 (`speakable`) ✅.
 
 > Envs opcionales (Sentry, Slack, Google Safe Browsing, Encryption Key) se pueden agregar en cualquier momento sin cambios de código.
 

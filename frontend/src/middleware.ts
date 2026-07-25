@@ -173,6 +173,8 @@ export const config = {
     "/collection-center-mexico",
     "/preguntas-frecuentes",
     "/faq",
+    "/novedades",
+    "/whats-new",
     "/aviso-de-privacidad",
     "/privacy",
     "/terminos",
