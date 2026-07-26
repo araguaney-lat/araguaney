@@ -18,8 +18,27 @@ interface Props {
   locale?: Locale
 }
 
+const LINK_STYLE = { fontSize: 12.5, color: "#E9E2D5", fontWeight: 600 } as const
+
 export default function HomeFooter({ dict, locale = "es" }: Props) {
   const legal = LEGAL_LINKS[locale]
+
+  const links: readonly { href: string; label: string }[] = [
+    {
+      href: localizedPath("nosotros", locale),
+      label: locale === "es" ? "Nosotros" : "About",
+    },
+    {
+      href: localizedPath("preguntas-frecuentes", locale),
+      label: locale === "es" ? "Preguntas frecuentes" : "FAQ",
+    },
+    {
+      href: localizedPath("novedades", locale),
+      label: locale === "es" ? "Novedades" : "What's new",
+    },
+    { href: legal.privacy, label: dict.privacyLink },
+    { href: legal.terms, label: dict.termsLink },
+  ]
 
   return (
     <footer
@@ -50,28 +69,32 @@ export default function HomeFooter({ dict, locale = "es" }: Props) {
         </div>
       </div>
 
-      <div className="flex flex-col gap-2 md:items-end" style={{ maxWidth: 420 }}>
-        <div style={{ fontSize: 12, color: "#A89E8C", lineHeight: 1.55 }}>{dict.privacy}</div>
-        <div className="flex items-center gap-4">
-          <Link href={localizedPath("nosotros", locale)} style={{ fontSize: 12.5, color: "#E9E2D5", fontWeight: 600 }}>
-            {locale === "es" ? "Nosotros" : "About"}
-          </Link>
-          <span style={{ color: "#5C5347" }}>·</span>
-          <Link href={localizedPath("preguntas-frecuentes", locale)} style={{ fontSize: 12.5, color: "#E9E2D5", fontWeight: 600 }}>
-            {locale === "es" ? "Preguntas frecuentes" : "FAQ"}
-          </Link>
-          <span style={{ color: "#5C5347" }}>·</span>
-          <Link href={localizedPath("novedades", locale)} style={{ fontSize: 12.5, color: "#E9E2D5", fontWeight: 600 }}>
-            {locale === "es" ? "Novedades" : "What's new"}
-          </Link>
-          <span style={{ color: "#5C5347" }}>·</span>
-          <Link href={legal.privacy} style={{ fontSize: 12.5, color: "#E9E2D5", fontWeight: 600 }}>
-            {dict.privacyLink}
-          </Link>
-          <span style={{ color: "#5C5347" }}>·</span>
-          <Link href={legal.terms} style={{ fontSize: 12.5, color: "#E9E2D5", fontWeight: 600 }}>
-            {dict.termsLink}
-          </Link>
+      {/* min-w-0 + max-w-full keep this column inside the viewport on mobile:
+          the links row below grows with every new footer link, and without the
+          cap it pushed the document past 390px (horizontal overflow → the
+          browser zooms the whole page out). */}
+      <div className="flex flex-col gap-2 md:items-end min-w-0 max-w-full">
+        <div
+          className="md:max-w-[420px]"
+          style={{ fontSize: 12, color: "#A89E8C", lineHeight: 1.55 }}
+        >
+          {dict.privacy}
+        </div>
+        <div className="flex flex-wrap md:flex-nowrap items-center gap-x-4 gap-y-2 md:justify-end">
+          {links.map((link, i) => (
+            <span key={link.href} className="flex items-center gap-4">
+              <Link href={link.href} style={LINK_STYLE}>
+                {link.label}
+              </Link>
+              {/* Separators only where the row stays on one line (md+): when it
+                  wraps they end up dangling at the end of a line. */}
+              {i < links.length - 1 && (
+                <span className="hidden md:inline" style={{ color: "#5C5347" }} aria-hidden>
+                  ·
+                </span>
+              )}
+            </span>
+          ))}
         </div>
       </div>
     </footer>
