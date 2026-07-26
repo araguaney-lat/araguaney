@@ -52,7 +52,7 @@ const CONTENT: Record<Locale, Content> = {
     description:
       "Qué exige el régimen de envío humanitario, qué debe incluir un manifiesto/packing list, y los errores más comunes que atoran un envío en aduana.",
     heroP:
-      "Una carga humanitaria mal documentada se atora en aduana — no por mala fe de nadie, sino porque la autoridad aduanal no puede verificar rápido qué contiene cada bulto. Esta guía explica qué exige el régimen de envío y cómo evitar los errores más comunes.",
+      "Una carga humanitaria mal documentada se atora en aduana, no por mala fe de nadie, sino porque la autoridad aduanal no puede verificar rápido qué contiene cada bulto. Esta guía explica qué exige el régimen de envío y cómo evitar los errores más comunes.",
     sections: [
       {
         h2: "El régimen: cajas homogéneas + manifiesto detallado",
@@ -64,12 +64,12 @@ const CONTENT: Record<Locale, Content> = {
       },
       {
         h2: "Cómo Araguaney genera el manifiesto automáticamente",
-        p: "Como cada caja ya se registró y selló como homogénea — con su producto, lote y caducidad — el manifiesto se genera directamente a partir de las tarimas y cajas del envío, sin captura manual adicional. El resultado es un PDF exportable listo para aduana, y opcionalmente un Excel con columnas alineadas al formato IFRC.",
+        p: "Como cada caja ya se registró y selló como homogénea (con su producto, lote y caducidad), el manifiesto se genera directamente a partir de las tarimas y cajas del envío, sin captura manual adicional. El resultado es un PDF exportable listo para aduana, y opcionalmente un Excel con columnas alineadas al formato IFRC.",
       },
     ],
     erroresH2: "Errores comunes que atoran un envío",
     errores: [
-      { title: "Cajas mixtas", desc: "Una caja con varios productos, lotes o caducidades distintas — aduana no puede verificar el contenido con precisión." },
+      { title: "Cajas mixtas", desc: "Una caja con varios productos, lotes o caducidades distintas: aduana no puede verificar el contenido con precisión." },
       { title: "Sin manifiesto detallado", desc: "Un envío sin packing list caja por caja obliga a una inspección física completa, retrasando el despacho días o semanas." },
       { title: "Códigos de material inconsistentes", desc: "No usar una clasificación reconocida (IFRC/ICRC, UNSPSC) dificulta que la aduana entienda qué se está enviando." },
       { title: "Sin trazabilidad de lote/caducidad en medicamentos", desc: "Los medicamentos sin esta información suelen ser rechazados directamente por la autoridad sanitaria del país receptor." },
@@ -101,7 +101,7 @@ const CONTENT: Record<Locale, Content> = {
     description:
       "What the humanitarian shipping regime requires, what a manifest/packing list must include, and the most common mistakes that get a shipment stuck at customs.",
     heroP:
-      "Poorly documented humanitarian cargo gets stuck at customs — not out of anyone's bad faith, but because the customs authority can't quickly verify what each package contains. This guide explains what the shipping regime requires and how to avoid the most common mistakes.",
+      "Poorly documented humanitarian cargo gets stuck at customs, not out of anyone's bad faith, but because the customs authority can't quickly verify what each package contains. This guide explains what the shipping regime requires and how to avoid the most common mistakes.",
     sections: [
       {
         h2: "The regime: homogeneous boxes + a detailed manifest",
@@ -113,12 +113,12 @@ const CONTENT: Record<Locale, Content> = {
       },
       {
         h2: "How Araguaney generates the manifest automatically",
-        p: "Because each box was already registered and sealed as homogeneous — with its product, batch and expiry — the manifest is generated directly from the shipment's pallets and boxes, with no additional manual entry. The result is an exportable PDF ready for customs, and optionally an Excel file with columns aligned to the IFRC format.",
+        p: "Because each box was already registered and sealed as homogeneous (with its product, batch and expiry), the manifest is generated directly from the shipment's pallets and boxes, with no additional manual entry. The result is an exportable PDF ready for customs, and optionally an Excel file with columns aligned to the IFRC format.",
       },
     ],
     erroresH2: "Common mistakes that get a shipment stuck",
     errores: [
-      { title: "Mixed boxes", desc: "A box with several products, batches or different expiry dates — customs can't verify the contents precisely." },
+      { title: "Mixed boxes", desc: "A box with several products, batches or different expiry dates: customs can't verify the contents precisely." },
       { title: "No detailed manifest", desc: "A shipment without a box-by-box packing list forces a full physical inspection, delaying clearance by days or weeks." },
       { title: "Inconsistent material codes", desc: "Not using a recognized classification (IFRC/ICRC, UNSPSC) makes it harder for customs to understand what is being shipped." },
       { title: "No batch/expiry traceability for medicine", desc: "Medicines without this information are often rejected outright by the receiving country's health authority." },

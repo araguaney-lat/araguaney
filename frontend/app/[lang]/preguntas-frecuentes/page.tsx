@@ -58,14 +58,14 @@ const CONTENT: Record<Locale, Content> = {
           { q: "¿Cuánto cuesta Araguaney?", a: "Es gratuito para centros de acopio y coordinaciones humanitarias: registro por ítem, cajas con QR, manifiestos y panel agregado, sin costo de licencia ni límite de cajas." },
           { q: "¿Necesito instalar algo o tener servidores propios?", a: "No. Araguaney es una aplicación web: entras desde el navegador, sin instalar nada ni administrar servidores." },
           { q: "¿Sirve para cualquier tipo de emergencia?", a: "Sí. El estándar es genérico: sismos, inundaciones, incendios o crisis migratorias. No está atado a un evento específico." },
-          { q: "¿En qué se diferencia de una hoja de cálculo?", a: "Valida reglas de donación (caducidad, controlados), genera QR y manifiestos automáticamente, registra la trazabilidad de cada caja al envío y suma el stock de varios centros en un panel nacional — cosas que una hoja de cálculo no hace." },
+          { q: "¿En qué se diferencia de una hoja de cálculo?", a: "Valida reglas de donación (caducidad, controlados), genera QR y manifiestos automáticamente, registra la trazabilidad de cada caja al envío y suma el stock de varios centros en un panel nacional, cosas que una hoja de cálculo no hace." },
         ],
       },
       {
         title: "Donaciones y reglas",
         faqs: [
           { q: "¿Qué es un centro de acopio?", a: "Un punto físico donde se reciben, clasifican y preparan donaciones en especie para canalizarlas hacia zonas afectadas por una emergencia. No entrega ayuda al beneficiario final: prepara y consolida la carga para su envío." },
-          { q: "¿Qué se puede donar?", a: "Medicamentos, insumos médicos, alimentos, agua, higiene, herramientas y equipo de rescate — siempre que cumplan las reglas de calidad (vida útil, sellado, no controlados)." },
+          { q: "¿Qué se puede donar?", a: "Medicamentos, insumos médicos, alimentos, agua, higiene, herramientas y equipo de rescate, siempre que cumplan las reglas de calidad (vida útil, sellado, no controlados)." },
           { q: "¿Qué es una caja homogénea y por qué importa?", a: "Una caja con un solo tipo de producto, un solo lote y una sola caducidad. Es lo que hace la carga trazable y aceptable dentro de un envío humanitario formal." },
           { q: "¿Qué reglas aplican a los medicamentos?", a: "Siguen los lineamientos de la OMS: vida útil mínima (≥ 365 días a la fecha de captura), denominación INN, lote y caducidad obligatorios, y bloqueo de sustancias controladas." },
           { q: "¿Qué donaciones se rechazan?", a: "Lo vencido o próximo a vencer, los medicamentos controlados y los productos abiertos o sin sellar. Las reglas se aplican en el momento del registro, no después." },
@@ -75,7 +75,7 @@ const CONTENT: Record<Locale, Content> = {
         title: "Operación",
         faqs: [
           { q: "¿Cómo funciona, del acopio al envío?", a: "Se registra cada donación por ítem, se empaca en cajas homogéneas con QR, las cajas se consolidan en tarimas, y las tarimas en envíos con un manifiesto exportable listo para aduana." },
-          { q: "¿Qué es un manifiesto o packing list?", a: "El documento detallado de todo lo que va en un envío, generado automáticamente a partir de sus tarimas y cajas — lo que exige el régimen de envío humanitario para pasar aduana." },
+          { q: "¿Qué es un manifiesto o packing list?", a: "El documento detallado de todo lo que va en un envío, generado automáticamente a partir de sus tarimas y cajas: lo que exige el régimen de envío humanitario para pasar aduana." },
           { q: "¿Cómo sumo mi centro de acopio?", a: "Desde la página de registro o contacto solicitas sumar tu centro; el equipo revisa la solicitud y te da acceso como coordinador." },
           { q: "¿Puedo coordinar varios centros a la vez?", a: "Sí. El panel nacional agrega el stock de todos los centros conectados, y las transferencias permiten mover inventario entre ellos." },
         ],
@@ -116,14 +116,14 @@ const CONTENT: Record<Locale, Content> = {
           { q: "How much does Araguaney cost?", a: "It's free for collection centers and humanitarian coordinations: item-level intake, boxes with QR, manifests and an aggregated dashboard, with no license fee and no box limit." },
           { q: "Do I need to install anything or run my own servers?", a: "No. Araguaney is a web application: you use it from the browser, with nothing to install and no servers to manage." },
           { q: "Can it be used for any kind of emergency?", a: "Yes. The standard is generic: earthquakes, floods, fires or migration crises. It isn't tied to a specific event." },
-          { q: "How is it different from a spreadsheet?", a: "It validates donation rules (expiry, controlled items), generates QR codes and manifests automatically, records the traceability of every box to shipment, and adds up the stock of several centers in a national dashboard — things a spreadsheet doesn't do." },
+          { q: "How is it different from a spreadsheet?", a: "It validates donation rules (expiry, controlled items), generates QR codes and manifests automatically, records the traceability of every box to shipment, and adds up the stock of several centers in a national dashboard, things a spreadsheet doesn't do." },
         ],
       },
       {
         title: "Donations and rules",
         faqs: [
           { q: "What is a collection center?", a: "A physical point where in-kind donations are received, sorted and prepared to channel toward areas hit by an emergency. It doesn't hand aid to the final beneficiary: it prepares and consolidates the cargo for shipping." },
-          { q: "What can be donated?", a: "Medicine, medical supplies, food, water, hygiene, tools and rescue gear — as long as they meet the quality rules (shelf life, sealed, not controlled)." },
+          { q: "What can be donated?", a: "Medicine, medical supplies, food, water, hygiene, tools and rescue gear, as long as they meet the quality rules (shelf life, sealed, not controlled)." },
           { q: "What is a homogeneous box and why does it matter?", a: "A box with a single product type, a single batch and a single expiry date. It's what makes the cargo traceable and acceptable inside a formal humanitarian shipment." },
           { q: "What rules apply to medicine?", a: "They follow WHO guidelines: minimum shelf life (≥ 365 days at intake), INN name, mandatory batch and expiry, and blocking of controlled substances." },
           { q: "What donations are rejected?", a: "Expired or soon-to-expire items, controlled medicines, and opened or unsealed products. The rules are enforced at intake, not after." },
@@ -133,7 +133,7 @@ const CONTENT: Record<Locale, Content> = {
         title: "Operations",
         faqs: [
           { q: "How does it work, from intake to shipment?", a: "Every donation is registered item by item, packed into homogeneous boxes with QR codes, the boxes consolidate into pallets, and the pallets into shipments with an exportable, customs-ready manifest." },
-          { q: "What is a manifest or packing list?", a: "The detailed document of everything in a shipment, generated automatically from its pallets and boxes — what the humanitarian shipment regime requires to clear customs." },
+          { q: "What is a manifest or packing list?", a: "The detailed document of everything in a shipment, generated automatically from its pallets and boxes: what the humanitarian shipment regime requires to clear customs." },
           { q: "How do I add my collection center?", a: "From the registration or contact page you request to add your center; the team reviews the request and gives you access as a coordinator." },
           { q: "Can I coordinate several centers at once?", a: "Yes. The national dashboard adds up the stock of every connected center, and transfers let you move inventory between them." },
         ],

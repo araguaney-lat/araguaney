@@ -97,11 +97,11 @@ export const CHANGELOG: readonly ChangelogEntry[] = [
     tag: "new",
     es: {
       title: "Etiquetas QR y manifiesto exportable",
-      body: "Cada caja homogénea se sella con un QR y su etiqueta, y cada envío genera un manifiesto / packing list exportable listo para aduana — sin recaptura manual.",
+      body: "Cada caja homogénea se sella con un QR y su etiqueta, y cada envío genera un manifiesto / packing list exportable listo para aduana, sin recaptura manual.",
     },
     en: {
       title: "QR labels and exportable manifest",
-      body: "Every homogeneous box is sealed with a QR code and its label, and each shipment produces an exportable manifest / packing list ready for customs — with no manual re-entry.",
+      body: "Every homogeneous box is sealed with a QR code and its label, and each shipment produces an exportable manifest / packing list ready for customs, with no manual re-entry.",
     },
   },
   {

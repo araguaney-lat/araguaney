@@ -59,14 +59,14 @@ const CONTENT: Record<Locale, Content> = {
     eyebrow: "Software para centros de acopio",
     h1: "El estándar para registrar, empacar y enviar donaciones de tu centro de acopio",
     heroP:
-      "Araguaney registra cada donación en especie por ítem, la empaca en cajas homogéneas con QR, la consolida en tarimas y envíos con manifiesto exportable — el mismo estándar que usan decenas de centros de acopio para coordinarse entre sí.",
+      "Araguaney registra cada donación en especie por ítem, la empaca en cajas homogéneas con QR, la consolida en tarimas y envíos con manifiesto exportable: el mismo estándar que usan decenas de centros de acopio para coordinarse entre sí.",
     heroCta: "Sumar mi centro de acopio",
     whatH2: "¿Qué es un centro de acopio?",
     whatP:
-      "Un centro de acopio recibe donaciones en especie — medicamentos, alimentos, agua, higiene, herramientas — para canalizarlas hacia zonas afectadas por una emergencia. Cuando varios centros operan cada uno con su propio método, es imposible saber qué hay disponible a nivel nacional o preparar un envío que cumpla las reglas de un régimen de ayuda humanitaria: cajas homogéneas y manifiesto detallado. Sin ese orden, los envíos se atoran.",
+      "Un centro de acopio recibe donaciones en especie (medicamentos, alimentos, agua, higiene, herramientas) para canalizarlas hacia zonas afectadas por una emergencia. Cuando varios centros operan cada uno con su propio método, es imposible saber qué hay disponible a nivel nacional o preparar un envío que cumpla las reglas de un régimen de ayuda humanitaria: cajas homogéneas y manifiesto detallado. Sin ese orden, los envíos se atoran.",
     differsH2: "Todo lo que necesita un centro de acopio",
     differs: [
-      { icon: "📦", title: "Caja homogénea + QR", desc: "Un solo producto, lote y caducidad por caja. QR y etiqueta impresos al sellar — trazable de punta a punta." },
+      { icon: "📦", title: "Caja homogénea + QR", desc: "Un solo producto, lote y caducidad por caja. QR y etiqueta impresos al sellar: trazable de punta a punta." },
       { icon: "📋", title: "Manifiesto exportable", desc: "Packing list lista para aduana en un clic, generada a partir de las tarimas y cajas de cada envío." },
       { icon: "🗺️", title: "Panel nacional en tiempo real", desc: "Suma el stock de todos los centros de acopio conectados: qué hay, cuánto y dónde." },
       { icon: "💊", title: "Validación de medicamentos", desc: "Vida útil mínima, denominación INN y bloqueo de sustancias controladas según lineamientos de la OMS." },
@@ -76,7 +76,7 @@ const CONTENT: Record<Locale, Content> = {
     faq: [
       { q: "¿Qué es un centro de acopio?", a: "Es un punto físico donde se reciben, clasifican y preparan donaciones en especie para canalizarlas hacia zonas afectadas por una emergencia. No entrega ayuda al beneficiario final: prepara y consolida la carga para su envío." },
       { q: "¿Cuánto cuesta el software de Araguaney?", a: "Es gratuito para centros de acopio y coordinaciones humanitarias: registro por ítem, cajas con QR, manifiestos y panel agregado, sin costo de licencia ni límite de cajas." },
-      { q: "¿Qué diferencia a Araguaney de una hoja de cálculo?", a: "Valida reglas de donación (caducidad, controlados), genera QR y manifiestos automáticamente, registra la trazabilidad de cada caja al envío y suma el stock de varios centros en un panel nacional — cosas que una hoja no hace." },
+      { q: "¿Qué diferencia a Araguaney de una hoja de cálculo?", a: "Valida reglas de donación (caducidad, controlados), genera QR y manifiestos automáticamente, registra la trazabilidad de cada caja al envío y suma el stock de varios centros en un panel nacional, cosas que una hoja no hace." },
       { q: "¿Se puede usar para cualquier emergencia?", a: "Sí. El estándar es genérico: sismos, inundaciones, incendios o crisis migratorias. No está atado a un evento específico." },
     ],
     finalH2: "Conecta tu centro de acopio con el estándar nacional",
@@ -99,14 +99,14 @@ const CONTENT: Record<Locale, Content> = {
     eyebrow: "Collection center software",
     h1: "The standard to register, pack and ship your collection center's donations",
     heroP:
-      "Araguaney registers every in-kind donation item by item, packs it into homogeneous boxes with QR codes, and consolidates it into pallets and shipments with an exportable manifest — the same standard dozens of collection centers use to coordinate with one another.",
+      "Araguaney registers every in-kind donation item by item, packs it into homogeneous boxes with QR codes, and consolidates it into pallets and shipments with an exportable manifest: the same standard dozens of collection centers use to coordinate with one another.",
     heroCta: "Add my collection center",
     whatH2: "What is a collection center?",
     whatP:
-      "A collection center receives in-kind donations — medicine, food, water, hygiene, tools — to channel them toward areas hit by an emergency. When several centers each work their own way, it's impossible to know what's available nationally or to prepare a shipment that meets the rules of a humanitarian aid regime: homogeneous boxes and a detailed manifest. Without that order, shipments get stuck.",
+      "A collection center receives in-kind donations (medicine, food, water, hygiene, tools) to channel them toward areas hit by an emergency. When several centers each work their own way, it's impossible to know what's available nationally or to prepare a shipment that meets the rules of a humanitarian aid regime: homogeneous boxes and a detailed manifest. Without that order, shipments get stuck.",
     differsH2: "Everything a collection center needs",
     differs: [
-      { icon: "📦", title: "Homogeneous box + QR", desc: "One product, batch and expiry per box. QR and label printed on sealing — traceable end to end." },
+      { icon: "📦", title: "Homogeneous box + QR", desc: "One product, batch and expiry per box. QR and label printed on sealing: traceable end to end." },
       { icon: "📋", title: "Exportable manifest", desc: "A customs-ready packing list in one click, generated from each shipment's pallets and boxes." },
       { icon: "🗺️", title: "National dashboard in real time", desc: "Adds up the stock of every connected collection center: what there is, how much, and where." },
       { icon: "💊", title: "Medicine validation", desc: "Minimum shelf life, INN name, and blocking of controlled substances per WHO guidelines." },
@@ -116,7 +116,7 @@ const CONTENT: Record<Locale, Content> = {
     faq: [
       { q: "What is a collection center?", a: "It's a physical point where in-kind donations are received, sorted and prepared to channel toward areas hit by an emergency. It doesn't hand aid to the final beneficiary: it prepares and consolidates the cargo for shipping." },
       { q: "How much does Araguaney's software cost?", a: "It's free for collection centers and humanitarian coordinations: item-level intake, boxes with QR, manifests and an aggregated dashboard, with no license fee and no box limit." },
-      { q: "How is Araguaney different from a spreadsheet?", a: "It validates donation rules (expiry, controlled items), generates QR codes and manifests automatically, records the traceability of every box to shipment, and adds up the stock of several centers in a national dashboard — things a spreadsheet doesn't do." },
+      { q: "How is Araguaney different from a spreadsheet?", a: "It validates donation rules (expiry, controlled items), generates QR codes and manifests automatically, records the traceability of every box to shipment, and adds up the stock of several centers in a national dashboard, things a spreadsheet doesn't do." },
       { q: "Can it be used for any emergency?", a: "Yes. The standard is generic: earthquakes, floods, fires or migration crises. It isn't tied to a specific event." },
     ],
     finalH2: "Connect your collection center to the national standard",

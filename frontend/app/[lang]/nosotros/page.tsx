@@ -76,7 +76,7 @@ const CONTENT: Record<Locale, Content> = {
     howH2: "Cómo lo hacemos",
     steps: [
       { icon: "📝", title: "Registro por ítem", desc: "Cada donación se captura con categoría, lote y caducidad, con reglas de calidad que rechazan lo que no cumple." },
-      { icon: "📦", title: "Caja homogénea con QR", desc: "Un solo producto, lote y caducidad por caja. QR y etiqueta impresos al sellar — trazable de punta a punta." },
+      { icon: "📦", title: "Caja homogénea con QR", desc: "Un solo producto, lote y caducidad por caja. QR y etiqueta impresos al sellar: trazable de punta a punta." },
       { icon: "📋", title: "Tarima y envío con manifiesto", desc: "Las cajas se consolidan en tarimas y envíos con packing list exportable, listo para aduana." },
       { icon: "🗺️", title: "Panel nacional agregado", desc: "El stock de todos los centros conectados, sumado en tiempo real: qué hay, cuánto y dónde." },
     ],
@@ -127,7 +127,7 @@ const CONTENT: Record<Locale, Content> = {
     howH2: "How we do it",
     steps: [
       { icon: "📝", title: "Item-level intake", desc: "Every donation is captured with category, batch and expiry, with quality rules that reject what doesn't comply." },
-      { icon: "📦", title: "Homogeneous box with QR", desc: "One product, batch and expiry per box. QR and label printed on sealing — traceable end to end." },
+      { icon: "📦", title: "Homogeneous box with QR", desc: "One product, batch and expiry per box. QR and label printed on sealing: traceable end to end." },
       { icon: "📋", title: "Pallet and shipment with manifest", desc: "Boxes consolidate into pallets and shipments with an exportable packing list, customs-ready." },
       { icon: "🗺️", title: "National dashboard", desc: "The stock of every connected center, added up in real time: what there is, how much, and where." },
     ],

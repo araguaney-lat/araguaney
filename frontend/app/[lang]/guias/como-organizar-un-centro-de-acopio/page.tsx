@@ -56,7 +56,7 @@ const CONTENT: Record<Locale, Content> = {
     eyebrow: "Guía",
     h1: "Cómo organizar un centro de acopio",
     intro:
-      "Un centro de acopio recibe donaciones en especie — medicamentos, alimentos, agua, higiene, herramientas — para canalizarlas hacia zonas afectadas por una emergencia. Esta guía cubre lo esencial para organizarlo bien desde el primer día, sin importar si es tu primer centro o si ya llevas semanas operando de forma improvisada.",
+      "Un centro de acopio recibe donaciones en especie (medicamentos, alimentos, agua, higiene, herramientas) para canalizarlas hacia zonas afectadas por una emergencia. Esta guía cubre lo esencial para organizarlo bien desde el primer día, sin importar si es tu primer centro o si ya llevas semanas operando de forma improvisada.",
     sections: [
       {
         h2: "1. Define roles antes de recibir la primera donación",
@@ -64,15 +64,15 @@ const CONTENT: Record<Locale, Content> = {
       },
       {
         h2: "2. Registra cada ítem, no solo “bultos”",
-        p: "El error más común de un centro improvisado es contar donaciones en cajas o bolsas genéricas (“3 cajas de medicamentos”) en vez de por ítem. Registra cada donación con su categoría, lote y fecha de caducidad. Esto es lo que permite después saber exactamente qué hay disponible — no solo cuánto volumen.",
+        p: "El error más común de un centro improvisado es contar donaciones en cajas o bolsas genéricas (“3 cajas de medicamentos”) en vez de por ítem. Registra cada donación con su categoría, lote y fecha de caducidad. Esto es lo que permite después saber exactamente qué hay disponible, no solo cuánto volumen.",
       },
       {
         h2: "3. Empaca en cajas homogéneas",
-        p: "Una caja homogénea contiene un solo tipo de producto, un solo lote y una sola fecha de caducidad — sin mezclas. Cada caja sellada recibe un código QR y una etiqueta. Esto no es burocracia: es exactamente lo que exige el régimen de envío humanitario para que la carga no se atore en aduana.",
+        p: "Una caja homogénea contiene un solo tipo de producto, un solo lote y una sola fecha de caducidad, sin mezclas. Cada caja sellada recibe un código QR y una etiqueta. Esto no es burocracia: es exactamente lo que exige el régimen de envío humanitario para que la carga no se atore en aduana.",
       },
       {
         h2: "4. Consolida en tarimas y genera el manifiesto",
-        p: "Las cajas selladas se agrupan en tarimas (mixtas, pueden llevar distintos productos). Cuando el envío está listo, se genera un manifiesto exportable — packing list con cada caja y tarima — listo para el trámite aduanal.",
+        p: "Las cajas selladas se agrupan en tarimas (mixtas, pueden llevar distintos productos). Cuando el envío está listo, se genera un manifiesto exportable (packing list con cada caja y tarima), listo para el trámite aduanal.",
       },
       {
         h2: "5. Conoce las reglas de rechazo antes de que lleguen donaciones",
@@ -87,7 +87,7 @@ const CONTENT: Record<Locale, Content> = {
       },
       {
         q: "¿Qué pasa si llega una donación mixta (varios productos en una misma bolsa)?",
-        a: "Se separa por producto, lote y caducidad al registrar — cada combinación distinta se convierte en su propia caja homogénea. Nunca se mezcla más de un producto en una caja.",
+        a: "Se separa por producto, lote y caducidad al registrar: cada combinación distinta se convierte en su propia caja homogénea. Nunca se mezcla más de un producto en una caja.",
       },
       {
         q: "¿Se puede operar sin conexión a internet?",
@@ -95,7 +95,7 @@ const CONTENT: Record<Locale, Content> = {
       },
       {
         q: "¿Qué hago si un medicamento no cumple la vida útil mínima?",
-        a: "Se rechaza en el registro — Araguaney bloquea automáticamente medicamentos con menos de 365 días de vida útil restante, siguiendo los lineamientos de la OMS para donación de medicamentos.",
+        a: "Se rechaza en el registro: Araguaney bloquea automáticamente medicamentos con menos de 365 días de vida útil restante, siguiendo los lineamientos de la OMS para donación de medicamentos.",
       },
     ],
     howToSteps: [
@@ -109,7 +109,7 @@ const CONTENT: Record<Locale, Content> = {
       },
       {
         name: "Empaca en cajas homogéneas",
-        text: "Cada caja contiene un solo tipo de producto, un solo lote y una sola caducidad — sin mezclas — y recibe un código QR y una etiqueta al sellarse.",
+        text: "Cada caja contiene un solo tipo de producto, un solo lote y una sola caducidad (sin mezclas) y recibe un código QR y una etiqueta al sellarse.",
       },
       {
         name: "Consolida en tarimas y genera el manifiesto",
@@ -134,7 +134,7 @@ const CONTENT: Record<Locale, Content> = {
     eyebrow: "Guide",
     h1: "How to organize a collection center",
     intro:
-      "A collection center receives in-kind donations — medicine, food, water, hygiene, tools — to channel them toward areas hit by an emergency. This guide covers the essentials to organize it well from day one, whether it's your first center or you've already been operating in an improvised way for weeks.",
+      "A collection center receives in-kind donations (medicine, food, water, hygiene, tools) to channel them toward areas hit by an emergency. This guide covers the essentials to organize it well from day one, whether it's your first center or you've already been operating in an improvised way for weeks.",
     sections: [
       {
         h2: "1. Define roles before receiving the first donation",
@@ -142,15 +142,15 @@ const CONTENT: Record<Locale, Content> = {
       },
       {
         h2: "2. Register every item, not just “bundles”",
-        p: "The most common mistake of an improvised center is counting donations in generic boxes or bags (“3 boxes of medicine”) instead of item by item. Register every donation with its category, batch, and expiry date. That's what later lets you know exactly what's available — not just how much volume.",
+        p: "The most common mistake of an improvised center is counting donations in generic boxes or bags (“3 boxes of medicine”) instead of item by item. Register every donation with its category, batch, and expiry date. That's what later lets you know exactly what's available, not just how much volume.",
       },
       {
         h2: "3. Pack into homogeneous boxes",
-        p: "A homogeneous box contains a single product type, a single batch, and a single expiry date — no mixing. Each sealed box gets a QR code and a label. This isn't bureaucracy: it's exactly what the humanitarian shipping regime requires so the cargo doesn't get stuck at customs.",
+        p: "A homogeneous box contains a single product type, a single batch, and a single expiry date, with no mixing. Each sealed box gets a QR code and a label. This isn't bureaucracy: it's exactly what the humanitarian shipping regime requires so the cargo doesn't get stuck at customs.",
       },
       {
         h2: "4. Consolidate into pallets and generate the manifest",
-        p: "Sealed boxes are grouped into pallets (mixed, they can carry different products). When the shipment is ready, an exportable manifest is generated — a packing list with every box and pallet — ready for the customs process.",
+        p: "Sealed boxes are grouped into pallets (mixed, they can carry different products). When the shipment is ready, an exportable manifest is generated (a packing list with every box and pallet), ready for the customs process.",
       },
       {
         h2: "5. Know the rejection rules before donations arrive",
@@ -165,7 +165,7 @@ const CONTENT: Record<Locale, Content> = {
       },
       {
         q: "What happens if a mixed donation arrives (several products in the same bag)?",
-        a: "It's separated by product, batch, and expiry at registration — each distinct combination becomes its own homogeneous box. More than one product is never mixed in a single box.",
+        a: "It's separated by product, batch, and expiry at registration: each distinct combination becomes its own homogeneous box. More than one product is never mixed in a single box.",
       },
       {
         q: "Can it be operated without an internet connection?",
@@ -173,7 +173,7 @@ const CONTENT: Record<Locale, Content> = {
       },
       {
         q: "What do I do if a medicine doesn't meet the minimum shelf life?",
-        a: "It's rejected at registration — Araguaney automatically blocks medicines with less than 365 days of remaining shelf life, following the WHO guidelines for medicine donations.",
+        a: "It's rejected at registration: Araguaney automatically blocks medicines with less than 365 days of remaining shelf life, following the WHO guidelines for medicine donations.",
       },
     ],
     howToSteps: [
@@ -187,7 +187,7 @@ const CONTENT: Record<Locale, Content> = {
       },
       {
         name: "Pack into homogeneous boxes",
-        text: "Each box contains a single product type, a single batch, and a single expiry — no mixing — and gets a QR code and a label when sealed.",
+        text: "Each box contains a single product type, a single batch, and a single expiry (no mixing), and gets a QR code and a label when sealed.",
       },
       {
         name: "Consolidate into pallets and generate the manifest",

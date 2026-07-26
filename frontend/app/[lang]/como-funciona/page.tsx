@@ -84,7 +84,7 @@ const CONTENT: Record<Locale, Content> = {
     heroEyebrow: "Cómo funciona",
     h1: "Que cada donación llegue ordenada",
     heroP:
-      "Araguaney le da a los centros de acopio un mismo estándar para recibir donaciones en especie, empacarlas con control de calidad y prepararlas para enviar — con trazabilidad de la caja al envío y un panel que suma el stock de todos los centros.",
+      "Araguaney le da a los centros de acopio un mismo estándar para recibir donaciones en especie, empacarlas con control de calidad y prepararlas para enviar, con trazabilidad de la caja al envío y un panel que suma el stock de todos los centros.",
     heroPills: ["Gratis para centros de acopio", "Para cualquier emergencia", "Sin datos personales"],
     flow: {
       eyebrow: "El flujo",
@@ -104,7 +104,7 @@ const CONTENT: Record<Locale, Content> = {
       note: "La razón por la que el stock de decenas de centros se puede sumar es que todos hablan el mismo idioma.",
     },
     conceptItems: [
-      { h: "Caja homogénea", p: "Un solo producto, un solo lote y una sola caducidad por caja. Es lo que permite verificar el contenido sin abrirla — el requisito clave del envío humanitario." },
+      { h: "Caja homogénea", p: "Un solo producto, un solo lote y una sola caducidad por caja. Es lo que permite verificar el contenido sin abrirla: el requisito clave del envío humanitario." },
       { h: "Tarima", p: "Agrupa cajas selladas para transporte. Puede llevar distintos productos. Tiene su propio código QR para seguirla." },
       { h: "Envío", p: "Agrupa tarimas y genera el manifiesto. Al despacharse, congela su contenido para conservar la trazabilidad." },
       { h: "Panel nacional", p: "Suma el stock disponible de todos los centros conectados: qué hay, cuánto y dónde, en tiempo real." },
@@ -159,7 +159,7 @@ const CONTENT: Record<Locale, Content> = {
     heroEyebrow: "How it works",
     h1: "That every donation arrives in order",
     heroP:
-      "Araguaney gives collection centers a single standard to receive in-kind donations, pack them with quality control, and prepare them for shipping — with traceability from box to shipment and a dashboard that adds up the stock of every center.",
+      "Araguaney gives collection centers a single standard to receive in-kind donations, pack them with quality control, and prepare them for shipping, with traceability from box to shipment and a dashboard that adds up the stock of every center.",
     heroPills: ["Free for collection centers", "For any emergency", "No personal data"],
     flow: {
       eyebrow: "The flow",
@@ -179,7 +179,7 @@ const CONTENT: Record<Locale, Content> = {
       note: "The reason the stock of dozens of centers can be added up is that they all speak the same language.",
     },
     conceptItems: [
-      { h: "Homogeneous box", p: "One product, one batch and one expiry per box. That's what lets you verify the contents without opening it — the key requirement of humanitarian shipping." },
+      { h: "Homogeneous box", p: "One product, one batch and one expiry per box. That's what lets you verify the contents without opening it: the key requirement of humanitarian shipping." },
       { h: "Pallet", p: "Groups sealed boxes for transport. It can carry different products. It has its own QR code for tracking." },
       { h: "Shipment", p: "Groups pallets and generates the manifest. Once dispatched, it freezes its contents to preserve traceability." },
       { h: "National dashboard", p: "Adds up the available stock of every connected center: what there is, how much, and where, in real time." },

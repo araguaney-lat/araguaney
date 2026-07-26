@@ -74,7 +74,7 @@ export const NEEDS_CATEGORIES: readonly NeedsCategory[] = [
       metaDescription:
         "Material de curación, guantes, jeringas y mascarillas para donar en una emergencia, clasificados según el catálogo IFRC/ICRC.",
       intro:
-        "Los insumos médicos —material de curación, protección y aplicación— son clave para la atención en campo. Se clasifican según el catálogo IFRC/ICRC, lo que permite describirlos con un código de material reconocido en el manifiesto de envío.",
+        "Los insumos médicos (material de curación, protección y aplicación) son clave para la atención en campo. Se clasifican según el catálogo IFRC/ICRC, lo que permite describirlos con un código de material reconocido en el manifiesto de envío.",
       accepted: [
         "Material de curación: gasas, vendas, apósitos, sin abrir.",
         "Protección: guantes, mascarillas, batas.",
@@ -91,7 +91,7 @@ export const NEEDS_CATEGORIES: readonly NeedsCategory[] = [
       metaDescription:
         "Wound-care material, gloves, syringes and masks to donate in an emergency, classified according to the IFRC/ICRC catalogue.",
       intro:
-        "Medical supplies —wound-care, protection and delivery items— are essential for field care. They are classified according to the IFRC/ICRC catalogue, which lets us describe them with a recognized material code on the shipment manifest.",
+        "Medical supplies (wound-care, protection and delivery items) are essential for field care. They are classified according to the IFRC/ICRC catalogue, which lets us describe them with a recognized material code on the shipment manifest.",
       accepted: [
         "Wound-care material: gauze, bandages, dressings, unopened.",
         "Protection: gloves, masks, gowns.",

@@ -56,7 +56,7 @@ const CONTENT: Record<Locale, Content> = {
       },
       {
         name: "Da a cada voluntario su propia cuenta",
-        text: "Cada persona opera con su usuario, no con uno compartido. Así cada acción — registrar, sellar, cerrar una tarima — queda atribuida a quien la hizo, sin ambigüedad.",
+        text: "Cada persona opera con su usuario, no con uno compartido. Así cada acción (registrar, sellar, cerrar una tarima) queda atribuida a quien la hizo, sin ambigüedad.",
       },
       {
         name: "Asigna permisos según el rol",
@@ -95,7 +95,7 @@ const CONTENT: Record<Locale, Content> = {
       },
       {
         name: "Give each volunteer their own account",
-        text: "Each person operates with their own user, not a shared one. That way every action — register, seal, close a pallet — is attributed to whoever did it, with no ambiguity.",
+        text: "Each person operates with their own user, not a shared one. That way every action (register, seal, close a pallet) is attributed to whoever did it, with no ambiguity.",
       },
       {
         name: "Assign permissions by role",

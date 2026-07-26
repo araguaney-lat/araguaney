@@ -17,7 +17,7 @@ const UI: Record<Locale, { metaTitle: string; ogTitle: string; description: stri
     metaTitle: "Novedades",
     ogTitle: "Novedades — Araguaney",
     description:
-      "Novedades de Araguaney: las últimas mejoras del software para centros de acopio — panel nacional, manifiesto, transferencias, mensajería, reportes y más.",
+      "Novedades de Araguaney: las últimas mejoras del software para centros de acopio: panel nacional, manifiesto, transferencias, mensajería, reportes y más.",
     ogEyebrow: "Novedades",
     eyebrow: "Novedades",
     h1: "Novedades",
@@ -30,7 +30,7 @@ const UI: Record<Locale, { metaTitle: string; ogTitle: string; description: stri
     metaTitle: "What's new",
     ogTitle: "What's new — Araguaney",
     description:
-      "What's new in Araguaney: the latest improvements to the collection-center software — national dashboard, manifest, transfers, messaging, reports and more.",
+      "What's new in Araguaney: the latest improvements to the collection-center software: national dashboard, manifest, transfers, messaging, reports and more.",
     ogEyebrow: "What's new",
     eyebrow: "What's new",
     h1: "What's new",
