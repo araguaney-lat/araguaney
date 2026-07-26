@@ -71,7 +71,7 @@ const CONTENT: Record<Locale, Content> = {
     ],
     coordH2: "De inventario a coordinación",
     coordP:
-      "Un inventario aislado ayuda a un centro; una coordinación ayuda a una región. Cuando varios puntos usan el mismo estándar, su stock se puede sumar en un panel único y responder, a nivel nacional, qué falta y dónde. Ese salto — de inventario a agregación — es el que convierte donaciones dispersas en respuesta ordenada.",
+      "Un inventario aislado ayuda a un centro; una coordinación ayuda a una región. Cuando varios puntos usan el mismo estándar, su stock se puede sumar en un panel único y responder, a nivel nacional, qué falta y dónde. Ese salto (de inventario a agregación) es el que convierte donaciones dispersas en respuesta ordenada.",
     ctaBoxTitle: "Monta tu inventario de ayuda con Araguaney",
     ctaStart: "Empezar ahora",
     ctaNeeds: "Ver qué falta ahora mismo",
@@ -111,7 +111,7 @@ const CONTENT: Record<Locale, Content> = {
     ],
     coordH2: "From inventory to coordination",
     coordP:
-      "An isolated inventory helps one center; coordination helps a region. When several points use the same standard, their stock can be added up in a single dashboard and answer, at a national level, what's missing and where. That leap — from inventory to aggregation — is what turns scattered donations into an orderly response.",
+      "An isolated inventory helps one center; coordination helps a region. When several points use the same standard, their stock can be added up in a single dashboard and answer, at a national level, what's missing and where. That leap (from inventory to aggregation) is what turns scattered donations into an orderly response.",
     ctaBoxTitle: "Build your aid inventory with Araguaney",
     ctaStart: "Get started now",
     ctaNeeds: "See what's missing right now",

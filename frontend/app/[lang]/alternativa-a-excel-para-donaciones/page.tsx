@@ -66,12 +66,12 @@ const CONTENT: Record<Locale, Content> = {
     metaTitle: "Alternativa a Excel para gestionar donaciones",
     ogTitle: "Alternativa a Excel para donaciones — Araguaney",
     description:
-      "¿Excel o WhatsApp para tu centro de acopio? Compara la hoja de cálculo con Araguaney: trazabilidad, QR, manifiesto para aduana, validación OMS y panel nacional — gratis.",
+      "¿Excel o WhatsApp para tu centro de acopio? Compara la hoja de cálculo con Araguaney: trazabilidad, QR, manifiesto para aduana, validación OMS y panel nacional, gratis.",
     ogEyebrow: "Comparativa",
     eyebrow: "Excel vs Araguaney",
     h1: "La alternativa a la hoja de cálculo para gestionar donaciones en especie",
     heroP:
-      "Excel, Google Sheets y los grupos de WhatsApp funcionan hasta que llega el primer envío grande: sin trazabilidad, sin QR, sin manifiesto y sin forma de sumar el stock entre centros. Araguaney hace exactamente eso, con el estándar que ya usan decenas de centros de acopio — y es gratis.",
+      "Excel, Google Sheets y los grupos de WhatsApp funcionan hasta que llega el primer envío grande: sin trazabilidad, sin QR, sin manifiesto y sin forma de sumar el stock entre centros. Araguaney hace exactamente eso, con el estándar que ya usan decenas de centros de acopio, y es gratis.",
     heroCta: "Empezar gratis",
     problemH2: "Por qué la hoja de cálculo se queda corta",
     problemP:
@@ -110,7 +110,7 @@ const CONTENT: Record<Locale, Content> = {
     faqTitle: "Preguntas frecuentes",
     faq: [
       { q: "¿Excel sirve para gestionar donaciones en especie?", a: "Para un acopio pequeño y puntual, sí. Pero no valida caducidad ni sustancias controladas, no genera QR ni manifiestos para aduana, no da trazabilidad de la caja al envío y no permite sumar el stock entre varios centros. En cuanto el acopio crece, esas ausencias frenan los envíos." },
-      { q: "¿Cuál es el mejor software para un centro de acopio?", a: "El que estandariza el registro por ítem, garantiza la caja homogénea con QR, produce el manifiesto exportable y agrega el stock a nivel nacional — sin cobrar por caja ni pedir datos personales de donantes. Araguaney está construido exactamente para eso y es gratuito." },
+      { q: "¿Cuál es el mejor software para un centro de acopio?", a: "El que estandariza el registro por ítem, garantiza la caja homogénea con QR, produce el manifiesto exportable y agrega el stock a nivel nacional, sin cobrar por caja ni pedir datos personales de donantes. Araguaney está construido exactamente para eso y es gratuito." },
       { q: "¿Cuánto cuesta Araguaney?", a: "Es gratuito para centros de acopio y coordinaciones humanitarias: registro por ítem, cajas con QR, manifiestos y panel agregado, sin costo de licencia ni límite de cajas." },
       { q: "¿Cómo migro desde mi hoja de cálculo?", a: "No hay una importación masiva: empiezas a registrar el inventario nuevo directamente en Araguaney a medida que entra. Como el registro es por ítem y guiado, en la práctica es más rápido que mantener la hoja al día." },
     ],
@@ -128,16 +128,16 @@ const CONTENT: Record<Locale, Content> = {
     metaTitle: "A donation spreadsheet alternative",
     ogTitle: "A donation spreadsheet alternative — Araguaney",
     description:
-      "Excel or WhatsApp for your aid center? Compare the spreadsheet with Araguaney: traceability, QR codes, a customs manifest, WHO validation and a national dashboard — free.",
+      "Excel or WhatsApp for your aid center? Compare the spreadsheet with Araguaney: traceability, QR codes, a customs manifest, WHO validation and a national dashboard, free.",
     ogEyebrow: "Comparison",
     eyebrow: "Spreadsheet vs Araguaney",
     h1: "The spreadsheet alternative for managing in-kind donations",
     heroP:
-      "Excel, Google Sheets and WhatsApp groups work until the first big shipment: no traceability, no QR codes, no manifest, and no way to add up stock across centers. Araguaney does exactly that, with the standard dozens of aid centers already use — and it's free.",
+      "Excel, Google Sheets and WhatsApp groups work until the first big shipment: no traceability, no QR codes, no manifest, and no way to add up stock across centers. Araguaney does exactly that, with the standard dozens of aid centers already use, and it's free.",
     heroCta: "Start free",
     problemH2: "Why a spreadsheet falls short",
     problemP:
-      "A spreadsheet is fine for four boxes. But a real aid center takes in hundreds of items with different batches and expiry dates, has to prepare shipments that clear customs, and — if it coordinates with other centers — needs to know what's available nationally. That's where the spreadsheet breaks:",
+      "A spreadsheet is fine for four boxes. But a real aid center takes in hundreds of items with different batches and expiry dates, has to prepare shipments that clear customs, and (if it coordinates with other centers) needs to know what's available nationally. That's where the spreadsheet breaks:",
     problems: [
       { icon: "🕳️", title: "No traceability", desc: "A cell doesn't know which box went to which pallet or shipment. When something goes missing, no one can track it." },
       { icon: "⏳", title: "No expiry or controlled-item checks", desc: "Nothing stops you sealing an expired medicine or a controlled substance. A spreadsheet doesn't know WHO rules." },
@@ -171,7 +171,7 @@ const CONTENT: Record<Locale, Content> = {
     faqTitle: "Frequently asked questions",
     faq: [
       { q: "Can Excel manage in-kind donations?", a: "For a small, one-off intake, yes. But it doesn't validate expiry or controlled substances, generate QR codes or customs manifests, give box-to-shipment traceability, or add up stock across several centers. As soon as intake grows, those gaps stall shipments." },
-      { q: "What is the best software for an aid collection center?", a: "The one that standardizes item-level intake, guarantees the homogeneous box with a QR code, produces the exportable manifest, and aggregates stock nationally — without charging per box or asking for donors' personal data. Araguaney is built for exactly that, and it's free." },
+      { q: "What is the best software for an aid collection center?", a: "The one that standardizes item-level intake, guarantees the homogeneous box with a QR code, produces the exportable manifest, and aggregates stock nationally, without charging per box or asking for donors' personal data. Araguaney is built for exactly that, and it's free." },
       { q: "How much does Araguaney cost?", a: "It's free for collection centers and humanitarian coordinations: item-level intake, boxes with QR, manifests and an aggregated dashboard, with no license fee and no box limit." },
       { q: "How do I migrate from my spreadsheet?", a: "There's no bulk import: you start registering new inventory directly in Araguaney as it comes in. Because intake is item-level and guided, in practice it's faster than keeping the spreadsheet up to date." },
     ],

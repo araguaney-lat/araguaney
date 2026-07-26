@@ -58,12 +58,12 @@ const CONTENT: Record<Locale, Content> = {
     ogTitle: "Software de ayuda humanitaria — Araguaney",
     ogImageTitle: "Software de ayuda humanitaria",
     description:
-      "¿Qué software sirve para donaciones de emergencia? Araguaney registra, empaca en cajas homogéneas con QR y genera manifiestos para cualquier escenario de ayuda humanitaria — sismos, inundaciones, crisis migratorias e incendios.",
+      "¿Qué software sirve para donaciones de emergencia? Araguaney registra, empaca en cajas homogéneas con QR y genera manifiestos para cualquier escenario de ayuda humanitaria: sismos, inundaciones, crisis migratorias e incendios.",
     ogEyebrow: "Ayuda humanitaria",
     eyebrow: "Ayuda humanitaria",
     h1: "Software de ayuda humanitaria para cualquier tipo de emergencia",
     heroP:
-      "Desde sismos hasta inundaciones, crisis migratorias o incendios: Araguaney estandariza el registro, empaque y envío de donaciones en especie para cualquier centro de acopio, en cualquier emergencia — no está atado a un solo evento.",
+      "Desde sismos hasta inundaciones, crisis migratorias o incendios: Araguaney estandariza el registro, empaque y envío de donaciones en especie para cualquier centro de acopio, en cualquier emergencia. No está atado a un solo evento.",
     heroCta: "Empezar ahora",
     scenariosH2: "Diseñado para cualquier escenario",
     scenarios: [
@@ -74,7 +74,7 @@ const CONTENT: Record<Locale, Content> = {
     ],
     standardH2: "Un mismo estándar, cualquier emergencia",
     standardP:
-      "Araguaney no está diseñado para un desastre específico. Registra donaciones por categoría, lote y caducidad, las empaca en cajas homogéneas con QR, y las consolida en tarimas y envíos con manifiesto exportable — apoyado en estándares reconocidos (OMS, IFRC/ICRC, IOM, UNSPSC, GS1) que garantizan la calidad del inventario sin importar el tipo de emergencia que lo origine.",
+      "Araguaney no está diseñado para un desastre específico. Registra donaciones por categoría, lote y caducidad, las empaca en cajas homogéneas con QR, y las consolida en tarimas y envíos con manifiesto exportable, apoyado en estándares reconocidos (OMS, IFRC/ICRC, IOM, UNSPSC, GS1) que garantizan la calidad del inventario sin importar el tipo de emergencia que lo origine.",
     faqTitle: "Preguntas frecuentes",
     faq: [
       { q: "¿Para qué tipo de emergencias sirve Araguaney?", a: "Para cualquier escenario de ayuda humanitaria: sismos, inundaciones, incendios o crisis migratorias. El estándar de registro, empaque y envío es el mismo, sin importar el evento." },
@@ -99,12 +99,12 @@ const CONTENT: Record<Locale, Content> = {
     ogTitle: "Humanitarian Aid Software — Araguaney",
     ogImageTitle: "Humanitarian aid software",
     description:
-      "What software works for emergency donations? Araguaney handles intake, homogeneous boxes with QR codes, and an exportable manifest for any humanitarian aid scenario — earthquakes, floods, migration crises, and fires.",
+      "What software works for emergency donations? Araguaney handles intake, homogeneous boxes with QR codes, and an exportable manifest for any humanitarian aid scenario: earthquakes, floods, migration crises, and fires.",
     ogEyebrow: "Humanitarian aid",
     eyebrow: "Humanitarian aid",
     h1: "Humanitarian aid software for any emergency scenario",
     heroP:
-      "From earthquakes to floods, migration crises, or fires: Araguaney standardizes the intake, packing, and shipment of in-kind donations for any aid center, in any emergency — it's not tied to a single event.",
+      "From earthquakes to floods, migration crises, or fires: Araguaney standardizes the intake, packing, and shipment of in-kind donations for any aid center, in any emergency. It's not tied to a single event.",
     heroCta: "Get started",
     scenariosH2: "Built for any scenario",
     scenarios: [
@@ -115,13 +115,13 @@ const CONTENT: Record<Locale, Content> = {
     ],
     standardH2: "One standard, any emergency",
     standardP:
-      "Araguaney isn't built for a specific disaster. It registers donations by category, batch, and expiry, packs them into homogeneous boxes with QR codes, and consolidates them into pallets and shipments with an exportable manifest — backed by recognized standards (WHO, IFRC/ICRC, IOM, UNSPSC, GS1) that ensure inventory quality no matter what kind of emergency triggered it.",
+      "Araguaney isn't built for a specific disaster. It registers donations by category, batch, and expiry, packs them into homogeneous boxes with QR codes, and consolidates them into pallets and shipments with an exportable manifest, backed by recognized standards (WHO, IFRC/ICRC, IOM, UNSPSC, GS1) that ensure inventory quality no matter what kind of emergency triggered it.",
     faqTitle: "Frequently asked questions",
     faq: [
       { q: "What kinds of emergencies is Araguaney for?", a: "Any humanitarian aid scenario: earthquakes, floods, wildfires or migration crises. The standard for registering, packing and shipping donations is the same, regardless of the event." },
-      { q: "What is a homogeneous box and why does it matter?", a: "A box holding a single product, a single batch and a single expiry date. It is what the humanitarian shipping regime requires so cargo can be verified at customs without being opened — and doesn't get stuck." },
+      { q: "What is a homogeneous box and why does it matter?", a: "A box holding a single product, a single batch and a single expiry date. It is what the humanitarian shipping regime requires so cargo can be verified at customs without being opened, and doesn't get stuck." },
       { q: "Does Araguaney handle money or beneficiaries?", a: "No. It only manages in-kind donation inventory, traceable from box to shipment. It does not handle cash donations or store final-beneficiary data." },
-      { q: "How much does it cost?", a: "It is free for collection centers and humanitarian coordinations — no box limit and no license fee." },
+      { q: "How much does it cost?", a: "It is free for collection centers and humanitarian coordinations: no box limit and no license fee." },
     ],
     finalH2: "Get ready before the next emergency hits",
     finalCta: "Get started",

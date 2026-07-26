@@ -65,9 +65,9 @@ plataforma detrás de Araguaney · LinkedIn ↗
 > "Araguaney no nació en una oficina. Nació organizando donaciones para Venezuela
 > tras el terremoto de junio de 2026, apoyando en varias etapas del proceso. Ahí
 > vi las dos caras: personas dando todo para que la ayuda llegara a destino, y una
-> logística que se atoraba por falta de orden — cajas armadas sin criterio,
+> logística que se atoraba por falta de orden (cajas armadas sin criterio,
 > inventarios en papel y requisitos de envío internacional imposibles de cubrir a
-> tiempo. Esa energía merece una herramienta a la altura. Eso es Araguaney, y es
+> tiempo). Esa energía merece una herramienta a la altura. Eso es Araguaney, y es
 > gratuito para quien lo necesite."
 
 **Cierre — compromiso de gratuidad (fuera de la cita, en destaque):**
@@ -96,9 +96,9 @@ platform behind Araguaney · LinkedIn ↗
 > "Araguaney wasn't born in an office. It was born while organizing donations for
 > Venezuela after the June 2026 earthquake, supporting several stages of the
 > process. There I saw both sides: people giving everything to get aid to its
-> destination, and logistics that jammed for lack of order — boxes packed without
+> destination, and logistics that jammed for lack of order (boxes packed without
 > criteria, inventories on paper, and international shipping requirements
-> impossible to meet in time. That energy deserves a tool to match. That's
+> impossible to meet in time). That energy deserves a tool to match. That's
 > Araguaney, and it's free for whoever needs it."
 
 **Cierre — compromiso de gratuidad (fuera de la cita, en destaque):**

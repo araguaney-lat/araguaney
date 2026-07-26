@@ -46,13 +46,13 @@ const CONTENT: Record<Locale, Content> = {
     eyebrow: "México",
     h1: "Centro de acopio en México",
     heroP:
-      "En México, los centros de acopio se multiplican tras cada emergencia — en la CDMX, Monterrey, Guadalajara y decenas de ciudades más. Araguaney les da un estándar común para registrar donaciones en especie, empacarlas bien y preparar envíos que cumplan las reglas, sin importar desde qué ciudad operen.",
+      "En México, los centros de acopio se multiplican tras cada emergencia: en la CDMX, Monterrey, Guadalajara y decenas de ciudades más. Araguaney les da un estándar común para registrar donaciones en especie, empacarlas bien y preparar envíos que cumplan las reglas, sin importar desde qué ciudad operen.",
     cofeprisH2: "Identificación de medicamentos (COFEPRIS)",
     cofeprisP:
-      "En México, los medicamentos se identifican y regulan a través de COFEPRIS. Para que una donación de medicamentos pueda usarse y enviarse, necesita estar bien identificada: denominación (INN), lote y caducidad legibles, y una vida útil restante suficiente. Araguaney captura esos datos en el registro por ítem y aplica las reglas de la OMS (vida útil mínima, bloqueo de controlados) en el momento de la recepción — de modo que lo que se sella ya viene identificado y en regla.",
+      "En México, los medicamentos se identifican y regulan a través de COFEPRIS. Para que una donación de medicamentos pueda usarse y enviarse, necesita estar bien identificada: denominación (INN), lote y caducidad legibles, y una vida útil restante suficiente. Araguaney captura esos datos en el registro por ítem y aplica las reglas de la OMS (vida útil mínima, bloqueo de controlados) en el momento de la recepción, de modo que lo que se sella ya viene identificado y en regla.",
     aduanaH2: "Aduana e importación humanitaria (SAT)",
     aduanaP:
-      "Cuando la ayuda cruza frontera, la autoridad aduanera (SAT) necesita verificar rápido qué contiene cada bulto. Un envío mal documentado se atora. Araguaney genera el manifiesto / packing list automáticamente a partir de las cajas homogéneas y tarimas de cada envío, con clasificación reconocida (IFRC/ICRC, UNSPSC) — lo que la aduana necesita para verificar el contenido sin abrir cada caja.",
+      "Cuando la ayuda cruza frontera, la autoridad aduanera (SAT) necesita verificar rápido qué contiene cada bulto. Un envío mal documentado se atora. Araguaney genera el manifiesto / packing list automáticamente a partir de las cajas homogéneas y tarimas de cada envío, con clasificación reconocida (IFRC/ICRC, UNSPSC): lo que la aduana necesita para verificar el contenido sin abrir cada caja.",
     aduanaNote:
       "Esta página es orientativa y no constituye asesoría legal ni aduanera. Consulta siempre la normativa vigente y a la autoridad correspondiente para tu caso.",
     aduanaGuideLink: "Guía completa: cómo preparar carga humanitaria para aduana →",
@@ -75,13 +75,13 @@ const CONTENT: Record<Locale, Content> = {
     eyebrow: "Mexico",
     h1: "Aid collection center in Mexico",
     heroP:
-      "In Mexico, collection centers multiply after every emergency — in Mexico City, Monterrey, Guadalajara and dozens more. Araguaney gives them a common standard to register in-kind donations, pack them well, and prepare shipments that meet the rules, no matter which city they operate from.",
+      "In Mexico, collection centers multiply after every emergency: in Mexico City, Monterrey, Guadalajara and dozens more. Araguaney gives them a common standard to register in-kind donations, pack them well, and prepare shipments that meet the rules, no matter which city they operate from.",
     cofeprisH2: "Medicine identification (COFEPRIS)",
     cofeprisP:
-      "In Mexico, medicines are identified and regulated through COFEPRIS. For a medicine donation to be usable and shippable, it needs proper identification: legible name (INN), batch and expiry, and enough remaining shelf life. Araguaney captures that at item-level intake and applies WHO rules (minimum shelf life, blocking of controlled substances) at the moment of receipt — so what's sealed is already identified and compliant.",
+      "In Mexico, medicines are identified and regulated through COFEPRIS. For a medicine donation to be usable and shippable, it needs proper identification: legible name (INN), batch and expiry, and enough remaining shelf life. Araguaney captures that at item-level intake and applies WHO rules (minimum shelf life, blocking of controlled substances) at the moment of receipt, so what's sealed is already identified and compliant.",
     aduanaH2: "Customs and humanitarian imports (SAT)",
     aduanaP:
-      "When aid crosses a border, the customs authority (SAT) needs to quickly verify what each package contains. A poorly documented shipment gets stuck. Araguaney generates the manifest / packing list automatically from each shipment's homogeneous boxes and pallets, with recognized classification (IFRC/ICRC, UNSPSC) — what customs needs to verify contents without opening every box.",
+      "When aid crosses a border, the customs authority (SAT) needs to quickly verify what each package contains. A poorly documented shipment gets stuck. Araguaney generates the manifest / packing list automatically from each shipment's homogeneous boxes and pallets, with recognized classification (IFRC/ICRC, UNSPSC): what customs needs to verify contents without opening every box.",
     aduanaNote:
       "This page is informational and is not legal or customs advice. Always consult current regulations and the relevant authority for your case.",
     aduanaGuideLink: "Full guide: how to prepare humanitarian cargo for customs →",

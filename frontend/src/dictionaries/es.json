@@ -33,7 +33,7 @@
       {
         "n": "02",
         "title": "Empacar",
-        "desc": "Cajas homogéneas —un solo producto, lote y caducidad— selladas con su QR y etiqueta.",
+        "desc": "Cajas homogéneas (un solo producto, lote y caducidad) selladas con su QR y etiqueta.",
         "desc_short": "Cajas homogéneas selladas con QR."
       },
       {
@@ -93,7 +93,7 @@
       },
       {
         "name": "UNSPSC",
-        "full": "Naciones Unidas — Código de Productos y Servicios",
+        "full": "Código de Productos y Servicios de Naciones Unidas",
         "desc": "Taxonomía universal de productos para categorizar todos los tipos de insumos."
       },
       {

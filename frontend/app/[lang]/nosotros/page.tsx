@@ -76,7 +76,7 @@ const CONTENT: Record<Locale, Content> = {
     howH2: "Cómo lo hacemos",
     steps: [
       { icon: "📝", title: "Registro por ítem", desc: "Cada donación se captura con categoría, lote y caducidad, con reglas de calidad que rechazan lo que no cumple." },
-      { icon: "📦", title: "Caja homogénea con QR", desc: "Un solo producto, lote y caducidad por caja. QR y etiqueta impresos al sellar — trazable de punta a punta." },
+      { icon: "📦", title: "Caja homogénea con QR", desc: "Un solo producto, lote y caducidad por caja. QR y etiqueta impresos al sellar: trazable de punta a punta." },
       { icon: "📋", title: "Tarima y envío con manifiesto", desc: "Las cajas se consolidan en tarimas y envíos con packing list exportable, listo para aduana." },
       { icon: "🗺️", title: "Panel nacional agregado", desc: "El stock de todos los centros conectados, sumado en tiempo real: qué hay, cuánto y dónde." },
     ],
@@ -98,7 +98,7 @@ const CONTENT: Record<Locale, Content> = {
     founderBio:
       "Llevo más de 20 años en tecnología como desarrollador de software, resolviendo problemas concretos de operación. Hoy lidero un departamento global de gestión de incidencias tecnológicas en una empresa internacional: sistemas que tienen que funcionar cuando algo se rompe y hay gente esperando. Araguaney está construido con ese mismo criterio.",
     founderQuote:
-      "Araguaney no nació en una oficina. Nació organizando donaciones para Venezuela tras el terremoto de junio de 2026, apoyando en varias etapas del proceso. Ahí vi las dos caras: personas dando todo para que la ayuda llegara a destino, y una logística que se atoraba por falta de orden — cajas armadas sin criterio, inventarios en papel y requisitos de envío internacional imposibles de cubrir a tiempo. Esa energía merece una herramienta a la altura. Eso es Araguaney, y es gratuito para quien lo necesite.",
+      "Araguaney no nació en una oficina. Nació organizando donaciones para Venezuela tras el terremoto de junio de 2026, apoyando en varias etapas del proceso. Ahí vi las dos caras: personas dando todo para que la ayuda llegara a destino, y una logística que se atoraba por falta de orden (cajas armadas sin criterio, inventarios en papel y requisitos de envío internacional imposibles de cubrir a tiempo). Esa energía merece una herramienta a la altura. Eso es Araguaney, y es gratuito para quien lo necesite.",
     founderFreeTitle: "Araguaney es gratuito, y va a seguir siéndolo.",
     founderFreeBody:
       "Sin licencias, sin límite de cajas y sin costo para centros de acopio ni coordinaciones humanitarias. La herramienta no cobra por ordenar la ayuda.",
@@ -127,7 +127,7 @@ const CONTENT: Record<Locale, Content> = {
     howH2: "How we do it",
     steps: [
       { icon: "📝", title: "Item-level intake", desc: "Every donation is captured with category, batch and expiry, with quality rules that reject what doesn't comply." },
-      { icon: "📦", title: "Homogeneous box with QR", desc: "One product, batch and expiry per box. QR and label printed on sealing — traceable end to end." },
+      { icon: "📦", title: "Homogeneous box with QR", desc: "One product, batch and expiry per box. QR and label printed on sealing: traceable end to end." },
       { icon: "📋", title: "Pallet and shipment with manifest", desc: "Boxes consolidate into pallets and shipments with an exportable packing list, customs-ready." },
       { icon: "🗺️", title: "National dashboard", desc: "The stock of every connected center, added up in real time: what there is, how much, and where." },
     ],
@@ -149,7 +149,7 @@ const CONTENT: Record<Locale, Content> = {
     founderBio:
       "I've spent over 20 years in technology as a software developer, solving concrete operational problems. Today I lead a global technology incident management department at an international company: systems that have to work when something breaks and people are waiting. Araguaney is built to that same standard.",
     founderQuote:
-      "Araguaney wasn't born in an office. It was born while organizing donations for Venezuela after the June 2026 earthquake, supporting several stages of the process. There I saw both sides: people giving everything to get aid to its destination, and logistics that jammed for lack of order — boxes packed without criteria, inventories on paper, and international shipping requirements impossible to meet in time. That energy deserves a tool to match. That's Araguaney, and it's free for whoever needs it.",
+      "Araguaney wasn't born in an office. It was born while organizing donations for Venezuela after the June 2026 earthquake, supporting several stages of the process. There I saw both sides: people giving everything to get aid to its destination, and logistics that jammed for lack of order (boxes packed without criteria, inventories on paper, and international shipping requirements impossible to meet in time). That energy deserves a tool to match. That's Araguaney, and it's free for whoever needs it.",
     founderFreeTitle: "Araguaney is free, and it will stay free.",
     founderFreeBody:
       "No licenses, no box limits and no cost for collection centers or humanitarian coordination teams. The tool doesn't charge for putting aid in order.",

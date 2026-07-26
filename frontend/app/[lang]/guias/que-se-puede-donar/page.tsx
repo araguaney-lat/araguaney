@@ -50,20 +50,20 @@ const CONTENT: Record<Locale, Content> = {
     eyebrow: "Guía",
     h1: "Qué se puede donar en un centro de acopio",
     intro:
-      "No toda donación con buena intención es útil o segura para canalizar hacia una emergencia. Estas son las categorías que un centro de acopio bien organizado acepta — y las reglas detrás de cada una.",
+      "No toda donación con buena intención es útil o segura para canalizar hacia una emergencia. Estas son las categorías que un centro de acopio bien organizado acepta, y las reglas detrás de cada una.",
     categoriesH2: "Categorías aceptadas",
     categorias: [
       { icon: "💊", title: "Medicamentos", desc: "Con INN, lote y caducidad. Mínimo 365 días de vida útil restante. Sin sustancias controladas." },
-      { icon: "🩺", title: "Insumos médicos", desc: "Material de curación, guantes, mascarillas, jeringas — clasificados por el catálogo IFRC/ICRC." },
+      { icon: "🩺", title: "Insumos médicos", desc: "Material de curación, guantes, mascarillas, jeringas, clasificados por el catálogo IFRC/ICRC." },
       { icon: "🥫", title: "Alimentos", desc: "No perecederos, mínimo 180 días de vida útil restante (configurable según el producto)." },
       { icon: "💧", title: "Agua", desc: "Embotellada o en garrafón, sellada de fábrica." },
-      { icon: "🧼", title: "Higiene", desc: "Jabón, pasta dental, toallas sanitarias, pañales — sin abrir." },
-      { icon: "🔧", title: "Herramientas", desc: "Palas, machetes, cascos — equipo para remoción de escombros y reconstrucción." },
-      { icon: "🦺", title: "Equipo de rescate", desc: "Chalecos, linternas, cuerdas — según el catálogo IOM de artículos de emergencia." },
+      { icon: "🧼", title: "Higiene", desc: "Jabón, pasta dental, toallas sanitarias, pañales, sin abrir." },
+      { icon: "🔧", title: "Herramientas", desc: "Palas, machetes, cascos: equipo para remoción de escombros y reconstrucción." },
+      { icon: "🦺", title: "Equipo de rescate", desc: "Chalecos, linternas, cuerdas, según el catálogo IOM de artículos de emergencia." },
     ],
     medsH2: "Reglas de la OMS para medicamentos",
     medsP:
-      "Siguiendo las WHO Guidelines for Medicine Donations, un medicamento solo se acepta si tiene al menos 365 días de vida útil restante a la fecha de recepción, y si se puede registrar con denominación INN, forma farmacéutica, concentración, lote y caducidad. Las sustancias controladas quedan bloqueadas — no se aceptan bajo ninguna circunstancia.",
+      "Siguiendo las WHO Guidelines for Medicine Donations, un medicamento solo se acepta si tiene al menos 365 días de vida útil restante a la fecha de recepción, y si se puede registrar con denominación INN, forma farmacéutica, concentración, lote y caducidad. Las sustancias controladas quedan bloqueadas: no se aceptan bajo ninguna circunstancia.",
     foodH2: "Reglas para alimentos",
     foodP:
       "Los alimentos donados deben tener al menos 180 días de vida útil restante (este umbral es configurable por tipo de producto). Deben ser no perecederos y venir en su empaque original y sellado.",
@@ -89,20 +89,20 @@ const CONTENT: Record<Locale, Content> = {
     eyebrow: "Guide",
     h1: "What can be donated at a collection center",
     intro:
-      "Not every well-intentioned donation is useful or safe to channel toward an emergency. These are the categories a well-organized collection center accepts — and the rules behind each one.",
+      "Not every well-intentioned donation is useful or safe to channel toward an emergency. These are the categories a well-organized collection center accepts, and the rules behind each one.",
     categoriesH2: "Accepted categories",
     categorias: [
       { icon: "💊", title: "Medicine", desc: "With INN name, batch and expiry. At least 365 days of remaining shelf life. No controlled substances." },
-      { icon: "🩺", title: "Medical supplies", desc: "Wound care, gloves, masks, syringes — classified by the IFRC/ICRC catalogue." },
+      { icon: "🩺", title: "Medical supplies", desc: "Wound care, gloves, masks, syringes, classified by the IFRC/ICRC catalogue." },
       { icon: "🥫", title: "Food", desc: "Non-perishable, at least 180 days of remaining shelf life (configurable per product)." },
       { icon: "💧", title: "Water", desc: "Bottled or in jugs, factory-sealed." },
-      { icon: "🧼", title: "Hygiene", desc: "Soap, toothpaste, sanitary pads, diapers — unopened." },
-      { icon: "🔧", title: "Tools", desc: "Shovels, machetes, helmets — gear for debris removal and reconstruction." },
-      { icon: "🦺", title: "Rescue gear", desc: "Vests, flashlights, ropes — per the IOM emergency relief items catalogue." },
+      { icon: "🧼", title: "Hygiene", desc: "Soap, toothpaste, sanitary pads, diapers, unopened." },
+      { icon: "🔧", title: "Tools", desc: "Shovels, machetes, helmets: gear for debris removal and reconstruction." },
+      { icon: "🦺", title: "Rescue gear", desc: "Vests, flashlights, ropes, per the IOM emergency relief items catalogue." },
     ],
     medsH2: "WHO rules for medicines",
     medsP:
-      "Following the WHO Guidelines for Medicine Donations, a medicine is only accepted if it has at least 365 days of remaining shelf life at the date of receipt, and if it can be registered with an INN name, pharmaceutical form, strength, batch and expiry. Controlled substances are blocked — they are not accepted under any circumstances.",
+      "Following the WHO Guidelines for Medicine Donations, a medicine is only accepted if it has at least 365 days of remaining shelf life at the date of receipt, and if it can be registered with an INN name, pharmaceutical form, strength, batch and expiry. Controlled substances are blocked: they are not accepted under any circumstances.",
     foodH2: "Rules for food",
     foodP:
       "Donated food must have at least 180 days of remaining shelf life (this threshold is configurable per product type). It must be non-perishable and come in its original, sealed packaging.",

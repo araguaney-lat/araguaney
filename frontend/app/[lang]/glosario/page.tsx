@@ -56,7 +56,7 @@ const CONTENT: Record<Locale, Content> = {
       {
         term: "Caja homogénea",
         definition:
-          "Caja que contiene un solo tipo de producto, un solo lote y una sola fecha de caducidad — sin mezclas. Es el requisito central del régimen de envío humanitario: permite verificar el contenido sin abrir la caja.",
+          "Caja que contiene un solo tipo de producto, un solo lote y una sola fecha de caducidad, sin mezclas. Es el requisito central del régimen de envío humanitario: permite verificar el contenido sin abrir la caja.",
       },
       {
         term: "Tarima (pallet)",
@@ -101,7 +101,7 @@ const CONTENT: Record<Locale, Content> = {
       {
         term: "UNSPSC",
         definition:
-          "United Nations Standard Products and Services Code — taxonomía internacional para clasificar productos y servicios, disponible en español. Araguaney la usa para categorizar donaciones de forma estandarizada.",
+          "United Nations Standard Products and Services Code: taxonomía internacional para clasificar productos y servicios, disponible en español. Araguaney la usa para categorizar donaciones de forma estandarizada.",
       },
       {
         term: "GS1 / GTIN",
@@ -154,7 +154,7 @@ const CONTENT: Record<Locale, Content> = {
       {
         term: "Homogeneous box",
         definition:
-          "A box that contains a single product type, a single batch and a single expiry date — with no mixing. It's the core requirement of the humanitarian shipping regime: it lets you verify the contents without opening the box.",
+          "A box that contains a single product type, a single batch and a single expiry date, with no mixing. It's the core requirement of the humanitarian shipping regime: it lets you verify the contents without opening the box.",
       },
       {
         term: "Pallet",
@@ -199,7 +199,7 @@ const CONTENT: Record<Locale, Content> = {
       {
         term: "UNSPSC",
         definition:
-          "United Nations Standard Products and Services Code — an international taxonomy to classify products and services, available in Spanish. Araguaney uses it to categorize donations in a standardized way.",
+          "United Nations Standard Products and Services Code: an international taxonomy to classify products and services, available in Spanish. Araguaney uses it to categorize donations in a standardized way.",
       },
       {
         term: "GS1 / GTIN",
