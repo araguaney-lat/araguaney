@@ -4,7 +4,7 @@ import {
   absoluteUrl,
   BRAND_SAME_AS,
   BRAND_FOUNDING_YEAR,
-  BRAND_FOUNDER_NAME,
+  FOUNDER,
 } from "@/lib/seo"
 import type { Locale } from "@/lib/routes"
 
@@ -22,16 +22,40 @@ const PUBLISHER: Schema = {
   logo: { "@type": "ImageObject", url: DEFAULT_OG_IMAGE },
 }
 
+// @id estables a nivel de host: el mismo nodo se referencia desde /nosotros,
+// /en/about y cada guía, en vez de crear una entidad nueva por página.
+export const ORGANIZATION_ID = `${SITE_URL}/#organization`
+export const FOUNDER_ID = `${SITE_URL}/#founder`
+
+// Referencia ligera al Person. Los consumidores que solo necesitan apuntar al
+// autor (Organization.founder, Article.author) usan esto; el nodo completo lo
+// emite /nosotros vía founderPersonSchema.
+const FOUNDER_REF: Schema = { "@type": "Person", "@id": FOUNDER_ID, name: FOUNDER.name }
+
+export function founderPersonSchema(locale: Locale): Schema {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "@id": FOUNDER_ID,
+    name: FOUNDER.name,
+    url: FOUNDER.url,
+    jobTitle: FOUNDER.jobTitle[locale],
+    sameAs: [...FOUNDER.sameAs],
+    worksFor: { "@id": ORGANIZATION_ID },
+  }
+}
+
 export const ORGANIZATION_SCHEMA: Schema = {
   "@context": "https://schema.org",
   "@type": "Organization",
+  "@id": ORGANIZATION_ID,
   name: "Araguaney",
   url: SITE_URL,
   logo: DEFAULT_OG_IMAGE,
   description:
     "El estándar común para la coordinación de centros de acopio y la logística de ayuda humanitaria.",
   foundingDate: BRAND_FOUNDING_YEAR,
-  founder: { "@type": "Person", name: BRAND_FOUNDER_NAME },
+  founder: FOUNDER_REF,
   knowsAbout: [
     "Centros de acopio",
     "Donaciones en especie",
@@ -112,7 +136,9 @@ export function articleSchema({
     inLanguage: locale,
     isAccessibleForFree: true,
     image: DEFAULT_OG_IMAGE,
-    author: PUBLISHER,
+    // Persona escribe, marca publica — es la separación que Google espera para
+    // señales de autoría (E-E-A-T).
+    author: FOUNDER_REF,
     publisher: PUBLISHER,
     // Freshness signals — Google shows them and AI engines weight recency.
     ...(datePublished ? { datePublished } : {}),
