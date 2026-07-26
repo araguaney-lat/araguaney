@@ -27,7 +27,19 @@ export const BRAND_SAME_AS: readonly string[] = [
 
 // Public founder attribution for the Organization `founder` (E-E-A-T signal).
 export const BRAND_FOUNDING_YEAR = "2026"
-export const BRAND_FOUNDER_NAME = "Antony E Delgado Casanova"
+
+// Identidad pública del fundador. `sameAs` es el perfil externo que permite a
+// buscadores y motores de respuesta resolver a la persona como entidad; el rol
+// va por locale porque también se renderiza como texto visible en /nosotros.
+export const FOUNDER = {
+  name: "Antony Delgado",
+  url: "https://www.linkedin.com/in/adelgadox/",
+  sameAs: ["https://www.linkedin.com/in/adelgadox/"] as readonly string[],
+  jobTitle: {
+    es: "Ingeniero de Software y responsable de la plataforma",
+    en: "Software Engineer, responsible for the platform",
+  },
+} as const
 
 export function absoluteUrl(path: string): string {
   return `${SITE_URL}${path.startsWith("/") ? path : `/${path}`}`

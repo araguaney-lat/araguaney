@@ -5,10 +5,15 @@ import HomeFooter from "@/components/HomeFooter"
 import { CtaLink } from "@/components/CtaLink"
 import { Breadcrumbs } from "@/components/Breadcrumbs"
 import { getDictionary } from "@/lib/i18n"
-import { ogImageUrl, alternates } from "@/lib/seo"
+import { ogImageUrl, alternates, FOUNDER } from "@/lib/seo"
 import { type Locale, localizedPath } from "@/lib/routes"
 import { JsonLd } from "@/components/JsonLd"
-import { ORGANIZATION_SCHEMA, aboutPageSchema, breadcrumbSchema } from "@/lib/structured-data"
+import {
+  ORGANIZATION_SCHEMA,
+  aboutPageSchema,
+  breadcrumbSchema,
+  founderPersonSchema,
+} from "@/lib/structured-data"
 
 const KEY = "nosotros"
 
@@ -39,7 +44,12 @@ interface Content {
   privacyH2: string
   privacyP: string
   founderH2: string
-  founderP: string
+  founderRole: string
+  founderBio: string
+  founderQuote: string
+  founderFreeTitle: string
+  founderFreeBody: string
+  founderLinkLabel: string
   finalH2: string
   finalCta: string
   crossFuncText: string
@@ -84,8 +94,15 @@ const CONTENT: Record<Locale, Content> = {
     privacyP:
       "Araguaney no registra datos personales de donantes ni de beneficiarios. Solo gestiona inventario, trazable de la caja al envío. Menos superficie de datos sensibles, menos riesgo, y una herramienta que se concentra en lo que importa: que la ayuda llegue.",
     founderH2: "Quién está detrás",
-    founderP:
-      "Araguaney fue fundado en 2026 por Antony E Delgado Casanova, con la misión de dar a la coordinación humanitaria en especie un estándar común, abierto y gratuito.",
+    founderRole: "Ingeniero de Software y responsable de la plataforma detrás de Araguaney",
+    founderBio:
+      "Llevo más de 20 años en tecnología como desarrollador de software, resolviendo problemas concretos de operación. Hoy lidero un departamento global de gestión de incidencias tecnológicas en una empresa internacional: sistemas que tienen que funcionar cuando algo se rompe y hay gente esperando. Araguaney está construido con ese mismo criterio.",
+    founderQuote:
+      "Araguaney no nació en una oficina. Nació organizando donaciones para Venezuela tras el terremoto de junio de 2026, apoyando en varias etapas del proceso. Ahí vi las dos caras: personas dando todo para que la ayuda llegara a destino, y una logística que se atoraba por falta de orden — cajas armadas sin criterio, inventarios en papel y requisitos de envío internacional imposibles de cubrir a tiempo. Esa energía merece una herramienta a la altura. Eso es Araguaney, y es gratuito para quien lo necesite.",
+    founderFreeTitle: "Araguaney es gratuito, y va a seguir siéndolo.",
+    founderFreeBody:
+      "Sin licencias, sin límite de cajas y sin costo para centros de acopio ni coordinaciones humanitarias. La herramienta no cobra por ordenar la ayuda.",
+    founderLinkLabel: "LinkedIn ↗",
     finalH2: "Suma tu centro al estándar nacional",
     finalCta: "Sumar mi centro de acopio",
     crossFuncText: "¿Quieres ver el flujo completo? ",
@@ -128,8 +145,15 @@ const CONTENT: Record<Locale, Content> = {
     privacyP:
       "Araguaney stores no personal data of donors or beneficiaries. It only manages inventory, traceable from box to shipment. Less sensitive-data surface, less risk, and a tool focused on what matters: getting aid delivered.",
     founderH2: "Who's behind it",
-    founderP:
-      "Araguaney was founded in 2026 by Antony E Delgado Casanova, with the mission of giving in-kind humanitarian coordination a common, open and free standard.",
+    founderRole: "Software Engineer, responsible for the platform behind Araguaney",
+    founderBio:
+      "I've spent over 20 years in technology as a software developer, solving concrete operational problems. Today I lead a global technology incident management department at an international company: systems that have to work when something breaks and people are waiting. Araguaney is built to that same standard.",
+    founderQuote:
+      "Araguaney wasn't born in an office. It was born while organizing donations for Venezuela after the June 2026 earthquake, supporting several stages of the process. There I saw both sides: people giving everything to get aid to its destination, and logistics that jammed for lack of order — boxes packed without criteria, inventories on paper, and international shipping requirements impossible to meet in time. That energy deserves a tool to match. That's Araguaney, and it's free for whoever needs it.",
+    founderFreeTitle: "Araguaney is free, and it will stay free.",
+    founderFreeBody:
+      "No licenses, no box limits and no cost for collection centers or humanitarian coordination teams. The tool doesn't charge for putting aid in order.",
+    founderLinkLabel: "LinkedIn ↗",
     finalH2: "Add your center to the national standard",
     finalCta: "Add my collection center",
     crossFuncText: "Want to see the full flow? ",
@@ -172,6 +196,9 @@ export default async function AboutPage({
   ]
   const structuredData = [
     ORGANIZATION_SCHEMA,
+    // Nodo completo del fundador: esta es su entity home. El resto del sitio
+    // solo lo referencia por @id.
+    founderPersonSchema(locale),
     aboutPageSchema({ path: localizedPath(KEY, locale), locale }),
     breadcrumbSchema(crumbs),
   ]
@@ -286,9 +313,48 @@ export default async function AboutPage({
             <h2 className="text-[18px] md:text-[22px] mb-3" style={{ fontFamily: "var(--font-source-serif)", fontWeight: 600, margin: "0 0 12px" }}>
               {c.founderH2}
             </h2>
-            <p className="text-[14.5px] md:text-[16px]" style={{ color: "#5C5347", lineHeight: 1.65 }}>
-              {c.founderP}
+
+            <div className="text-[16px] md:text-[18px]" style={{ fontWeight: 600, color: "#2B2723" }}>
+              {FOUNDER.name}
+            </div>
+            <div className="text-[13.5px] mb-4 flex flex-wrap items-center gap-x-2" style={{ color: "#6E6557" }}>
+              <span>{c.founderRole}</span>
+              {/* El rol envuelve en móvil y el separador quedaría solo al inicio
+                  de la línea siguiente; solo se muestra donde caben en una. */}
+              <span className="hidden md:inline" aria-hidden>
+                ·
+              </span>
+              <a
+                href={FOUNDER.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: "#1F5E8C", fontWeight: 600 }}
+              >
+                {c.founderLinkLabel}
+              </a>
+            </div>
+
+            <p className="text-[14.5px] md:text-[16px] mb-5" style={{ color: "#5C5347", lineHeight: 1.65 }}>
+              {c.founderBio}
             </p>
+
+            <blockquote
+              className="text-[14.5px] md:text-[16px] pl-4 mb-6"
+              style={{ borderLeft: "2px solid #EAD9B0", color: "#5C5347", lineHeight: 1.65, fontStyle: "italic", margin: "0 0 24px" }}
+            >
+              {c.founderQuote}
+            </blockquote>
+
+            {/* El compromiso de gratuidad va fuera de la cita: es promesa del
+                producto, no opinión del fundador, y debe leerse por sí solo. */}
+            <div className="p-4 rounded-xl" style={{ background: "#FBEFC9", border: "1px solid #EAD9B0" }}>
+              <div className="text-[14.5px] md:text-[15.5px]" style={{ fontWeight: 700, color: "#2B2723", marginBottom: 4 }}>
+                {c.founderFreeTitle}
+              </div>
+              <div className="text-[13.5px] md:text-[14.5px]" style={{ color: "#5C5347", lineHeight: 1.6 }}>
+                {c.founderFreeBody}
+              </div>
+            </div>
           </div>
         </div>
 

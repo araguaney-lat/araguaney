@@ -1,4 +1,5 @@
 import type { Locale, RouteKey } from "@/lib/routes"
+import { FOUNDER } from "@/lib/seo"
 
 export interface ContentDates {
   /** ISO yyyy-mm-dd the page was first published. */
@@ -40,5 +41,5 @@ export function updatedLabel(locale: Locale): string {
 
 /** Byline label per locale (links to /nosotros — E-E-A-T author attribution). */
 export function authorByline(locale: Locale): string {
-  return locale === "es" ? "Por el equipo de Araguaney" : "By the Araguaney team"
+  return locale === "es" ? `Por ${FOUNDER.name}` : `By ${FOUNDER.name}`
 }
