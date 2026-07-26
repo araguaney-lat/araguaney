@@ -374,3 +374,22 @@ def get_me_v2(current_user = Depends(get_current_user)):
 ```
 
 Unversioned routes (Stripe webhooks, health check) bypass the registry entirely.
+
+## Licencia y marca
+
+El código de Araguaney es **software libre bajo [AGPL-3.0](LICENSE)**: puedes
+usarlo, estudiarlo, modificarlo y desplegar tu propia instancia. Si operas una
+versión modificada como servicio, la AGPL te obliga a publicar tus cambios.
+
+El uso de la plataforma en [araguaney.lat](https://www.araguaney.lat) es
+**gratuito** para centros de acopio y coordinaciones humanitarias: sin
+licencias, sin límite de cajas y sin costo por uso.
+
+**La marca no se licencia con el código.** El nombre "Araguaney", el logo y el
+dominio araguaney.lat identifican la instancia oficial y su red de centros.
+Un fork debe operar bajo otro nombre y dominio, sin presentarse como la
+instancia oficial — especialmente durante una emergencia, cuando la confusión
+cuesta más.
+
+Para reportar vulnerabilidades: [SECURITY.md](SECURITY.md). Para contribuir:
+[CONTRIBUTING.md](CONTRIBUTING.md).
