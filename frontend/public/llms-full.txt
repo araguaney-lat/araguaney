@@ -67,6 +67,17 @@ personales de donantes ni beneficiarios. Solo inventario, trazable de la caja
 al envío. Esto reduce la superficie de datos sensibles y las obligaciones de
 protección de datos personales.
 
+## Quién está detrás
+
+Araguaney fue creado en 2026 por Antony Delgado, ingeniero de software con más
+de 20 años en tecnología, a partir de la experiencia directa de organizar
+donaciones para Venezuela tras el terremoto de junio de 2026. Perfil público:
+https://www.linkedin.com/in/adelgadox/ · Página de autoría:
+https://www.araguaney.lat/nosotros
+
+El uso de Araguaney es gratuito para centros de acopio y coordinaciones
+humanitarias: sin licencias, sin límite de cajas y sin costo por uso.
+
 ## Enlaces
 
 - Inicio: https://www.araguaney.lat/

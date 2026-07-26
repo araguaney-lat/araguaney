@@ -21,6 +21,18 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: readonly ChangelogEntry[] = [
   {
+    date: "2026-07-26",
+    tag: "improvement",
+    es: {
+      title: "Quién está detrás de Araguaney",
+      body: "La página Nosotros ahora dice quién construye y responde por la plataforma, con su perfil público, y deja explícito el compromiso: Araguaney es gratuito y va a seguir siéndolo.",
+    },
+    en: {
+      title: "Who's behind Araguaney",
+      body: "The About page now says who builds and answers for the platform, with a public profile, and makes the commitment explicit: Araguaney is free and will stay free.",
+    },
+  },
+  {
     date: "2026-07-24",
     tag: "new",
     es: {
