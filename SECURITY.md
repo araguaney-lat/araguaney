@@ -6,7 +6,7 @@
 
 - **GitHub**: usa [Private vulnerability reporting](../../security/advisories/new)
   (pestaña *Security* → *Report a vulnerability*). Es el canal preferido.
-- **Email**: antony.edc@gmail.com con el asunto `[SECURITY] araguaney`.
+- **Email**: security@araguaney.lat con el asunto `[SECURITY] araguaney`.
 
 No abras un issue público para vulnerabilidades. Araguaney gestiona inventario
 de ayuda humanitaria de centros reales: una fuga entre centros o un bypass de
@@ -19,7 +19,7 @@ mejor esfuerzo.
 
 **EN** — If you find a vulnerability, report it privately via
 [GitHub private vulnerability reporting](../../security/advisories/new)
-(preferred) or by email to antony.edc@gmail.com with subject
+(preferred) or by email to security@araguaney.lat with subject
 `[SECURITY] araguaney`. Please do not open a public issue. Include a
 description, reproduction steps and estimated impact. Target response:
 acknowledgement within 72 hours. Single-maintainer project — fixes are
