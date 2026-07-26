@@ -22,11 +22,14 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     )
     try:
         payload = jwt.decode(token, settings.secret_key, algorithms=[settings.algorithm])
-        user_id: str = payload.get("sub")
+        raw_user_id: str | None = payload.get("sub")
         jti: str | None = payload.get("jti")
-        if user_id is None or jti is None:
+        if raw_user_id is None or jti is None:
             raise credentials_exception
-    except jwt.PyJWTError:
+        # Parse here so a malformed sub is a 401, not a DB error deeper down
+        # (Postgres coerces str→uuid implicitly; other dialects don't).
+        user_id = _uuid.UUID(raw_user_id)
+    except (jwt.PyJWTError, ValueError):
         raise credentials_exception
 
     if TokenDenylistRepository(db).is_denied(jti):

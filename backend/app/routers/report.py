@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 
 from app.arq_pool import enqueue
 from app.database import get_db
-from app.dependencies import get_current_user
+from app.dependencies import get_current_user, tenant_scope
 from app.models.user import User
 from app.repositories.export_job_repository import ExportJobRepository
 from app.repositories.report_repository import ReportRepository
@@ -46,10 +46,6 @@ def _require_campaign_access(repo: ReportRepository, user: User, campaign_id: UU
         raise api_error("FORBIDDEN", "No tienes acceso a esta campaña", status_code=403)
 
 
-def _center_scope(user: User) -> UUID | None:
-    return None if user.center_role == "national_admin" else user.center_id
-
-
 @router.get("/campaign/{campaign_id}/summary", response_model=ReportSummary)
 @limiter.limit("60/minute")
 def get_summary(
@@ -63,7 +59,7 @@ def get_summary(
     repo = ReportRepository(db)
     _require_campaign_access(repo, current_user, campaign_id)
     s, e = _resolve_dates(start, end)
-    return repo.summary(campaign_id, _center_scope(current_user), s, e)
+    return repo.summary(campaign_id, tenant_scope(current_user), s, e)
 
 
 @router.get("/campaign/{campaign_id}/activity", response_model=list[ActivityPoint])
@@ -79,7 +75,7 @@ def get_activity(
     repo = ReportRepository(db)
     _require_campaign_access(repo, current_user, campaign_id)
     s, e = _resolve_dates(start, end)
-    return repo.activity(campaign_id, _center_scope(current_user), s, e)
+    return repo.activity(campaign_id, tenant_scope(current_user), s, e)
 
 
 @router.get("/campaign/{campaign_id}/by-category", response_model=list[CategoryBreakdown])
@@ -95,7 +91,7 @@ def get_by_category(
     repo = ReportRepository(db)
     _require_campaign_access(repo, current_user, campaign_id)
     s, e = _resolve_dates(start, end)
-    return repo.by_category(campaign_id, _center_scope(current_user), s, e)
+    return repo.by_category(campaign_id, tenant_scope(current_user), s, e)
 
 
 @router.get("/campaign/{campaign_id}/by-center", response_model=list[CenterBreakdown])
@@ -111,7 +107,7 @@ def get_by_center(
     repo = ReportRepository(db)
     _require_campaign_access(repo, current_user, campaign_id)
     s, e = _resolve_dates(start, end)
-    return repo.by_center(campaign_id, _center_scope(current_user), s, e)
+    return repo.by_center(campaign_id, tenant_scope(current_user), s, e)
 
 
 @router.get("/campaign/{campaign_id}/countries", response_model=list[CountryPoint])
@@ -127,7 +123,7 @@ def get_countries(
     repo = ReportRepository(db)
     _require_campaign_access(repo, current_user, campaign_id)
     s, e = _resolve_dates(start, end)
-    return repo.countries(campaign_id, _center_scope(current_user), s, e)
+    return repo.countries(campaign_id, tenant_scope(current_user), s, e)
 
 
 @router.post("/campaign/{campaign_id}/export.csv", response_model=ExportJobOut, status_code=202)
@@ -145,7 +141,7 @@ def export_csv(
     repo = ReportRepository(db)
     _require_campaign_access(repo, current_user, campaign_id)
     s, e = _resolve_dates(start, end)
-    scope = _center_scope(current_user)
+    scope = tenant_scope(current_user)
 
     job = ExportJobRepository(db).create(
         kind="REPORT_EXPORT_CSV",
