@@ -1,4 +1,5 @@
 {
+  "_comment": "Respuestas para la postulacion al DPG Registry. El repositorio publicgoods-candidates fue archivado en 2024; este archivo ya no se sube; es la fuente desde la que se copian los datos al portal https://app.digitalpublicgoods.net/signup. Estructura conservada del esquema oficial por claridad.",
   "name": "Araguaney",
   "description": "Free and open-source software for humanitarian aid collection centers. It registers in-kind donations item by item with quality rules (WHO medicine donation guidelines), packs them into homogeneous boxes with QR codes, consolidates them into pallets and shipments with a customs-ready manifest, and aggregates the stock of every connected center into a national dashboard. It stores no personal data of donors or beneficiaries.",
   "website": "https://www.araguaney.lat",
