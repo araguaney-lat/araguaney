@@ -17,7 +17,7 @@ export const privacyEn: LegalDoc = {
       heading: "Data controller",
       blocks: [
         "The controller of your personal data is the Araguaney project (\"Araguaney\", \"the platform\", \"we\"), a non-profit initiative to coordinate humanitarian aid collection centers.",
-        "As of the date of this notice, Araguaney is a project in the process of being formally constituted as a legal entity. Until that is complete, the operating controller handles privacy requests through the email listed in the Data Subject Rights section. This notice will be updated with the legal name and registered address once the entity is constituted.",
+        "As of the date of this notice there is no legal entity associated with the project: the data controller is Antony Delgado Casanova, the project's owner, who personally handles privacy requests through the email listed below and in the Data Subject Rights section. If a legal entity is constituted in the future, this notice will be updated with its legal name and registered address.",
         "For any matter related to your personal data or this notice, contact us at: privacidad@araguaney.lat",
       ],
     },
