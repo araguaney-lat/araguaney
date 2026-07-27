@@ -87,6 +87,32 @@ export const BRAND_SAME_AS: readonly string[] = [
 
 ---
 
+## Renovación anual del DPG (una vez al año)
+
+Si Araguaney entra al [DPG Registry](https://digitalpublicgoods.net/registry),
+el reconocimiento **vale un año**. La DPG Alliance envía una renovación anual y
+hay que confirmar que la solución sigue cumpliendo el DPG Standard. Si no se
+responde, o si se dejó de cumplir algún indicador, la entrada pasa a estado
+**Expired** y se pierde el listado (y con él la referencia externa que sostiene
+el ítem de Wikidata).
+
+Qué revisar antes de confirmar la renovación:
+
+- La licencia sigue siendo AGPL-3.0 y el repositorio sigue público.
+- `SECURITY.md`, `CODE_OF_CONDUCT.md` y `CONTRIBUTING.md` siguen vigentes y con
+  contactos que funcionan.
+- Sigue sin registrarse PII de donantes ni beneficiarios (es el indicador donde
+  el proyecto es más fuerte, y el más fácil de romper sin darse cuenta al
+  agregar features).
+- Los exportes no-PII siguen disponibles (manifiesto XLSX, CSV de reportes, API).
+- Aviso de privacidad y Términos siguen publicados y actualizados.
+
+Las respuestas por indicador, con enlaces, están en
+[`seo/entity-registration.md`](seo/entity-registration.md) — sirven de base para
+la renovación, no solo para la postulación inicial.
+
+---
+
 ## Recordatorios de infraestructura (una sola vez, ya configurados)
 
 Estos ya están hechos; anótalos por si migras de entorno o alguien pregunta:

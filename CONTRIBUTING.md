@@ -60,6 +60,10 @@ npx tsc --noEmit             # typecheck
 - Commits: formato convencional (`feat:`, `fix:`, `docs:`, `test:`, `chore:`).
 - En el copy visible: sin raya (—) como inciso; paréntesis, dos puntos o coma.
 
+## Código de conducta
+
+Al participar aceptas el [Código de Conducta](CODE_OF_CONDUCT.md).
+
 ## Licencia
 
 Al contribuir aceptas que tu aporte se licencia bajo [AGPL-3.0](LICENSE).

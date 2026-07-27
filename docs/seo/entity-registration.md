@@ -53,7 +53,7 @@ existe en el repositorio:
 | 8 | Estándares abiertos y buenas prácticas | ✅ | WHO Guidelines for Medicine Donations, catálogo IFRC/ICRC, IOM ERIC, UNSPSC, GS1 — documentados en `/nosotros` |
 | 9A | Privacidad y seguridad de datos | ✅ | `SECURITY.md` con canal privado, `docs/security.md` con las capas, suite de aislamiento multi-tenant en CI, secret scanning + push protection |
 | 9B | Contenido inapropiado / ilegal | ✅ | No hay contenido generado por usuarios público. La mensajería es interna entre operadores autenticados |
-| 9C | Protección contra acoso | ✅ | Sin funciones sociales públicas. Mensajería con guard de participante y auditoría por acción |
+| 9C | Protección contra acoso | ✅ | Sin funciones sociales públicas. Mensajería con guard de participante y auditoría por acción. `CODE_OF_CONDUCT.md` con canal de reporte |
 
 **Única brecha real: el indicador 1.** Antes de postular, declarar los ODS en
 el README. Propuesta de redacción:
@@ -94,6 +94,86 @@ pedir aclaraciones por comentarios en el PR.
 > **Antes de postular**: el campo `contact_email` apunta a
 > `security@araguaney.lat`. Si prefieres un buzón general (`hola@`, `contacto@`),
 > créalo y cámbialo en el JSON.
+
+### Respuestas por indicador (para copiar al formulario)
+
+La guía de postulación pide **evidencia con enlaces** para cada uno de los 9
+indicadores. Estas son las respuestas con las URLs exactas.
+
+**1. Relevancia para los ODS** — usar el texto de `SDGs` en
+[`dpg-nominee-araguaney.json`](dpg-nominee-araguaney.json) (ODS 11 target 11.5
+y ODS 17 targets 17.16-17.17, cada uno con su evidencia).
+
+**2. Licencia abierta** — AGPL-3.0, aprobada por OSI:
+https://github.com/araguaney-lat/araguaney/blob/main/LICENSE
+
+**3. Propiedad clara** — repositorio bajo la organización `araguaney-lat`;
+sección "Licencia y marca" del README
+(https://github.com/araguaney-lat/araguaney#licencia-y-marca), que separa el
+código libre de la marca; sección "Propiedad y responsabilidad de los datos"
+de los Términos (https://www.araguaney.lat/terminos); autoría del fundador en
+https://www.araguaney.lat/nosotros
+
+**4. Independencia de plataforma** — sin dependencias propietarias
+obligatorias: FastAPI + PostgreSQL + Next.js, todos open source.
+`backend/Dockerfile`, `frontend/Dockerfile` y `docker-compose.yml` permiten
+correr la pila completa en cualquier infraestructura. Vercel y Railway son la
+instancia oficial, no un requisito. Servicios externos opcionales (Sentry,
+Cloudinary, Resend) degradan de forma controlada o se sustituyen por
+configuración.
+
+**5. Documentación** — README (arquitectura, stack, setup),
+[`CONTRIBUTING.md`](https://github.com/araguaney-lat/araguaney/blob/main/CONTRIBUTING.md)
+(entorno de desarrollo reproducible sin servicios externos), `CLAUDE.md`
+(reglas de dominio y de negocio), carpeta `docs/`, y manuales de usuario dentro
+de la app en `/dashboard/ayuda`.
+
+**6. Mecanismo de extracción de datos no-PII** — el inventario se exporta sin
+datos personales:
+- Manifiesto / packing list en PDF y **XLSX** por envío
+  (`POST /v1/shipments/{id}/manifest.xlsx`, formato alineado a IFRC).
+- Reportes de campaña en **CSV** (`POST /v1/reports/campaign/{id}/export.csv`).
+- **API REST** en JSON para todo el modelo de dominio.
+No hay PII que exportar: el sistema no registra datos de donantes ni
+beneficiarios.
+
+**7. Privacidad y cumplimiento legal** — sí se recogen datos personales, pero
+solo de las **personas operadoras** (nombre, correo institucional), no de
+donantes ni beneficiarios. Aviso de privacidad:
+https://www.araguaney.lat/aviso-de-privacidad · Términos:
+https://www.araguaney.lat/terminos · Jurisdicción y ley aplicable: México
+(LFPDPPP), declarada en los Términos.
+
+**8. Estándares abiertos y buenas prácticas** — WHO Guidelines for Medicine
+Donations (vida útil, INN, controlados), catálogo de materiales IFRC/ICRC, IOM
+Emergency Relief Items Catalogue, taxonomía UNSPSC, códigos GS1/GTIN. Todos
+listados con su función en https://www.araguaney.lat/nosotros
+
+**9. No causar daño por diseño**
+- *Datos personales y seguridad*: solo cuentas de operadores. Contraseñas con
+  bcrypt, JWT con lista de revocación, cifrado de columnas sensibles,
+  rate limiting, WAF de Cloudflare, headers de seguridad y CSP. Aislamiento
+  entre centros verificado por una suite de tests que corre en cada PR
+  (`backend/tests/tenant/`). Política de reporte:
+  [`SECURITY.md`](https://github.com/araguaney-lat/araguaney/blob/main/SECURITY.md),
+  con reporte privado habilitado en GitHub.
+- *Contenido ilegal o inapropiado*: no hay contenido público generado por
+  usuarios. La mensajería es interna entre operadores autenticados de centros
+  aprobados.
+- *Protección frente al acoso*: sin funciones sociales públicas; la mensajería
+  exige ser participante del hilo o miembro de la campaña, y cada acción queda
+  en la auditoría. Código de conducta:
+  [`CODE_OF_CONDUCT.md`](https://github.com/araguaney-lat/araguaney/blob/main/CODE_OF_CONDUCT.md)
+
+### Después de postular
+
+- Revisión técnica del equipo del DPG, objetivo **30 días** (varía con el
+  volumen de solicitudes).
+- Si se aprueba: entrada en el DPG Registry y acceso a la comunidad de Product
+  Owners.
+- **El reconocimiento vale un año.** Hay que responder la renovación anual y
+  seguir cumpliendo el Standard; si no, la solución pasa a estado *Expired*.
+  Anotado en el runbook de mantenimiento (`docs/seo-maintenance.md`).
 
 ### Prioridad 2: catálogos de tecnología humanitaria
 
