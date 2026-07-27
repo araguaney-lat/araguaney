@@ -400,4 +400,5 @@ instancia oficial — especialmente durante una emergencia, cuando la confusión
 cuesta más.
 
 Para reportar vulnerabilidades: [SECURITY.md](SECURITY.md). Para contribuir:
-[CONTRIBUTING.md](CONTRIBUTING.md).
+[CONTRIBUTING.md](CONTRIBUTING.md). Normas de convivencia:
+[CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
