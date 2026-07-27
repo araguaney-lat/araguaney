@@ -5,6 +5,8 @@ import {
   BRAND_SAME_AS,
   BRAND_FOUNDING_YEAR,
   FOUNDER,
+  LICENSE_URL,
+  SOURCE_REPO_URL,
 } from "@/lib/seo"
 import type { Locale } from "@/lib/routes"
 
@@ -93,6 +95,11 @@ export const SOFTWARE_APPLICATION_SCHEMA: Schema = {
     "In-kind donation management for aid centers: item-level intake, homogeneous boxes with QR codes, pallets and shipments with an exportable manifest.",
   url: SITE_URL,
   offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  // Software libre: `license` + `isAccessibleForFree` distinguen "gratis" de
+  // "abierto" — son dos promesas distintas y ambas verificables.
+  license: LICENSE_URL,
+  isAccessibleForFree: true,
+  codeRepository: SOURCE_REPO_URL,
 }
 
 // AboutPage for /nosotros — marks it as the entity home and links it to the

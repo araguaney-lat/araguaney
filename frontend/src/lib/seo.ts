@@ -25,6 +25,12 @@ export const BRAND_SAME_AS: readonly string[] = [
   "https://github.com/araguaney-lat",
 ]
 
+// Repositorio público y licencia. El código abierto es una señal de confianza
+// verificable: cualquiera puede auditar que no se guardan datos personales.
+export const SOURCE_REPO_URL = "https://github.com/araguaney-lat/araguaney"
+export const LICENSE_URL = "https://www.gnu.org/licenses/agpl-3.0.html"
+export const LICENSE_NAME = "AGPL-3.0"
+
 // Public founder attribution for the Organization `founder` (E-E-A-T signal).
 export const BRAND_FOUNDING_YEAR = "2026"
 

@@ -5,7 +5,7 @@ import HomeFooter from "@/components/HomeFooter"
 import { CtaLink } from "@/components/CtaLink"
 import { Breadcrumbs } from "@/components/Breadcrumbs"
 import { getDictionary } from "@/lib/i18n"
-import { ogImageUrl, alternates, FOUNDER } from "@/lib/seo"
+import { ogImageUrl, alternates, FOUNDER, SOURCE_REPO_URL } from "@/lib/seo"
 import { type Locale, localizedPath } from "@/lib/routes"
 import { JsonLd } from "@/components/JsonLd"
 import {
@@ -43,6 +43,9 @@ interface Content {
   standards: Standard[]
   privacyH2: string
   privacyP: string
+  openSourceH2: string
+  openSourceP: string
+  openSourceCta: string
   founderH2: string
   founderRole: string
   founderBio: string
@@ -93,6 +96,10 @@ const CONTENT: Record<Locale, Content> = {
     privacyH2: "Privacidad por diseño",
     privacyP:
       "Araguaney no registra datos personales de donantes ni de beneficiarios. Solo gestiona inventario, trazable de la caja al envío. Menos superficie de datos sensibles, menos riesgo, y una herramienta que se concentra en lo que importa: que la ayuda llegue.",
+    openSourceH2: "Código abierto y auditable",
+    openSourceP:
+      "El código de Araguaney es público y libre, bajo licencia AGPL-3.0. Cualquiera puede revisar cómo funciona por dentro: que el inventario de cada centro está aislado del de los demás, y que no se guardan datos personales de donantes ni de beneficiarios. Es la diferencia entre pedirte que confíes y darte cómo verificarlo. Además, si un día este proyecto se detiene, los centros pueden seguir operando su propia instancia.",
+    openSourceCta: "Ver el código en GitHub ↗",
     founderH2: "Quién está detrás",
     founderRole: "Ingeniero de Software y responsable de la plataforma detrás de Araguaney",
     founderBio:
@@ -144,6 +151,10 @@ const CONTENT: Record<Locale, Content> = {
     privacyH2: "Privacy by design",
     privacyP:
       "Araguaney stores no personal data of donors or beneficiaries. It only manages inventory, traceable from box to shipment. Less sensitive-data surface, less risk, and a tool focused on what matters: getting aid delivered.",
+    openSourceH2: "Open source and auditable",
+    openSourceP:
+      "Araguaney's code is public and free, under the AGPL-3.0 license. Anyone can review how it works inside: that each center's inventory is isolated from the rest, and that no personal data of donors or beneficiaries is stored. That's the difference between asking you to trust us and giving you a way to verify it. And if this project ever stops, centers can keep running their own instance.",
+    openSourceCta: "View the code on GitHub ↗",
     founderH2: "Who's behind it",
     founderRole: "Software Engineer, responsible for the platform behind Araguaney",
     founderBio:
@@ -304,6 +315,30 @@ export default async function AboutPage({
             <p className="text-[14.5px] md:text-[16px]" style={{ color: "#5C5347", lineHeight: 1.65 }}>
               {c.privacyP}
             </p>
+          </div>
+        </div>
+
+        {/* ── Código abierto ── */}
+        <div className="px-5 md:px-[46px] py-10 md:py-[56px]" style={{ background: "#fff", borderTop: "1px solid #EFE7D6" }}>
+          <div className="max-w-[720px] mx-auto">
+            <h2 className="text-[22px] md:text-[30px] mb-4" style={{ fontFamily: "var(--font-source-serif)", fontWeight: 600, margin: "0 0 16px" }}>
+              {c.openSourceH2}
+            </h2>
+            <p className="text-[14.5px] md:text-[16px] mb-4" style={{ color: "#5C5347", lineHeight: 1.65 }}>
+              {c.openSourceP}
+            </p>
+            <a
+              href={SOURCE_REPO_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-4 py-2 text-[14px]"
+              style={{
+                border: "1.5px solid #E6D4A6", borderRadius: 99,
+                color: "#2B2723", fontWeight: 600, background: "#FBF8F1",
+              }}
+            >
+              {c.openSourceCta}
+            </a>
           </div>
         </div>
 

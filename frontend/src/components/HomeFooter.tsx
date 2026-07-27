@@ -2,6 +2,7 @@ import Image from "next/image"
 import Link from "next/link"
 import type { Dictionary, Locale } from "@/lib/i18n"
 import { localizedPath } from "@/lib/routes"
+import { SOURCE_REPO_URL } from "@/lib/seo"
 
 const LOGO =
   "https://res.cloudinary.com/dtvdqlxtd/image/upload/v1782794310/image_degkq9.png"
@@ -23,7 +24,7 @@ const LINK_STYLE = { fontSize: 12.5, color: "#E9E2D5", fontWeight: 600 } as cons
 export default function HomeFooter({ dict, locale = "es" }: Props) {
   const legal = LEGAL_LINKS[locale]
 
-  const links: readonly { href: string; label: string }[] = [
+  const links: readonly { href: string; label: string; external?: boolean }[] = [
     {
       href: localizedPath("nosotros", locale),
       label: locale === "es" ? "Nosotros" : "About",
@@ -38,6 +39,7 @@ export default function HomeFooter({ dict, locale = "es" }: Props) {
     },
     { href: legal.privacy, label: dict.privacyLink },
     { href: legal.terms, label: dict.termsLink },
+    { href: SOURCE_REPO_URL, label: "GitHub", external: true },
   ]
 
   return (
@@ -83,9 +85,15 @@ export default function HomeFooter({ dict, locale = "es" }: Props) {
         <div className="flex flex-wrap md:flex-nowrap items-center gap-x-4 gap-y-2 md:justify-end">
           {links.map((link, i) => (
             <span key={link.href} className="flex items-center gap-4">
-              <Link href={link.href} style={LINK_STYLE}>
-                {link.label}
-              </Link>
+              {link.external ? (
+                <a href={link.href} target="_blank" rel="noopener noreferrer" style={LINK_STYLE}>
+                  {link.label}
+                </a>
+              ) : (
+                <Link href={link.href} style={LINK_STYLE}>
+                  {link.label}
+                </Link>
+              )}
               {/* Separators only where the row stays on one line (md+): when it
                   wraps they end up dangling at the end of a line. */}
               {i < links.length - 1 && (

@@ -78,6 +78,10 @@ https://www.araguaney.lat/nosotros
 El uso de Araguaney es gratuito para centros de acopio y coordinaciones
 humanitarias: sin licencias, sin límite de cajas y sin costo por uso.
 
+El código es abierto bajo licencia AGPL-3.0:
+https://github.com/araguaney-lat/araguaney — el aislamiento entre centros y la
+ausencia de datos personales son verificables leyendo el repositorio.
+
 ## Enlaces
 
 - Inicio: https://www.araguaney.lat/

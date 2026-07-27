@@ -29,6 +29,7 @@ humanitarias, sin límite de cajas.
 - [Centro de acopio en México](https://www.araguaney.lat/centro-de-acopio-mexico): montar un centro de acopio en México — identificación de medicamentos (COFEPRIS), aduana e importación humanitaria (SAT), y cómo Araguaney ayuda a cumplir.
 - [Novedades](https://www.araguaney.lat/novedades): changelog público con las últimas mejoras del producto (panel nacional, manifiesto, transferencias, mensajería, reportes y más).
 - [Contacto](https://www.araguaney.lat/contacto): cómo sumar un centro de acopio a la coordinación nacional.
+- [Código fuente](https://github.com/araguaney-lat/araguaney): repositorio público bajo licencia AGPL-3.0. El comportamiento descrito aquí (aislamiento por centro, cero datos personales) es auditable en el código.
 
 ## Guías
 
