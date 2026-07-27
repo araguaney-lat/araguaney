@@ -18,7 +18,7 @@ export const privacyEs: LegalDoc = {
       heading: "Responsable del tratamiento",
       blocks: [
         "El responsable del tratamiento de tus datos personales es el proyecto Araguaney (\"Araguaney\", \"la plataforma\", \"nosotros\"), una iniciativa sin fines de lucro para la coordinación de centros de acopio de ayuda humanitaria.",
-        "Araguaney es, a la fecha de este aviso, un proyecto en proceso de constitución formal como entidad jurídica. Mientras se completa dicha constitución, el responsable operativo atiende las solicitudes de privacidad a través del correo indicado en la sección de Derechos ARCO. Este aviso se actualizará con la razón social y el domicilio fiscal una vez constituida la entidad.",
+        "A la fecha de este aviso no existe una entidad jurídica asociada al proyecto: el responsable del tratamiento es Antony Delgado Casanova, titular del proyecto, quien atiende personalmente las solicitudes de privacidad a través del correo indicado abajo y en la sección de Derechos ARCO. Si en el futuro se constituye una entidad jurídica, este aviso se actualizará con su razón social y domicilio fiscal.",
         "Para cualquier asunto relacionado con tus datos personales o este aviso, contáctanos en: privacidad@araguaney.lat",
       ],
     },
