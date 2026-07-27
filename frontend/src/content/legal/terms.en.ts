@@ -70,6 +70,14 @@ export const termsEn: LegalDoc = {
       ],
     },
     {
+      heading: "Platform ownership",
+      blocks: [
+        "Araguaney is a project by Antony Delgado Casanova, who holds the copyright to the source code, the name \"Araguaney\", the logo and the araguaney.lat domain. There is no legal entity associated with the project.",
+        "The source code is released as free software under the AGPL-3.0 license and is available at https://github.com/araguaney-lat/araguaney. Anyone may use, study, modify and deploy their own instance under the terms of that license.",
+        "The trademark is not licensed along with the code: a derived instance must operate under a different name and domain, without presenting itself as the official instance.",
+      ],
+    },
+    {
       heading: "Data ownership and responsibility",
       blocks: [
         "The inventory data each center records (donations, boxes, pallets, shipments and manifests) belongs to the center that captures it. Araguaney hosts and processes it to provide the service and to produce the aggregated national view that enables coordination between centers.",
