@@ -162,6 +162,12 @@ Emergency Relief Items Catalogue, taxonomía UNSPSC, códigos GS1/GTIN. Todos
 listados con su función en https://www.araguaney.lat/nosotros
 
 **9. No causar daño por diseño**
+- *Borrado de datos*: la cancelación ARCO se atiende de forma manual por el canal
+  publicado (`privacidad@araguaney.lat`); los adjuntos de mensajería se purgan
+  automáticamente al vencer. **No hay borrado autoservicio en producto**: es la
+  única respuesta del cuestionario que hoy admite un "no existe", y quedó como
+  task 19 de la Fase 13 con el diseño esbozado (anonimizar en vez de borrar en
+  cascada, para no romper la trazabilidad del inventario).
 - *Datos personales y seguridad*: solo cuentas de operadores. Contraseñas con
   bcrypt, JWT con lista de revocación, cifrado de columnas sensibles,
   rate limiting, WAF de Cloudflare, headers de seguridad y CSP. Aislamiento
