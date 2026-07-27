@@ -64,8 +64,36 @@ el README. Propuesta de redacción:
 > logística de ayuda humanitaria en especie, y al **ODS 17.16-17.17** (alianzas)
 > al dar a centros de acopio independientes un estándar común de coordinación.
 
-Ruta: `digitalpublicgoods.net` → *Eligibility Tool* para autoevaluar, luego
-*nominación* al registro. Revisión manual, no inmediata.
+### Cómo se postula (es un PR con un archivo JSON)
+
+La nominación al DPG Registry no es un formulario largo: es agregar un archivo
+JSON al repositorio [`DPGAlliance/publicgoods-candidates`](https://github.com/DPGAlliance/publicgoods-candidates).
+
+El archivo ya está escrito y **validado contra su `nominee-schema.json`**:
+[`dpg-nominee-araguaney.json`](dpg-nominee-araguaney.json).
+
+Pasos, todo desde el navegador:
+
+1. Buscar "araguaney" en ese repositorio para confirmar que nadie lo nominó antes.
+2. Ir a la carpeta [`nominees/`](https://github.com/DPGAlliance/publicgoods-candidates/tree/master/nominees) → botón **Add file** → **Create new file**.
+3. Nombre del archivo: `araguaney.json` (debe coincidir con el campo `name` en
+   kebab-case).
+4. Pegar el contenido de `dpg-nominee-araguaney.json` tal cual.
+5. Abajo, elegir **Create a new branch for this commit and start a pull request**
+   → **Propose new file** → **Create Pull Request**.
+6. Esperar el check verde de su CI (valida esquema, orden de campos y sangría de
+   2 espacios). Si algo falla, el log dice la línea exacta.
+
+Después hay revisión manual del equipo del DPG; puede tomar semanas y suelen
+pedir aclaraciones por comentarios en el PR.
+
+> **Detalle que rompe la validación**: su esquema usa el identificador SPDX
+> corto `AGPL-3.0`, no el moderno `AGPL-3.0-only` que declara nuestro
+> `package.json`. El archivo ya usa el que ellos aceptan.
+
+> **Antes de postular**: el campo `contact_email` apunta a
+> `security@araguaney.lat`. Si prefieres un buzón general (`hola@`, `contacto@`),
+> créalo y cámbialo en el JSON.
 
 ### Prioridad 2: catálogos de tecnología humanitaria
 
