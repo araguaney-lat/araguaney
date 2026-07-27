@@ -21,6 +21,18 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: readonly ChangelogEntry[] = [
   {
+    date: "2026-07-27",
+    tag: "new",
+    es: {
+      title: "Araguaney es código abierto",
+      body: "El código de la plataforma es público bajo licencia AGPL-3.0. Cualquiera puede auditar que el inventario de cada centro está aislado y que no se guardan datos personales, o levantar su propia instancia.",
+    },
+    en: {
+      title: "Araguaney is open source",
+      body: "The platform's code is public under the AGPL-3.0 license. Anyone can audit that each center's inventory is isolated and that no personal data is stored, or run their own instance.",
+    },
+  },
+  {
     date: "2026-07-26",
     tag: "improvement",
     es: {
