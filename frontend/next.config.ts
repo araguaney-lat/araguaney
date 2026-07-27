@@ -60,7 +60,13 @@ export default withSentryConfig(nextConfig, {
   org: "bioflow",
   project: "araguaney",
   silent: !process.env.CI,
+  // Applies to both webpack and turbopack builds.
   widenClientFileUpload: true,
-  disableLogger: true,
-  automaticVercelMonitors: true,
+  // `disableLogger` y `automaticVercelMonitors` de nivel raíz están deprecados
+  // desde @sentry/nextjs 10: ahora viven bajo `webpack` porque no tienen efecto
+  // en builds con Turbopack, y agruparlos lo hace explícito.
+  webpack: {
+    treeshake: { removeDebugLogging: true },
+    automaticVercelMonitors: true,
+  },
 })
