@@ -9,19 +9,19 @@
     "start": "next start"
   },
   "dependencies": {
-    "@sentry/nextjs": "^10.63.0",
+    "@sentry/nextjs": "^10.68.0",
     "@zxing/browser": "^0.2.0",
     "@zxing/library": "^0.23.0",
-    "lucide-react": "^1.23.0",
-    "next": "^16.2.10",
+    "lucide-react": "^1.27.0",
+    "next": "^16.2.12",
     "next-auth": "^5.0.0-beta.31",
     "prop-types": "^15.8.1",
-    "react": "19.2.7",
-    "react-dom": "19.2.7",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
     "react-simple-maps": "^3.0.0",
     "react-turnstile": "^1.1.5",
-    "recharts": "^3.9.2",
-    "resend": "^6.17.1",
+    "recharts": "^3.10.1",
+    "resend": "^6.18.0",
     "zod": "^4.4.3"
   },
   "devDependencies": {
