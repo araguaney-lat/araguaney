@@ -1,0 +1,43 @@
+{
+  "name": "Araguaney",
+  "description": "Free and open-source software for humanitarian aid collection centers. It registers in-kind donations item by item with quality rules (WHO medicine donation guidelines), packs them into homogeneous boxes with QR codes, consolidates them into pallets and shipments with a customs-ready manifest, and aggregates the stock of every connected center into a national dashboard. It stores no personal data of donors or beneficiaries.",
+  "website": "https://www.araguaney.lat",
+  "license": [
+    {
+      "spdx": "AGPL-3.0",
+      "licenseURL": "https://github.com/araguaney-lat/araguaney/blob/main/LICENSE"
+    }
+  ],
+  "SDGs": [
+    {
+      "SDGNumber": 11,
+      "evidenceText": "Target 11.5 aims to significantly reduce the losses caused by disasters. Araguaney addresses the logistics failure that delays in-kind relief: without a shared standard, each collection center records donations its own way, boxes are packed without criteria, and shipments stall at customs for lack of a manifest. By standardizing item-level intake, homogeneous boxes with QR traceability, and exportable packing lists, relief supplies reach affected populations faster and in usable condition.",
+      "evidenceURL": "https://www.araguaney.lat/nosotros"
+    },
+    {
+      "SDGNumber": 17,
+      "evidenceText": "Targets 17.16 and 17.17 promote multi-stakeholder partnerships. Araguaney gives independent collection centers, civil society organizations and coordination bodies a common registration standard and a shared national dashboard, so organizations that would otherwise operate in isolation can see aggregate stock and coordinate shipments. The software is free to use and open source, removing cost as a barrier to participation.",
+      "evidenceURL": "https://www.araguaney.lat/como-funciona"
+    }
+  ],
+  "sectors": [
+    "Humanitarian",
+    "Emergency Response",
+    "Logistics",
+    "Supply Chain Solutions"
+  ],
+  "type": [
+    "software"
+  ],
+  "repositoryURL": "https://github.com/araguaney-lat/araguaney",
+  "organizations": [
+    {
+      "name": "Araguaney",
+      "website": "https://www.araguaney.lat",
+      "org_type": "owner",
+      "contact_name": "Antony Delgado",
+      "contact_email": "security@araguaney.lat"
+    }
+  ],
+  "stage": "nominee"
+}
