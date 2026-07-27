@@ -30,18 +30,15 @@ pie title Tareas completadas (351 tareas)
 | 17 | [AEO/GEO + expansión de keywords](phase-17-aeo-keyword-expansion.md) | 15 | 6 | 🟡 71% |
 | **Total** | | **333** | **18** | **🟡 95%** |
 
-> **Pendientes (33):**
-> - **12 gated por pago/decisión de negocio:** Fase 4 → 2 (spend caps + alertas, requieren plan
->   de pago de infra). Fase 13 → 10 (bloque de donativos/pagos: entidad receptora, asesoría
->   legal/contable, procesador de pagos, T&C de donación, transparencia — gated tras la decisión
->   "¿recibir donativos?").
-> - **14 nuevas (Fase 17 — AEO/GEO + expansión de keywords):** trabajo de posicionamiento
->   ejecutable sin gate de pago (entidad/Wikidata, escenarios, medición de visibilidad en IA).
->   Tasks 1 (Bing), 2 (IndexNow), 3 (`llms.txt` 2026), 4 (host canónico), 5 (señales de
->   entidad), 7 (`/nosotros` entity home), 9 (bylines E-E-A-T), 10 (página comparativa vs
->   Excel), 11 (landings por escenario), 12 (landing MX + `areaServed`), 13 (hub
->   `/preguntas-frecuentes`), 14 (meta en formato pregunta), 15 (frescura/`dateModified`),
->   16 (changelog `/novedades`) y 18 (`speakable`) ✅.
+> **Pendientes (18):**
+> - **12 gated por pago o por decisión de negocio:** Fase 4 → 2 (spend caps + alertas, requieren
+>   plan de pago de infra). Fase 13 → 10 (bloque de donativos/pagos: entidad receptora, asesoría
+>   legal/contable, procesador de pagos, T&C de donación, transparencia). Todo el bloque de
+>   donativos depende de una decisión previa —"¿Araguaney recibe dinero?"— que además
+>   contradice el no-objetivo declarado en `CLAUDE.md`.
+> - **6 ejecutables (Fase 17):** tasks 6 (Wikidata) y 8 (directorios) preparadas en
+>   [`docs/seo/entity-registration.md`](../seo/entity-registration.md); 17 (video demo),
+>   19 (monitoreo de citas en IA), 20 (analítica de Bing) y 21 (KPIs de AEO).
 
 > Envs opcionales (Sentry, Slack, Google Safe Browsing, Encryption Key) se pueden agregar en cualquier momento sin cambios de código.
 

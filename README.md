@@ -375,6 +375,14 @@ def get_me_v2(current_user = Depends(get_current_user)):
 
 Unversioned routes (Stripe webhooks, health check) bypass the registry entirely.
 
+## Objetivos de Desarrollo Sostenible
+
+Araguaney contribuye al **ODS 11.5** (reducir de forma significativa las
+pérdidas causadas por desastres) mejorando la trazabilidad y la eficiencia de
+la logística de ayuda humanitaria en especie, y al **ODS 17.16-17.17**
+(alianzas para lograr los objetivos) al dar a centros de acopio independientes
+un estándar común de coordinación y un panel agregado compartido.
+
 ## Licencia y marca
 
 El código de Araguaney es **software libre bajo [AGPL-3.0](LICENSE)**: puedes
