@@ -393,6 +393,10 @@ El uso de la plataforma en [araguaney.lat](https://www.araguaney.lat) es
 **gratuito** para centros de acopio y coordinaciones humanitarias: sin
 licencias, sin límite de cajas y sin costo por uso.
 
+**Titularidad.** Araguaney es un proyecto de **Antony Delgado Casanova**,
+titular del copyright del código, del nombre "Araguaney" y del dominio
+araguaney.lat. No existe una entidad jurídica asociada al proyecto.
+
 **La marca no se licencia con el código.** El nombre "Araguaney", el logo y el
 dominio araguaney.lat identifican la instancia oficial y su red de centros.
 Un fork debe operar bajo otro nombre y dominio, sin presentarse como la
