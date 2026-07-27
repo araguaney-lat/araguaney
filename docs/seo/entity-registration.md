@@ -64,36 +64,48 @@ el README. Propuesta de redacción:
 > logística de ayuda humanitaria en especie, y al **ODS 17.16-17.17** (alianzas)
 > al dar a centros de acopio independientes un estándar común de coordinación.
 
-### Cómo se postula (es un PR con un archivo JSON)
+### Cómo se postula (portal web, con cuenta)
 
-La nominación al DPG Registry no es un formulario largo: es agregar un archivo
-JSON al repositorio [`DPGAlliance/publicgoods-candidates`](https://github.com/DPGAlliance/publicgoods-candidates).
+> **El proceso cambió.** Hasta 2024 la nominación era un PR con un archivo JSON
+> al repositorio `DPGAlliance/publicgoods-candidates`. Ese repo está
+> **archivado y en solo lectura** desde agosto de 2024: los PRs nuevos ya no se
+> pueden abrir. Ahora se postula desde un portal web.
 
-El archivo ya está escrito y **validado contra su `nominee-schema.json`**:
-[`dpg-nominee-araguaney.json`](dpg-nominee-araguaney.json).
+Pasos:
 
-Pasos, todo desde el navegador:
+1. **Autoevaluación** con el *DPG Eligibility Tool* y lectura de la *DPG
+   Submission Guide*, ambos enlazados desde
+   [digitalpublicgoods.net/decoded](https://digitalpublicgoods.net/decoded).
+2. **Verificar que no esté ya listado**: buscar Araguaney en el
+   [DPG Registry](https://digitalpublicgoods.net/registry).
+3. **Iniciar la postulación** en
+   [app.digitalpublicgoods.net/signup](https://app.digitalpublicgoods.net/signup).
+   Se puede empezar a llenar sin cuenta; pide crear cuenta y verificar el email
+   solo para enviarla. Una solución por postulación.
+4. **Llenar el formulario** con los datos de abajo.
+5. **Enviar** y responder por el portal las aclaraciones que pida el equipo de
+   revisión. Es revisión manual y puede tomar semanas.
 
-1. Buscar "araguaney" en ese repositorio para confirmar que nadie lo nominó antes.
-2. Ir a la carpeta [`nominees/`](https://github.com/DPGAlliance/publicgoods-candidates/tree/master/nominees) → botón **Add file** → **Create new file**.
-3. Nombre del archivo: `araguaney.json` (debe coincidir con el campo `name` en
-   kebab-case).
-4. Pegar el contenido de `dpg-nominee-araguaney.json` tal cual.
-5. Abajo, elegir **Create a new branch for this commit and start a pull request**
-   → **Propose new file** → **Create Pull Request**.
-6. Esperar el check verde de su CI (valida esquema, orden de campos y sangría de
-   2 espacios). Si algo falla, el log dice la línea exacta.
+Contacto para dudas del proceso: `hello@digitalpublicgoods.net`.
 
-Después hay revisión manual del equipo del DPG; puede tomar semanas y suelen
-pedir aclaraciones por comentarios en el PR.
+### Datos listos para el formulario
 
-> **Detalle que rompe la validación**: su esquema usa el identificador SPDX
-> corto `AGPL-3.0`, no el moderno `AGPL-3.0-only` que declara nuestro
-> `package.json`. El archivo ya usa el que ellos aceptan.
+El archivo [`dpg-nominee-araguaney.json`](dpg-nominee-araguaney.json) mantiene
+todas las respuestas en un solo lugar. Ya no se sube a ningún lado: **es la
+fuente de la que se copia y pega** en el portal. Contiene la descripción en
+inglés, los dos ODS con su texto de evidencia, licencia, sectores, repositorio
+y organización responsable.
+
+> **Sobre la licencia**: el JSON usa el identificador SPDX corto `AGPL-3.0`
+> porque era el que aceptaba el esquema del repositorio archivado. Si el
+> formulario web ofrece una lista, elegir la opción de AGPL v3; si acepta texto
+> libre, el identificador correcto para nuestro caso es **`AGPL-3.0-only`**
+> (es lo que declara `package.json`, y significa "solo la versión 3", sin el
+> "or later").
 
 > **Antes de postular**: el campo `contact_email` apunta a
 > `security@araguaney.lat`. Si prefieres un buzón general (`hola@`, `contacto@`),
-> créalo y cámbialo en el JSON.
+> créalo y úsalo en el formulario.
 
 ### Respuestas por indicador (para copiar al formulario)
 
@@ -316,8 +328,8 @@ independiente**.
 
 ## Estado
 
-- [ ] Declarar ODS en el README (brecha del indicador 1 del DPG)
-- [ ] Postular al DPG Registry
+- [x] Declarar ODS en el README (brecha del indicador 1 del DPG)
+- [ ] Postular al DPG Registry (portal web: app.digitalpublicgoods.net/signup)
 - [ ] Anuncio de lanzamiento open source (base para ReliefWeb y otros)
 - [ ] Alta en 2-3 catálogos de tecnología humanitaria
 - [ ] Crear el ítem de Wikidata (después de la primera referencia independiente)
