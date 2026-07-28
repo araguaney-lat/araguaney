@@ -29,6 +29,7 @@ export const termsEs: LegalDoc = {
       heading: "Cuentas y acceso",
       blocks: [
         "El acceso a la plataforma es por invitación. Las cuentas son creadas por administradores o coordinadores de un centro de acopio, y cada cuenta pertenece a una persona identificada mediante su correo electrónico.",
+        "Las cuentas están reservadas a personas mayores de edad. Quien coordina un centro es responsable de a quién otorga acceso y debe verificar este requisito antes de crear una cuenta. Las personas menores de edad pueden participar en la operación física del centro bajo supervisión, pero no reciben cuenta en la plataforma.",
         {
           list: [
             "Eres responsable de mantener la confidencialidad de tu contraseña y de toda actividad realizada bajo tu cuenta.",
