@@ -44,6 +44,12 @@ for _m in (
     __import__(f"app.models.{_m}")
 
 from app.main import app  # noqa: E402
+from app.utils.rate_limit import limiter  # noqa: E402
+
+# Rate limits key on client IP, and every test shares the TestClient's address:
+# without this, a suite that exercises the same endpoint repeatedly starts
+# getting 429s partway through instead of testing what it meant to test.
+limiter.enabled = False
 from app.models.box import Box  # noqa: E402
 from app.models.campaign import Campaign  # noqa: E402
 from app.models.center import Center  # noqa: E402

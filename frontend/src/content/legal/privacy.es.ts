@@ -111,7 +111,8 @@ export const privacyEs: LegalDoc = {
       heading: "Derechos ARCO y revocación del consentimiento",
       blocks: [
         "Como titular de tus datos personales, tienes derecho a Acceder a ellos, Rectificarlos cuando sean inexactos, Cancelarlos cuando consideres que no se requieren para las finalidades señaladas, y Oponerte a su tratamiento (derechos ARCO). También puedes revocar el consentimiento que nos hayas otorgado.",
-        "Para ejercer cualquiera de estos derechos, envía tu solicitud al correo:",
+        "Puedes ejercer la cancelación por ti misma o por ti mismo, en cualquier momento, desde Configuración en tu panel: la opción \"Eliminar mi cuenta\" borra de forma permanente tu nombre, correo, foto y datos de acceso. El registro de qué cajas sellaste o qué envíos despachaste se conserva sin tu nombre, porque la trazabilidad del inventario no puede romperse; queda como un identificador que ya no permite reconocerte.",
+        "Para ejercer cualquiera de estos derechos, o si prefieres que lo hagamos por ti, envía tu solicitud al correo:",
         {
           emphasis:
             "privacidad@araguaney.lat — Incluye tu nombre, el correo asociado a tu cuenta y una descripción clara de tu solicitud. Responderemos en un plazo máximo de 20 días hábiles.",

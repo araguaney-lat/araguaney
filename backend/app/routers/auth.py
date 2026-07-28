@@ -10,19 +10,21 @@ from app.models.user import User
 from app.schemas.auth import (
     AcceptTermsRequest,
     ChangePasswordRequest,
+    DeleteAccountRequest,
     ForgotPasswordRequest,
     OAuthLogin,
     ResendRequest,
     ResetPasswordRequest,
+    Token,
     TOTPChallengeIn,
     TOTPConfirmIn,
     TOTPConfirmOut,
     TOTPSetupOut,
-    Token,
     UserCreate,
 )
 from app.schemas.user_domain import AvatarOut, UserOut, UserProfileOut, UserUpdate
 from app.services.auth_service import AuthService
+from app.services.account_deletion_service import AccountDeletionService
 from app.services.profile_service import ProfileService
 from app.utils.cloudflare import get_client_ip
 from app.utils.rate_limit import limiter
@@ -161,6 +163,37 @@ def change_password(
     db.commit()
     enqueue(background_tasks, "send_password_changed_email_task", current_user.email)
     return result
+
+
+@router.delete("/me", status_code=204)
+@limiter.limit("5/minute")
+def delete_own_account(
+    request: Request,
+    data: DeleteAccountRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+    token: str = Depends(_oauth2_scheme),
+):
+    """Self-service ARCO cancellation: anonymizes the account, keeps traceability.
+
+    The user row survives as an opaque id because audit events must remain
+    attributable; every personal field is destroyed. See
+    AccountDeletionService for the full field map.
+    """
+    from app.repositories.audit_repository import AuditRepository
+
+    user_id = current_user.id
+    AccountDeletionService(db).delete_own_account(current_user, data.password)
+    AuditRepository(db).log(
+        "USER_SELF_DELETED",
+        "user",
+        user_id=user_id,
+        entity_id=str(user_id),
+        ip=get_client_ip(request),
+    )
+    # Other sessions die on their own: get_current_user rejects inactive accounts.
+    AuthService(db).logout(token)
+    db.commit()
 
 
 @router.post("/me/accept-terms")

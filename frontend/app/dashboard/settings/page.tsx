@@ -1,6 +1,7 @@
 import { auth } from "@/auth"
 import Link from "next/link"
 import { ChangePasswordForm } from "@/components/ChangePasswordForm"
+import { DeleteAccountForm } from "@/components/DeleteAccountForm"
 import { ProfileNameForm } from "@/components/ProfileNameForm"
 import { AvatarUpload } from "@/components/AvatarUpload"
 import { apiFetch } from "@/lib/api"
@@ -107,6 +108,20 @@ export default async function SettingsPage() {
           </div>
           <span className="text-fnt text-sm">›</span>
         </Link>
+      </div>
+
+      <div>
+        <h2 className="text-sm font-semibold text-dRejT mb-3">{t.danger_section}</h2>
+        <DeleteAccountForm
+          labels={{
+            title: t.delete_title,
+            body: t.delete_body,
+            warning: t.delete_warning,
+            passwordLabel: t.delete_password_label,
+            confirm: t.delete_confirm,
+            pending: t.delete_pending,
+          }}
+        />
       </div>
     </div>
   )
