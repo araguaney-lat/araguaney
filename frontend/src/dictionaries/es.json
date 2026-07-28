@@ -615,7 +615,14 @@
       "totp_status_enabled_desc": "Tu cuenta está protegida con autenticación en dos pasos.",
       "totp_status_disabled_desc": "Activa 2FA para mayor seguridad en tu cuenta.",
       "totp_btn_deactivate": "Desactivar",
-      "totp_btn_activate": "Activar"
+      "totp_btn_activate": "Activar",
+      "danger_section": "Zona de peligro",
+      "delete_title": "Eliminar mi cuenta",
+      "delete_body": "Tu nombre, correo y foto se eliminan de forma permanente. El registro de qué cajas sellaste o qué envíos despachaste se conserva sin tu nombre, porque la trazabilidad del inventario no puede romperse.",
+      "delete_warning": "Esta acción no se puede deshacer.",
+      "delete_password_label": "Confirma con tu contraseña",
+      "delete_confirm": "Eliminar mi cuenta",
+      "delete_pending": "Eliminando…"
     },
     "admin_users": {
       "title": "Usuarios",
@@ -964,7 +971,7 @@
       "error_email_not_verified": "Verifica tu email antes de iniciar sesión.",
       "error_account_disabled": "Tu cuenta está desactivada.",
       "error_invalid_credentials": "Credenciales inválidas.",
-    "session_expired": "Tu sesión expiró. Inicia sesión de nuevo para continuar.",
+      "session_expired": "Tu sesión expiró. Inicia sesión de nuevo para continuar.",
       "submitting": "Entrando…",
       "submit": "Entrar",
       "no_center_yet": "¿Tu centro aún no usa Araguaney?",
@@ -1042,7 +1049,9 @@
       "session_update_failed": "Error al actualizar sesión",
       "must_accept_terms": "Debes aceptar los Términos y el Aviso de Privacidad para continuar.",
       "accept_terms_failed": "Error al registrar la aceptación",
-      "accept_terms_session_failed": "Error al actualizar la sesión"
+      "accept_terms_session_failed": "Error al actualizar la sesión",
+      "password_required": "Escribe tu contraseña para confirmar",
+      "delete_account_failed": "No se pudo eliminar la cuenta"
     }
   }
 }

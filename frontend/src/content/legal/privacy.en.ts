@@ -110,7 +110,8 @@ export const privacyEn: LegalDoc = {
       heading: "Data subject rights (ARCO) and consent withdrawal",
       blocks: [
         "As the owner of your personal data, you have the right to Access it, Rectify it when inaccurate, Cancel it when you consider it is no longer required for the stated purposes, and Object to its processing (ARCO rights). You may also withdraw any consent you have given us.",
-        "To exercise any of these rights, send your request to:",
+        "You can exercise cancellation yourself at any time from Settings in your dashboard: the \"Delete my account\" option permanently removes your name, email, photo and credentials. The record of which boxes you sealed or which shipments you dispatched is kept without your name, because inventory traceability cannot be broken; it remains as an identifier that no longer allows you to be recognized.",
+        "To exercise any of these rights, or if you prefer that we do it for you, send your request to:",
         {
           emphasis:
             "privacidad@araguaney.lat — Include your name, the email associated with your account and a clear description of your request. We will respond within a maximum of 20 business days.",

@@ -44,6 +44,12 @@ class AcceptTermsRequest(StrictModel):
     version: str
 
 
+class DeleteAccountRequest(StrictModel):
+    """Password confirmation for self-service account deletion (ARCO cancellation)."""
+
+    password: str
+
+
 class ResendRequest(StrictModel):
     email: str
 

@@ -157,6 +157,34 @@ export async function revalidateDashboardAction(): Promise<void> {
   revalidatePath("/dashboard", "layout")
 }
 
+export async function deleteAccountAction(_: unknown, formData: FormData) {
+  const t = await authDict()
+  const session = await auth()
+  if (!session?.accessToken) return { error: t.errors.not_authenticated }
+
+  const password = formData.get("password") as string
+  if (!password) return { error: t.errors.password_required }
+
+  const res = await fetch(`${API_URL}/v1/auth/me`, {
+    method: "DELETE",
+    body: JSON.stringify({ password }),
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${session.accessToken}`,
+    },
+  })
+
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}))
+    return { error: extractError(data, t.errors.delete_account_failed) }
+  }
+
+  // The account is gone: drop the session and land on the login screen.
+  await signOut({ redirectTo: "/login?deleted=1" })
+  return null
+}
+
+
 export async function changePasswordAction(_: unknown, formData: FormData) {
   const t = await authDict()
   const session = await auth()

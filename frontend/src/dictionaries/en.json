@@ -615,7 +615,14 @@
       "totp_status_enabled_desc": "Your account is protected with two-factor authentication.",
       "totp_status_disabled_desc": "Enable 2FA for better account security.",
       "totp_btn_deactivate": "Disable",
-      "totp_btn_activate": "Enable"
+      "totp_btn_activate": "Enable",
+      "danger_section": "Danger zone",
+      "delete_title": "Delete my account",
+      "delete_body": "Your name, email and photo are permanently removed. The record of which boxes you sealed or which shipments you dispatched is kept without your name, because inventory traceability cannot be broken.",
+      "delete_warning": "This action cannot be undone.",
+      "delete_password_label": "Confirm with your password",
+      "delete_confirm": "Delete my account",
+      "delete_pending": "Deleting…"
     },
     "admin_users": {
       "title": "Users",
@@ -964,7 +971,7 @@
       "error_email_not_verified": "Verify your email before signing in.",
       "error_account_disabled": "Your account is disabled.",
       "error_invalid_credentials": "Invalid credentials.",
-    "session_expired": "Your session expired. Please sign in again to continue.",
+      "session_expired": "Your session expired. Please sign in again to continue.",
       "submitting": "Signing in…",
       "submit": "Sign in",
       "no_center_yet": "Your center doesn't use Araguaney yet?",
@@ -1042,7 +1049,9 @@
       "session_update_failed": "Error updating session",
       "must_accept_terms": "You must accept the Terms and Privacy Notice to continue.",
       "accept_terms_failed": "Error recording acceptance",
-      "accept_terms_session_failed": "Error updating session"
+      "accept_terms_session_failed": "Error updating session",
+      "password_required": "Enter your password to confirm",
+      "delete_account_failed": "Could not delete the account"
     }
   }
 }
