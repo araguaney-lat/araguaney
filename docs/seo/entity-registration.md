@@ -33,7 +33,7 @@ exactamente el tipo de referencia independiente que sostiene el ítem.
 
 ---
 
-## Task 8 — Directorios y menciones
+## Task 8: directorios y menciones
 
 ### Prioridad 1: Digital Public Goods Registry
 
@@ -43,14 +43,14 @@ existe en el repositorio:
 
 | # | Indicador | Estado | Evidencia / qué falta |
 |---|---|---|---|
-| 1 | Relevancia para los ODS | ⚠️ | Encaje claro con **ODS 11.5** (reducir pérdidas por desastres) y **ODS 17** (alianzas). **Falta declararlo explícitamente** en el README o en `/nosotros` — el indicador exige que el proyecto indique a qué ODS contribuye |
+| 1 | Relevancia para los ODS | ⚠️ | Encaje claro con **ODS 11.5** (reducir pérdidas por desastres) y **ODS 17** (alianzas). **Falta declararlo explícitamente** en el README o en `/nosotros`: el indicador exige que el proyecto indique a qué ODS contribuye |
 | 2 | Licencia abierta | ✅ | AGPL-3.0 (`LICENSE`), aprobada por OSI |
 | 3 | Propiedad clara | ✅ | Repo en la organización `araguaney-lat`; fundador identificado en `/nosotros` con perfil público |
 | 4 | Independencia de plataforma | ✅ | `backend/Dockerfile`, `frontend/Dockerfile` y `docker-compose.yml`. Stack sin dependencias propietarias obligatorias: FastAPI + Postgres + Next.js. Vercel y Railway son conveniencia, no requisito |
 | 5 | Documentación | ✅ | `README.md`, `CLAUDE.md` (dominio y reglas), `CONTRIBUTING.md` (setup reproducible sin servicios externos), `docs/` |
 | 6 | Extracción de datos no-PII | ✅ | **Nuestro punto más fuerte**: el sistema no almacena PII de donantes ni beneficiarios por diseño. Exportes de manifiesto en PDF/Excel |
 | 7 | Privacidad y leyes aplicables | ✅ | Aviso de privacidad y términos publicados; alineado con LFPDPPP (MX) por ausencia de datos personales |
-| 8 | Estándares abiertos y buenas prácticas | ✅ | WHO Guidelines for Medicine Donations, catálogo IFRC/ICRC, IOM ERIC, UNSPSC, GS1 — documentados en `/nosotros` |
+| 8 | Estándares abiertos y buenas prácticas | ✅ | WHO Guidelines for Medicine Donations, catálogo IFRC/ICRC, IOM ERIC, UNSPSC, GS1, documentados en `/nosotros` |
 | 9A | Privacidad y seguridad de datos | ✅ | `SECURITY.md` con canal privado, `docs/security.md` con las capas, suite de aislamiento multi-tenant en CI, secret scanning + push protection |
 | 9B | Contenido inapropiado / ilegal | ✅ | No hay contenido generado por usuarios público. La mensajería es interna entre operadores autenticados |
 | 9C | Protección contra acoso | ✅ | Sin funciones sociales públicas. Mensajería con guard de participante y auditoría por acción. `CODE_OF_CONDUCT.md` con canal de reporte |
@@ -112,21 +112,21 @@ y organización responsable.
 La guía de postulación pide **evidencia con enlaces** para cada uno de los 9
 indicadores. Estas son las respuestas con las URLs exactas.
 
-**1. Relevancia para los ODS** — usar el texto de `SDGs` en
+**1. Relevancia para los ODS**: usar el texto de `SDGs` en
 [`dpg-nominee-araguaney.json`](dpg-nominee-araguaney.json) (ODS 11 target 11.5
 y ODS 17 targets 17.16-17.17, cada uno con su evidencia).
 
-**2. Licencia abierta** — AGPL-3.0, aprobada por OSI:
+**2. Licencia abierta**: AGPL-3.0, aprobada por OSI:
 https://github.com/araguaney-lat/araguaney/blob/main/LICENSE
 
-**3. Propiedad clara** — repositorio bajo la organización `araguaney-lat`;
+**3. Propiedad clara**: repositorio bajo la organización `araguaney-lat`;
 sección "Licencia y marca" del README
 (https://github.com/araguaney-lat/araguaney#licencia-y-marca), que separa el
 código libre de la marca; sección "Propiedad y responsabilidad de los datos"
 de los Términos (https://www.araguaney.lat/terminos); autoría del fundador en
 https://www.araguaney.lat/nosotros
 
-**4. Independencia de plataforma** — sin dependencias propietarias
+**4. Independencia de plataforma**: sin dependencias propietarias
 obligatorias: FastAPI + PostgreSQL + Next.js, todos open source.
 `backend/Dockerfile`, `frontend/Dockerfile` y `docker-compose.yml` permiten
 correr la pila completa en cualquier infraestructura. Vercel y Railway son la
@@ -134,13 +134,13 @@ instancia oficial, no un requisito. Servicios externos opcionales (Sentry,
 Cloudinary, Resend) degradan de forma controlada o se sustituyen por
 configuración.
 
-**5. Documentación** — README (arquitectura, stack, setup),
+**5. Documentación**: README (arquitectura, stack, setup),
 [`CONTRIBUTING.md`](https://github.com/araguaney-lat/araguaney/blob/main/CONTRIBUTING.md)
 (entorno de desarrollo reproducible sin servicios externos), `CLAUDE.md`
 (reglas de dominio y de negocio), carpeta `docs/`, y manuales de usuario dentro
 de la app en `/dashboard/ayuda`.
 
-**6. Mecanismo de extracción de datos no-PII** — el inventario se exporta sin
+**6. Mecanismo de extracción de datos no-PII**: el inventario se exporta sin
 datos personales:
 - Manifiesto / packing list en PDF y **XLSX** por envío
   (`POST /v1/shipments/{id}/manifest.xlsx`, formato alineado a IFRC).
@@ -149,14 +149,14 @@ datos personales:
 No hay PII que exportar: el sistema no registra datos de donantes ni
 beneficiarios.
 
-**7. Privacidad y cumplimiento legal** — sí se recogen datos personales, pero
+**7. Privacidad y cumplimiento legal**: sí se recogen datos personales, pero
 solo de las **personas operadoras** (nombre, correo institucional), no de
 donantes ni beneficiarios. Aviso de privacidad:
 https://www.araguaney.lat/aviso-de-privacidad · Términos:
 https://www.araguaney.lat/terminos · Jurisdicción y ley aplicable: México
 (LFPDPPP), declarada en los Términos.
 
-**8. Estándares abiertos y buenas prácticas** — WHO Guidelines for Medicine
+**8. Estándares abiertos y buenas prácticas**: WHO Guidelines for Medicine
 Donations (vida útil, INN, controlados), catálogo de materiales IFRC/ICRC, IOM
 Emergency Relief Items Catalogue, taxonomía UNSPSC, códigos GS1/GTIN. Todos
 listados con su función en https://www.araguaney.lat/nosotros
@@ -233,7 +233,7 @@ and humanitarian logistics.
 
 ---
 
-## Task 6 — Ítem de Wikidata
+## Task 6: ítem de Wikidata
 
 ### Identificadores verificados
 
@@ -334,8 +334,17 @@ independiente**.
 
 ## Estado
 
+**Postulación al DPG Registry enviada el 2026-07-27.** Estado: *under review*.
+La revisión es manual y el objetivo declarado por la DPG Alliance es de 30 días,
+variable según el volumen de solicitudes. Si piden aclaraciones, llegan por el
+portal.
+
+> **De esta fecha se cuenta la renovación anual.** El reconocimiento vale un año;
+> el checklist de qué revisar antes de confirmarla está en
+> [`../seo-maintenance.md`](../seo-maintenance.md).
+
 - [x] Declarar ODS en el README (brecha del indicador 1 del DPG)
-- [ ] Postular al DPG Registry (portal web: app.digitalpublicgoods.net/signup)
+- [x] Postular al DPG Registry (enviada el 2026-07-27, en revisión)
 - [ ] Anuncio de lanzamiento open source (base para ReliefWeb y otros)
 - [ ] Alta en 2-3 catálogos de tecnología humanitaria
 - [ ] Crear el ítem de Wikidata (después de la primera referencia independiente)

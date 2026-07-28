@@ -28,6 +28,7 @@ export const termsEn: LegalDoc = {
       heading: "Accounts and access",
       blocks: [
         "Access to the platform is by invitation. Accounts are created by administrators or coordinators of a collection center, and each account belongs to a person identified by their email address.",
+        "Accounts are restricted to adults. The coordinator of a center is responsible for who they grant access to and must verify this requirement before creating an account. Minors may take part in the physical operation of a center under supervision, but are not issued platform accounts.",
         {
           list: [
             "You are responsible for keeping your password confidential and for all activity performed under your account.",

@@ -89,6 +89,9 @@ export const BRAND_SAME_AS: readonly string[] = [
 
 ## Renovación anual del DPG (una vez al año)
 
+> Postulación enviada el **2026-07-27**. Si se aprueba, la renovación se cuenta
+> desde la fecha de aprobación que confirme la DPG Alliance.
+
 Si Araguaney entra al [DPG Registry](https://digitalpublicgoods.net/registry),
 el reconocimiento **vale un año**. La DPG Alliance envía una renovación anual y
 hay que confirmar que la solución sigue cumpliendo el DPG Standard. Si no se
