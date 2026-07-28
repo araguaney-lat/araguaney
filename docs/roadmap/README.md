@@ -4,8 +4,8 @@
 
 ```mermaid
 pie title Tareas completadas (353 tareas)
-    "Listas" : 334
-    "Pendientes" : 19
+    "Listas" : 335
+    "Pendientes" : 18
 ```
 
 | Fase | Nombre | Listas | Pendientes | Progreso |
@@ -23,16 +23,15 @@ pie title Tareas completadas (353 tareas)
 | 10 | [Endurecimiento de seguridad (post-auditoría)](phase-10-security-hardening.md) | 22 | 0 | ✅ 100% |
 | 11 | [SEO y reposicionamiento genérico](phase-11-seo-positioning.md) | 26 | 0 | ✅ 100% |
 | 12 | [Optimización y rendimiento](phase-12-optimization.md) | 29 | 0 | ✅ 100% |
-| 13 | [Compliance y legal](phase-13-compliance-legal.md) | 9 | 11 | 🟡 45% |
+| 13 | [Compliance y legal](phase-13-compliance-legal.md) | 10 | 10 | 🟡 50% |
 | 14 | [Auto-registro de centros con aprobación](phase-14-center-self-registration.md) | 17 | 0 | ✅ 100% |
 | 15 | [Deliverability de emails + aviso de solicitudes](phase-15-email-deliverability.md) | 15 | 0 | ✅ 100% |
 | 16 | [Rediseño de plantillas de email con marca](phase-16-email-brand-redesign.md) | 10 | 0 | ✅ 100% |
 | 17 | [AEO/GEO + expansión de keywords](phase-17-aeo-keyword-expansion.md) | 15 | 6 | 🟡 71% |
-| **Total** | | **334** | **19** | **🟡 95%** |
+| **Total** | | **335** | **18** | **🟡 95%** |
 
-> **Pendientes (19):**
-> - **1 de privacidad, ejecutable ya (Fase 13, grupo A):** política de retención documentada
->   (task 20). El borrado autoservicio (task 19) ya está en producto.
+> **Pendientes (18):**
+> El grupo A de la Fase 13 (privacidad, lo que aplica hoy) está completo.
 > - **12 gated por pago o por decisión de negocio:** Fase 4 → 2 (spend caps + alertas, requieren
 >   plan de pago de infra). Fase 13 → 10 (bloque de donativos/pagos: entidad receptora, asesoría
 >   legal/contable, procesador de pagos, T&C de donación, transparencia). Todo el bloque de

@@ -108,6 +108,27 @@ export const privacyEs: LegalDoc = {
       ],
     },
     {
+      heading: "Plazos de conservación",
+      blocks: [
+        "Conservamos cada tipo de dato solo mientras es necesario para la finalidad que lo originó. Estos son los plazos vigentes:",
+        {
+          table: {
+            head: ["Dato", "Plazo", "Qué ocurre al vencer"],
+            rows: [
+              ["Datos de tu cuenta (nombre, correo, foto)", "Mientras la cuenta exista", "Se eliminan cuando eliminas tu cuenta o cuando tu centro la da de baja"],
+              ["Registros de auditoría (IP, acción, fecha)", "90 días", "Se borran de forma automática cada noche"],
+              ["Adjuntos de mensajería", "90 días", "El archivo se elimina del almacenamiento automáticamente"],
+              ["Archivos de exportación (manifiestos, reportes)", "1 hora", "Se eliminan tras la descarga; 24 horas si la generación falló"],
+              ["Registros de fallos de envío de correo", "90 días", "Se borran de forma automática"],
+              ["Eventos de inventario (quién selló una caja, cerró una tarima o despachó un envío)", "Indefinido", "No se eliminan: sostienen la trazabilidad de la ayuda enviada"],
+            ],
+          },
+        },
+        "Los eventos de inventario merecen una aclaración. Son la razón de ser de la plataforma: permiten saber qué contenía cada caja y quién la preparó, que es lo que un envío humanitario debe poder demostrar ante la autoridad aduanera. Por eso no se borran. Cuando eliminas tu cuenta, esos eventos se conservan pero dejan de identificarte: tu nombre y tu correo desaparecen, y solo queda un identificador que ya no permite reconocerte.",
+        "No eliminamos cuentas de forma automática por inactividad. El voluntariado humanitario es intermitente y una persona puede volver meses después, ante una nueva emergencia, y necesitar su acceso. Corresponde a la coordinación de cada centro dar de baja a quienes ya no forman parte de él, y a cada persona eliminar su cuenta cuando lo desee.",
+      ],
+    },
+    {
       heading: "Derechos ARCO y revocación del consentimiento",
       blocks: [
         "Como titular de tus datos personales, tienes derecho a Acceder a ellos, Rectificarlos cuando sean inexactos, Cancelarlos cuando consideres que no se requieren para las finalidades señaladas, y Oponerte a su tratamiento (derechos ARCO). También puedes revocar el consentimiento que nos hayas otorgado.",
