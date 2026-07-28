@@ -107,6 +107,27 @@ export const privacyEn: LegalDoc = {
       ],
     },
     {
+      heading: "Retention periods",
+      blocks: [
+        "We keep each type of data only for as long as the purpose that originated it requires. These are the current periods:",
+        {
+          table: {
+            head: ["Data", "Period", "What happens when it expires"],
+            rows: [
+              ["Account data (name, email, photo)", "While the account exists", "Removed when you delete your account or when your center deactivates it"],
+              ["Audit records (IP, action, date)", "90 days", "Automatically deleted every night"],
+              ["Message attachments", "90 days", "The file is automatically removed from storage"],
+              ["Export files (manifests, reports)", "1 hour", "Deleted after download; 24 hours if generation failed"],
+              ["Email delivery failure records", "90 days", "Automatically deleted"],
+              ["Inventory events (who sealed a box, closed a pallet or dispatched a shipment)", "Indefinite", "Not deleted: they sustain the traceability of the aid that was shipped"],
+            ],
+          },
+        },
+        "Inventory events deserve an explanation. They are the reason the platform exists: they make it possible to know what each box contained and who prepared it, which is what a humanitarian shipment must be able to demonstrate to customs authorities. That is why they are not deleted. When you delete your account, those events are kept but stop identifying you: your name and email disappear, and only an identifier remains that no longer allows you to be recognized.",
+        "We do not automatically delete accounts for inactivity. Humanitarian volunteering is intermittent, and a person may come back months later, facing a new emergency, and need their access. It is up to each center's coordination to deactivate people who are no longer part of it, and up to each person to delete their account whenever they wish.",
+      ],
+    },
+    {
       heading: "Data subject rights (ARCO) and consent withdrawal",
       blocks: [
         "As the owner of your personal data, you have the right to Access it, Rectify it when inaccurate, Cancel it when you consider it is no longer required for the stated purposes, and Object to its processing (ARCO rights). You may also withdraw any consent you have given us.",
