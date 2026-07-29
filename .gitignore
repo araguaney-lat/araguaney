@@ -45,3 +45,5 @@ scripts/
 # Screenshots and browser automation artifacts
 screenshots/
 .playwright-mcp/
+# Las capturas de Playwright caen en la raiz del repo si no se les da ruta
+/*.png
