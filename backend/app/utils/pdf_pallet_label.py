@@ -9,6 +9,7 @@ from datetime import datetime
 
 import qrcode
 from reportlab.lib.pagesizes import A4
+from reportlab.lib.utils import ImageReader
 from reportlab.lib.units import mm
 from reportlab.pdfgen import canvas
 
@@ -36,12 +37,15 @@ def generate_pallet_label_pdf(pallet: PalletLabelData) -> bytes:
     qr_buf = io.BytesIO()
     img.save(qr_buf, format="PNG")
     qr_buf.seek(0)
+    # drawImage espera una ruta o un ImageReader: pasarle el BytesIO crudo
+    # revienta con "expected str, bytes or os.PathLike object, not BytesIO".
+    qr_image = ImageReader(qr_buf)
 
     qr_size = 55 * mm
     qr_x = (w - qr_size) / 2
     qr_y = h - 30 * mm - qr_size
 
-    c.drawImage(qr_buf, qr_x, qr_y, width=qr_size, height=qr_size)
+    c.drawImage(qr_image, qr_x, qr_y, width=qr_size, height=qr_size)
 
     c.setFont("Helvetica-Bold", 18)
     c.drawCentredString(w / 2, qr_y - 12 * mm, pallet.code)
@@ -76,7 +80,7 @@ def generate_pallet_label_pdf(pallet: PalletLabelData) -> bytes:
             c.drawString(x, y - row * 5 * mm, f"• {code}")
 
     c.setFont("Helvetica", 7)
-    c.drawCentredString(w / 2, 15 * mm, "Acopio · Coordinación humanitaria · acopio.org")
+    c.drawCentredString(w / 2, 15 * mm, "Araguaney · Coordinación humanitaria · araguaney.lat")
 
     c.save()
     return buf.getvalue()

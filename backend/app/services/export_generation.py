@@ -98,7 +98,7 @@ def generate_box_labels_pdf(db: Session, center_id: str | None, status: str) -> 
         raise ValueError("No boxes found with the given filters")
 
     pt_cache: dict = {}
-    center_name = "Acopio"
+    center_name = "Araguaney"
     if scope:
         center = CenterRepository(db).find_by_id(scope)
         if center:
@@ -129,14 +129,18 @@ def generate_box_labels_pdf(db: Session, center_id: str | None, status: str) -> 
 
 
 def generate_pallet_label_pdf(db: Session, pallet_id: str) -> tuple[bytes, str, str]:
+    from app.repositories.center_repository import CenterRepository
     from app.services.pallet_service import PalletService
     from app.config import settings
 
     detail = PalletService(db).get_detail(UUID(pallet_id), center_id=None)
     base_url = settings.frontend_url.split(",")[0].strip().rstrip("/")
+    # La etiqueta se pega en una tarima física: quien la lee necesita el nombre
+    # del centro, no su UUID.
+    center = CenterRepository(db).find_by_id(detail.center_id) if detail.center_id else None
     label = PalletLabelData(
         code=detail.code,
-        center_name=str(detail.center_id),
+        center_name=center.name if center else "Araguaney",
         status=detail.status,
         box_codes=[b.code for b in detail.boxes],
         closed_at=detail.closed_at,

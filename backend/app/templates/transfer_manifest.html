@@ -11,7 +11,21 @@
   .meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2mm 8mm; margin: 4mm 0; font-size: 8.5pt; }
   .meta-label { color: #666; font-size: 7.5pt; }
   .meta-val { font-weight: bold; }
-  table { width: 100%; border-collapse: collapse; margin-top: 2mm; font-size: 7.5pt; }
+  /* Mismas diez columnas que el manifiesto de envio: apaisado y anchos fijos,
+     o la columna de peso termina fuera de la hoja. */
+  @page { size: A4 landscape; margin: 12mm; }
+  table { width: 100%; border-collapse: collapse; margin-top: 2mm; font-size: 7.5pt; table-layout: fixed; }
+  .boxes col.c-codigo    { width: 12%; }
+  .boxes col.c-producto  { width: 17%; }
+  .boxes col.c-categoria { width: 9%; }
+  .boxes col.c-inn       { width: 12%; }
+  .boxes col.c-conc      { width: 10%; }
+  .boxes col.c-lote      { width: 11%; }
+  .boxes col.c-cad       { width: 9%; }
+  .boxes col.c-cant      { width: 7%; }
+  .boxes col.c-unidad    { width: 7%; }
+  .boxes col.c-peso      { width: 6%; }
+  .boxes td, .boxes th { overflow-wrap: break-word; }
   th { background: #e5e7eb; padding: 2mm 2.5mm; text-align: left; font-size: 7pt; font-weight: bold; border: 0.3pt solid #ccc; }
   td { padding: 1.5mm 2.5mm; border: 0.3pt solid #ddd; vertical-align: top; }
   tr:nth-child(even) td { background: #f9fafb; }
@@ -49,7 +63,12 @@
   </div>
 
   <h2>Cajas ({{ transfer.boxes | length }})</h2>
-  <table>
+  <table class="boxes">
+    <colgroup>
+      <col class="c-codigo"><col class="c-producto"><col class="c-categoria">
+      <col class="c-inn"><col class="c-conc"><col class="c-lote">
+      <col class="c-cad"><col class="c-cant"><col class="c-unidad"><col class="c-peso">
+    </colgroup>
     <thead>
       <tr>
         <th>Código</th>
@@ -92,7 +111,7 @@
   </div>
 
   <div class="footer">
-    Araguaney — Coordinación humanitaria · Documento generado automáticamente · {{ generated_at }}
+    Araguaney · Coordinación humanitaria · araguaney.lat · Documento generado automáticamente · {{ generated_at }}
   </div>
 </div>
 </body>
