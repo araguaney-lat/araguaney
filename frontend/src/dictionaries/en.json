@@ -231,7 +231,9 @@
         "OPEN": "Open",
         "CLOSED": "Closed",
         "SHIPPED": "Shipped"
-      }
+      },
+      "scan_box": "Scan box",
+      "scan_label": "Point at the box QR code"
     },
     "shipments": {
       "title": "Shipments",

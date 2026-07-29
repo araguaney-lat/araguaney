@@ -231,7 +231,9 @@
         "OPEN": "Abierta",
         "CLOSED": "Cerrada",
         "SHIPPED": "Enviada"
-      }
+      },
+      "scan_box": "Escanear caja",
+      "scan_label": "Apunta al QR de la caja"
     },
     "shipments": {
       "title": "Envíos",
