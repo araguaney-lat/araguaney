@@ -107,7 +107,7 @@ class PalletService(BaseService):
         return PalletPublicOut(
             code=pallet.code,
             status=pallet.status,
-            center_name=center.name if center else "Acopio",
+            center_name=center.name if center else "Araguaney",
             box_count=len(boxes),
             closed_at=pallet.closed_at,
         )
