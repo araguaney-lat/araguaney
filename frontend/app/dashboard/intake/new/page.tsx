@@ -26,6 +26,9 @@ interface BoxRow {
   expiry_date: string
   weight_kg: string
   offlineBlocked: boolean
+  // Codigo leido durante la captura. No viaja a la caja: alimenta el catalogo,
+  // que aprende que GTIN corresponde al tipo de producto elegido.
+  scannedGtin: string
 }
 
 function newRow(): BoxRow {
@@ -38,6 +41,7 @@ function newRow(): BoxRow {
     expiry_date: "",
     weight_kg: "",
     offlineBlocked: false,
+    scannedGtin: "",
   }
 }
 
@@ -114,8 +118,14 @@ function BoxRowInput({
   const set = (field: keyof BoxRow) => (e: React.ChangeEvent<HTMLInputElement>) =>
     onChange({ ...row, [field]: e.target.value })
 
-  const selectProduct = (pt: ProductType) => {
-    onChange({ ...row, product_type: pt, unit: pt.default_unit ?? row.unit, offlineBlocked: false })
+  const selectProduct = (pt: ProductType, gtin?: string) => {
+    onChange({
+      ...row,
+      product_type: pt,
+      unit: pt.default_unit ?? row.unit,
+      offlineBlocked: false,
+      scannedGtin: gtin ?? row.scannedGtin,
+    })
     setShowDropdown(false)
     setBarcodeInput("")
     setBarcodeError(null)
@@ -125,12 +135,14 @@ function BoxRowInput({
     setBarcodeError(null)
     const { product, offlineBlocked, notFound } = await lookupBarcode(gtin)
     if (product) {
-      selectProduct(product)
+      selectProduct(product, gtin)
     } else if (offlineBlocked) {
-      onChange({ ...row, offlineBlocked: true })
+      onChange({ ...row, offlineBlocked: true, scannedGtin: gtin })
       setBarcodeError(t.barcode_offline)
     } else if (notFound) {
-      onChange({ ...row, offlineBlocked: false })
+      // Justo el caso que enseña: el codigo no existe en ningun catalogo, la
+      // persona elegira el producto a mano y esa asociacion queda registrada.
+      onChange({ ...row, offlineBlocked: false, scannedGtin: gtin })
       setBarcodeError(t.barcode_not_found)
     }
   }, [lookupBarcode, row, onChange, t]) // eslint-disable-line react-hooks/exhaustive-deps
@@ -408,6 +420,7 @@ export default function NewIntakePage() {
       batch: row.batch.trim() || undefined,
       expiry_date: row.expiry_date || undefined,
       weight_kg: row.weight_kg ? parseFloat(row.weight_kg) : undefined,
+      gtin: row.scannedGtin || undefined,
     }))
 
     setSubmitting(true)

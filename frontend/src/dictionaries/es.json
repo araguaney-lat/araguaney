@@ -231,7 +231,9 @@
         "OPEN": "Abierta",
         "CLOSED": "Cerrada",
         "SHIPPED": "Enviada"
-      }
+      },
+      "scan_box": "Escanear caja",
+      "scan_label": "Apunta al QR de la caja"
     },
     "shipments": {
       "title": "Envíos",
@@ -808,6 +810,16 @@
         "TOOL": "Herramienta",
         "RESCUE_GEAR": "Equipo de rescate",
         "OTHER": "Otro"
+      },
+      "gtins_show": "Códigos de barras",
+      "gtins_hide": "Ocultar códigos",
+      "gtins_title": "Códigos de barras ligados a este producto",
+      "gtins_empty": "Sin códigos ligados todavía. Se ligan solos al capturar donaciones.",
+      "gtins_unlink": "Desligar",
+      "gtins_source": {
+        "intake": "capturado en un centro",
+        "catalog": "del catálogo",
+        "seed": "sembrado"
       }
     },
     "catalog_new": {

@@ -340,3 +340,11 @@ export interface NationalDashboardOut {
 export interface PublicNeedsOut {
   by_category: CategoryStockOut[]
 }
+
+/** Código de barras aprendido durante una captura y ligado a un tipo de producto. */
+export interface ProductGtin {
+  id: string
+  gtin: string
+  source: string
+  created_at: string
+}

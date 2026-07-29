@@ -6,7 +6,12 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.dependencies import get_current_user, require_national_admin
 from app.models.user import User
-from app.schemas.product_type import ProductTypeCreate, ProductTypeOut, ProductTypeUpdate
+from app.schemas.product_type import (
+    ProductGtinOut,
+    ProductTypeCreate,
+    ProductTypeOut,
+    ProductTypeUpdate,
+)
 from app.services.product_type_service import ProductTypeService
 from app.utils.open_food_facts import lookup_barcode
 from app.utils.rate_limit import limiter
@@ -98,3 +103,28 @@ def promote_product_type(
 ):
     """Promote a campaign-scoped ProductType to the global catalog (campaign_id → NULL)."""
     return ProductTypeService(db).promote(pt_id)
+
+
+@router.get("/{pt_id}/gtins", response_model=list[ProductGtinOut])
+@limiter.limit("60/minute")
+def list_product_gtins(
+    request: Request,
+    pt_id: UUID,
+    db: Session = Depends(get_db),
+    _: User = Depends(get_current_user),
+):
+    """Códigos de barras asociados a un tipo de producto (aprendidos en captura)."""
+    return ProductTypeService(db).list_gtins(pt_id)
+
+
+@router.delete("/{pt_id}/gtins/{gtin_id}", status_code=204)
+@limiter.limit("30/minute")
+def unlink_product_gtin(
+    request: Request,
+    pt_id: UUID,
+    gtin_id: UUID,
+    db: Session = Depends(get_db),
+    admin: User = Depends(require_national_admin),
+):
+    """Desliga un código capturado por error. El GTIN queda libre otra vez."""
+    ProductTypeService(db).unlink_gtin(pt_id, gtin_id, user_id=admin.id)

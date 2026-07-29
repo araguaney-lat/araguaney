@@ -1,6 +1,8 @@
 from uuid import UUID
 
+from app.models.product_gtin import ProductGtin
 from app.models.product_type import ProductType, PRODUCT_CATEGORIES
+from app.repositories.audit_repository import AuditRepository
 from app.repositories.product_type_repository import ProductTypeRepository
 from app.schemas.product_type import ProductTypeCreate, ProductTypeUpdate
 from app.services.base import BaseService
@@ -33,6 +35,36 @@ class ProductTypeService(BaseService):
             raise api_error("INVALID_GTIN", "GTIN must be a valid EAN-8, UPC-A, or EAN-13", field="gtin")
         pt = ProductType(**data.model_dump())
         return ProductTypeRepository(self.db).save(pt)
+
+    def list_gtins(self, pt_id: UUID) -> list[ProductGtin]:
+        repo = ProductTypeRepository(self.db)
+        if not repo.find_by_id(pt_id):
+            raise api_error("PRODUCT_TYPE_NOT_FOUND", "Product type not found", status_code=404)
+        return repo.list_gtins(pt_id)
+
+    def unlink_gtin(self, pt_id: UUID, gtin_id: UUID, user_id: UUID | None = None) -> None:
+        """Desliga un código de barras capturado por error.
+
+        El aprendizaje del catálogo se queda con quien capturó primero, así que
+        sin esta salida un código mal asociado sería permanente y global. Queda
+        en auditoría porque afecta al catálogo de todos los centros.
+        """
+        repo = ProductTypeRepository(self.db)
+        enlace = repo.find_gtin(gtin_id)
+        # Si el código cuelga de otro producto se responde igual que si no
+        # existiera: la ruta declara a qué producto pertenece.
+        if not enlace or enlace.product_type_id != pt_id:
+            raise api_error("GTIN_NOT_FOUND", "Barcode link not found", status_code=404)
+
+        AuditRepository(self.db).log(
+            "PRODUCT_GTIN_UNLINKED",
+            "product_type",
+            user_id=user_id,
+            entity_id=str(pt_id),
+            extra={"gtin": enlace.gtin, "source": enlace.source},
+        )
+        repo.delete_gtin(enlace)
+        repo.commit()
 
     def promote(self, pt_id: UUID) -> ProductType:
         repo = ProductTypeRepository(self.db)

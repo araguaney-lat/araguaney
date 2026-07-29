@@ -12,6 +12,7 @@ from app.repositories.user_campaign_repository import UserCampaignRepository
 from app.schemas.intake import BoxDraft, IntakeCreate, IntakeOut, BoxOut
 from app.services.base import BaseService
 from app.services.validation_service import validate_box
+from app.utils.gtin import normalize as normalize_gtin, validate as validate_gtin
 from app.utils.errors import api_error
 
 
@@ -87,6 +88,18 @@ class IntakeService(BaseService):
             )
             intake_repo.save_box(box)
             saved_boxes.append(box)
+
+            # El catálogo aprende: el código leído queda ligado al producto que
+            # la persona eligió. Un GTIN mal formado se ignora en silencio, no
+            # vale la pena tumbar una captura del almacén por eso.
+            if bd.gtin:
+                gtin = normalize_gtin(bd.gtin)
+                if validate_gtin(gtin):
+                    pt_repo.link_gtin(
+                        product_type_id=bd.product_type_id,
+                        gtin=gtin,
+                        user_id=user_id,
+                    )
 
             event = BoxEvent(
                 box_id=box.id,

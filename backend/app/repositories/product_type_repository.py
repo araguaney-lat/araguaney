@@ -3,6 +3,7 @@ from uuid import UUID
 from sqlalchemy import func, or_, select
 from sqlalchemy.orm import Session
 
+from app.models.product_gtin import ProductGtin
 from app.models.product_type import ProductType
 from app.repositories.base import BaseRepository
 
@@ -58,9 +59,61 @@ class ProductTypeRepository(BaseRepository):
         return self.db.get(ProductType, pt_id)
 
     def find_by_gtin(self, gtin: str) -> ProductType | None:
+        """Busca por código de barras: primero lo aprendido del uso, luego el catálogo."""
+        aprendido = self.db.execute(
+            select(ProductType)
+            .join(ProductGtin, ProductGtin.product_type_id == ProductType.id)
+            .where(ProductGtin.gtin == gtin)
+        ).scalar_one_or_none()
+        if aprendido is not None:
+            return aprendido
+
         return self.db.execute(
             select(ProductType).where(ProductType.gtin == gtin)
         ).scalar_one_or_none()
+
+    def link_gtin(
+        self,
+        *,
+        product_type_id: UUID,
+        gtin: str,
+        user_id: UUID | None = None,
+        source: str = "intake",
+    ) -> ProductGtin | None:
+        """Liga un código de barras a un tipo de producto. No pisa lo ya existente.
+
+        Devuelve la asociación vigente si el GTIN ya estaba ligado a este mismo
+        producto, y None si pertenece a otro: gana quien lo capturó primero, para
+        que una captura equivocada no reescriba el catálogo de todos los centros.
+        """
+        existente = self.db.execute(
+            select(ProductGtin).where(ProductGtin.gtin == gtin)
+        ).scalar_one_or_none()
+        if existente is not None:
+            return existente if existente.product_type_id == product_type_id else None
+
+        enlace = ProductGtin(
+            product_type_id=product_type_id,
+            gtin=gtin,
+            source=source,
+            created_by_user_id=user_id,
+        )
+        self.db.add(enlace)
+        return enlace
+
+    def list_gtins(self, product_type_id: UUID) -> list[ProductGtin]:
+        return list(self.db.execute(
+            select(ProductGtin)
+            .where(ProductGtin.product_type_id == product_type_id)
+            .order_by(ProductGtin.created_at.desc())
+        ).scalars().all())
+
+    def find_gtin(self, gtin_id: UUID) -> ProductGtin | None:
+        return self.db.get(ProductGtin, gtin_id)
+
+    def delete_gtin(self, enlace: ProductGtin) -> None:
+        """Desliga el código. Queda libre para que otra captura lo reclame."""
+        self.db.delete(enlace)
 
     def exists_in_scope(
         self,

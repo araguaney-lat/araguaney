@@ -1,6 +1,8 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
+import dynamic from "next/dynamic"
+import { ScanLine } from "lucide-react"
 import { useSession } from "next-auth/react"
 import { apiFetch } from "@/lib/api"
 import type { Center, PalletOut, PalletDetailOut, PalletStatus, EventOut } from "@/types"
@@ -12,6 +14,24 @@ import {
 } from "@/lib/pallet-actions"
 import { useExportJob } from "@/hooks/useExportJob"
 import { useDict } from "@/context/DictionaryContext"
+
+// @zxing/browser solo hace falta cuando se abre la camara — fuera del bundle inicial.
+const CameraScanner = dynamic(
+  () => import("@/components/CameraScanner").then((mod) => mod.CameraScanner),
+  { ssr: false }
+)
+
+// El QR de una caja codifica la URL publica de su ficha, {base}/b/{code}.
+// Del escaneo puede llegar esa URL o el codigo pelado si alguien lo teclea.
+function parseBoxCode(scanned: string): string {
+  try {
+    const path = new URL(scanned).pathname
+    if (path.startsWith("/b/")) return path.slice(3).toUpperCase()
+  } catch {
+    // no era una URL: se trata como codigo directo
+  }
+  return scanned.trim().toUpperCase()
+}
 
 const STATUS_COLORS: Record<PalletStatus, string> = {
   OPEN: "bg-dDraftB text-dDraftT",
@@ -51,6 +71,7 @@ export default function PalletsPage() {
   const [activePallet, setActivePallet] = useState<PalletDetailOut | null>(null)
   const [palletEvents, setPalletEvents] = useState<EventOut[]>([])
   const [boxCodeInput, setBoxCodeInput] = useState("")
+  const [scanning, setScanning] = useState(false)
   const [actionLoading, setActionLoading] = useState<string | null>(null)
   const labelExport = useExportJob()
 
@@ -97,10 +118,13 @@ export default function PalletsPage() {
     }
   }
 
-  const handleAddBox = async () => {
-    if (!activePallet || !boxCodeInput.trim()) return
+  // `code` llega cuando la caja entra por la camara: el estado del input aun no
+  // se ha actualizado en ese momento, asi que el codigo viaja como argumento.
+  const handleAddBox = async (code?: string) => {
+    const value = (code ?? boxCodeInput).trim().toUpperCase()
+    if (!activePallet || !value) return
     setActionLoading("add-box")
-    const result = await addBoxToPalletAction(activePallet.id, boxCodeInput.trim().toUpperCase())
+    const result = await addBoxToPalletAction(activePallet.id, value)
     setActionLoading(null)
     if (result.error) {
       setError(result.error)
@@ -110,6 +134,14 @@ export default function PalletsPage() {
       await fetchPallets()
     }
   }
+
+  const handleScan = useCallback((scanned: string) => {
+    setScanning(false)
+    setError(null)
+    const code = parseBoxCode(scanned)
+    setBoxCodeInput(code)
+    handleAddBox(code)
+  }, [activePallet, boxCodeInput]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleClose = async (palletId: string) => {
     setActionLoading(palletId)
@@ -233,7 +265,16 @@ export default function PalletsPage() {
                   className="flex-1 text-sm border border-inpB bg-inp rounded-lg px-3 py-2 font-mono uppercase text-tx placeholder:normal-case placeholder:font-sans focus:outline-none focus:ring-2 focus:ring-[var(--gold)]"
                 />
                 <button
-                  onClick={handleAddBox}
+                  type="button"
+                  onClick={() => setScanning(true)}
+                  title={t.scan_box}
+                  aria-label={t.scan_box}
+                  className="px-3 py-2 rounded-lg border border-cardB bg-chip text-sm text-tx hover:bg-card2"
+                >
+                  <ScanLine className="h-4 w-4" aria-hidden />
+                </button>
+                <button
+                  onClick={() => handleAddBox()}
                   disabled={!boxCodeInput.trim() || actionLoading === "add-box"}
                   className="px-3 py-2 bg-[var(--gold)] text-[#3B2A00] rounded-lg text-sm hover:opacity-90 disabled:opacity-50"
                 >
@@ -271,6 +312,14 @@ export default function PalletsPage() {
           </div>
         )}
       </div>
+
+      {scanning && (
+        <CameraScanner
+          onResult={handleScan}
+          onClose={() => setScanning(false)}
+          label={t.scan_label}
+        />
+      )}
     </div>
   )
 }

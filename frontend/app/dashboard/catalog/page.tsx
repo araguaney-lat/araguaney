@@ -1,10 +1,10 @@
 "use client"
 
-import { useState, useEffect, useTransition } from "react"
+import { Fragment, useState, useEffect, useTransition } from "react"
 import Link from "next/link"
 import { useSession } from "next-auth/react"
-import type { ProductType, Campaign } from "@/types"
-import { promoteProductTypeAction } from "@/lib/catalog-actions"
+import type { ProductType, Campaign, ProductGtin } from "@/types"
+import { promoteProductTypeAction, unlinkProductGtinAction } from "@/lib/catalog-actions"
 import { useDict } from "@/context/DictionaryContext"
 
 type ProductTypeWithCampaign = ProductType & { campaign_id: string | null }
@@ -22,6 +22,39 @@ export default function CatalogPage() {
   const [scopeFilter, setScopeFilter] = useState<"all" | "global" | "campaign">("all")
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
+
+  // Codigos de barras por producto. Se piden al desplegar la fila: son pocos
+  // productos los que interesan y no vale traerlos todos de entrada.
+  const [expanded, setExpanded] = useState<string | null>(null)
+  const [gtins, setGtins] = useState<Record<string, ProductGtin[]>>({})
+  const [loadingGtins, setLoadingGtins] = useState(false)
+
+  const toggleGtins = (ptId: string) => {
+    if (expanded === ptId) { setExpanded(null); return }
+    setExpanded(ptId)
+    if (gtins[ptId]) return
+    setLoadingGtins(true)
+    fetch(`/api/product-types/${ptId}/gtins`)
+      .then((r) => (r.ok ? r.json() : []))
+      .then((data: ProductGtin[]) => setGtins((prev) => ({ ...prev, [ptId]: data })))
+      .catch(() => setGtins((prev) => ({ ...prev, [ptId]: [] })))
+      .finally(() => setLoadingGtins(false))
+  }
+
+  const handleUnlink = (ptId: string, gtinId: string) => {
+    setError(null)
+    startTransition(async () => {
+      const result = await unlinkProductGtinAction(ptId, gtinId)
+      if (result.error) {
+        setError(result.error)
+        return
+      }
+      setGtins((prev) => ({
+        ...prev,
+        [ptId]: (prev[ptId] ?? []).filter((g) => g.id !== gtinId),
+      }))
+    })
+  }
 
   useEffect(() => {
     Promise.all([
@@ -143,7 +176,8 @@ export default function CatalogPage() {
             </thead>
             <tbody className="divide-y divide-line">
               {filtered.map((pt) => (
-                <tr key={pt.id} className="hover:bg-card2">
+                <Fragment key={pt.id}>
+                <tr className="hover:bg-card2">
                   <td className="px-4 py-3">
                     <p className="font-medium text-tx">{pt.display_name}</p>
                     <p className="text-xs text-fnt">
@@ -172,13 +206,20 @@ export default function CatalogPage() {
                     )}
                   </td>
                   {isAdmin && (
-                    <td className="px-4 py-3 text-right">
+                    <td className="px-4 py-3 text-right whitespace-nowrap">
+                      <button
+                        type="button"
+                        onClick={() => toggleGtins(pt.id)}
+                        className="text-xs text-mut hover:text-tx"
+                      >
+                        {expanded === pt.id ? t.gtins_hide : t.gtins_show}
+                      </button>
                       {pt.campaign_id !== null && (
                         <button
                           type="button"
                           disabled={isPending}
                           onClick={() => handlePromote(pt)}
-                          className="text-xs text-[var(--blue)] hover:text-[var(--blue)] disabled:opacity-50"
+                          className="ml-3 text-xs text-[var(--blue)] hover:text-[var(--blue)] disabled:opacity-50"
                         >
                           {t.promote_action}
                         </button>
@@ -186,6 +227,37 @@ export default function CatalogPage() {
                     </td>
                   )}
                 </tr>
+
+                {isAdmin && expanded === pt.id && (
+                  <tr className="bg-card2">
+                    <td colSpan={4} className="px-4 py-3">
+                      <p className="mb-2 text-xs font-semibold text-mut">{t.gtins_title}</p>
+                      {loadingGtins && !gtins[pt.id] ? (
+                        <p className="text-xs text-fnt">{t.loading}</p>
+                      ) : (gtins[pt.id] ?? []).length === 0 ? (
+                        <p className="text-xs text-fnt">{t.gtins_empty}</p>
+                      ) : (
+                        <ul className="space-y-1">
+                          {(gtins[pt.id] ?? []).map((g) => (
+                            <li key={g.id} className="flex items-center gap-3 text-xs">
+                              <span className="font-mono text-tx">{g.gtin}</span>
+                              <span className="text-fnt">{t.gtins_source[g.source as keyof typeof t.gtins_source] ?? g.source}</span>
+                              <button
+                                type="button"
+                                disabled={isPending}
+                                onClick={() => handleUnlink(pt.id, g.id)}
+                                className="ml-auto text-[var(--dRejT)] hover:underline disabled:opacity-50"
+                              >
+                                {t.gtins_unlink}
+                              </button>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </td>
+                  </tr>
+                )}
+                </Fragment>
               ))}
             </tbody>
           </table>

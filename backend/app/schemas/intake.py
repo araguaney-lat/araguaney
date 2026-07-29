@@ -12,6 +12,9 @@ class BoxDraft(StrictModel):
     batch: str | None = None
     expiry_date: StrictDate | None = None
     weight_kg: StrictDecimal | None = None
+    # Código de barras leído durante la captura. No se guarda en la caja: sirve
+    # para que el catálogo aprenda qué GTIN corresponde a este tipo de producto.
+    gtin: str | None = None
 
 
 class IntakeCreate(StrictModel):
