@@ -27,6 +27,7 @@ from app.models import export_job  # noqa: F401
 from app.models import intake  # noqa: F401
 from app.models import messaging  # noqa: F401
 from app.models import pallet  # noqa: F401
+from app.models import product_gtin  # noqa: F401
 from app.models import product_type  # noqa: F401
 from app.models import request  # noqa: F401
 from app.models import shipment  # noqa: F401

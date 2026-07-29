@@ -12,6 +12,7 @@ import app.models.user            # noqa: F401
 import app.models.token_denylist  # noqa: F401
 import app.models.center          # noqa: F401
 import app.models.product_type    # noqa: F401
+import app.models.product_gtin    # noqa: F401
 import app.models.shipment        # noqa: F401
 import app.models.pallet          # noqa: F401
 import app.models.intake          # noqa: F401

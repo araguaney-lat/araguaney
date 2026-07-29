@@ -314,6 +314,7 @@ export interface BoxDraft {
   batch?: string
   expiry_date?: string
   weight_kg?: number
+  gtin?: string
 }
 
 export interface CreateIntakePayload {
