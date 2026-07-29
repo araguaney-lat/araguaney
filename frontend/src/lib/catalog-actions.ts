@@ -52,3 +52,21 @@ export async function promoteProductTypeAction(
     return { error: "Error al promover el tipo de producto" }
   }
 }
+
+export async function unlinkProductGtinAction(
+  productTypeId: string,
+  gtinId: string
+): Promise<{ ok?: true; error?: string }> {
+  const session = await auth()
+  try {
+    await apiFetch(`/v1/product-types/${productTypeId}/gtins/${gtinId}`, {
+      method: "DELETE",
+      token: session?.accessToken,
+    })
+    revalidatePath("/dashboard/catalog")
+    return { ok: true }
+  } catch (err: unknown) {
+    if (err instanceof Error) return { error: err.message }
+    return { error: "Error al desligar el código de barras" }
+  }
+}

@@ -810,6 +810,16 @@
         "TOOL": "Tool",
         "RESCUE_GEAR": "Rescue gear",
         "OTHER": "Other"
+      },
+      "gtins_show": "Barcodes",
+      "gtins_hide": "Hide barcodes",
+      "gtins_title": "Barcodes linked to this product",
+      "gtins_empty": "No barcodes linked yet. They are linked automatically during intake.",
+      "gtins_unlink": "Unlink",
+      "gtins_source": {
+        "intake": "captured at a center",
+        "catalog": "from the catalog",
+        "seed": "seeded"
       }
     },
     "catalog_new": {

@@ -1,6 +1,24 @@
 import type { NextConfig } from "next"
 import { withSentryConfig } from "@sentry/nextjs"
 
+// Las fichas publicas de QR incrustan la imagen directo del backend
+// (`{API}/b/{code}/qr.png`), asi que su origen tiene que estar en img-src o el
+// navegador la bloquea sin decir nada visible en la pagina.
+const apiOrigin = (() => {
+  try {
+    return new URL(process.env.NEXT_PUBLIC_API_URL ?? "").origin
+  } catch {
+    return ""
+  }
+})()
+
+const imgSrc = [
+  "'self'", "data:", "blob:",
+  "https://res.cloudinary.com",
+  "https://www.google-analytics.com",
+  ...(apiOrigin ? [apiOrigin] : []),
+].join(" ")
+
 const securityHeaders = [
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "X-Frame-Options", value: "SAMEORIGIN" },
@@ -16,7 +34,7 @@ const securityHeaders = [
       "default-src 'self'",
       "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com https://www.googletagmanager.com",
       "style-src 'self' 'unsafe-inline'",
-      "img-src 'self' data: blob: https://res.cloudinary.com https://www.google-analytics.com",
+      `img-src ${imgSrc}`,
       "font-src 'self'",
       "connect-src 'self' https://*.sentry.io https://*.ingest.sentry.io https://challenges.cloudflare.com https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com",
       "frame-src https://challenges.cloudflare.com",

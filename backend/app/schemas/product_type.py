@@ -70,3 +70,10 @@ class ProductTypeOut(StrictORMModel):
     min_shelf_life_days: int | None
     unit_weight_kg: Decimal | None
     created_at: datetime
+
+
+class ProductGtinOut(StrictORMModel):
+    id: UUID
+    gtin: str
+    source: str
+    created_at: datetime

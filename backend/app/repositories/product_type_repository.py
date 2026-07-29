@@ -101,6 +101,20 @@ class ProductTypeRepository(BaseRepository):
         self.db.add(enlace)
         return enlace
 
+    def list_gtins(self, product_type_id: UUID) -> list[ProductGtin]:
+        return list(self.db.execute(
+            select(ProductGtin)
+            .where(ProductGtin.product_type_id == product_type_id)
+            .order_by(ProductGtin.created_at.desc())
+        ).scalars().all())
+
+    def find_gtin(self, gtin_id: UUID) -> ProductGtin | None:
+        return self.db.get(ProductGtin, gtin_id)
+
+    def delete_gtin(self, enlace: ProductGtin) -> None:
+        """Desliga el código. Queda libre para que otra captura lo reclame."""
+        self.db.delete(enlace)
+
     def exists_in_scope(
         self,
         inn_name: str,
