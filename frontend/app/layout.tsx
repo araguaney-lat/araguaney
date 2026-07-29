@@ -67,7 +67,9 @@ export default async function RootLayout({
       lang={locale}
       className={`${hanken.variable} ${sourceSerif.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
+      {/* Las extensiones del navegador (ColorZilla, Grammarly…) inyectan atributos en
+          <body> antes de que React hidrate; sin esto el diff sale como error de hidratación. */}
+      <body className="min-h-full flex flex-col" suppressHydrationWarning>
         {children}
         <ServiceWorkerRegistration />
         <GoogleAnalytics />
