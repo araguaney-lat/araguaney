@@ -15,7 +15,7 @@ interface Campaign {
 
 async function getMyCampaigns(token: string): Promise<Campaign[]> {
   try {
-    return await apiFetch<Campaign[]>("/v1/campaigns/my", { token })
+    return await apiFetch<Campaign[]>("/v1/campaigns/mine", { token })
   } catch {
     return []
   }
