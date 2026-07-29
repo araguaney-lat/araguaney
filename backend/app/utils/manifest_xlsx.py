@@ -41,7 +41,7 @@ def generate_manifest_xlsx(data: ManifestData) -> bytes:
 
     # ── Title block ──────────────────────────────────────────────────────────
     ws.merge_cells("A1:L1")
-    ws["A1"] = f"MANIFIESTO DE ENVÍO — {data.shipment_id[:8].upper()}"
+    ws["A1"] = f"MANIFIESTO DE ENVÍO · {data.reference or data.shipment_id[:8].upper()}"
     ws["A1"].font = Font(bold=True, size=13)
 
     meta = [
@@ -111,7 +111,7 @@ def generate_manifest_xlsx(data: ManifestData) -> bytes:
     total_weight = sum(float(b.weight_kg) for p in data.pallets for b in p.boxes if b.weight_kg)
 
     ws.merge_cells(f"A{current_row}:F{current_row}")
-    total_label = ws.cell(row=current_row, column=1, value=f"TOTALES — {total_boxes} cajas")
+    total_label = ws.cell(row=current_row, column=1, value=f"TOTALES · {total_boxes} cajas")
     total_label.font = Font(bold=True, size=9)
 
     ws.cell(row=current_row, column=7, value=total_units).font = Font(bold=True, size=9)
