@@ -516,7 +516,11 @@
       "manual_label": "También puedes escribir el código manualmente:",
       "go": "Ir",
       "camera_label": "Apunta al QR de la caja o tarima",
-      "subtitle_detail": "Escanea el QR de una caja o tarima para ver su ficha."
+      "subtitle_detail": "Escanea el QR de una caja o tarima para ver su ficha.",
+      "cancel": "Cancelar",
+      "camera_insecure": "La cámara solo funciona en HTTPS o en localhost.",
+      "camera_error": "No se pudo iniciar la cámara.",
+      "camera_retry": "Reintentar"
     },
     "team": {
       "title": "Equipo",
