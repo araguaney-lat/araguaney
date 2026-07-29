@@ -28,6 +28,10 @@ export function CameraScanner({ onResult, onClose, label }: Props) {
 
   const videoRef = useRef<HTMLVideoElement>(null)
   const controlsRef = useRef<IScannerControls | null>(null)
+  // Serializes start/stop. `IScannerControls.stop()` nulls the <video> srcObject, so a
+  // start that resolves late would blank a newer stream sharing the same element — which
+  // is exactly what React's dev double-effect triggers: flash of camera, then black.
+  const chainRef = useRef<Promise<unknown>>(Promise.resolve())
   const [error, setError] = useState<StartError | null>(null)
   const [attempt, setAttempt] = useState(0)
 
@@ -51,36 +55,45 @@ export function CameraScanner({ onResult, onClose, label }: Props) {
       return
     }
 
-    const reader = new BrowserMultiFormatReader()
+    const started = chainRef.current.then(() => {
+      if (cancelled) return null
 
-    reader
-      .decodeFromVideoDevice(undefined, video, (result, err) => {
-        if (result) {
-          stop()
-          onResult(result.getText())
-          return
-        }
-        // NotFoundException fires on every frame without a code — expected, not an error.
-        if (err && err.name !== "NotFoundException") {
+      const reader = new BrowserMultiFormatReader()
+
+      return reader
+        .decodeFromVideoDevice(undefined, video, (result, err) => {
+          if (result) {
+            stop()
+            onResult(result.getText())
+            return
+          }
+          // NotFoundException fires on every frame without a code — expected, not an error.
+          if (err && err.name !== "NotFoundException") {
+            console.error(err)
+          }
+        })
+        .then((controls) => {
+          if (cancelled) {
+            controls.stop()
+            return null
+          }
+          controlsRef.current = controls
+          return controls
+        })
+        .catch((err: unknown) => {
+          if (cancelled) return null
           console.error(err)
-        }
-      })
-      .then((controls) => {
-        if (cancelled) {
-          controls.stop()
-          return
-        }
-        controlsRef.current = controls
-      })
-      .catch((err: unknown) => {
-        if (cancelled) return
-        console.error(err)
-        setError(classifyError(err))
-      })
+          setError(classifyError(err))
+          return null
+        })
+    })
+
+    chainRef.current = started
 
     return () => {
       cancelled = true
-      stop()
+      // The next start waits for this teardown, so it never races the previous stream.
+      chainRef.current = started.then(stop)
     }
   }, [onResult, stop, attempt])
 
