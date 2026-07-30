@@ -17,6 +17,7 @@ import {
   BarChart2,
   HelpCircle,
   Inbox,
+  Gift,
 } from "lucide-react"
 
 export type IconComponent = React.ComponentType<{ size?: number; className?: string }>
@@ -33,6 +34,7 @@ export type DashboardNav = {
   home: string
   national: string
   intake: string
+  donations: string
   boxes: string
   pallets: string
   shipments: string
@@ -85,6 +87,9 @@ export const NAV_ITEMS: NavItem[] = [
 // Operations — day-to-day tools, grouped under its own header.
 export const OPS_ITEMS: NavItem[] = [
   { href: "/dashboard/intake", labelKey: "intake", roles: ["national_admin", "coordinator", "volunteer"], icon: PackagePlus },
+  // Pre-registro: lo que el donante anunció antes de llegar. Va junto a
+  // Recepción porque el doble check desemboca justo en el intake.
+  { href: "/dashboard/donations", labelKey: "donations", roles: ["national_admin", "coordinator", "volunteer"], icon: Gift },
   { href: "/dashboard/scan", labelKey: "scan", roles: ["national_admin", "coordinator", "volunteer"], icon: ScanLine },
   { href: "/dashboard/transfers", labelKey: "transfers", roles: ["national_admin", "coordinator"], icon: ArrowLeftRight },
   { href: "/dashboard/reports", labelKey: "reports", roles: ["national_admin", "coordinator", "volunteer"], icon: BarChart2 },

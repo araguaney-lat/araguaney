@@ -23,6 +23,9 @@ class IntakeCreate(StrictModel):
     # Sin `donor` la donacion es anonima, que es la norma del dominio. El check
     # "Registrar donante" del intake es lo que llena este bloque.
     donor: DonorInput | None = None
+    # Donación pre-registrada de la que sale este intake (Fase 18). Al crearlo
+    # se liga en ambos sentidos: trazabilidad donante → cajas → tarima → envío.
+    donation_id: StrictUUID | None = None
     # Legado: se conserva para no romper clientes viejos, pero la captura nueva
     # usa `donor`. El texto libre historico sigue visible en el detalle.
     donante_libre: str | None = None

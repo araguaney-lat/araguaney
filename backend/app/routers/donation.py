@@ -16,6 +16,8 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.database import get_db
+from app.dependencies import require_center_role, resolve_write_center_id, tenant_scope
+from app.models.user import User
 from app.schemas.donation import (
     DonationCreate,
     DonationItemInput,
@@ -23,7 +25,7 @@ from app.schemas.donation import (
     DonationPublicOut,
     PublicCenterOut,
 )
-from app.schemas._base import StrictModel
+from app.schemas._base import StrictModel, StrictUUID
 from app.services.donation_service import DonationService
 from app.utils.rate_limit import limiter
 
@@ -146,3 +148,64 @@ def public_centers(request: Request, response: Response, db: Session = Depends(g
     return db.execute(
         select(Center).where(Center.is_active.is_(True)).order_by(Center.name)
     ).scalars().all()
+
+
+# ── Recepción en el centro (autenticado) ─────────────────────────────────────
+
+class ReceiveIn(StrictModel):
+    """Solo las excepciones: lo que no viene marcado se da por recibido."""
+
+    results: dict[str, str] = {}
+    extras: list[DonationItemInput] = []
+    # Solo lo usa national_admin, que no tiene centro propio.
+    center_id: StrictUUID | None = None
+
+
+@router.get("/donations", response_model=list[DonationOut])
+@limiter.limit("120/minute")
+def list_donations(
+    request: Request,
+    incoming: bool = False,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_center_role),
+    scope=Depends(tenant_scope),
+):
+    """`incoming=true` da las que vienen en camino a mi centro; si no, las recibidas."""
+    from app.repositories.donation_repository import DonationRepository
+
+    return DonationRepository(db).list_for_center(scope, incoming=incoming)
+
+
+@router.get("/donations/{code}", response_model=DonationOut)
+@limiter.limit("120/minute")
+def get_donation(
+    request: Request,
+    code: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_center_role),
+):
+    """Detalle para el doble check. Cualquier centro puede abrir un código:
+    el QR no está atado al centro que el donante eligió."""
+    from app.repositories.donation_repository import DonationRepository
+    from app.utils.errors import api_error as _err
+
+    donation = DonationRepository(db).find_by_code(code)
+    if donation is None or donation.status in ("PENDING_EMAIL", "EXPIRED"):
+        raise _err("NOT_FOUND", "Donación no encontrada", status_code=404)
+    return donation
+
+
+@router.post("/donations/{code}/receive", response_model=DonationOut)
+@limiter.limit("60/minute")
+def receive_donation(
+    request: Request,
+    code: str,
+    data: ReceiveIn,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_center_role),
+):
+    # national_admin no tiene centro propio: debe decir en cuál está recibiendo.
+    center_id = resolve_write_center_id(current_user, data.center_id)
+    return DonationService(db).receive(
+        code, data.results, data.extras, center_id=center_id, user_id=current_user.id
+    )

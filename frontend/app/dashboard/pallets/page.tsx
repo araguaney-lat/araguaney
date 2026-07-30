@@ -26,7 +26,9 @@ const CameraScanner = dynamic(
 function parseBoxCode(scanned: string): string {
   try {
     const path = new URL(scanned).pathname
-    if (path.startsWith("/b/")) return path.slice(3).toUpperCase()
+    // /d/ es la ficha de una donación: se reconoce para poder avisar del
+    // error de flujo con su código, en vez de devolver la URL entera.
+    if (path.startsWith("/b/") || path.startsWith("/d/")) return path.slice(3).toUpperCase()
   } catch {
     // no era una URL: se trata como codigo directo
   }
@@ -139,6 +141,12 @@ export default function PalletsPage() {
     setScanning(false)
     setError(null)
     const code = parseBoxCode(scanned)
+    // Un QR de donación aquí es un error de flujo, no una caja: se avisa en vez
+    // de mandarlo al backend, que respondería "caja no encontrada".
+    if (code.startsWith("DN-")) {
+      setError(t.scanned_donation)
+      return
+    }
     setBoxCodeInput(code)
     handleAddBox(code)
   }, [activePallet, boxCodeInput]) // eslint-disable-line react-hooks/exhaustive-deps

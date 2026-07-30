@@ -19,6 +19,7 @@ from app.services.base import BaseService
 from app.utils.errors import api_error
 
 _MANAGE_TOKEN_DAYS = 30
+_RECEPTION_STATES = ("RECEIVED", "MISSING", "REJECTED")
 
 
 def _hash_token(token: str) -> str:
@@ -189,4 +190,73 @@ class DonationService(BaseService):
         donation = DonationRepository(self.db).find_by_code(code)
         if donation is None or donation.status in ("PENDING_EMAIL", "EXPIRED", "CANCELLED"):
             raise api_error("NOT_FOUND", "Donación no encontrada", status_code=404)
+        return donation
+
+    # ── Recepción en el centro ───────────────────────────────────────────────
+
+    def receive(
+        self,
+        code: str,
+        resultados: dict,
+        extras: list,
+        center_id,
+        user_id,
+    ) -> Donation:
+        """Doble check del centro: confirma lo que llegó y registra la merma.
+
+        `resultados` solo lleva las **excepciones** (id de renglón → estado). Lo
+        que no viene marcado se da por recibido: el formulario optimiza para el
+        caso normal, que es que todo llegue.
+
+        El centro que recibe puede no ser el que eligió el donante — aquel era
+        intención, este es el hecho.
+        """
+        repo = DonationRepository(self.db)
+        donation = repo.find_by_code(code)
+
+        if donation is None or donation.status not in ("REGISTERED",):
+            raise api_error(
+                "NOT_RECEIVABLE",
+                "Esta donación no está lista para recibirse",
+                status_code=409 if donation is not None else 404,
+            )
+
+        invalidos = set(resultados.values()) - set(_RECEPTION_STATES)
+        if invalidos:
+            raise api_error(
+                "INVALID_RECEPTION_STATUS",
+                f"Estado de recepción inválido: {', '.join(sorted(invalidos))}",
+                field="reception_status",
+            )
+
+        for item in donation.items:
+            item.reception_status = resultados.get(str(item.id), "RECEIVED")
+
+        for extra in extras:
+            donation.items.append(
+                DonationItem(
+                    donation_id=donation.id,
+                    product_type_id=extra.product_type_id,
+                    free_text=extra.free_text,
+                    quantity=extra.quantity,
+                    unit=extra.unit,
+                    added_by="center",
+                    reception_status="RECEIVED",
+                )
+            )
+
+        donation.received_center_id = center_id
+        donation.received_at = datetime.now(timezone.utc)
+        donation.status = "RECEIVED"
+        donation.manage_token_hash = None   # el enlace del donante deja de servir
+
+        repo.log_event(
+            donation,
+            from_status="REGISTERED",
+            to_status="RECEIVED",
+            user_id=user_id,
+            note=f"Recibida con {len(extras)} renglón(es) agregado(s) por el centro"
+            if extras else None,
+        )
+        repo.commit()
         return donation

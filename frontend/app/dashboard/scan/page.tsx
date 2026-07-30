@@ -26,6 +26,10 @@ export default function ScanPage() {
     try {
       const url = new URL(text)
       const path = url.pathname
+      if (path.startsWith("/d/")) {
+        router.push(`/dashboard/donations/${path.slice(3)}`)
+        return
+      }
       if (path.startsWith("/b/") || path.startsWith("/p/")) {
         router.push(path)
         return
@@ -34,7 +38,9 @@ export default function ScanPage() {
       // not a URL — treat as bare code
     }
 
-    if (text.startsWith("P-")) {
+    if (text.startsWith("DN-")) {
+      router.push(`/dashboard/donations/${text}`)
+    } else if (text.startsWith("P-")) {
       router.push(`/p/${text}`)
     } else {
       router.push(`/b/${text}`)

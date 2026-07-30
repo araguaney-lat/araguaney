@@ -108,6 +108,7 @@
       "home": "Home",
       "national": "National dashboard",
       "intake": "Intake",
+      "donations": "Donations",
       "boxes": "Boxes",
       "pallets": "Pallets",
       "shipments": "Shipments",
@@ -233,7 +234,8 @@
         "SHIPPED": "Shipped"
       },
       "scan_box": "Scan box",
-      "scan_label": "Point at the box QR code"
+      "scan_label": "Point at the box QR code",
+      "scanned_donation": "That is a donation code. Receive it from Donations; only sealed boxes go here."
     },
     "shipments": {
       "title": "Shipments",
@@ -763,7 +765,8 @@
         "hint_fisica": "Only the name is required. Without an email we cannot recognize this donor next time.",
         "hint_moral": "Organizations require legal name, who delivers, email and phone.",
         "matches_title": "Already registered at this center:"
-      }
+      },
+      "from_donation": "Capture originated from donation {code}."
     },
     "campaign_members": {
       "back": "← Campaigns",
@@ -863,6 +866,31 @@
       "cancel": "Cancel",
       "offline_tooltip": "Requires connection to create a new product type",
       "offline_notice": "Offline — new product types cannot be created."
+    },
+    "donations": {
+      "title": "Donations",
+      "list_subtitle": "Donations pre-registered by donors.",
+      "subtitle": "Only mark what is missing or you cannot accept. Everything else counts as received.",
+      "already_received": "This donation was already received.",
+      "not_found": "We could not find that donation.",
+      "tab_incoming": "Incoming",
+      "tab_received": "Received",
+      "empty_incoming": "No donations on their way to your center.",
+      "empty_received": "No pre-registered donations received yet.",
+      "item_count_one": "1 line",
+      "item_count_other": "{count} lines",
+      "extras_title": "Did something arrive that was not registered?",
+      "extra_description": "What it is",
+      "extra_unit": "Unit",
+      "add_extra": "+ Add what came extra",
+      "added_by_center": "added by the center",
+      "confirm": "Confirm reception",
+      "confirming": "Confirming…",
+      "status": {
+        "RECEIVED": "Received",
+        "MISSING": "Did not arrive",
+        "REJECTED": "Not accepted"
+      }
     }
   },
   "studio": {

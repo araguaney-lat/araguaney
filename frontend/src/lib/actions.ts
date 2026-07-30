@@ -333,6 +333,8 @@ export interface CreateIntakePayload {
   notes?: string
   boxes: BoxDraft[]
   center_id?: string
+  // Pre-registro que originó la captura: cierra el circuito donante → cajas.
+  donation_id?: string
 }
 
 export async function createIntakeAction(payload: CreateIntakePayload) {
