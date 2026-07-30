@@ -171,9 +171,16 @@ Todo cambio de estado escribe un `DonationEvent` (patrón `BoxEvent`).
   La subida pública requiere donación en `REGISTERED` + token de gestión válido.
 - **Escrituras scopeadas:** recepción y edición de centro pasan por
   `TenantRepository.scoped()`; tests de aislamiento en `tests/tenant/`.
-- **PII mínima y retención:** nombre + email, nada más (sin teléfono).
+- **PII mínima y retención:** nombre + email; teléfono opcional (se agregó al
+  diseñar la Fase 19, para que el centro pueda contactar cuando haga falta).
   `PENDING_EMAIL` > 7 días → purga (job ARQ, patrón de retención Fase 13).
   Borrado a solicitud del donante: manual en MVP (email), documentado en el aviso.
+- **Control estructural (Fase 20):** el centro y la campaña que elige el donante
+  son **intención, no destino** — no existe forma de designar consignatario ni de
+  seguir los bienes hasta quién los recibió, y la tarima es mixta por diseño, así
+  que no hay "lote de fulano" viajando junto. Son decisiones de dominio que
+  cierran el esquema "yo dono, una parte relacionada recibe allá"; quien las
+  cambie sin saberlo estará desarmando un control. Detalle en `docs/security.md`.
 - **Legal:** actualizar aviso de privacidad (nueva categoría de titular: donante),
   tabla de retención y `CLAUDE.md` (reversión explícita del NO-objetivo #4).
 

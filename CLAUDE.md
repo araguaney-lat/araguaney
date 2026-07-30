@@ -171,6 +171,7 @@ El sidebar del `national_admin` en `/dashboard` tiene dos secciones:
   Campañas              Solicitudes
   Centros               Auditoría
   Transferencias
+  Revisiones
 ```
 
 ### Rol de plataforma (`superadmin`) — opera en `/studio`
@@ -229,6 +230,7 @@ Centro (tenant)
 | `Pallet` | Tarima de transporte | Mixta; agrupa cajas selladas. `code` → QR |
 | `Shipment` | Envío | Agrupa tarimas; genera manifiesto |
 | `BoxEvent`/`PalletEvent`/`ShipmentEvent` | Auditoría | from_status → to_status + user + ts |
+| `RiskReview` | Escalamiento (Fase 20) | Captura de volumen atípico pendiente de que la coordinación la apruebe o rechace |
 
 Categorías (`ProductType.category`): `MEDICINE | MEDICAL_SUPPLY | FOOD | WATER | HYGIENE | TOOL | RESCUE_GEAR | OTHER`.
 
@@ -250,6 +252,31 @@ tiene un solo `batch` y una sola `expiry_date`. Si llega mezcla → se divide en
 - `Box`: `DRAFT → SEALED → SHIPPED` (+ `REJECTED` desde `DRAFT`). Solo cajas `SEALED` entran a tarima.
 - `Pallet`: `OPEN → CLOSED → SHIPPED`. Solo cajas `SEALED` entran; solo tarimas `CLOSED` entran a envío.
 - `Shipment`: `OPEN → CLOSED → SHIPPED`. Al `SHIPPED` se congela todo.
+
+**Prevención de riesgos en donaciones** (Fase 20). Existe para cerrar el uso de la
+donación en especie como canal de lavado basado en comercio: una empresa "dona"
+producto y una parte relacionada lo recibe en destino.
+
+1. **Transferencia irrevocable.** Donar transfiere la propiedad sin
+   contraprestación. Quien dona no designa consignatario, no exige que su lote
+   viaje junto, no rastrea los bienes hasta la entrega ni pide su devolución.
+   Se acepta al registrar y queda la versión aceptada (`terms_version`).
+2. **Decisiones de dominio que son controles.** El centro y la campaña que elige
+   el donante son intención, no destino; la tarima es mixta por diseño. No son
+   descuidos: quien "arregle" eso desarma el control. Ver `docs/security.md`.
+3. **Umbral de volumen atípico.** Sobre cierto volumen —configurable por entorno,
+   **nunca con valores en este repositorio**— una donación no puede quedar
+   anónima. Es escalamiento, no tope: si no se puede identificar, la captura
+   entra igual y abre una `RiskReview` que resuelve la coordinación, nunca quien
+   la capturó.
+4. **Leyenda de aduana** bilingüe en manifiestos y etiquetas de tarima
+   (`CUSTOMS_LEGEND_ES/EN` en `app/legal.py`, texto único).
+5. **Guía de banderas rojas** para coordinadores en `/dashboard/ayuda`, con el
+   protocolo registrar → escalar → rechazar.
+
+Alcance declarado: registro y escalamiento. **No** hay screening de sanciones ni
+verificación documental de identidad — desproporcionado para una plataforma que
+no maneja dinero (FATF R.8 pide controles proporcionales al riesgo).
 
 ---
 

@@ -30,20 +30,22 @@ pie title Tareas completadas (431 tareas)
 | 17 | [AEO/GEO + expansión de keywords](phase-17-aeo-keyword-expansion.md) | 15 | 6 | 🟡 71% |
 | 18 | [Pre-registro de donaciones por el donante](phase-18-donor-preregistration.md) | 23 | 0 | ✅ 100% |
 | 19 | [Identidad estructurada del donante en el intake](phase-19-structured-donor-identity.md) | 9 | 0 | ✅ 100% |
-| 20 | [Prevención de riesgos: responsabilidad y anti-lavado en especie](phase-20-risk-prevention.md) | 4 | 6 | 🟡 40% |
+| 20 | [Prevención de riesgos: responsabilidad y anti-lavado en especie](phase-20-risk-prevention.md) | 6 | 4 | 🟡 60% |
 | 21 | [Logística: pesaje, anexo Carta Porte y perfiles de paletizado](phase-21-logistics-weighing.md) | 0 | 12 | ⬜ 0% |
 | 22 | [Trazabilidad extendida: avión y destino](phase-22-extended-traceability.md) | 0 | 14 | ⬜ 0% |
 | 23 | [IA asistida: captura, catálogo y necesidades](phase-23-ai-assisted-capture.md) | 0 | 11 | ⬜ 0% |
-| **Total** | | **371** | **61** | **🟡 86%** |
+| **Total** | | **373** | **59** | **🟡 86%** |
 
-> **Pendientes (61):**
+> **Pendientes (59):**
 > El grupo A de la Fase 13 (privacidad, lo que aplica hoy) está completo.
 > - Los borradores legales de las fases 20 y 21 están escritos y esperando revisión profesional
 >   (abogado y fiscalista): [`docs/legal/drafts/`](../legal/drafts/README.md). Sus tareas siguen
 >   abiertas hasta que esa revisión ocurra.
-> - **6 de la Fase 20 (prevención de riesgos):** cláusulas y controles anti-lavado en especie;
->   diseño en [su spec](../superpowers/specs/2026-07-29-risk-prevention-design.md); la task 7
->   (revisión de abogado) es gate de publicación.
+> - **4 de la Fase 20 (prevención de riesgos):** los controles de producto están puestos (aceptación
+>   registrada, umbral con escalamiento, leyenda de aduana, guía de banderas rojas y controles
+>   estructurales documentados). Lo que queda son los tres textos legales (tasks 1, 2 y 6), que la
+>   task 7 —revisión de abogado— gatea antes de publicar; los borradores ya están escritos en
+>   [`docs/legal/drafts/`](../legal/drafts/README.md).
 > - **12 de la Fase 21 (logística y pesaje):** báscula por tarima, anexo de datos Carta Porte
 >   (sin timbrado) y perfiles de altura; diseño en
 >   [su spec](../superpowers/specs/2026-07-29-logistics-weighing-design.md); la guía fiscal
