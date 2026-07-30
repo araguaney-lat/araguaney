@@ -130,3 +130,63 @@ class DonationService(BaseService):
             raise api_error("INVALID_TOKEN", "Enlace inválido o vencido", status_code=404)
 
         return donation
+
+    # ── Gestión por el donante ───────────────────────────────────────────────
+
+    def _editable(self, token: str) -> Donation:
+        """Resuelve el enlace y exige que la donación siga siendo del donante.
+
+        Desde RECEIVED manda el inventario del centro: lo que se despachó es un
+        registro inmutable y el donante ya no lo toca.
+        """
+        donation = self.get_by_manage_token(token)
+        if donation.status != "REGISTERED":
+            raise api_error(
+                "NOT_EDITABLE",
+                "Esta donación ya no se puede modificar",
+                status_code=409,
+            )
+        return donation
+
+    def update_items(self, token: str, items: list) -> Donation:
+        """Reemplaza los renglones. El donante manda mientras no entregue."""
+        donation = self._editable(token)
+        repo = DonationRepository(self.db)
+
+        donation.items = [
+            DonationItem(
+                product_type_id=item.product_type_id,
+                free_text=item.free_text,
+                quantity=item.quantity,
+                unit=item.unit,
+                added_by="donor",
+            )
+            for item in items
+        ]
+        repo.log_event(donation, from_status="REGISTERED", to_status="REGISTERED",
+                       note="El donante actualizó los renglones")
+        repo.commit()
+        return donation
+
+    def cancel(self, token: str) -> Donation:
+        donation = self._editable(token)
+        repo = DonationRepository(self.db)
+        donation.status = "CANCELLED"
+        donation.manage_token_hash = None   # el enlace deja de servir
+        repo.log_event(donation, from_status="REGISTERED", to_status="CANCELLED",
+                       note="Cancelada por el donante")
+        repo.commit()
+        return donation
+
+    # ── Ficha pública del QR ─────────────────────────────────────────────────
+
+    def get_public(self, code: str) -> Donation:
+        """Ficha mínima del QR.
+
+        Una donación sin confirmar responde igual que una inexistente: si no
+        respondieran igual, probar códigos revelaría cuáles existen.
+        """
+        donation = DonationRepository(self.db).find_by_code(code)
+        if donation is None or donation.status in ("PENDING_EMAIL", "EXPIRED", "CANCELLED"):
+            raise api_error("NOT_FOUND", "Donación no encontrada", status_code=404)
+        return donation
