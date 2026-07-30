@@ -72,3 +72,18 @@ class DonationRepository(BaseRepository):
 
     def commit(self) -> None:
         self.db.commit()
+
+    def list_for_center(self, center_id, incoming: bool = False) -> list[Donation]:
+        """Donaciones de un centro: las recibidas, o las que vienen en camino.
+
+        `center_id=None` solo para national_admin, que ve todos los centros.
+        """
+        if incoming:
+            stmt = select(Donation).where(Donation.status == "REGISTERED")
+            if center_id is not None:
+                stmt = stmt.where(Donation.intended_center_id == center_id)
+        else:
+            stmt = select(Donation).where(Donation.status == "RECEIVED")
+            if center_id is not None:
+                stmt = stmt.where(Donation.received_center_id == center_id)
+        return list(self.db.execute(stmt.order_by(Donation.created_at.desc()).limit(200)).scalars().all())

@@ -376,6 +376,44 @@ export default function NewIntakePage() {
   const [centers, setCenters] = useState<Center[]>([])
   const [selectedCenterId, setSelectedCenterId] = useState("")
 
+  // Captura que viene de un pre-registro ya recibido: se lee de la URL en un
+  // efecto (no con useSearchParams) para no forzar un Suspense en esta página.
+  const [donation, setDonation] = useState<{ id: string; code: string } | null>(null)
+  const [suggestedCampaignId, setSuggestedCampaignId] = useState("")
+
+  useEffect(() => {
+    const code = new URLSearchParams(window.location.search).get("donation")
+    if (!code || !token) return
+    apiFetch<{
+      id: string
+      code: string
+      intended_campaign_id: string | null
+      items: { free_text: string | null; quantity: number; unit: string; reception_status: string | null }[]
+    }>(`/v1/donations/${code}`, { token })
+      .then((d) => {
+        setDonation({ id: d.id, code: d.code })
+        // La campaña que eligió el donante era intención: se sugiere, y quien
+        // captura puede cambiarla. La asociación vinculante la hace el intake.
+        setSuggestedCampaignId(d.intended_campaign_id ?? "")
+        // Solo lo que efectivamente llegó: lo faltante o rechazado no entra al
+        // inventario. El producto del catálogo lo elige quien captura, la
+        // descripción del donante es texto libre y no se puede mapear sola.
+        const recibidos = d.items.filter((i) => i.reception_status === "RECEIVED")
+        if (recibidos.length > 0) {
+          setRows(recibidos.map((i) => ({
+            ...newRow(),
+            quantity: String(i.quantity),
+            unit: i.unit,
+          })))
+          setNotes(
+            `${t.from_donation.replace("{code}", d.code)}\n` +
+            recibidos.map((i) => `· ${i.free_text ?? ""} (${i.quantity} ${i.unit})`).join("\n")
+          )
+        }
+      })
+      .catch(() => setDonation(null))
+  }, [token]) // eslint-disable-line react-hooks/exhaustive-deps
+
   useEffect(() => {
     if (!isNationalAdmin || !token) return
     apiFetch<Center[]>("/v1/centers", { token })
@@ -391,12 +429,19 @@ export default function NewIntakePage() {
       .then((r) => r.ok ? r.json() : [])
       .then((data: Campaign[]) => {
         setCampaigns(data)
-        if (data.length > 0 && !campaignId) {
-          setCampaignId(data[0].id)
-        }
+        // Forma funcional: la sugerencia del pre-registro puede haber llegado
+        // primero y no debe quedar pisada por la primera campaña de la lista.
+        if (data.length > 0) setCampaignId((id) => id || data[0].id)
       })
       .catch(() => setCampaigns([]))
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // La sugerencia solo se aplica si quien captura pertenece a esa campaña:
+  // seleccionar una que no está en su lista dejaría el select en un valor muerto.
+  useEffect(() => {
+    if (!suggestedCampaignId) return
+    if (campaigns.some((c) => c.id === suggestedCampaignId)) setCampaignId(suggestedCampaignId)
+  }, [suggestedCampaignId, campaigns])
 
   const updateRow = (key: string) => (updated: BoxRow) =>
     setRows((prev) => prev.map((r) => (r.key === key ? updated : r)))
@@ -447,6 +492,7 @@ export default function NewIntakePage() {
       notes: notes.trim() || undefined,
       boxes,
       center_id: isNationalAdmin ? selectedCenterId : undefined,
+      donation_id: donation?.id,
     })
     setSubmitting(false)
 
@@ -463,6 +509,12 @@ export default function NewIntakePage() {
         <h1 className="text-xl font-semibold text-tx">{t.title}</h1>
         <p className="text-sm text-mut mt-1">{t.subtitle}</p>
       </div>
+
+      {donation && (
+        <div className="mb-4 rounded-lg border border-cardB bg-card px-3 py-2 text-xs text-mut">
+          {t.from_donation.replace("{code}", donation.code)}
+        </div>
+      )}
 
       <div className="mb-4">
         <div className={`flex items-center gap-2 rounded-lg px-3 py-2 text-xs ${

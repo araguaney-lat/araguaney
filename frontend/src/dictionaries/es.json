@@ -108,6 +108,7 @@
       "home": "Inicio",
       "national": "Panel nacional",
       "intake": "Recepción",
+      "donations": "Donaciones",
       "boxes": "Cajas",
       "pallets": "Tarimas",
       "shipments": "Envíos",
@@ -233,7 +234,8 @@
         "SHIPPED": "Enviada"
       },
       "scan_box": "Escanear caja",
-      "scan_label": "Apunta al QR de la caja"
+      "scan_label": "Apunta al QR de la caja",
+      "scanned_donation": "Ese es un código de donación. Recíbela desde Donaciones; aquí solo entran cajas selladas."
     },
     "shipments": {
       "title": "Envíos",
@@ -763,7 +765,8 @@
         "hint_fisica": "Solo el nombre es obligatorio. Sin correo no podremos reconocer al donante en futuras donaciones.",
         "hint_moral": "Para persona moral pedimos razón social, quien entrega, correo y teléfono.",
         "matches_title": "Ya registrado en este centro:"
-      }
+      },
+      "from_donation": "Captura originada por la donación {code}."
     },
     "campaign_members": {
       "back": "← Campañas",
@@ -863,6 +866,31 @@
       "cancel": "Cancelar",
       "offline_tooltip": "Requiere conexión para crear un nuevo tipo de producto",
       "offline_notice": "Sin conexión — no se pueden crear nuevos tipos de producto."
+    },
+    "donations": {
+      "title": "Donaciones",
+      "list_subtitle": "Donaciones pre-registradas por donantes.",
+      "subtitle": "Marca solo lo que falte o no puedas aceptar. Lo demás se da por recibido.",
+      "already_received": "Esta donación ya fue recibida.",
+      "not_found": "No encontramos esa donación.",
+      "tab_incoming": "En camino",
+      "tab_received": "Recibidas",
+      "empty_incoming": "No hay donaciones en camino a tu centro.",
+      "empty_received": "Aún no has recibido donaciones pre-registradas.",
+      "item_count_one": "1 renglón",
+      "item_count_other": "{count} renglones",
+      "extras_title": "¿Vino algo que no estaba registrado?",
+      "extra_description": "Qué es",
+      "extra_unit": "Unidad",
+      "add_extra": "+ Agregar lo que vino de más",
+      "added_by_center": "agregado por el centro",
+      "confirm": "Confirmar recepción",
+      "confirming": "Confirmando…",
+      "status": {
+        "RECEIVED": "Recibido",
+        "MISSING": "No llegó",
+        "REJECTED": "No aceptado"
+      }
     }
   },
   "studio": {

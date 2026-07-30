@@ -61,6 +61,16 @@ class IntakeService(BaseService):
                     )
                 product_types[bd.product_type_id] = pt
 
+        # Pre-registro que originó esta captura, si viene de un QR de donación.
+        # Se resuelve antes del intake porque de aquí puede salir el donante.
+        donation = None
+        if data.donation_id is not None:
+            from app.models.donation import Donation
+
+            candidata = self.db.get(Donation, data.donation_id)
+            if candidata is not None and candidata.received_center_id == center_id:
+                donation = candidata
+
         # Donante identificado (opcional): sin bloque `donor` la donacion es
         # anonima. Se resuelve antes de crear el intake para que un dato
         # invalido no deje un intake a medias.
@@ -68,6 +78,10 @@ class IntakeService(BaseService):
         if data.donor is not None:
             donor = DonorRepository(self.db).find_or_create(data.donor, center_id)
             self.db.flush()  # asigna el id antes de ligarlo al intake
+        elif donation is not None:
+            # Quien se pre-registró ya se identificó: volver a teclearlo en el
+            # mostrador solo abriría la puerta a un segundo donante duplicado.
+            donor = donation.donor
 
         intake = intake_repo.save_intake(Intake(
             center_id=center_id,
@@ -120,6 +134,11 @@ class IntakeService(BaseService):
                 note=reject_reason,
             )
             self.db.add(event)
+
+        # Cierra el circuito con el pre-registro: la donación apunta al intake
+        # que la materializó en cajas.
+        if donation is not None:
+            donation.intake_id = intake.id
 
         intake_repo.commit()
 

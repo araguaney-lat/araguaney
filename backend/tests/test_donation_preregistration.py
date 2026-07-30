@@ -11,6 +11,7 @@ estas pruebas fijan:
 """
 
 import hashlib
+from contextlib import contextmanager
 from datetime import datetime, timedelta, timezone
 from unittest.mock import MagicMock, patch
 from uuid import uuid4
@@ -382,3 +383,196 @@ def test_la_ficha_publica_se_cachea_en_el_edge():
 
     src = Path("app/routers/donation.py").read_text()
     assert "s-maxage" in src and "Cache-Control" in src
+
+
+# ── Recepción en el centro ───────────────────────────────────────────────────
+
+def _para_recibir():
+    d = MagicMock()
+    d.status = "REGISTERED"
+    d.code = "DN-ABC123"
+    d.received_center_id = None
+    it1, it2 = MagicMock(reception_status=None), MagicMock(reception_status=None)
+    it1.id, it2.id = uuid4(), uuid4()
+    d.items = [it1, it2]
+    return d
+
+
+def _recibir(svc, donation, resultados=None, extras=None, centro=CENTER):
+    with patch("app.services.donation_service.DonationRepository") as MockRepo:
+        MockRepo.return_value.find_by_code.return_value = donation
+        out = svc.receive(
+            "DN-ABC123",
+            resultados if resultados is not None else {},
+            extras or [],
+            center_id=centro,
+            user_id=uuid4(),
+        )
+        return out, MockRepo.return_value
+
+
+def test_recibir_marca_el_centro_que_realmente_recibio():
+    """El centro elegido por el donante era intención; este es el hecho."""
+    svc, _ = _service()
+    d = _para_recibir()
+    _recibir(svc, d)
+    assert d.received_center_id == CENTER and d.status == "RECEIVED"
+
+
+def test_lo_no_marcado_se_da_por_recibido():
+    """El formulario optimiza para el caso normal: solo se marca la excepción."""
+    svc, _ = _service()
+    d = _para_recibir()
+    _recibir(svc, d)
+    assert all(i.reception_status == "RECEIVED" for i in d.items)
+
+
+def test_se_registran_las_excepciones_marcadas():
+    svc, _ = _service()
+    d = _para_recibir()
+    _recibir(svc, d, {str(d.items[0].id): "MISSING"})
+    assert d.items[0].reception_status == "MISSING"
+    assert d.items[1].reception_status == "RECEIVED"
+
+
+def test_lo_que_vino_de_mas_se_marca_como_agregado_por_el_centro():
+    svc, _ = _service()
+    d = _para_recibir()
+    _recibir(svc, d, None, [DonationItemInput(free_text="2 cajas de leche", quantity=2, unit="cajas")])
+    agregados = [i for i in d.items if getattr(i, "added_by", None) == "center"]
+    assert len(agregados) == 1
+
+
+def test_no_se_puede_recibir_dos_veces():
+    svc, _ = _service()
+    d = _para_recibir()
+    d.status = "RECEIVED"
+    with pytest.raises(HTTPException) as exc:
+        _recibir(svc, d)
+    assert exc.value.status_code == 409
+
+
+def test_no_se_puede_recibir_una_donacion_cancelada():
+    svc, _ = _service()
+    d = _para_recibir()
+    d.status = "CANCELLED"
+    with pytest.raises(HTTPException):
+        _recibir(svc, d)
+
+
+def test_recibir_deja_evento_de_auditoria():
+    svc, _ = _service()
+    d = _para_recibir()
+    _, repo = _recibir(svc, d)
+    assert repo.log_event.called
+
+
+def test_un_estado_de_recepcion_invalido_se_rechaza():
+    svc, _ = _service()
+    d = _para_recibir()
+    with pytest.raises(HTTPException):
+        _recibir(svc, d, {str(d.items[0].id): "PERDIDO_EN_EL_CAMINO"})
+
+
+def test_el_intake_creado_desde_una_donacion_queda_ligado():
+    """Trazabilidad donante → cajas: sin esto el pre-registro se pierde al recibir."""
+    from app.schemas.intake import IntakeCreate
+
+    campos = IntakeCreate.model_fields
+    assert "donation_id" in campos, "IntakeCreate debe aceptar la donación de origen"
+
+
+def _box_draft():
+    """Una caja mínima válida: el intake exige al menos una."""
+    bd = MagicMock()
+    bd.product_type_id = uuid4()
+    bd.quantity = 1
+    bd.unit = "cajas"
+    bd.batch = None
+    bd.expiry_date = None
+    bd.weight_kg = None
+    bd.gtin = None
+    return bd
+
+
+@contextmanager
+def _intake_patches():
+    """Aísla al IntakeService de todo lo que no es el vínculo con la donación."""
+    with (
+        patch("app.services.intake_service.CampaignRepository") as MockCampaign,
+        patch("app.services.intake_service.ProductTypeRepository") as MockPt,
+        patch("app.services.intake_service.IntakeRepository") as MockIntake,
+        patch("app.services.intake_service.UserCampaignRepository") as MockMembership,
+        patch("app.services.intake_service.validate_box", return_value=None),
+        patch("app.services.intake_service.IntakeOut"),
+        patch("app.services.intake_service.BoxOut"),
+        # La respuesta no es lo que se prueba: armarla exigiría un donante ORM real.
+        patch("app.services.intake_service.DonorOut"),
+    ):
+        campaign = MagicMock()
+        campaign.is_active = True
+        MockCampaign.return_value.find_by_id.return_value = campaign
+        MockMembership.return_value.is_member.return_value = True
+        MockPt.return_value.find_by_id.return_value = MagicMock(category="OTHER", min_shelf_life_days=None)
+        MockIntake.return_value.save_intake.side_effect = lambda i: i
+        yield MockIntake, MockPt
+
+
+def test_el_intake_hereda_al_donante_del_pre_registro():
+    """Quien ya se identificó al pre-registrarse no se vuelve a teclear.
+
+    Si el mostrador lo recapturara a mano saldría un segundo donante con los
+    mismos datos, y el histórico del donante quedaría partido en dos.
+    """
+    from app.services.intake_service import IntakeService
+
+    center = uuid4()
+    donor = MagicMock()
+    donor.id = uuid4()
+    donacion = MagicMock()
+    donacion.received_center_id = center
+    donacion.donor = donor
+
+    db = MagicMock()
+    db.get.return_value = donacion
+
+    data = MagicMock()
+    data.boxes = [_box_draft()]
+    data.donor = None               # el mostrador no recaptura al donante
+    data.donation_id = uuid4()
+    data.donante_libre = None
+    data.notes = None
+
+    with _intake_patches() as (MockIntake, _):
+        IntakeService(db).create(data, center, uuid4())
+        intake = MockIntake.return_value.save_intake.call_args[0][0]
+
+    assert intake.donor_id == donor.id
+    assert donacion.intake_id == intake.id
+
+
+def test_un_pre_registro_de_otro_centro_no_contamina_el_intake():
+    """El scoping de tenant también aplica al pre-registro: una donación
+    recibida en otro centro no puede ligarse ni prestar su donante."""
+    from app.services.intake_service import IntakeService
+
+    donacion = MagicMock()
+    donacion.received_center_id = uuid4()      # otro centro
+    donacion.intake_id = None
+
+    db = MagicMock()
+    db.get.return_value = donacion
+
+    data = MagicMock()
+    data.boxes = [_box_draft()]
+    data.donor = None
+    data.donation_id = uuid4()
+    data.donante_libre = None
+    data.notes = None
+
+    with _intake_patches() as (MockIntake, _):
+        IntakeService(db).create(data, uuid4(), uuid4())
+        intake = MockIntake.return_value.save_intake.call_args[0][0]
+
+    assert intake.donor_id is None
+    assert donacion.intake_id is None
