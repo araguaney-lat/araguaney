@@ -39,7 +39,7 @@ for _m in (
     "user", "token_denylist", "center", "product_type", "shipment", "pallet",
     "intake", "box", "events", "campaign", "audit_log", "request",
     "user_campaign", "transfer", "messaging", "export_job",
-    "center_application", "email_failure",
+    "center_application", "email_failure", "donor", "donation",
 ):
     __import__(f"app.models.{_m}")
 
