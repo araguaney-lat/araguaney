@@ -112,11 +112,15 @@ def close_shipment(
 def ship_shipment(
     request: Request,
     shipment_id: UUID,
+    background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
     current_user: User = Depends(require_coordinator),
     scope: UUID | None = Depends(tenant_scope),
 ):
-    shipment = ShipmentService(db).ship(shipment_id, center_id=scope, user_id=current_user.id)
+    shipment = ShipmentService(db).ship(
+        shipment_id, center_id=scope, user_id=current_user.id,
+        background_tasks=background_tasks,
+    )
     AuditRepository(db).log("SHIPMENT_SHIPPED", "shipment",
         user_id=current_user.id, entity_id=str(shipment_id), ip=get_client_ip(request))
     db.commit()

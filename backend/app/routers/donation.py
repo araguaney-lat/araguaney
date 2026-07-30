@@ -12,7 +12,7 @@ aquí son correos, ya acotados por el límite de tasa.
 """
 
 from fastapi import APIRouter, BackgroundTasks, Depends, Request, Response
-from pydantic import EmailStr
+from pydantic import EmailStr, Field
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -20,6 +20,7 @@ from app.database import get_db
 from app.dependencies import require_center_role, resolve_write_center_id, tenant_scope
 from app.models.user import User
 from app.schemas.donation import (
+    _MAX_ITEMS,
     DonationCreate,
     DonationItemInput,
     DonationOut,
@@ -36,6 +37,12 @@ router = APIRouter(tags=["donations"])
 # que un QR compartido no golpee la base en cada escaneo.
 _FICHA_CACHE = "public, max-age=60, s-maxage=300, stale-while-revalidate=600"
 
+# Lo autenticado nunca se cachea. Hoy ningún proxy guardaría una respuesta con
+# `Authorization`, pero eso es una convención del proxy, no una instrucción
+# nuestra: decirlo explícitamente es lo que impide que un cambio de capa de
+# borde deje contenido de un centro en una caché compartida.
+_NO_CACHE = "no-store"
+
 
 class TokenIn(StrictModel):
     token: str
@@ -46,12 +53,14 @@ class EmailIn(StrictModel):
 
 
 class ItemsIn(StrictModel):
-    items: list[DonationItemInput]
+    # Mismo tope que el alta: el enlace de gestión es legítimo, pero no es un
+    # permiso ilimitado de escritura sobre la base.
+    items: list[DonationItemInput] = Field(max_length=_MAX_ITEMS)
 
 
 # ── Alta y confirmación ──────────────────────────────────────────────────────
 
-@router.post("/public/donations", response_model=DonationOut, status_code=201)
+@router.post("/public/donations", status_code=202)
 @limiter.limit("5/hour")
 def submit_donation(
     request: Request,
@@ -59,8 +68,14 @@ def submit_donation(
     background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
 ):
-    """Registra la donación en PENDING_EMAIL y manda el correo de confirmación."""
-    return DonationService(db).submit(data, background_tasks)
+    """Registra la donación en PENDING_EMAIL y manda el correo de confirmación.
+
+    Responde lo mismo si ese correo ya tenía una donación abierta: el código de
+    la donación viaja por correo, nunca en esta respuesta, para que probar
+    direcciones ajenas no diga nada de quién está donando.
+    """
+    DonationService(db).submit(data, background_tasks)
+    return {"ok": True}
 
 
 @router.post("/public/donations/confirm", response_model=DonationOut)
@@ -177,8 +192,8 @@ def public_centers(request: Request, response: Response, db: Session = Depends(g
 class ReceiveIn(StrictModel):
     """Solo las excepciones: lo que no viene marcado se da por recibido."""
 
-    results: dict[str, str] = {}
-    extras: list[DonationItemInput] = []
+    results: dict[str, str] = Field(default_factory=dict, max_length=_MAX_ITEMS)
+    extras: list[DonationItemInput] = Field(default_factory=list, max_length=_MAX_ITEMS)
     # Solo lo usa national_admin, que no tiene centro propio.
     center_id: StrictUUID | None = None
 
@@ -187,12 +202,14 @@ class ReceiveIn(StrictModel):
 @limiter.limit("120/minute")
 def list_donations(
     request: Request,
+    response: Response,
     incoming: bool = False,
     db: Session = Depends(get_db),
     current_user: User = Depends(require_center_role),
     scope=Depends(tenant_scope),
 ):
     """`incoming=true` da las que vienen en camino a mi centro; si no, las recibidas."""
+    response.headers["Cache-Control"] = _NO_CACHE
     from app.repositories.donation_repository import DonationRepository
 
     return DonationRepository(db).list_for_center(scope, incoming=incoming)
@@ -203,11 +220,13 @@ def list_donations(
 def get_donation(
     request: Request,
     code: str,
+    response: Response,
     db: Session = Depends(get_db),
     current_user: User = Depends(require_center_role),
 ):
     """Detalle para el doble check. Cualquier centro puede abrir un código:
     el QR no está atado al centro que el donante eligió."""
+    response.headers["Cache-Control"] = _NO_CACHE
     from app.repositories.donation_repository import DonationRepository
     from app.utils.errors import api_error as _err
 
@@ -223,11 +242,13 @@ def receive_donation(
     request: Request,
     code: str,
     data: ReceiveIn,
+    background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
     current_user: User = Depends(require_center_role),
 ):
     # national_admin no tiene centro propio: debe decir en cuál está recibiendo.
     center_id = resolve_write_center_id(current_user, data.center_id)
     return DonationService(db).receive(
-        code, data.results, data.extras, center_id=center_id, user_id=current_user.id
+        code, data.results, data.extras, center_id=center_id, user_id=current_user.id,
+        background_tasks=background_tasks,
     )

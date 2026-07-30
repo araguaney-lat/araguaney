@@ -18,6 +18,7 @@ from uuid import uuid4
 
 import pytest
 from fastapi import HTTPException
+from pydantic import ValidationError
 
 from app.schemas.donation import DonationCreate, DonationItemInput
 from app.services.donation_service import DonationService, _hash_token
@@ -85,7 +86,7 @@ def _submit(svc, db, data=None):
         patch("app.services.donation_service.DonorRepository") as MockDonor,
         patch("app.services.donation_service.enqueue") as mock_enqueue,
     ):
-        MockRepo.return_value.has_open_for_email.return_value = False
+        MockRepo.return_value.find_open_for_email.return_value = None
         MockDonor.return_value.find_or_create_self.side_effect = lambda d: MagicMock(
             id=uuid4(), email=d.email
         )
@@ -129,17 +130,50 @@ def test_la_campana_elegida_se_guarda_como_intencion():
     assert donation.received_center_id is None
 
 
-def test_no_se_permite_una_segunda_donacion_abierta_del_mismo_correo():
-    svc, db = _service()
+def _submit_con_donacion_abierta(abierta):
+    """Alta de un correo que ya tiene una donación abierta."""
+    svc, _ = _service()
     with (
         patch("app.services.donation_service.DonationRepository") as MockRepo,
         patch("app.services.donation_service.DonorRepository"),
-        patch("app.services.donation_service.enqueue"),
+        patch("app.services.donation_service.enqueue") as mock_enqueue,
     ):
-        MockRepo.return_value.has_open_for_email.return_value = True
-        with pytest.raises(HTTPException) as exc:
-            svc.submit(_payload(), MagicMock())
-    assert exc.value.status_code == 400
+        MockRepo.return_value.find_open_for_email.return_value = abierta
+        resultado = svc.submit(_payload(), MagicMock())
+        return resultado, MockRepo.return_value, mock_enqueue
+
+
+def test_no_se_crea_una_segunda_donacion_abierta_del_mismo_correo():
+    abierta = MagicMock(status="PENDING_EMAIL")
+    _, repo, _ = _submit_con_donacion_abierta(abierta)
+    assert not repo.save.called
+
+
+def test_el_alta_no_delata_que_un_correo_ya_tiene_donacion():
+    """Antes respondía 400 DUPLICATE_DONATION: eso convertía al formulario
+    público en un verificador de correos ajenos. Ahora no distingue."""
+    resultado, _, _ = _submit_con_donacion_abierta(MagicMock(status="PENDING_EMAIL"))
+    assert resultado is None      # el router responde igual con o sin donación
+
+
+def test_un_reintento_reenvia_la_confirmacion_a_quien_si_es_dueno(monkeypatch):
+    """Quien de verdad es dueño del correo recibe el enlace otra vez; quien solo
+    está probando direcciones no recibe nada y no ve diferencia."""
+    abierta = MagicMock(status="PENDING_EMAIL")
+    abierta.donor = MagicMock(email="ana@example.com", first_name="Ana",
+                              email_verify_token_hash="hash-viejo")
+    _, _, mock_enqueue = _submit_con_donacion_abierta(abierta)
+
+    assert mock_enqueue.call_args[0][1] == "send_donation_confirmation_email_task"
+    assert abierta.donor.email_verify_token_hash != "hash-viejo"
+
+
+def test_un_reintento_sobre_una_donacion_ya_confirmada_no_manda_nada():
+    """Ya tiene su QR en el correo: reenviar solo daría ruido, y rotar su enlace
+    de gestión dejaría que un tercero se lo tumbara a voluntad."""
+    abierta = MagicMock(status="REGISTERED")
+    _, _, mock_enqueue = _submit_con_donacion_abierta(abierta)
+    assert not mock_enqueue.called
 
 
 # ── Confirmación: un solo uso y genera el enlace de gestión ──────────────────
@@ -647,3 +681,136 @@ def test_el_reenvio_esta_en_el_router_publico():
 
     src = Path("app/routers/donation.py").read_text()
     assert "/public/donations/resend" in src
+
+
+# ── Topes de entrada (pasada de seguridad, task 19) ──────────────────────────
+
+def test_un_renglon_no_puede_llevar_un_texto_gigante():
+    """Endpoint público sin sesión: sin tope, un renglón puede pesar megabytes."""
+    with pytest.raises(ValidationError):
+        DonationItemInput(free_text="x" * 5_000, quantity=1, unit="piezas")
+
+
+def test_la_unidad_tiene_tope():
+    with pytest.raises(ValidationError):
+        DonationItemInput(free_text="3 cobijas", quantity=3, unit="u" * 500)
+
+
+def test_las_notas_tienen_tope():
+    with pytest.raises(ValidationError):
+        _payload(notes="x" * 5_000)
+
+
+def test_los_datos_del_donante_tienen_tope():
+    from app.schemas.donor import DonorInput
+
+    with pytest.raises(ValidationError):
+        DonorInput(first_name="a" * 500, last_name="Pérez", email="ana@example.com")
+
+
+def test_la_edicion_del_donante_tiene_tope_de_renglones():
+    """El enlace de gestión es legítimo, pero no es un permiso ilimitado de escritura."""
+    from app.routers.donation import ItemsIn
+
+    renglon = {"free_text": "3 cobijas", "quantity": 3, "unit": "piezas"}
+    with pytest.raises(ValidationError):
+        ItemsIn(items=[renglon] * 200)
+
+
+def test_la_recepcion_tiene_tope_de_renglones_extra():
+    from app.routers.donation import ReceiveIn
+
+    renglon = {"free_text": "3 cobijas", "quantity": 3, "unit": "piezas"}
+    with pytest.raises(ValidationError):
+        ReceiveIn(results={}, extras=[renglon] * 200)
+
+
+def test_el_doble_check_tiene_tope_de_resultados():
+    from app.routers.donation import ReceiveIn
+
+    with pytest.raises(ValidationError):
+        ReceiveIn(results={str(uuid4()): "RECEIVED" for _ in range(200)}, extras=[])
+
+
+def test_lo_autenticado_no_se_cachea():
+    """La ficha pública se cachea en el borde; el listado de un centro no."""
+    from pathlib import Path
+
+    src = Path("app/routers/donation.py").read_text()
+    assert '_NO_CACHE = "no-store"' in src
+    assert src.count("_NO_CACHE") >= 3
+
+
+# ── Correos que cierran el ciclo (tasks 10 y 21) ─────────────────────────────
+
+def test_recibir_avisa_al_donante():
+    """La plantilla del resumen existía desde la task 10 pero nadie la disparaba."""
+    svc, _ = _service()
+    d = _para_recibir()
+    d.donor = MagicMock(email="ana@example.com")
+
+    with (
+        patch("app.services.donation_service.DonationRepository") as MockRepo,
+        patch("app.services.donation_service.enqueue") as mock_enqueue,
+    ):
+        MockRepo.return_value.find_by_code.return_value = d
+        svc.receive("DN-ABC123", {}, [], center_id=CENTER, user_id=uuid4(),
+                    background_tasks=MagicMock())
+
+    assert mock_enqueue.call_args[0][1] == "send_donation_received_email_task"
+
+
+def test_recibir_sin_correo_del_donante_no_intenta_avisar():
+    """Un donante capturado en ventanilla puede no haber dado correo."""
+    svc, _ = _service()
+    d = _para_recibir()
+    d.donor = MagicMock(email=None)
+
+    with (
+        patch("app.services.donation_service.DonationRepository") as MockRepo,
+        patch("app.services.donation_service.enqueue") as mock_enqueue,
+    ):
+        MockRepo.return_value.find_by_code.return_value = d
+        svc.receive("DN-ABC123", {}, [], center_id=CENTER, user_id=uuid4(),
+                    background_tasks=MagicMock())
+
+    assert not mock_enqueue.called
+
+
+def test_el_correo_de_despacho_existe_y_esta_registrado():
+    from app.email import send_donation_shipped_email
+    from app.worker import WorkerSettings
+
+    nombres = [f.__name__ if hasattr(f, "__name__") else f.coroutine.__name__
+               for f in WorkerSettings.functions]
+    assert "send_donation_shipped_email_task" in nombres
+    assert callable(send_donation_shipped_email)
+
+
+def test_despachar_avisa_a_quien_pre_registro_lo_que_iba_en_el_envio():
+    """Cierra el círculo: la persona que donó se entera de que su ayuda salió."""
+    from app.services.shipment_service import ShipmentService
+
+    donacion = MagicMock(code="DN-ABC123")
+    donacion.donor = MagicMock(email="ana@example.com")
+
+    db = MagicMock()
+    svc = ShipmentService(db)
+
+    with (
+        patch("app.services.shipment_service.ShipmentRepository") as MockShip,
+        patch("app.services.shipment_service.PalletRepository") as MockPallet,
+        patch("app.services.shipment_service.DonationRepository") as MockDon,
+        patch("app.services.shipment_service.enqueue") as mock_enqueue,
+    ):
+        envio = MagicMock(status="CLOSED", reference="EN-0001")
+        MockShip.return_value.find_by_id.return_value = envio
+        MockShip.return_value.find_pallets.return_value = []
+        MockPallet.return_value.find_boxes_for_pallets.return_value = {}
+        MockDon.return_value.find_donations_for_shipment.return_value = [donacion]
+
+        svc.ship(uuid4(), center_id=CENTER, user_id=uuid4(), background_tasks=MagicMock())
+
+    nombre, destino, code, referencia = mock_enqueue.call_args[0][1:]
+    assert nombre == "send_donation_shipped_email_task"
+    assert (destino, code, referencia) == ("ana@example.com", "DN-ABC123", "EN-0001")

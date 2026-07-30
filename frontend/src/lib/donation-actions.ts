@@ -5,8 +5,17 @@ import { z } from "zod"
 import { apiFetch, ApiError } from "@/lib/api"
 import { verifyTurnstile } from "@/lib/turnstile"
 
-/** Resultado uniforme: la página nunca ve el error crudo del backend. */
+/** Resultado uniforme: la página nunca ve el error crudo del backend.
+
+El alta no devuelve el código de la donación. Ese código viaja por correo, para
+que quien pruebe una dirección ajena no obtenga nada del formulario. */
 export type DonationResult =
+  | { ok: true }
+  | { ok: false; error: string }
+
+/** La confirmación sí devuelve el código: llegó por correo y quien la ejecuta
+ya demostró ser dueño de la dirección. */
+export type DonationConfirmResult =
   | { ok: true; code: string }
   | { ok: false; error: string }
 
@@ -18,10 +27,6 @@ const MESSAGES: Record<string, Record<string, string>> = {
   TURNSTILE: {
     es: "No pudimos verificar que eres una persona. Recarga la página e inténtalo de nuevo.",
     en: "We could not verify you are human. Reload the page and try again.",
-  },
-  DUPLICATE_DONATION: {
-    es: "Ya tienes una donación registrada sin entregar. Revisa tu correo.",
-    en: "You already have a registered donation pending delivery. Check your email.",
   },
   GENERIC: {
     es: "No pudimos registrar tu donación. Inténtalo de nuevo en unos minutos.",
@@ -84,7 +89,7 @@ export async function submitDonation(input: unknown): Promise<DonationResult> {
   }
 
   try {
-    const res = await apiFetch<{ code: string }>("/v1/public/donations", {
+    await apiFetch("/v1/public/donations", {
       method: "POST",
       body: JSON.stringify({
         donor: {
@@ -100,7 +105,7 @@ export async function submitDonation(input: unknown): Promise<DonationResult> {
         notes: fields.notes || undefined,
       }),
     })
-    return { ok: true, code: res.code }
+    return { ok: true }
   } catch (err) {
     const code = err instanceof ApiError ? err.code : null
     const msg = (code && MESSAGES[code]?.[locale]) || MESSAGES.GENERIC[locale]
@@ -108,7 +113,7 @@ export async function submitDonation(input: unknown): Promise<DonationResult> {
   }
 }
 
-export async function confirmDonation(token: string, locale = "es"): Promise<DonationResult> {
+export async function confirmDonation(token: string, locale = "es"): Promise<DonationConfirmResult> {
   try {
     const res = await apiFetch<{ code: string }>("/v1/public/donations/confirm", {
       method: "POST",
@@ -149,7 +154,7 @@ export async function resendDonationConfirmation(input: unknown): Promise<Donati
       method: "POST",
       body: JSON.stringify({ email }),
     })
-    return { ok: true, code: "" }
+    return { ok: true }
   } catch {
     return { ok: false, error: MESSAGES.RESEND_GENERIC[locale] }
   }

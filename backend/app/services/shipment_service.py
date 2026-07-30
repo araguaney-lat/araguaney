@@ -1,8 +1,10 @@
 from datetime import datetime, timezone
 from uuid import UUID
 
+from app.arq_pool import enqueue
 from app.models.events import BoxEvent, PalletEvent, ShipmentEvent
 from app.models.shipment import Shipment
+from app.repositories.donation_repository import DonationRepository
 from app.repositories.pallet_repository import PalletRepository
 from app.repositories.shipment_repository import ShipmentRepository
 from app.schemas.box import BoxOut
@@ -86,7 +88,10 @@ class ShipmentService(BaseService):
         repo.commit()
         return shipment
 
-    def ship(self, shipment_id: UUID, center_id: UUID | None, user_id: UUID) -> Shipment:
+    def ship(
+        self, shipment_id: UUID, center_id: UUID | None, user_id: UUID,
+        background_tasks=None,
+    ) -> Shipment:
         """CLOSED → SHIPPED: freeze all pallets and their boxes."""
         repo = ShipmentRepository(self.db)
         shipment = repo.find_by_id(shipment_id, center_id)
@@ -113,7 +118,26 @@ class ShipmentService(BaseService):
         shipment.shipped_at = datetime.now(tz=timezone.utc)
         self.db.add(ShipmentEvent(shipment_id=shipment.id, user_id=user_id, from_status="CLOSED", to_status="SHIPPED"))
         repo.commit()
+
+        self._avisar_a_donantes(shipment_id, shipment.reference, background_tasks)
         return shipment
+
+    def _avisar_a_donantes(self, shipment_id: UUID, reference: str, background_tasks) -> None:
+        """Cierra el círculo con quien se pre-registró: su donación ya salió.
+
+        Va después del commit: un fallo mandando correos no puede deshacer un
+        despacho que ya ocurrió.
+        """
+        if background_tasks is None:
+            return
+        for donation in DonationRepository(self.db).find_donations_for_shipment(shipment_id):
+            enqueue(
+                background_tasks,
+                "send_donation_shipped_email_task",
+                donation.donor.email,
+                donation.code,
+                reference,
+            )
 
     def get_detail(self, shipment_id: UUID, center_id: UUID | None) -> ShipmentDetailOut:
         shipment = ShipmentRepository(self.db).find_by_id(shipment_id, center_id)

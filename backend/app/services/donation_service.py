@@ -11,6 +11,7 @@ from datetime import datetime, timedelta, timezone
 from fastapi import BackgroundTasks
 
 from app.arq_pool import enqueue
+from app.models.center import Center
 from app.models.donation import Donation, DonationItem
 from app.repositories.donation_repository import DonationRepository
 from app.repositories.donor_repository import DonorRepository
@@ -20,6 +21,13 @@ from app.utils.errors import api_error
 
 _MANAGE_TOKEN_DAYS = 30
 _RECEPTION_STATES = ("RECEIVED", "MISSING", "REJECTED")
+
+# Lo que el donante lee en su correo. El estado interno no le dice nada.
+_ETIQUETA_RECEPCION = {
+    "RECEIVED": "Recibido",
+    "MISSING": "No llegó",
+    "REJECTED": "No aceptado",
+}
 
 
 def _hash_token(token: str) -> str:
@@ -32,20 +40,23 @@ def _donation_code() -> str:
 
 class DonationService(BaseService):
 
-    def submit(self, data: DonationCreate, background_tasks: BackgroundTasks) -> Donation:
+    def submit(self, data: DonationCreate, background_tasks: BackgroundTasks) -> Donation | None:
         """Registra la donación en estado PENDING_EMAIL y manda la confirmación.
 
         Nada existe para el centro hasta que el correo se confirma: sin ese paso
         el formulario público sería un vector de basura.
+
+        Devuelve `None` cuando ese correo ya tenía una donación abierta. El
+        router responde igual en ambos casos: contestar distinto convertiría al
+        formulario en un verificador de correos ajenos, y basta con probar una
+        dirección para saber si esa persona está donando.
         """
         repo = DonationRepository(self.db)
 
-        if repo.has_open_for_email(data.donor.email):
-            raise api_error(
-                "DUPLICATE_DONATION",
-                "Ya tienes una donación registrada sin entregar. Consulta tu correo.",
-                field="email",
-            )
+        abierta = repo.find_open_for_email(data.donor.email)
+        if abierta is not None:
+            self._reenviar_si_procede(abierta, background_tasks)
+            return None
 
         donor = DonorRepository(self.db).find_or_create_self(data.donor)
         self.db.flush()
@@ -85,6 +96,29 @@ class DonationService(BaseService):
             raw_token,
         )
         return donation
+
+    def _reenviar_si_procede(self, abierta: Donation, background_tasks: BackgroundTasks) -> None:
+        """Quien de verdad es dueño del correo recibe su enlace otra vez.
+
+        Solo aplica a la que sigue sin confirmar. Una donación ya confirmada tiene
+        su QR en el buzón, y rotarle el enlace de gestión dejaría que cualquiera
+        que conozca el correo se lo tumbara a voluntad.
+        """
+        if abierta.status != "PENDING_EMAIL":
+            return
+
+        raw_token = secrets.token_urlsafe(32)
+        abierta.donor.email_verify_token_hash = _hash_token(raw_token)
+        abierta.confirmation_sent_at = datetime.now(timezone.utc)
+        DonationRepository(self.db).commit()
+
+        enqueue(
+            background_tasks,
+            "send_donation_confirmation_email_task",
+            abierta.donor.email,
+            abierta.donor.first_name,
+            raw_token,
+        )
 
     def confirm_email(self, token: str, background_tasks: BackgroundTasks) -> Donation:
         """Confirma el correo, deja la donación REGISTERED y emite el enlace de gestión."""
@@ -234,6 +268,7 @@ class DonationService(BaseService):
         extras: list,
         center_id,
         user_id,
+        background_tasks: BackgroundTasks | None = None,
     ) -> Donation:
         """Doble check del centro: confirma lo que llegó y registra la merma.
 
@@ -292,4 +327,30 @@ class DonationService(BaseService):
             if extras else None,
         )
         repo.commit()
+
+        self._avisar_recepcion(donation, background_tasks)
         return donation
+
+    def _avisar_recepcion(self, donation: Donation, background_tasks) -> None:
+        """Resumen del doble check. Sin correo no hay a quién avisar: un donante
+        capturado en ventanilla puede no haberlo dado."""
+        correo = getattr(donation.donor, "email", None)
+        if background_tasks is None or not correo:
+            return
+
+        centro = self.db.get(Center, donation.received_center_id)
+        renglones = [
+            {
+                "label": item.free_text or "",
+                "status": _ETIQUETA_RECEPCION.get(item.reception_status, item.reception_status),
+            }
+            for item in donation.items
+        ]
+        enqueue(
+            background_tasks,
+            "send_donation_received_email_task",
+            correo,
+            donation.code,
+            getattr(centro, "name", ""),
+            renglones,
+        )

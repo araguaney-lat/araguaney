@@ -10,22 +10,28 @@ import re
 from datetime import datetime
 from uuid import UUID
 
-from pydantic import field_validator, model_validator
+from pydantic import Field, field_validator, model_validator
 
 from app.schemas._base import StrictModel, StrictORMModel
 
 DONOR_TYPES = ("fisica", "moral")
+
+# El pre-registro público escribe aquí sin sesión: los topes son la primera
+# defensa contra un request que solo busca engordar la base.
+_MAX_NAME = 120
+_MAX_EMAIL = 254        # RFC 5321
+_MAX_PHONE = 30
 
 _EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 
 
 class DonorInput(StrictModel):
     donor_type: str = "fisica"
-    first_name: str
-    last_name: str
-    legal_name: str | None = None      # solo persona moral
-    email: str | None = None
-    phone: str | None = None
+    first_name: str = Field(max_length=_MAX_NAME)
+    last_name: str = Field(max_length=_MAX_NAME)
+    legal_name: str | None = Field(default=None, max_length=_MAX_NAME)   # solo persona moral
+    email: str | None = Field(default=None, max_length=_MAX_EMAIL)
+    phone: str | None = Field(default=None, max_length=_MAX_PHONE)
 
     @field_validator("first_name", "last_name", "legal_name", "email", "phone", mode="before")
     @classmethod
