@@ -20,6 +20,11 @@ export const ROUTE_SLUGS: Record<string, Record<Locale, string>> = {
   "": { es: "", en: "" }, // home
   "centro-de-acopio": { es: "centro-de-acopio", en: "collection-center" },
   "registrar-centro": { es: "registrar-centro", en: "register-center" },
+  donar: { es: "donar", en: "donate" },
+  "donar/confirmar": {
+    es: "donar/confirmar",
+    en: "donate/confirm",
+  },
   "registrar-centro/confirmar": {
     es: "registrar-centro/confirmar",
     en: "register-center/confirm",

@@ -12,6 +12,7 @@ aquí son correos, ya acotados por el límite de tasa.
 """
 
 from fastapi import APIRouter, BackgroundTasks, Depends, Request, Response
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.database import get_db
@@ -20,6 +21,7 @@ from app.schemas.donation import (
     DonationItemInput,
     DonationOut,
     DonationPublicOut,
+    PublicCenterOut,
 )
 from app.schemas._base import StrictModel
 from app.services.donation_service import DonationService
@@ -130,3 +132,17 @@ def public_donation_qr(request: Request, code: str, db: Session = Depends(get_db
         media_type="image/png",
         headers={"Cache-Control": _FICHA_CACHE},
     )
+
+
+# ── Catálogos públicos que necesita el formulario ────────────────────────────
+
+@router.get("/public/centers", response_model=list[PublicCenterOut])
+@limiter.limit("60/minute")
+def public_centers(request: Request, response: Response, db: Session = Depends(get_db)):
+    """Centros activos, sin datos de contacto. Cacheable: cambia poco."""
+    from app.models.center import Center
+
+    response.headers["Cache-Control"] = _FICHA_CACHE
+    return db.execute(
+        select(Center).where(Center.is_active.is_(True)).order_by(Center.name)
+    ).scalars().all()

@@ -1,5 +1,7 @@
 from datetime import date
 
+from uuid import UUID
+
 from app.schemas._base import StrictModel
 
 
@@ -60,7 +62,12 @@ class PublicNeedsOut(StrictModel):
 
 
 class PublicCampaignListItemOut(StrictModel):
-    """Safe for public listing: no PII, just what's needed to build a link/card."""
+    """Safe for public listing: no PII, just what's needed to build a link/card.
+
+    Incluye `id` porque el formulario de donación manda la campaña elegida como
+    intención; el UUID no es secreto y la ficha ya es pública por slug.
+    """
+    id: UUID
     slug: str
     name: str
     destination_country: str | None
