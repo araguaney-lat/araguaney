@@ -5,9 +5,9 @@ import type { LegalDoc } from "./types"
 
 export const privacyEn: LegalDoc = {
   title: "Privacy Notice",
-  version: "1.1",
-  updatedISO: "2026-07-29",
-  updatedLabel: "July 29, 2026",
+  version: "1.2",
+  updatedISO: "2026-07-30",
+  updatedLabel: "July 30, 2026",
   versionLabel: "Version",
   updatedPrefix: "Last updated:",
   intro:

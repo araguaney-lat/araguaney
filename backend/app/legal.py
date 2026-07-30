@@ -7,7 +7,7 @@ three must be bumped together). Existing users whose `accepted_terms_version`
 no longer matches this value are re-gated to /accept-terms on next login.
 """
 
-CURRENT_TERMS_VERSION = "1.0"
+CURRENT_TERMS_VERSION = "1.2"
 
 # Términos de Donación en Especie (Fase 20). Versión independiente de la de
 # usuarios: quien dona no tiene cuenta, acepta otro documento y en otro momento.

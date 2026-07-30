@@ -6,9 +6,9 @@ import type { LegalDoc } from "./types"
 
 export const termsEs: LegalDoc = {
   title: "Términos y Condiciones",
-  version: "1.0",
-  updatedISO: "2026-07-02",
-  updatedLabel: "2 de julio de 2026",
+  version: "1.2",
+  updatedISO: "2026-07-30",
+  updatedLabel: "30 de julio de 2026",
   versionLabel: "Versión",
   updatedPrefix: "Última actualización:",
   intro:
