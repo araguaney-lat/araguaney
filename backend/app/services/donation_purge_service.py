@@ -72,7 +72,12 @@ class DonationPurgeService:
             select(Donation).where(Donation.status == "PENDING_EMAIL")
         ).scalars().all()
 
-        vencidas = [d for d in candidatas if (_aware(d.created_at) or corte) < corte]
+        # El reloj es el último correo de confirmación enviado; `created_at` solo
+        # respalda a las filas anteriores a que existiera esa columna.
+        def _reloj(d):
+            return _aware(d.confirmation_sent_at) or _aware(d.created_at) or corte
+
+        vencidas = [d for d in candidatas if _reloj(d) < corte]
         for donation in vencidas:
             donation.status = "EXPIRED"
             donation.manage_token_hash = None

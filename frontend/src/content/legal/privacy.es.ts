@@ -132,7 +132,7 @@ export const privacyEs: LegalDoc = {
               ["Archivos de exportación (manifiestos, reportes)", "1 hora", "Se eliminan tras la descarga; 24 horas si la generación falló"],
               ["Registros de fallos de envío de correo", "90 días", "Se borran de forma automática"],
               ["Datos de personas donantes registradas (nombre, razón social, correo, teléfono)", "Mientras el centro los conserve", "Se eliminan a solicitud de la persona donante o cuando el centro los da de baja"],
-              ["Donación pre-registrada en línea que nunca confirmaste por correo", "7 días", "La donación vence y tus datos de contacto se eliminan, salvo que tengas otra donación pendiente o ya entregada"],
+              ["Donación pre-registrada en línea que nunca confirmaste por correo", "7 días desde el último correo de confirmación que te enviamos", "La donación vence y tus datos de contacto se eliminan, salvo que tengas otra donación pendiente o ya entregada"],
               ["Enlace para gestionar tu donación pre-registrada", "30 días", "El enlace deja de funcionar y se elimina de nuestra base; también se elimina en cuanto entregas la donación"],
               ["Eventos de inventario (quién selló una caja, cerró una tarima o despachó un envío)", "Indefinido", "No se eliminan: sostienen la trazabilidad de la ayuda enviada"],
             ],

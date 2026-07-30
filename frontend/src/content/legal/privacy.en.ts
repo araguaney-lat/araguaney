@@ -131,7 +131,7 @@ export const privacyEn: LegalDoc = {
               ["Export files (manifests, reports)", "1 hour", "Deleted after download; 24 hours if generation failed"],
               ["Email delivery failure records", "90 days", "Automatically deleted"],
               ["Registered donor data (name, legal name, email, phone)", "While the center keeps it", "Deleted at the donor's request or when the center removes it"],
-              ["Online pre-registered donation you never confirmed by email", "7 days", "The donation expires and your contact details are deleted, unless you have another pending or delivered donation"],
+              ["Online pre-registered donation you never confirmed by email", "7 days from the last confirmation email we sent you", "The donation expires and your contact details are deleted, unless you have another pending or delivered donation"],
               ["Link to manage your pre-registered donation", "30 days", "The link stops working and is deleted from our database; it is also deleted as soon as you deliver the donation"],
               ["Inventory events (who sealed a box, closed a pallet or dispatched a shipment)", "Indefinite", "Not deleted: they sustain the traceability of the aid that was shipped"],
             ],

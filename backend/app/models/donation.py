@@ -52,6 +52,9 @@ class Donation(Base):
 
     notes = Column(Text, nullable=True)
     created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
+    # Último envío del correo de confirmación. La purga mide desde aquí, no desde
+    # `created_at`: pedir el correo de nuevo tiene que dar tiempo de confirmarlo.
+    confirmation_sent_at = Column(DateTime(timezone=True), nullable=True)
     registered_at = Column(DateTime(timezone=True), nullable=True)
     received_at = Column(DateTime(timezone=True), nullable=True)
 

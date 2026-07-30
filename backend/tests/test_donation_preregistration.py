@@ -576,3 +576,74 @@ def test_un_pre_registro_de_otro_centro_no_contamina_el_intake():
 
     assert intake.donor_id is None
     assert donacion.intake_id is None
+
+
+# ── Reenvío del correo de confirmación ───────────────────────────────────────
+
+def _pendiente(email="quien@ejemplo.test"):
+    d = MagicMock()
+    d.status = "PENDING_EMAIL"
+    d.donor = MagicMock(email=email, first_name="Quien", email_verify_token_hash="hash-viejo")
+    return d
+
+
+def test_reenviar_rota_el_token(monkeypatch):
+    """El enlace anterior deja de servir: si no, un correo filtrado seguiría vivo."""
+    svc, bg = _service()
+    d = _pendiente()
+
+    with patch("app.services.donation_service.DonationRepository") as MockRepo:
+        MockRepo.return_value.find_pending_by_email.return_value = d
+        svc.resend("quien@ejemplo.test", bg)
+
+    assert d.donor.email_verify_token_hash != "hash-viejo"
+
+
+def test_reenviar_manda_el_correo_con_el_token_nuevo():
+    svc, bg = _service()
+    d = _pendiente()
+
+    with (
+        patch("app.services.donation_service.DonationRepository") as MockRepo,
+        patch("app.services.donation_service.enqueue") as mock_enqueue,
+    ):
+        MockRepo.return_value.find_pending_by_email.return_value = d
+        svc.resend("quien@ejemplo.test", bg)
+
+    nombre, destino, _, token = mock_enqueue.call_args[0][1:]
+    assert nombre == "send_donation_confirmation_email_task"
+    assert destino == "quien@ejemplo.test"
+    assert _hash_token(token) == d.donor.email_verify_token_hash
+
+
+def test_reenviar_a_un_correo_desconocido_no_lo_delata():
+    """Misma respuesta exista o no: si no, el formulario sería un verificador de correos."""
+    svc, bg = _service()
+
+    with (
+        patch("app.services.donation_service.DonationRepository") as MockRepo,
+        patch("app.services.donation_service.enqueue") as mock_enqueue,
+    ):
+        MockRepo.return_value.find_pending_by_email.return_value = None
+        svc.resend("nadie@ejemplo.test", bg)     # no levanta
+
+    assert not mock_enqueue.called
+
+
+def test_reenviar_reinicia_el_reloj_de_la_purga():
+    """Sin esto, pedir el correo de nuevo el último día no serviría de nada."""
+    svc, bg = _service()
+    d = _pendiente()
+
+    with patch("app.services.donation_service.DonationRepository") as MockRepo:
+        MockRepo.return_value.find_pending_by_email.return_value = d
+        svc.resend("quien@ejemplo.test", bg)
+
+    assert d.confirmation_sent_at is not None
+
+
+def test_el_reenvio_esta_en_el_router_publico():
+    from pathlib import Path
+
+    src = Path("app/routers/donation.py").read_text()
+    assert "/public/donations/resend" in src

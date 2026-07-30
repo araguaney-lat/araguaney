@@ -234,3 +234,15 @@ def test_la_purga_reporta_lo_que_hizo(db):
     assert resultado["vencidas"] == 1
     assert resultado["donantes_purgados"] == 1
     assert resultado["enlaces_vencidos"] == 0
+
+
+def test_un_reenvio_reciente_salva_a_una_donacion_vieja(db):
+    """El reloj es el último correo enviado: pedirlo de nuevo compra el plazo entero."""
+    donor = _donante(db)
+    donation = _donacion(db, donor, dias=30)
+    donation.confirmation_sent_at = _ahora() - timedelta(days=1)
+    db.flush()
+
+    DonationPurgeService.purge(db)
+
+    assert donation.status == "PENDING_EMAIL"

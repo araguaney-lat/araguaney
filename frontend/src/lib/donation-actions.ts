@@ -27,6 +27,10 @@ const MESSAGES: Record<string, Record<string, string>> = {
     es: "No pudimos registrar tu donación. Inténtalo de nuevo en unos minutos.",
     en: "We could not register your donation. Please try again in a few minutes.",
   },
+  RESEND_GENERIC: {
+    es: "No pudimos reenviar el correo. Inténtalo de nuevo en unos minutos.",
+    en: "We could not resend the email. Please try again in a few minutes.",
+  },
 }
 
 const itemSchema = z
@@ -40,6 +44,12 @@ const itemSchema = z
   .refine((i) => Boolean(i.product_type_id) !== Boolean(i.free_text), {
     message: "Cada renglón lleva un producto o una descripción, no ambos",
   })
+
+const resendSchema = z.object({
+  locale: z.enum(["es", "en"]).default("es"),
+  turnstileToken: z.string().min(1),
+  email: z.string().trim().email(),
+})
 
 const submitSchema = z.object({
   locale: z.enum(["es", "en"]).default("es"),
@@ -113,5 +123,34 @@ export async function confirmDonation(token: string, locale = "es"): Promise<Don
           ? "This link is invalid or has already been used."
           : "Este enlace es inválido o ya fue utilizado.",
     }
+  }
+}
+
+
+/** Reenvía el correo de confirmación rotando el token del enlace anterior.
+
+Devuelve `ok` exista o no una donación con ese correo: el backend responde igual
+por la misma razón, y contradecirlo aquí volvería al formulario un verificador
+de direcciones. */
+export async function resendDonationConfirmation(input: unknown): Promise<DonationResult> {
+  const parsed = resendSchema.safeParse(input)
+  if (!parsed.success) {
+    return { ok: false, error: MESSAGES.INVALID[localeOf(input)] }
+  }
+
+  const { turnstileToken, locale, email } = parsed.data
+
+  if (!(await verifyTurnstile(turnstileToken))) {
+    return { ok: false, error: MESSAGES.TURNSTILE[locale] }
+  }
+
+  try {
+    await apiFetch("/v1/public/donations/resend", {
+      method: "POST",
+      body: JSON.stringify({ email }),
+    })
+    return { ok: true, code: "" }
+  } catch {
+    return { ok: false, error: MESSAGES.RESEND_GENERIC[locale] }
   }
 }

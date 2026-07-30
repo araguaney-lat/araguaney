@@ -12,6 +12,7 @@ aquí son correos, ya acotados por el límite de tasa.
 """
 
 from fastapi import APIRouter, BackgroundTasks, Depends, Request, Response
+from pydantic import EmailStr
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -38,6 +39,10 @@ _FICHA_CACHE = "public, max-age=60, s-maxage=300, stale-while-revalidate=600"
 
 class TokenIn(StrictModel):
     token: str
+
+
+class EmailIn(StrictModel):
+    email: EmailStr
 
 
 class ItemsIn(StrictModel):
@@ -68,6 +73,23 @@ def confirm_donation(
 ):
     """Confirma el correo: la donación pasa a REGISTERED y se emite el QR."""
     return DonationService(db).confirm_email(data.token, background_tasks)
+
+
+@router.post("/public/donations/resend", status_code=202)
+@limiter.limit("3/hour")
+def resend_donation_confirmation(
+    request: Request,
+    data: EmailIn,
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db),
+):
+    """Reenvía la confirmación rotando el token.
+
+    Responde 202 siempre, exista o no una donación con ese correo: distinguir
+    convertiría al endpoint en un verificador de direcciones.
+    """
+    DonationService(db).resend(data.email, background_tasks)
+    return {"ok": True}
 
 
 # ── Gestión por el donante (enlace firmado, sin sesión) ──────────────────────
