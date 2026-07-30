@@ -282,7 +282,7 @@ def public_campaigns(
     campaigns = CampaignRepository(db).find_public_active()
     payload = [
         PublicCampaignListItemOut(
-            slug=c.slug, name=c.name, destination_country=c.destination_country
+            id=c.id, slug=c.slug, name=c.name, destination_country=c.destination_country
         )
         for c in campaigns
     ]

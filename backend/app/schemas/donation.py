@@ -99,3 +99,24 @@ class DonationPublicOut(StrictORMModel):
     code: str
     status: str
     items: list[DonationItemOut] = []
+
+
+class PublicCenterOut(StrictORMModel):
+    """Centro visible para quien va a donar.
+
+    Deliberadamente sin correo ni teléfono de contacto: el formulario solo
+    necesita saber a dónde piensa llevar la donación, y publicar datos de
+    contacto de cada centro sería una lista de correos servida en bandeja.
+    """
+
+    id: UUID
+    name: str
+    state_name: str | None
+    country_code: str | None
+
+
+class PublicCampaignOut(StrictORMModel):
+    id: UUID
+    name: str
+    slug: str | None
+    description: str | None

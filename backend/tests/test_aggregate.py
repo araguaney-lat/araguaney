@@ -109,12 +109,13 @@ class TestPublicNeedsOut:
 class TestPublicCampaignListItemOut:
     def test_valid(self):
         out = PublicCampaignListItemOut(
-            slug="operacion-venezuela", name="Operación Venezuela", destination_country="VE"
+            id=uuid4(), slug="operacion-venezuela", name="Operación Venezuela",
+            destination_country="VE",
         )
         assert out.slug == "operacion-venezuela"
 
     def test_nullable_destination(self):
-        out = PublicCampaignListItemOut(slug="ayuda", name="Ayuda", destination_country=None)
+        out = PublicCampaignListItemOut(id=uuid4(), slug="ayuda", name="Ayuda", destination_country=None)
         assert out.destination_country is None
 
 

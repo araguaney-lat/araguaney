@@ -38,9 +38,15 @@ class CampaignRepository(BaseRepository[Campaign]):
         return self.find_by_slug(slug) is not None
 
     def find_public_active(self) -> list[Campaign]:
-        """Active, non-general campaigns with a slug — safe for public listing (no PII)."""
+        """Campañas activas, públicas y con slug — seguras para listar (sin PII).
+
+        `is_public` hace explícita una visibilidad que antes era implícita: hasta
+        la migración 032 bastaba con tener slug, así que una campaña interna
+        quedaba expuesta sin que nadie lo decidiera.
+        """
         stmt = select(Campaign).where(
             Campaign.is_active.is_(True),
+            Campaign.is_public.is_(True),
             Campaign.is_general.is_(False),
             Campaign.slug.isnot(None),
         )
