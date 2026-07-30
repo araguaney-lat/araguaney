@@ -33,3 +33,8 @@ def box_qr_png(code: str, base_url: str, size: int = 10) -> bytes:
 def pallet_qr_png(code: str, base_url: str, size: int = 10) -> bytes:
     """Return PNG bytes for a QR code pointing to /p/{code}."""
     return _make_qr_png(f"{base_url.rstrip('/')}/p/{code}", size)
+
+
+def donation_qr_png(code: str, base_url: str, size: int = 10) -> bytes:
+    """Return PNG bytes for a QR code pointing to /d/{code}."""
+    return _make_qr_png(f"{base_url.rstrip('/')}/d/{code}", size)

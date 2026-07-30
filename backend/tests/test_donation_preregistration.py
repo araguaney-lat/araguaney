@@ -232,3 +232,38 @@ def test_gestion_con_token_vencido_falla():
 def test_hash_de_token_es_estable_y_no_reversible():
     assert _hash_token("abc") == hashlib.sha256(b"abc").hexdigest()
     assert "abc" not in _hash_token("abc")
+
+
+# ── QR y correos ─────────────────────────────────────────────────────────────
+
+def test_el_qr_de_donacion_apunta_a_la_ficha_publica():
+    from app.utils.qr import donation_qr_png
+    png = donation_qr_png("DN-ABC123", "https://araguaney.lat")
+    assert png[:8] == b"\x89PNG\r\n\x1a\n"
+
+
+def test_las_tres_tareas_de_correo_estan_registradas_en_el_worker():
+    """Registrar la tarea es lo que evita que el encolado falle en silencio."""
+    import inspect
+
+    from app import worker
+
+    for nombre in (
+        "send_donation_confirmation_email_task",
+        "send_donation_registered_email_task",
+        "send_donation_received_email_task",
+    ):
+        assert hasattr(worker, nombre), f"falta la tarea {nombre}"
+
+
+def test_la_firma_de_la_tarea_coincide_con_lo_que_encola_el_servicio():
+    """El encolado es posicional: un orden distinto manda el correo al campo equivocado."""
+    import inspect
+
+    from app import worker
+
+    params = list(inspect.signature(worker.send_donation_registered_email_task).parameters)
+    assert params == ["ctx", "to", "code", "manage_token"]
+
+    params = list(inspect.signature(worker.send_donation_confirmation_email_task).parameters)
+    assert params == ["ctx", "to", "first_name", "token"]

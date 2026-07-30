@@ -52,6 +52,21 @@ async def send_invitation_email_task(ctx, to: str, username: str, temp_password:
     await asyncio.to_thread(send_invitation_email, to, username, temp_password)
 
 
+async def send_donation_confirmation_email_task(ctx, to: str, first_name: str, token: str) -> None:
+    from app.email import send_donation_confirmation_email
+    await asyncio.to_thread(send_donation_confirmation_email, to, first_name, token)
+
+
+async def send_donation_registered_email_task(ctx, to: str, code: str, manage_token: str) -> None:
+    from app.email import send_donation_registered_email
+    await asyncio.to_thread(send_donation_registered_email, to, code, manage_token)
+
+
+async def send_donation_received_email_task(ctx, to: str, code: str, center_name: str, items: list) -> None:
+    from app.email import send_donation_received_email
+    await asyncio.to_thread(send_donation_received_email, to, code, center_name, items)
+
+
 async def send_request_reply_email_task(ctx, to: str, request_title: str, reply_body: str, request_url: str) -> None:
     from app.email import send_request_reply_email
     await asyncio.to_thread(send_request_reply_email, to, request_title, reply_body, request_url)
@@ -232,6 +247,9 @@ def _build_fallbacks() -> dict:
         send_center_application_confirm_email,
         send_center_application_received_email,
         send_center_application_rejected_email,
+        send_donation_confirmation_email,
+        send_donation_registered_email,
+        send_donation_received_email,
     )
     from app.services.export_generation import run_export_job
     from app.utils.indexnow import submit_url
@@ -242,6 +260,9 @@ def _build_fallbacks() -> dict:
         "send_verification_email_task": send_verification_email,
         "send_password_reset_email_task": send_password_reset_email,
         "send_invitation_email_task": send_invitation_email,
+        "send_donation_confirmation_email_task": send_donation_confirmation_email,
+        "send_donation_registered_email_task": send_donation_registered_email,
+        "send_donation_received_email_task": send_donation_received_email,
         "send_request_reply_email_task": send_request_reply_email,
         "send_message_private_email_task": send_message_private_email,
         "send_message_public_email_task": send_message_public_email,
@@ -288,6 +309,9 @@ class WorkerSettings:
         send_verification_email_task,
         send_password_reset_email_task,
         send_invitation_email_task,
+        send_donation_confirmation_email_task,
+        send_donation_registered_email_task,
+        send_donation_received_email_task,
         send_request_reply_email_task,
         send_message_private_email_task,
         send_message_public_email_task,
