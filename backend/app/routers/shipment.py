@@ -154,6 +154,62 @@ def download_manifest(
     return ExportJobOut(id=job.id, kind=job.kind, status=job.status, error=None)
 
 
+@router.post("/{shipment_id}/carta-porte.xlsx", response_model=ExportJobOut, status_code=202)
+@limiter.limit("2/minute")
+def download_carta_porte_xlsx(
+    request: Request,
+    shipment_id: UUID,
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_coordinator),
+    scope: UUID | None = Depends(tenant_scope),
+):
+    """Anexo de datos Carta Porte 3.1 en hoja de cálculo.
+
+    Es el insumo para el PAC de quien transporta, no un comprobante fiscal:
+    Araguaney no timbra. Lo que falte para poder timbrar viene declarado arriba
+    del archivo.
+    """
+    return _queue_carta_porte(
+        request, shipment_id, background_tasks, db, current_user, scope,
+        kind="SHIPMENT_CARTA_PORTE_XLSX", task="generate_shipment_carta_porte_xlsx_task",
+    )
+
+
+@router.post("/{shipment_id}/carta-porte.json", response_model=ExportJobOut, status_code=202)
+@limiter.limit("2/minute")
+def download_carta_porte_json(
+    request: Request,
+    shipment_id: UUID,
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_coordinator),
+    scope: UUID | None = Depends(tenant_scope),
+):
+    """El mismo anexo en JSON, para quien integra con su PAC."""
+    return _queue_carta_porte(
+        request, shipment_id, background_tasks, db, current_user, scope,
+        kind="SHIPMENT_CARTA_PORTE_JSON", task="generate_shipment_carta_porte_json_task",
+    )
+
+
+def _queue_carta_porte(request, shipment_id, background_tasks, db, current_user, scope,
+                       *, kind: str, task: str):
+    from app.utils.errors import api_error
+
+    if not ShipmentRepository(db).find_by_id(shipment_id, scope):
+        raise api_error("SHIPMENT_NOT_FOUND", "Shipment not found", status_code=404)
+
+    job = ExportJobRepository(db).create(
+        kind=kind,
+        params={"shipment_id": str(shipment_id)},
+        requested_by=current_user.id,
+        center_id=scope,
+    )
+    enqueue(background_tasks, task, str(job.id))
+    return ExportJobOut(id=job.id, kind=job.kind, status=job.status, error=None)
+
+
 @router.post("/{shipment_id}/manifest.xlsx", response_model=ExportJobOut, status_code=202)
 @limiter.limit("2/minute")
 def download_manifest_xlsx(

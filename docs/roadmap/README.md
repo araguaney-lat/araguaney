@@ -31,12 +31,12 @@ pie title Tareas completadas (431 tareas)
 | 18 | [Pre-registro de donaciones por el donante](phase-18-donor-preregistration.md) | 23 | 0 | ✅ 100% |
 | 19 | [Identidad estructurada del donante en el intake](phase-19-structured-donor-identity.md) | 9 | 0 | ✅ 100% |
 | 20 | [Prevención de riesgos: responsabilidad y anti-lavado en especie](phase-20-risk-prevention.md) | 6 | 4 | 🟡 60% |
-| 21 | [Logística: pesaje, anexo Carta Porte y perfiles de paletizado](phase-21-logistics-weighing.md) | 5 | 7 | 🟡 42% |
+| 21 | [Logística: pesaje, anexo Carta Porte y perfiles de paletizado](phase-21-logistics-weighing.md) | 9 | 3 | 🟡 75% |
 | 22 | [Trazabilidad extendida: avión y destino](phase-22-extended-traceability.md) | 0 | 14 | ⬜ 0% |
 | 23 | [IA asistida: captura, catálogo y necesidades](phase-23-ai-assisted-capture.md) | 0 | 11 | ⬜ 0% |
-| **Total** | | **378** | **54** | **🟡 88%** |
+| **Total** | | **382** | **50** | **🟡 88%** |
 
-> **Pendientes (54):**
+> **Pendientes (50):**
 > El grupo A de la Fase 13 (privacidad, lo que aplica hoy) está completo.
 > - Los borradores legales de las fases 20 y 21 están escritos y esperando revisión profesional
 >   (abogado y fiscalista): [`docs/legal/drafts/`](../legal/drafts/README.md). Sus tareas siguen
@@ -46,10 +46,9 @@ pie title Tareas completadas (431 tareas)
 >   estructurales documentados). Lo que queda son los tres textos legales (tasks 1, 2 y 6), que la
 >   task 7 —revisión de abogado— gatea antes de publicar; los borradores ya están escritos en
 >   [`docs/legal/drafts/`](../legal/drafts/README.md).
-> - **7 de la Fase 21 (logística y pesaje):** el pesaje por tarima, el estimado por caja, los
->   manifiestos con peso de báscula y los perfiles de altura ya están. Faltan el anexo de datos
->   Carta Porte y las claves SAT, los seeds de peso unitario, las dos guías y el cierre; la guía
->   fiscal está gated por revisión de fiscalista. Diseño en
+> - **3 de la Fase 21 (logística y pesaje):** el pesaje, los perfiles de altura, los pesos de
+>   referencia, la guía de paletizado y el anexo Carta Porte ya están. Falta la guía fiscal (gated
+>   por revisión de fiscalista), los tests de cierre y el registro en `CLAUDE.md`. Diseño en
 >   [su spec](../superpowers/specs/2026-07-29-logistics-weighing-design.md).
 > - **14 de la Fase 22 (trazabilidad extendida):** hitos logísticos, recepción en destino con
 >   merma e incidencias; diseño en

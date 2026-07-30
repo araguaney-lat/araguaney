@@ -7,6 +7,7 @@ and build the file. Each returns (bytes, content_type, filename).
 """
 
 from datetime import date
+from decimal import Decimal
 from typing import Callable
 from uuid import UUID
 
@@ -226,6 +227,90 @@ def generate_report_export_csv(
     return output.getvalue().encode("utf-8"), "text/csv", filename
 
 
+def _build_carta_porte_data(db: Session, shipment_id: UUID):
+    """Arma el anexo desde el envío: mercancías por tipo de producto, peso de báscula.
+
+    Las cajas se agrupan por tipo de producto porque el complemento declara
+    mercancías, no bultos individuales: cien cajas del mismo producto son un
+    renglón con cantidad cien, no cien renglones.
+    """
+    from app.repositories.pallet_repository import PalletRepository
+    from app.repositories.product_type_repository import ProductTypeRepository
+    from app.repositories.shipment_repository import ShipmentRepository
+    from app.utils.carta_porte import CartaPorteData, CartaPorteMercancia
+    from app.utils.weight import net_weight
+
+    shipment = ShipmentRepository(db).find_by_id(shipment_id, center_id=None)
+    if not shipment:
+        raise ValueError(f"Shipment {shipment_id} not found")
+
+    pallets = ShipmentRepository(db).find_pallets(shipment_id)
+    boxes_by_pallet = PalletRepository(db).find_boxes_for_pallets([p.id for p in pallets])
+    pt_repo = ProductTypeRepository(db)
+    pt_cache: dict = {}
+
+    agrupado: dict = {}
+    for pallet in pallets:
+        for box in boxes_by_pallet[pallet.id]:
+            if box.product_type_id not in pt_cache:
+                pt_cache[box.product_type_id] = pt_repo.find_by_id(box.product_type_id)
+            pt = pt_cache[box.product_type_id]
+            clave = (box.product_type_id, box.unit)
+            actual = agrupado.get(clave)
+            if actual is None:
+                agrupado[clave] = CartaPorteMercancia(
+                    descripcion=pt.display_name if pt else "—",
+                    sat_product_key=getattr(pt, "sat_product_key", None) if pt else None,
+                    unspsc_code=pt.unspsc_code if pt else None,
+                    cantidad=box.quantity,
+                    unidad=box.unit,
+                    clave_unidad=None,
+                    peso_kg=Decimal(box.weight_kg) if box.weight_kg else None,
+                )
+            else:
+                actual.cantidad += box.quantity
+                if box.weight_kg:
+                    actual.peso_kg = (actual.peso_kg or Decimal(0)) + Decimal(box.weight_kg)
+
+    # El peso que se declara es el de báscula por tarima. Sin ninguna pesada no
+    # hay peso bruto que declarar, y el anexo lo dice en vez de sumar estimados.
+    netos = [
+        n for p in pallets
+        if (n := net_weight(p.gross_weight_kg, p.tare_weight_kg)) is not None
+    ]
+
+    return CartaPorteData(
+        shipment_reference=shipment.reference,
+        origen=None,        # domicilio del centro: lo completa quien timbra
+        destino=shipment.destination,
+        peso_bruto_total=sum(netos, Decimal(0)) if netos else None,
+        numero_bultos=len(pallets),
+        mercancias=list(agrupado.values()),
+    )
+
+
+def generate_shipment_carta_porte_json(db: Session, shipment_id: str) -> tuple[bytes, str, str]:
+    import json
+
+    from app.utils.carta_porte import build_annex
+
+    anexo = build_annex(_build_carta_porte_data(db, UUID(shipment_id)))
+    contenido = json.dumps(anexo, ensure_ascii=False, indent=2).encode("utf-8")
+    return contenido, "application/json", f"carta_porte_{shipment_id[:8]}.json"
+
+
+def generate_shipment_carta_porte_xlsx(db: Session, shipment_id: str) -> tuple[bytes, str, str]:
+    from app.utils.carta_porte import build_annex
+    from app.utils.carta_porte_xlsx import build_carta_porte_xlsx
+
+    anexo = build_annex(_build_carta_porte_data(db, UUID(shipment_id)))
+    return (
+        build_carta_porte_xlsx(anexo),
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        f"carta_porte_{shipment_id[:8]}.xlsx",
+    )
+
+
 _GENERATORS: dict[str, Callable[[Session, dict], tuple[bytes, str, str]]] = {
     "SHIPMENT_MANIFEST_PDF": lambda db, p: generate_shipment_manifest_pdf(db, p["shipment_id"]),
     "SHIPMENT_MANIFEST_XLSX": lambda db, p: generate_shipment_manifest_xlsx(db, p["shipment_id"]),
@@ -235,6 +320,8 @@ _GENERATORS: dict[str, Callable[[Session, dict], tuple[bytes, str, str]]] = {
     "REPORT_EXPORT_CSV": lambda db, p: generate_report_export_csv(
         db, p["campaign_id"], p["center_id"], p["start"], p["end"]
     ),
+    "SHIPMENT_CARTA_PORTE_XLSX": lambda db, p: generate_shipment_carta_porte_xlsx(db, p["shipment_id"]),
+    "SHIPMENT_CARTA_PORTE_JSON": lambda db, p: generate_shipment_carta_porte_json(db, p["shipment_id"]),
 }
 
 

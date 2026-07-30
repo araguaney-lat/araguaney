@@ -344,8 +344,9 @@ independiente**.
 > que no puede quedarse es una afirmación falsa en una solicitud en revisión.
 > Corregido en el sitio público, el README y `dpg-nominee-araguaney.json`
 > (campo `privacy_note` con la justificación nueva de los indicadores 6, 7 y 9).
-> **Pendiente: avisar a la DPG Alliance** (`hello@digitalpublicgoods.net`) o
-> editar la solicitud en el portal si lo permite estando en revisión.
+> **Avisado a la DPG Alliance el 2026-07-30** (`hello@digitalpublicgoods.net`),
+> con la corrección de los indicadores 6, 7 y 9 y la pregunta de si actualizamos
+> nosotros la solicitud en el portal o la enmiendan ellos. Sin respuesta todavía.
 La revisión es manual y el objetivo declarado por la DPG Alliance es de 30 días,
 variable según el volumen de solicitudes. Si piden aclaraciones, llegan por el
 portal.

@@ -255,3 +255,41 @@ def test_el_total_prefiere_el_neto_de_la_tarima_sobre_la_suma_de_cajas():
 def test_sin_tarima_pesada_el_total_declara_que_suma_cajas():
     html = _manifiesto()
     assert "10.000 kg" in html and "suma de cajas" in html
+
+
+# ── Guía de paletizado (task 10) ─────────────────────────────────────────────
+
+def test_la_guia_de_paletizado_existe_en_ambos_idiomas():
+    from pathlib import Path
+
+    raiz = Path(__file__).resolve().parents[2] / "frontend" / "content" / "manuals"
+    for ruta in (raiz / "paletizado.html", raiz / "en" / "paletizado.html"):
+        assert ruta.exists(), ruta
+        assert len(ruta.read_text()) > 2000
+
+
+def test_la_guia_explica_que_la_base_de_la_tarima_cuenta():
+    """Es el error que más veces manda una tarima de regreso al andén."""
+    from pathlib import Path
+
+    raiz = Path(__file__).resolve().parents[2] / "frontend" / "content" / "manuals"
+    es = (raiz / "paletizado.html").read_text()
+    assert "15 cm" in es and "145" in es
+
+
+def test_la_guia_advierte_del_arco_de_rayos_x():
+    """Caber en el avión no basta si el escáner de la terminal es más bajo."""
+    from pathlib import Path
+
+    raiz = Path(__file__).resolve().parents[2] / "frontend" / "content" / "manuals"
+    for ruta, frase in ((raiz / "paletizado.html", "más bajo que la puerta del avión"),
+                        (raiz / "en" / "paletizado.html", "lower than the aircraft door")):
+        assert frase in ruta.read_text(), ruta
+
+
+def test_la_guia_esta_registrada_en_el_indice_de_ayuda():
+    from pathlib import Path
+
+    registro = (Path(__file__).resolve().parents[2] / "frontend" / "app" / "dashboard"
+                / "ayuda" / "manuals.ts").read_text()
+    assert "paletizado" in registro
