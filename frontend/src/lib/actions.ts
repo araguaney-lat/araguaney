@@ -4,7 +4,7 @@ import { signIn, signOut, auth } from "@/auth"
 import { AuthError } from "next-auth"
 import { redirect } from "next/navigation"
 import { revalidatePath } from "next/cache"
-import { apiFetch } from "@/lib/api"
+import { apiFetch, ApiError } from "@/lib/api"
 import { CURRENT_TERMS_VERSION } from "@/lib/legal"
 import { getLocale, getDictionary } from "@/lib/i18n"
 
@@ -337,6 +337,9 @@ export interface CreateIntakePayload {
   donation_id?: string
   // Aceptación de los Términos de Donación por el donante identificado (Fase 20).
   donor_terms_accepted?: boolean
+  // Por qué una captura de volumen atípico queda sin identificar. Abre una
+  // revisión para la coordinación; no la resuelve quien captura.
+  anonymous_exception_reason?: string
 }
 
 export async function createIntakeAction(payload: CreateIntakePayload) {
@@ -352,6 +355,11 @@ export async function createIntakeAction(payload: CreateIntakePayload) {
     revalidatePath("/dashboard/intake")
     return { data }
   } catch (err: unknown) {
-    return { error: err instanceof Error ? err.message : "Error al registrar intake" }
+    // El código viaja además del mensaje: la página necesita distinguir el
+    // "identifica al donante por volumen" para ofrecer la excepción.
+    return {
+      error: err instanceof Error ? err.message : "Error al registrar intake",
+      code: err instanceof ApiError ? err.code : undefined,
+    }
   }
 }

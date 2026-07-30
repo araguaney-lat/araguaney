@@ -84,6 +84,7 @@ def _intake_data(donor=None, boxes=1, weight=None):
     data.donante_libre = None
     data.notes = None
     data.donor_terms_accepted = True
+    data.anonymous_exception_reason = None
     data.boxes = []
     for _ in range(boxes):
         bd = MagicMock()
@@ -236,3 +237,212 @@ def test_el_pre_registro_sobre_el_umbral_queda_marcado(monkeypatch):
         donation = svc.submit(data, MagicMock())
 
     assert donation.atypical_volume is True
+
+
+# ── Excepción aprobada: la captura nunca se detiene ──────────────────────────
+#
+# El umbral pide identificar. Si la persona se niega —que es en sí una bandera
+# roja— el voluntario no se queda atorado con el camión en la puerta: registra
+# la excepción con motivo, la captura entra, y queda pendiente de que un
+# coordinador o national_admin la apruebe o la rechace. Todo con auditoría.
+
+def test_sobre_el_umbral_sin_identificar_y_sin_motivo_no_procede(monkeypatch):
+    monkeypatch.setenv("DONATION_VOLUME_THRESHOLD_BOXES", "3")
+    with pytest.raises(HTTPException):
+        _correr_intake(_intake_data(donor=None, boxes=5))
+
+
+def test_con_motivo_de_excepcion_la_captura_entra(monkeypatch):
+    """El almacén no se detiene: lo que se abre es una revisión, no un bloqueo."""
+    monkeypatch.setenv("DONATION_VOLUME_THRESHOLD_BOXES", "3")
+    data = _intake_data(donor=None, boxes=5)
+    data.anonymous_exception_reason = "La persona se negó a identificarse"
+    intake = _correr_intake(data)
+    assert intake is not None
+
+
+def test_la_excepcion_abre_una_revision_pendiente(monkeypatch):
+    monkeypatch.setenv("DONATION_VOLUME_THRESHOLD_BOXES", "3")
+    from app.models.risk_review import RiskReview
+
+    data = _intake_data(donor=None, boxes=5)
+    data.anonymous_exception_reason = "La persona se negó a identificarse"
+    revisiones = _revisiones_creadas(data)
+
+    assert len(revisiones) == 1
+    assert revisiones[0].kind == "ANONYMOUS_EXCEPTION"
+    assert revisiones[0].status == "PENDING"
+    assert isinstance(revisiones[0], RiskReview)
+
+
+def test_sobre_el_umbral_con_donante_tambien_avisa_al_coordinador(monkeypatch):
+    """Identificado no quiere decir sin revisar: el volumen atípico se mira."""
+    monkeypatch.setenv("DONATION_VOLUME_THRESHOLD_BOXES", "3")
+    data = _intake_data(donor=MagicMock(donor_type="fisica"), boxes=5)
+    revisiones = _revisiones_creadas(data)
+
+    assert [r.kind for r in revisiones] == ["ATYPICAL_VOLUME"]
+
+
+def test_una_captura_normal_no_genera_revisiones(monkeypatch):
+    monkeypatch.setenv("DONATION_VOLUME_THRESHOLD_BOXES", "3")
+    assert _revisiones_creadas(_intake_data(donor=None, boxes=1)) == []
+
+
+def _revisiones_creadas(data):
+    """Las RiskReview que el intake agregó a la sesión."""
+    from app.models.risk_review import RiskReview
+    from app.services.intake_service import IntakeService
+
+    db = MagicMock()
+    db.get.return_value = None
+    agregados = []
+    db.add.side_effect = lambda obj: agregados.append(obj)
+
+    with (
+        patch("app.services.intake_service.CampaignRepository") as MockCampaign,
+        patch("app.services.intake_service.ProductTypeRepository") as MockPt,
+        patch("app.services.intake_service.IntakeRepository") as MockIntake,
+        patch("app.services.intake_service.UserCampaignRepository") as MockMembership,
+        patch("app.services.intake_service.DonorRepository"),
+        patch("app.services.intake_service.validate_box", return_value=None),
+        patch("app.services.intake_service.IntakeOut"),
+        patch("app.services.intake_service.BoxOut"),
+        patch("app.services.intake_service.DonorOut"),
+    ):
+        campaign = MagicMock()
+        campaign.is_active = True
+        MockCampaign.return_value.find_by_id.return_value = campaign
+        MockMembership.return_value.is_member.return_value = True
+        MockPt.return_value.find_by_id.return_value = MagicMock(
+            category="OTHER", min_shelf_life_days=None
+        )
+        MockIntake.return_value.save_intake.side_effect = lambda i: i
+        IntakeService(db).create(data, uuid4(), uuid4())
+
+    return [o for o in agregados if isinstance(o, RiskReview)]
+
+
+# ── Resolución de la revisión ────────────────────────────────────────────────
+
+def _review_service(revision=None, actor_role="coordinator", actor_id=None):
+    from app.services.risk_review_service import RiskReviewService
+
+    db = MagicMock()
+    svc = RiskReviewService(db)
+    actor = MagicMock(id=actor_id or uuid4(), center_role=actor_role, center_id=uuid4())
+    return svc, db, actor
+
+
+def _revision(center_id=None, created_by=None):
+    r = MagicMock()
+    r.id = uuid4()
+    r.status = "PENDING"
+    r.center_id = center_id or uuid4()
+    r.created_by_user_id = created_by or uuid4()
+    return r
+
+
+def test_el_coordinador_aprueba_y_queda_quien_y_cuando():
+    svc, db, actor = _review_service()
+    revision = _revision(center_id=actor.center_id)
+
+    with patch("app.services.risk_review_service.RiskReviewRepository") as MockRepo:
+        MockRepo.return_value.find_by_id.return_value = revision
+        svc.resolve(revision.id, "APPROVED", "Donante conocido del centro", actor)
+
+    assert revision.status == "APPROVED"
+    assert revision.reviewed_by_user_id == actor.id
+    assert revision.reviewed_at is not None
+
+
+def test_rechazar_exige_motivo():
+    """Un rechazo sin motivo no le sirve a quien capturó ni a la auditoría."""
+    svc, db, actor = _review_service()
+    revision = _revision(center_id=actor.center_id)
+
+    with (
+        patch("app.services.risk_review_service.RiskReviewRepository") as MockRepo,
+        pytest.raises(HTTPException),
+    ):
+        MockRepo.return_value.find_by_id.return_value = revision
+        svc.resolve(revision.id, "REJECTED", "", actor)
+
+
+def test_un_voluntario_no_puede_resolver():
+    """Escalar es el punto: quien captura no se autoriza a sí mismo."""
+    svc, db, actor = _review_service(actor_role="volunteer")
+    revision = _revision(center_id=actor.center_id)
+
+    with (
+        patch("app.services.risk_review_service.RiskReviewRepository") as MockRepo,
+        pytest.raises(HTTPException) as exc,
+    ):
+        MockRepo.return_value.find_by_id.return_value = revision
+        svc.resolve(revision.id, "APPROVED", "ok", actor)
+    assert exc.value.status_code == 403
+
+
+def test_nadie_aprueba_su_propia_captura():
+    """Separación de funciones: si el coordinador capturó, escala al nacional."""
+    svc, db, actor = _review_service()
+    revision = _revision(center_id=actor.center_id, created_by=actor.id)
+
+    with (
+        patch("app.services.risk_review_service.RiskReviewRepository") as MockRepo,
+        pytest.raises(HTTPException) as exc,
+    ):
+        MockRepo.return_value.find_by_id.return_value = revision
+        svc.resolve(revision.id, "APPROVED", "ok", actor)
+    assert exc.value.status_code == 403
+
+
+def test_el_admin_nacional_si_puede_resolver_lo_que_el_mismo_capturo():
+    """Es el escalamiento final: si él no puede, la revisión queda muerta."""
+    svc, db, actor = _review_service(actor_role="national_admin")
+    revision = _revision(created_by=actor.id)
+
+    with patch("app.services.risk_review_service.RiskReviewRepository") as MockRepo:
+        MockRepo.return_value.find_by_id.return_value = revision
+        svc.resolve(revision.id, "APPROVED", "Revisado con el centro", actor)
+
+    assert revision.status == "APPROVED"
+
+
+def test_un_coordinador_no_resuelve_revisiones_de_otro_centro():
+    svc, db, actor = _review_service()
+    revision = _revision()          # otro centro
+
+    with (
+        patch("app.services.risk_review_service.RiskReviewRepository") as MockRepo,
+        pytest.raises(HTTPException) as exc,
+    ):
+        MockRepo.return_value.find_by_id.return_value = revision
+        svc.resolve(revision.id, "APPROVED", "ok", actor)
+    assert exc.value.status_code == 404
+
+
+def test_una_revision_ya_resuelta_no_se_vuelve_a_resolver():
+    svc, db, actor = _review_service()
+    revision = _revision(center_id=actor.center_id)
+    revision.status = "APPROVED"
+
+    with (
+        patch("app.services.risk_review_service.RiskReviewRepository") as MockRepo,
+        pytest.raises(HTTPException) as exc,
+    ):
+        MockRepo.return_value.find_by_id.return_value = revision
+        svc.resolve(revision.id, "REJECTED", "no", actor)
+    assert exc.value.status_code == 409
+
+
+def test_la_cola_de_revisiones_esta_montada_y_limitada():
+    from pathlib import Path
+
+    src = Path("app/routers/risk_review.py").read_text()
+    assert "@limiter.limit" in src
+    assert "AuditRepository" in src        # resolver deja rastro fuera de la propia fila
+    assert "_NO_CACHE" in src
+
+    main = Path("app/main.py").read_text()
+    assert "risk_review.router" in main
