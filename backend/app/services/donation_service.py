@@ -5,6 +5,7 @@ con `secrets`, se guarda **solo hasheado** y es de un solo uso.
 """
 
 import hashlib
+import logging
 import secrets
 from datetime import datetime, timedelta, timezone
 
@@ -18,6 +19,9 @@ from app.repositories.donor_repository import DonorRepository
 from app.schemas.donation import DonationCreate
 from app.services.base import BaseService
 from app.utils.errors import api_error
+from app.utils.r2 import delete_object
+
+logger = logging.getLogger(__name__)
 
 _MANAGE_TOKEN_DAYS = 30
 _RECEPTION_STATES = ("RECEIVED", "MISSING", "REJECTED")
@@ -239,6 +243,16 @@ class DonationService(BaseService):
     def cancel(self, token: str) -> Donation:
         donation = self._editable(token)
         repo = DonationRepository(self.db)
+
+        # Quien cancela retira su donación entera. Dejar las fotos en R2 sería
+        # conservar el dato personal justo donde nadie irá a buscarlo.
+        for foto in list(donation.photos):
+            try:
+                delete_object(foto.storage_key)
+            except Exception:                   # noqa: BLE001
+                logger.warning("No se pudo borrar la foto %s de R2", foto.storage_key)
+            self.db.delete(foto)
+
         donation.status = "CANCELLED"
         donation.manage_token_hash = None   # el enlace deja de servir
         repo.log_event(donation, from_status="REGISTERED", to_status="CANCELLED",

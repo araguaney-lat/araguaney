@@ -45,7 +45,7 @@
 | 5 | `DonationService`: recepción | `receive` (doble check por renglón, renglones extra `added_by=center`, `received_center_id` por `tenant_scope`, → `RECEIVED` + evento) y armado del **borrador de intake** a partir de renglones con `product_type_id`; liga `donation.intake_id` al intake creado. | 🔴 Alta | ✅ Done |
 | 6 | Routers públicos `/v1/donations/public/*` | Alta, confirmación, reenvío, ficha `/d/{code}` (mínima, sin PII, cacheable), gestión por token. Turnstile + `@limiter.limit()` en todos; 404 genérico anti-enumeración. | 🟠 Media | ✅ Done |
 | 7 | Router autenticado `/v1/donations/*` | Listado scoped (dirigidas a mi centro / recibidas por mi centro; `national_admin` ve todo), detalle por `code`, `receive`. | 🟠 Media | ✅ Done |
-| 8 | Fotos en R2 | upload-url → confirm (patrón `messaging`), allowlist JPEG/PNG/WebP, 5 MB, máx 5 por donación. Subida pública exige `REGISTERED` + token de gestión; lectura con URL firmada corta. | 🟠 Media | ⬜ |
+| 8 | Fotos en R2 | upload-url → confirm desde el enlace de gestión (patrón `messaging`): solo JPEG/PNG/WebP, 5 MB, máx 5 por donación, y solo mientras la donación siga en `REGISTERED`. La llave la arma el servidor con el id de la donación — el nombre del archivo del cliente nunca la toca — y confirmar solo vale dentro de esa carpeta. Lectura con URL firmada de vida corta, para el donante y para el centro que va a recibir; la ficha pública del QR **no** las expone. Se borran del almacenamiento al quitarlas, al cancelar y al vencer. | 🟠 Media | ✅ Done |
 | 9 | QR `DN-` | `donation_qr_png` en `app/utils/qr.py` → `/d/{code}`. | 🟢 Baja | ✅ Done |
 | 9b | Campañas públicas | `GET /v1/campaigns/public` (solo `is_active AND is_public`, sin auth, rate-limited, cacheable). Toggle "mostrar en la página pública" en el gestor de campañas (crear + editar). Índice público `/eventos` que lista esas campañas y enlaza las fichas `/eventos/[slug]` existentes (i18n ES/EN); `[slug]` responde 404 para campañas no públicas. | 🟠 Media | ✅ Done |
 | 10 | Emails (3 plantillas) | Confirmación de email, QR + enlace de gestión, resumen de recepción. Marca de Fase 16; envío via ARQ. | 🟠 Media | ✅ Done |
@@ -56,7 +56,7 @@
 | # | Tarea | Descripción | Complejidad | Estado |
 |---|-------|-------------|-------------|--------|
 | 12 | `/donar` | Formulario: datos, selector de centros activos, campaña opcional (de `/v1/campaigns/public`; sin elegir → Donaciones Generales), renglones con autocompletado de catálogo + texto libre, fotos, Turnstile. i18n ES/EN. | 🔴 Alta | ✅ Done |
-| 13 | Confirmación + gestión | Página de "revisa tu correo", `/donacion/[token]` (editar renglones/fotos/cancelar en `REGISTERED`; solo lectura después), reenvío de enlace. | 🟠 Media | ✅ Done |
+| 13 | Confirmación + gestión | Página de "revisa tu correo", `/donacion/[token]` (editar renglones, fotos y cancelar en `REGISTERED`; solo lectura después) y reenvío del enlace. **La página de gestión faltaba**: se dio por hecha, pero el enlace del correo de confirmación respondía 404 en producción hasta la task 8. | 🟠 Media | ✅ Done |
 | 14 | Ficha pública `/d/[code]` | Estado + resumen de renglones, sin PII, cacheable. Estilo de `/b/[code]`. | 🟢 Baja | ✅ Done |
 
 ### Frontend — centro (dashboard)

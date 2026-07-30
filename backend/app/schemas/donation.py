@@ -85,6 +85,35 @@ class DonationItemOut(StrictORMModel):
     reception_status: str | None
 
 
+class DonationPhotoOut(StrictORMModel):
+    """Lo que el cliente necesita para pintar la galería.
+
+    Sin `storage_key`: la llave del almacenamiento es un detalle del servidor y
+    publicarla invitaría a construir rutas a mano.
+    """
+
+    id: UUID
+    content_type: str
+    size_bytes: int
+    created_at: datetime
+
+
+class PhotoUploadUrlOut(StrictModel):
+    upload_url: str
+    storage_key: str
+
+
+class PhotoUploadUrlIn(StrictModel):
+    content_type: str
+    size_bytes: int
+
+
+class PhotoConfirmIn(StrictModel):
+    storage_key: str
+    content_type: str
+    size_bytes: int
+
+
 class DonationOut(StrictORMModel):
     id: UUID
     code: str
@@ -96,6 +125,7 @@ class DonationOut(StrictORMModel):
     created_at: datetime
     registered_at: datetime | None
     items: list[DonationItemOut] = []
+    photos: list[DonationPhotoOut] = []
 
 
 class DonationPublicOut(StrictORMModel):

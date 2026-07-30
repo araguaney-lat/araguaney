@@ -62,13 +62,17 @@ def generate_upload_url(r2_key: str, content_type: str, size_bytes: int) -> str:
     )
 
 
-def generate_download_url(r2_key: str) -> str:
-    """Generate a presigned GET URL."""
+def generate_download_url(r2_key: str, expires_in: int = DOWNLOAD_URL_TTL) -> str:
+    """Generate a presigned GET URL.
+
+    ``expires_in`` lets a caller ask for a shorter life than the default: a URL
+    handed to a public page should not live as long as one behind a session.
+    """
     client = _client()
     return client.generate_presigned_url(
         "get_object",
         Params={"Bucket": settings.r2_bucket_name, "Key": r2_key},
-        ExpiresIn=DOWNLOAD_URL_TTL,
+        ExpiresIn=expires_in,
     )
 
 

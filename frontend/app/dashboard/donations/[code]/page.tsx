@@ -17,11 +17,16 @@ interface Item {
   reception_status: string | null
 }
 
+interface Photo {
+  id: string
+}
+
 interface Donation {
   id: string
   code: string
   status: string
   items: Item[]
+  photos: Photo[]
 }
 
 /** Estados de excepción. Lo recibido es el default y no se marca. */
@@ -61,6 +66,18 @@ export default function ReceiveDonationPage({
       else next[itemId] = estado
       return next
     })
+
+  // La URL es firmada y de vida corta: se pide al abrirla, no al pintar la lista.
+  async function verFoto(photoId: string) {
+    try {
+      const res = await apiFetch<{ url: string }>(
+        `/v1/donations/${donation!.code}/photos/${photoId}/url`, { token }
+      )
+      window.open(res.url, "_blank", "noopener,noreferrer")
+    } catch {
+      setError(dict.dashboard.common.error_unknown)
+    }
+  }
 
   async function confirm() {
     if (!donation) return
@@ -142,6 +159,24 @@ export default function ReceiveDonationPage({
           </li>
         ))}
       </ul>
+
+      {(donation.photos?.length ?? 0) > 0 && (
+        <div>
+          <p className="text-xs font-semibold text-mut">{t.photos_title}</p>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {donation.photos.map((p, i) => (
+              <button
+                key={p.id}
+                type="button"
+                onClick={() => verFoto(p.id)}
+                className="rounded-lg border border-cardB bg-card px-3 py-2 text-xs text-tx hover:bg-card2"
+              >
+                {t.photo_n.replace("{n}", String(i + 1))}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {!recibida && (
         <>
