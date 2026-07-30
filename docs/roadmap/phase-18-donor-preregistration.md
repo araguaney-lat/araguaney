@@ -49,7 +49,7 @@
 | 9 | QR `DN-` | `donation_qr_png` en `app/utils/qr.py` → `/d/{code}`. | 🟢 Baja | ✅ Done |
 | 9b | Campañas públicas | `GET /v1/campaigns/public` (solo `is_active AND is_public`, sin auth, rate-limited, cacheable). Toggle "mostrar en la página pública" en el gestor de campañas (crear + editar). Índice público `/eventos` que lista esas campañas y enlaza las fichas `/eventos/[slug]` existentes (i18n ES/EN); `[slug]` responde 404 para campañas no públicas. | 🟠 Media | ✅ Done |
 | 10 | Emails (3 plantillas) | Confirmación de email, QR + enlace de gestión, resumen de recepción. Marca de Fase 16; envío via ARQ. | 🟠 Media | ✅ Done |
-| 11 | Purga y expiración | Job ARQ: `PENDING_EMAIL` > 7 días → `EXPIRED` + purga de PII del donante sin otras donaciones; tokens de gestión vencidos. Documentar en la tabla de retención. | 🟠 Media | ⬜ |
+| 11 | Purga y expiración | Job ARQ `purge_donations_cron` (diario 05:00 UTC): `PENDING_EMAIL` pasado el plazo → `EXPIRED` + purga de PII del donante de autoservicio sin otra donación viva o entregada; enlaces de gestión vencidos borrados de la base. Plazo por `DONATION_PENDING_RETENTION_DAYS` (default 7), documentado en `.env.example` y declarado en el aviso de privacidad ES/EN. | 🟠 Media | ✅ Done |
 
 ### Frontend — donante (público)
 
@@ -71,9 +71,10 @@
 
 | # | Tarea | Descripción | Complejidad | Estado |
 |---|-------|-------------|-------------|--------|
-| 18 | Tests | Ciclo de estados + eventos, tokens (single-use, expiración, rotación, hash-only), anti-enumeración, aislamiento tenant en `tests/tenant/`, conversión renglones → intake, purga. | 🔴 Alta | ⬜ |
+| 18 | Tests | Ciclo de estados + eventos, tokens (single-use, expiración, hash-only), anti-enumeración, aislamiento tenant en `tests/tenant/test_isolation_donations.py`, vínculo renglones → intake y purga (`tests/test_donation_purge.py`, contra SQLite real). La rotación de token queda fuera hasta que exista el reenvío (task 22). | 🔴 Alta | ✅ Done |
 | 19 | Seguridad de cierre | Pasada final: rate limits en todos los endpoints nuevos, cache headers de la ficha, revisión con `security-reviewer`. | 🟠 Media | ⬜ |
 | 20 | Legal | Aviso de privacidad (nueva categoría: donante), tabla de retención, `CLAUDE.md` (reversión explícita del NO-objetivo #4 y nueva sección pública `/donar`). | 🟠 Media | ⬜ |
+| 22 | Reenvío del enlace de confirmación | `POST /v1/public/donations/resend`: rota el token (el enlace anterior muere), reenvía el correo y responde 202 exista o no ese correo, para no volver al endpoint un verificador de direcciones. Turnstile en la acción de Next + límite estricto en el backend. Botón en la pantalla de "revisa tu correo" (ES/EN). Migración `033`: `donations.confirmation_sent_at`, el reloj que la purga usa en vez de `created_at`, para que pedirlo el último día sirva de algo. | 🟠 Media | ✅ Done |
 | 21 | (Opcional) Email "salió en envío" | Propagar `SHIPPED` de las cajas del intake ligado → email al donante. Solo si el MVP aterriza bien. | 🟠 Media | ⬜ |
 
 ---

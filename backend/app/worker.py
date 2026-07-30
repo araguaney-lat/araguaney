@@ -219,6 +219,17 @@ async def purge_audit_logs_cron(ctx) -> None:
     logger.info("Audit log purge: deleted %d rows older than %s days", deleted, retention_days)
 
 
+async def purge_donations_cron(ctx) -> None:
+    from app.database import SessionLocal
+    from app.services.donation_purge_service import DonationPurgeService
+    with SessionLocal() as db:
+        r = DonationPurgeService.purge(db)
+    logger.info(
+        "Donation purge: %d expired, %d donors stripped of PII, %d stale manage links cleared",
+        r["vencidas"], r["donantes_purgados"], r["enlaces_vencidos"],
+    )
+
+
 async def purge_email_failures_cron(ctx) -> None:
     from app.database import SessionLocal
     from app.repositories.email_failure_repository import EmailFailureRepository
@@ -338,6 +349,7 @@ class WorkerSettings:
         cron(purge_audit_logs_cron, hour=3, minute=0),
         cron(purge_attachments_cron, hour=4, minute=0),
         cron(purge_email_failures_cron, hour=4, minute=30),
+        cron(purge_donations_cron, hour=5, minute=0),
         # Export jobs expire 1h after DONE (see ExportJobRepository.DOWNLOAD_TTL_SECONDS) —
         # runs hourly, not daily like the other purges, to keep R2/db lean on that timescale.
         cron(purge_export_jobs_cron, minute=15),

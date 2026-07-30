@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import Turnstile from "react-turnstile"
 
-import { submitDonation } from "@/lib/donation-actions"
+import { resendDonationConfirmation, submitDonation } from "@/lib/donation-actions"
 
 export interface DonationFormLabels {
   firstName: string
@@ -29,6 +29,10 @@ export interface DonationFormLabels {
   submitting: string
   successTitle: string
   successBody: string
+  resendPrompt: string
+  resend: string
+  resending: string
+  resendDone: string
   turnstileError: string
   requiredError: string
 }
@@ -73,6 +77,10 @@ export default function DonationForm({
   const [sending, setSending] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [done, setDone] = useState(false)
+  // El token de Turnstile es de un solo uso: el reenvío necesita el suyo.
+  const [resendToken, setResendToken] = useState("")
+  const [resending, setResending] = useState(false)
+  const [resent, setResent] = useState(false)
 
   // Catálogos públicos: sin datos de contacto de los centros ni campañas internas.
   useEffect(() => {
@@ -131,11 +139,53 @@ export default function DonationForm({
     }
   }
 
+  async function handleResend() {
+    setResending(true)
+    setError(null)
+    const result = await resendDonationConfirmation({
+      locale, turnstileToken: resendToken, email: form.email,
+    })
+    setResending(false)
+    if (result.ok) {
+      setResent(true)
+    } else {
+      setError(result.error)
+      setResendToken("")
+      setTurnstileKey((k) => k + 1)
+    }
+  }
+
   if (done) {
     return (
       <div className="rounded-2xl border border-zinc-200 bg-white p-8 text-center">
         <p className="text-lg font-semibold text-zinc-900">{t.successTitle}</p>
         <p className="mt-2 text-sm text-zinc-600">{t.successBody}</p>
+
+        {/* El correo se pierde: sin esta salida, quien no lo recibe se queda
+            sin donación cuando la purga vence su registro. */}
+        <div className="mt-6 border-t border-zinc-100 pt-6">
+          {resent ? (
+            <p className="text-sm text-zinc-600">{t.resendDone}</p>
+          ) : (
+            <>
+              <p className="text-xs text-zinc-500">{t.resendPrompt}</p>
+              {sitekey && (
+                <div className="mt-3 flex justify-center">
+                  <Turnstile key={turnstileKey} sitekey={sitekey} onVerify={setResendToken} theme="light" />
+                </div>
+              )}
+              <button
+                type="button"
+                onClick={handleResend}
+                disabled={resending || !resendToken}
+                className="mt-3 text-sm text-amber-700 hover:underline disabled:opacity-50 disabled:no-underline"
+              >
+                {resending ? t.resending : t.resend}
+              </button>
+              {error && <p className="mt-2 text-sm text-red-700">{error}</p>}
+            </>
+          )}
+        </div>
       </div>
     )
   }

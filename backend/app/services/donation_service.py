@@ -60,6 +60,7 @@ class DonationService(BaseService):
             intended_campaign_id=data.intended_campaign_id,
             status="PENDING_EMAIL",
             notes=data.notes,
+            confirmation_sent_at=datetime.now(timezone.utc),
         )
         donation.donor = donor
         donation.items = [
@@ -117,6 +118,38 @@ class DonationService(BaseService):
             raw_manage,
         )
         return donation
+
+    def resend(self, email: str, background_tasks: BackgroundTasks) -> None:
+        """Reenvía la confirmación rotando el token: el enlace anterior muere.
+
+        Un correo desconocido no levanta error y no manda nada. Responder
+        distinto convertiría al formulario en un verificador de correos: bastaría
+        probar direcciones para saber cuáles tienen una donación en curso.
+        """
+        repo = DonationRepository(self.db)
+        donation = repo.find_pending_by_email(email)
+        if donation is None:
+            return
+
+        raw_token = secrets.token_urlsafe(32)
+        donation.donor.email_verify_token_hash = _hash_token(raw_token)
+        # Reinicia el reloj de la purga: pedirlo el último día tiene que servir.
+        donation.confirmation_sent_at = datetime.now(timezone.utc)
+        repo.log_event(
+            donation,
+            from_status="PENDING_EMAIL",
+            to_status="PENDING_EMAIL",
+            note="Reenvío del correo de confirmación",
+        )
+        repo.commit()
+
+        enqueue(
+            background_tasks,
+            "send_donation_confirmation_email_task",
+            donation.donor.email,
+            donation.donor.first_name,
+            raw_token,
+        )
 
     def get_by_manage_token(self, token: str) -> Donation:
         """Resuelve el enlace de gestión. Vencido o inexistente responden igual."""

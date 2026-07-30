@@ -34,6 +34,16 @@ class DonationRepository(BaseRepository):
             .limit(1)
         ).first() is not None
 
+    def find_pending_by_email(self, email: str) -> Donation | None:
+        """La donación sin confirmar de este correo. La más reciente, si hay varias."""
+        return self.db.execute(
+            select(Donation)
+            .join(Donor, Donor.id == Donation.donor_id)
+            .where(Donor.email == email, Donation.status == "PENDING_EMAIL")
+            .order_by(Donation.created_at.desc())
+            .limit(1)
+        ).scalars().first()
+
     def find_by_verify_token_hash(self, token_hash: str) -> Donation | None:
         return self.db.execute(
             select(Donation)
