@@ -4,7 +4,8 @@
 > App web multi-centro y gratuita: registra donaciones **en especie** por ítem, las empaca en
 > **cajas homogéneas** con QR, las consolida en **tarimas** y **envíos** con manifiesto
 > exportable, y agrega el stock de todos los centros en un **panel nacional** en tiempo real.
-> Sin datos personales de donantes ni beneficiarios — solo inventario, trazable de la caja al envío.
+> Sin datos de beneficiarios y con la donación anónima como norma: del donante solo se guarda lo que decide dar,
+> con plazo de conservación declarado y purga automática.
 
 **El flujo:** `Intake` (recepción) → `Box` (caja homogénea + QR) → `Pallet` (tarima) → `Shipment`
 (envío + manifiesto) → panel nacional agregado.
@@ -45,7 +46,7 @@ Multi-tenant "pool / row-level": **un solo deploy, una sola DB, `center_id` disc
 |---|---|
 | `Center` | El tenant (centro de acopio) |
 | `ProductType` | El SKU — categoría + atributos (p. ej. `strength`) |
-| `Intake` | Recepción de una donación (`donante_libre` opcional, sin PII) |
+| `Intake` | Recepción de una donación (donante opcional; anónimo por default) |
 | `Box` | Caja **homogénea**: 1 `product_type` + 1 lote + 1 caducidad · QR propio |
 | `Pallet` | Tarima (mixta) que agrupa cajas selladas · QR propio |
 | `Shipment` | Envío que agrupa tarimas · genera el manifiesto/packing list |

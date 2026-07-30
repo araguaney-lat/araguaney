@@ -85,7 +85,7 @@ const CONTENT: Record<Locale, Content> = {
     h1: "Que cada donación llegue ordenada",
     heroP:
       "Araguaney le da a los centros de acopio un mismo estándar para recibir donaciones en especie, empacarlas con control de calidad y prepararlas para enviar, con trazabilidad de la caja al envío y un panel que suma el stock de todos los centros.",
-    heroPills: ["Gratis para centros de acopio", "Para cualquier emergencia", "Sin datos personales"],
+    heroPills: ["Gratis para centros de acopio", "Para cualquier emergencia", "Sin datos de beneficiarios"],
     flow: {
       eyebrow: "El flujo",
       h2: "Del acopio al envío, en cinco pasos",
@@ -160,7 +160,7 @@ const CONTENT: Record<Locale, Content> = {
     h1: "That every donation arrives in order",
     heroP:
       "Araguaney gives collection centers a single standard to receive in-kind donations, pack them with quality control, and prepare them for shipping, with traceability from box to shipment and a dashboard that adds up the stock of every center.",
-    heroPills: ["Free for collection centers", "For any emergency", "No personal data"],
+    heroPills: ["Free for collection centers", "For any emergency", "No recipient data"],
     flow: {
       eyebrow: "The flow",
       h2: "From collection to shipping, in five steps",

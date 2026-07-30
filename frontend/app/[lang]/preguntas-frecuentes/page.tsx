@@ -83,7 +83,7 @@ const CONTENT: Record<Locale, Content> = {
       {
         title: "Privacidad y datos",
         faqs: [
-          { q: "¿Araguaney guarda datos personales de donantes o beneficiarios?", a: "No. Araguaney solo gestiona inventario, trazable de la caja al envío. No se registran datos personales de donantes ni de beneficiarios." },
+          { q: "¿Araguaney guarda datos personales de donantes o beneficiarios?", a: "De personas beneficiarias no se guarda absolutamente nada. De quien dona depende de cómo llegue: en el mostrador la donación es anónima por default y solo se registran datos si la persona lo pide — es una casilla opcional que viene desmarcada. Registrar la donación en línea sí pide nombre y correo, porque el código QR y el enlace para modificarla o cancelarla llegan por ahí; sin correo no habría a dónde mandarlos. Un pre-registro que nadie confirma se elimina, y los plazos están en el aviso de privacidad." },
           { q: "¿Araguaney gestiona dinero o donativos económicos?", a: "No. Araguaney gestiona únicamente donaciones en especie e inventario; no maneja dinero ni donativos económicos." },
         ],
       },
@@ -141,7 +141,7 @@ const CONTENT: Record<Locale, Content> = {
       {
         title: "Privacy and data",
         faqs: [
-          { q: "Does Araguaney store personal data of donors or beneficiaries?", a: "No. Araguaney only manages inventory, traceable from box to shipment. No personal data of donors or beneficiaries is stored." },
+          { q: "Does Araguaney store personal data of donors or beneficiaries?", a: "Nothing at all is stored about aid recipients. For donors it depends on how they arrive: at the counter the donation is anonymous by default and details are only recorded if the person asks — it is an optional checkbox, unticked. Registering a donation online does require a name and email, because the QR code and the link to change or cancel it are sent there; without an email there would be nowhere to send them. A pre-registration nobody confirms is deleted, and the retention periods are in the privacy notice." },
           { q: "Does Araguaney handle money or financial donations?", a: "No. Araguaney manages only in-kind donations and inventory; it does not handle money or financial donations." },
         ],
       },

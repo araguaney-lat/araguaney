@@ -48,8 +48,8 @@ existe en el repositorio:
 | 3 | Propiedad clara | ✅ | Repo en la organización `araguaney-lat`; fundador identificado en `/nosotros` con perfil público |
 | 4 | Independencia de plataforma | ✅ | `backend/Dockerfile`, `frontend/Dockerfile` y `docker-compose.yml`. Stack sin dependencias propietarias obligatorias: FastAPI + Postgres + Next.js. Vercel y Railway son conveniencia, no requisito |
 | 5 | Documentación | ✅ | `README.md`, `CLAUDE.md` (dominio y reglas), `CONTRIBUTING.md` (setup reproducible sin servicios externos), `docs/` |
-| 6 | Extracción de datos no-PII | ✅ | **Nuestro punto más fuerte**: el sistema no almacena PII de donantes ni beneficiarios por diseño. Exportes de manifiesto en PDF/Excel |
-| 7 | Privacidad y leyes aplicables | ✅ | Aviso de privacidad y términos publicados; alineado con LFPDPPP (MX) por ausencia de datos personales |
+| 6 | Extracción de datos no-PII | ✅ | De personas beneficiarias no existe ni un dato. Los exportes (manifiesto PDF/XLSX, reportes CSV) llevan inventario, nunca datos del donante, y la ficha pública del QR muestra estado y contenido, nunca quién donó |
+| 7 | Privacidad y leyes aplicables | ✅ | Aviso de privacidad y términos publicados, con categoría propia para quien dona; plazos de conservación declarados; purga automática de lo no confirmado; borrado autoservicio; derechos ARCO con contacto público. Alineado con LFPDPPP (MX) **por régimen**, ya no por ausencia de datos |
 | 8 | Estándares abiertos y buenas prácticas | ✅ | WHO Guidelines for Medicine Donations, catálogo IFRC/ICRC, IOM ERIC, UNSPSC, GS1, documentados en `/nosotros` |
 | 9A | Privacidad y seguridad de datos | ✅ | `SECURITY.md` con canal privado, `docs/security.md` con las capas, suite de aislamiento multi-tenant en CI, secret scanning + push protection |
 | 9B | Contenido inapropiado / ilegal | ✅ | No hay contenido generado por usuarios público. La mensajería es interna entre operadores autenticados |
@@ -335,6 +335,17 @@ independiente**.
 ## Estado
 
 **Postulación al DPG Registry enviada el 2026-07-27.** Estado: *under review*.
+
+> **Actualización 2026-07-30 — la postulación quedó desfasada y hay que avisar.**
+> Entre el envío y hoy salieron el pre-registro de donaciones (Fase 18) y la
+> identidad estructurada del donante (Fase 19), así que la frase enviada —"no
+> almacena datos personales de donantes"— dejó de ser cierta. No invalida nada:
+> una entrada del registro se mantiene viva y el proyecto puede evolucionar. Lo
+> que no puede quedarse es una afirmación falsa en una solicitud en revisión.
+> Corregido en el sitio público, el README y `dpg-nominee-araguaney.json`
+> (campo `privacy_note` con la justificación nueva de los indicadores 6, 7 y 9).
+> **Pendiente: avisar a la DPG Alliance** (`hello@digitalpublicgoods.net`) o
+> editar la solicitud en el portal si lo permite estando en revisión.
 La revisión es manual y el objetivo declarado por la DPG Alliance es de 30 días,
 variable según el volumen de solicitudes. Si piden aclaraciones, llegan por el
 portal.

@@ -1,7 +1,7 @@
 {
-  "_comment": "Respuestas para la postulacion al DPG Registry. El repositorio publicgoods-candidates fue archivado en 2024; este archivo ya no se sube; es la fuente desde la que se copian los datos al portal https://app.digitalpublicgoods.net/signup. Estructura conservada del esquema oficial por claridad.",
+  "_comment": "Respuestas para la postulacion al DPG Registry. El repositorio publicgoods-candidates fue archivado en 2024; este archivo ya no se sube; es la fuente desde la que se copian los datos al portal https://app.digitalpublicgoods.net/signup. Estructura conservada del esquema oficial por claridad. ACTUALIZADO 2026-07-30: la descripcion decia que no se almacenan datos personales de donantes, y dejo de ser cierto al enviarse el pre-registro en linea de donaciones. Ver 'privacy_note' abajo.",
   "name": "Araguaney",
-  "description": "Free and open-source software for humanitarian aid collection centers. It registers in-kind donations item by item with quality rules (WHO medicine donation guidelines), packs them into homogeneous boxes with QR codes, consolidates them into pallets and shipments with a customs-ready manifest, and aggregates the stock of every connected center into a national dashboard. It stores no personal data of donors or beneficiaries.",
+  "description": "Free and open-source software for humanitarian aid collection centers. It registers in-kind donations item by item with quality rules (WHO medicine donation guidelines), packs them into homogeneous boxes with QR codes, consolidates them into pallets and shipments with a customs-ready manifest, and aggregates the stock of every connected center into a national dashboard. It stores no data whatsoever about aid recipients. At the collection center a donation is anonymous by default — recording the donor is an optional checkbox someone has to tick on purpose — while registering a donation online does require a name and email, because that is where the QR code and the link to modify or cancel it are sent. Donor data is covered by a published privacy notice with declared retention periods, automatic purge of unconfirmed records and self-service deletion.",
   "website": "https://www.araguaney.lat",
   "license": [
     {
@@ -40,5 +40,17 @@
       "contact_email": "security@araguaney.lat"
     }
   ],
-  "stage": "nominee"
+  "stage": "nominee",
+  "privacy_note": {
+    "changed_on": "2026-07-30",
+    "why": "Between the submission (2026-07-27) and this update, the platform shipped donor pre-registration: a person can register what they plan to donate before dropping it off, receive a QR code, and edit or cancel it. That path requires a name and an email — there would be nowhere to send the code otherwise — so the earlier claim of storing no donor personal data no longer holds. In-person intake is unchanged: anonymous by default, with donor details behind an optional checkbox.",
+    "indicator_6_data_extraction": "Unchanged for aid recipients: none of their data exists in the system. Exports (manifest PDF/XLSX, reports CSV) contain inventory, not personal data. Donor data is never part of an export and never appears on a public page — the QR page of a donation shows its status and contents, never who sent it.",
+    "indicator_7_privacy_and_laws": "Compliance now rests on a regime rather than on absence of data: privacy notice (ES/EN) with a dedicated donor category stating what is collected, why and whether it is required; declared retention periods per data type; an automatic purge job that expires unconfirmed pre-registrations and strips the donor's personal data when no live or delivered donation justifies keeping it; self-service account deletion for platform users; and ARCO rights with a published contact. Aligned with Mexico's LFPDPPP.",
+    "indicator_9_do_no_harm": "Strengthened: in-kind donation is a known trade-based money-laundering channel, so the platform added an irrevocable-transfer acceptance recorded with its version, structural controls (a donor cannot designate the consignee nor trace goods to destination, and pallets are mixed by design), an escalation queue for unusual-volume captures resolved by coordination and never by whoever captured it, and a published red-flag guide for coordinators. Scope is deliberately proportionate per FATF R.8: recording and escalation, no sanctions screening or documentary identity verification.",
+    "evidence": [
+      "https://www.araguaney.lat/aviso-de-privacidad",
+      "https://github.com/araguaney-lat/araguaney/blob/main/docs/security.md",
+      "https://github.com/araguaney-lat/araguaney/blob/main/backend/app/services/donation_purge_service.py"
+    ]
+  }
 }

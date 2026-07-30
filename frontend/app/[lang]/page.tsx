@@ -59,7 +59,7 @@ const HOME_FAQ = [
   },
   {
     q: "¿Registra datos personales de donantes o beneficiarios?",
-    a: "No. Solo gestiona inventario, trazable de la caja al envío. No guarda datos personales de donantes ni beneficiarios.",
+    a: "De beneficiarios, ninguno. En el centro la donación es anónima salvo que la persona pida registrarse: hay una casilla opcional que despliega los datos, y viene desmarcada. En línea sí hace falta un correo, porque ahí es donde llega el código QR y el enlace para modificar o cancelar la donación. Esos datos tienen plazo declarado y se purgan solos.",
   },
 ]
 

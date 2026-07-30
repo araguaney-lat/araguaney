@@ -5,9 +5,9 @@ import type { LegalDoc } from "./types"
 
 export const termsEn: LegalDoc = {
   title: "Terms and Conditions",
-  version: "1.0",
-  updatedISO: "2026-07-02",
-  updatedLabel: "July 2, 2026",
+  version: "1.2",
+  updatedISO: "2026-07-30",
+  updatedLabel: "July 30, 2026",
   versionLabel: "Version",
   updatedPrefix: "Last updated:",
   intro:
@@ -47,7 +47,7 @@ export const termsEn: LegalDoc = {
           list: [
             "Use it solely for legitimate humanitarian aid coordination purposes.",
             "Register truthful and accurate information about donations and inventory.",
-            "Not enter personal data of donors or final beneficiaries (the platform is not designed for that).",
+            "Not enter personal data of final beneficiaries (the platform is not designed for that), nor donor data outside the fields provided for it.",
             "Not attempt to breach the platform's security, access other centers' data without authorization, or interfere with its operation.",
             "Not use the platform for unlawful, fraudulent or harmful activities.",
           ],
