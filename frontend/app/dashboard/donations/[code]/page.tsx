@@ -25,6 +25,7 @@ interface Donation {
   id: string
   code: string
   status: string
+  atypical_volume: boolean
   items: Item[]
   photos: Photo[]
 }
@@ -122,6 +123,13 @@ export default function ReceiveDonationPage({
         <h1 className="font-mono text-xl font-bold text-tx">{donation.code}</h1>
         <p className="mt-1 text-sm text-mut">{recibida ? t.already_received : t.subtitle}</p>
       </div>
+
+      {donation.atypical_volume && (
+        <div className="rounded-xl border border-[var(--dDraftB)] bg-[var(--dDraftB)] p-4">
+          <p className="text-sm font-semibold text-[var(--dDraftT)]">{t.atypical_title}</p>
+          <p className="mt-1 text-xs text-[var(--dDraftT)]">{t.atypical_body}</p>
+        </div>
+      )}
 
       <ul className="divide-y divide-line rounded-xl border border-cardB bg-card">
         {donation.items.map((item) => (

@@ -25,6 +25,8 @@ export interface DonationFormLabels {
   addItem: string
   removeItem: string
   notes: string
+  termsLabel: string
+  termsError: string
   submit: string
   submitting: string
   successTitle: string
@@ -72,6 +74,7 @@ export default function DonationForm({
     intended_center_id: "", intended_campaign_id: "", notes: "",
   })
   const [rows, setRows] = useState<Row[]>([emptyRow()])
+  const [terms, setTerms] = useState(false)
   const [token, setToken] = useState("")
   const [turnstileKey, setTurnstileKey] = useState(0)
   const [sending, setSending] = useState(false)
@@ -110,6 +113,10 @@ export default function DonationForm({
       setError(t.requiredError)
       return
     }
+    if (!terms) {
+      setError(t.termsError)
+      return
+    }
     if (!token) {
       setError(t.turnstileError)
       return
@@ -127,6 +134,7 @@ export default function DonationForm({
       intended_campaign_id: form.intended_campaign_id || undefined,
       items,
       notes: form.notes || undefined,
+      terms_accepted: true,
     })
     setSending(false)
 
@@ -301,6 +309,21 @@ export default function DonationForm({
         <label className={label}>{t.notes}</label>
         <textarea className={input} rows={2} value={form.notes} onChange={set("notes")} />
       </div>
+
+      {/* Fase 20: la donación es una transferencia irrevocable. Se acepta antes
+          de registrar, y queda guardado qué versión se aceptó. */}
+      <label className="flex items-start gap-3 rounded-xl border border-zinc-200 bg-zinc-50 p-4 text-sm text-zinc-700">
+        <input
+          type="checkbox"
+          checked={terms}
+          onChange={(e) => setTerms(e.target.checked)}
+          className="mt-0.5 h-4 w-4 shrink-0"
+        />
+        {/* Sin enlace al documento completo todavía: los Términos de Donación
+            no se publican hasta que un abogado los revise (Fase 20, task 7).
+            Mientras tanto, lo que se acepta es exactamente lo que dice aquí. */}
+        <span>{t.termsLabel}</span>
+      </label>
 
       {sitekey && (
         <Turnstile key={turnstileKey} sitekey={sitekey} onVerify={setToken} theme="light" />

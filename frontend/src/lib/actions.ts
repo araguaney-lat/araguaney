@@ -335,6 +335,8 @@ export interface CreateIntakePayload {
   center_id?: string
   // Pre-registro que originó la captura: cierra el circuito donante → cajas.
   donation_id?: string
+  // Aceptación de los Términos de Donación por el donante identificado (Fase 20).
+  donor_terms_accepted?: boolean
 }
 
 export async function createIntakeAction(payload: CreateIntakePayload) {

@@ -26,6 +26,9 @@ class IntakeCreate(StrictModel):
     # Donación pre-registrada de la que sale este intake (Fase 18). Al crearlo
     # se liga en ambos sentidos: trazabilidad donante → cajas → tarima → envío.
     donation_id: StrictUUID | None = None
+    # Fase 20: aceptación de los Términos de Donación por el donante identificado.
+    # La persona moral acepta siempre; la física, si se registra.
+    donor_terms_accepted: bool = False
     # Legado: se conserva para no romper clientes viejos, pero la captura nueva
     # usa `donor`. El texto libre historico sigue visible en el detalle.
     donante_libre: str | None = None

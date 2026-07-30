@@ -766,7 +766,9 @@
         "hint_moral": "Organizations require legal name, who delivers, email and phone.",
         "matches_title": "Already registered at this center:"
       },
-      "from_donation": "Capture originated from donation {code}."
+      "from_donation": "Capture originated from donation {code}.",
+      "donor_terms": "The donor accepts the Donation Terms: the donation is irrevocable, without consideration, and carries no right to designate who receives the goods.",
+      "error_donor_terms": "A legal entity must accept the Donation Terms."
     },
     "campaign_members": {
       "back": "← Campaigns",
@@ -892,7 +894,9 @@
         "REJECTED": "Not accepted"
       },
       "photos_title": "Photos sent by the donor",
-      "photo_n": "Photo {n}"
+      "photo_n": "Photo {n}",
+      "atypical_title": "Unusual volume",
+      "atypical_body": "This donation exceeds what an individual usually brings. Nothing is wrong with that, but do the double check with the red-flag guide at hand and escalate to national coordination if something does not add up."
     }
   },
   "studio": {

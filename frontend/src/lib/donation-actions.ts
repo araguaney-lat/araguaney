@@ -67,6 +67,8 @@ const submitSchema = z.object({
   intended_campaign_id: z.string().uuid().optional(),
   items: z.array(itemSchema).min(1).max(50),
   notes: z.string().trim().max(500).optional(),
+  // Fase 20: el backend lo exige; aquí se refleja para fallar antes y claro.
+  terms_accepted: z.literal(true),
 })
 
 function localeOf(input: unknown): string {
@@ -103,6 +105,7 @@ export async function submitDonation(input: unknown): Promise<DonationResult> {
         intended_campaign_id: fields.intended_campaign_id,
         items: fields.items,
         notes: fields.notes || undefined,
+        terms_accepted: true,
       }),
     })
     return { ok: true }

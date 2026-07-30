@@ -1,6 +1,6 @@
 import uuid
 
-from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Text
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, Text, text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
@@ -51,6 +51,14 @@ class Donation(Base):
     )
 
     notes = Column(Text, nullable=True)
+
+    # Términos de Donación en Especie que la persona aceptó al registrar (Fase 20).
+    terms_version = Column(String, nullable=True)
+    terms_accepted_at = Column(DateTime(timezone=True), nullable=True)
+    # Marca, no bloqueo: el donante ya viene identificado. Le dice al centro que
+    # haga el doble check con la guía de banderas rojas a la mano.
+    atypical_volume = Column(Boolean, nullable=False, server_default=text("false"))
+
     created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
     # Último envío del correo de confirmación. La purga mide desde aquí, no desde
     # `created_at`: pedir el correo de nuevo tiene que dar tiempo de confirmarlo.

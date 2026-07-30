@@ -6,6 +6,7 @@ from app.models.box import Box
 from app.models.events import BoxEvent
 from app.models.intake import Intake
 from app.repositories.campaign_repository import CampaignRepository
+from app.legal import CURRENT_DONATION_TERMS_VERSION
 from app.repositories.donor_repository import DonorRepository
 from app.repositories.intake_repository import IntakeRepository
 from app.repositories.product_type_repository import ProductTypeRepository
@@ -16,6 +17,7 @@ from app.services.base import BaseService
 from app.services.validation_service import validate_box
 from app.utils.gtin import normalize as normalize_gtin, validate as validate_gtin
 from app.utils.errors import api_error
+from app.utils.volume import exceeds_volume_threshold
 
 
 def _box_code() -> str:
@@ -71,11 +73,34 @@ class IntakeService(BaseService):
             if candidata is not None and candidata.received_center_id == center_id:
                 donation = candidata
 
+        # Fase 20 — el anonimato se acaba con el volumen. El escrutinio por tipo
+        # de donante tiene una evasión obvia (registrarse como física, o no
+        # registrarse); el umbral la cierra. Es escalamiento, no tope: exige
+        # identificar, no impide donar.
+        if data.donor is None and donation is None and exceeds_volume_threshold(
+            boxes=len(data.boxes),
+            kg=sum(bd.weight_kg or 0 for bd in data.boxes) or None,
+        ):
+            raise api_error(
+                "DONOR_REQUIRED_FOR_VOLUME",
+                "Esta donación supera el volumen que puede quedar anónimo. "
+                "Registra a la persona o empresa donante para continuar.",
+                field="donor",
+            )
+
         # Donante identificado (opcional): sin bloque `donor` la donacion es
         # anonima. Se resuelve antes de crear el intake para que un dato
         # invalido no deje un intake a medias.
         donor = None
         if data.donor is not None:
+            # Quien dona a nombre de una empresa acepta los Términos siempre: es
+            # la parte del control que cierra el "yo dono, yo recibo en destino".
+            if data.donor.donor_type == "moral" and not data.donor_terms_accepted:
+                raise api_error(
+                    "TERMS_NOT_ACCEPTED",
+                    "La persona moral debe aceptar los Términos de Donación",
+                    field="donor_terms_accepted",
+                )
             donor = DonorRepository(self.db).find_or_create(data.donor, center_id)
             self.db.flush()  # asigna el id antes de ligarlo al intake
         elif donation is not None:
@@ -88,6 +113,11 @@ class IntakeService(BaseService):
             campaign_id=campaign_id,
             received_by_user_id=user_id,
             donor_id=donor.id if donor else None,
+            # Solo hay aceptación que registrar si alguien se identificó.
+            donor_terms_version=(
+                CURRENT_DONATION_TERMS_VERSION
+                if donor is not None and data.donor_terms_accepted else None
+            ),
             donante_libre=data.donante_libre,
             notes=data.notes,
         ))

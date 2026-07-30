@@ -766,7 +766,9 @@
         "hint_moral": "Para persona moral pedimos razón social, quien entrega, correo y teléfono.",
         "matches_title": "Ya registrado en este centro:"
       },
-      "from_donation": "Captura originada por la donación {code}."
+      "from_donation": "Captura originada por la donación {code}.",
+      "donor_terms": "La persona donante acepta los Términos de Donación: la donación es irrevocable, sin contraprestación y sin derecho a designar quién recibe en destino.",
+      "error_donor_terms": "Una persona moral debe aceptar los Términos de Donación."
     },
     "campaign_members": {
       "back": "← Campañas",
@@ -892,7 +894,9 @@
         "REJECTED": "No aceptado"
       },
       "photos_title": "Fotos que mandó el donante",
-      "photo_n": "Foto {n}"
+      "photo_n": "Foto {n}",
+      "atypical_title": "Volumen atípico",
+      "atypical_body": "Esta donación supera el volumen habitual de una persona. No hay nada malo en eso, pero haz el doble check con la guía de banderas rojas a la mano y escala a la coordinación nacional si algo no cuadra."
     }
   },
   "studio": {
