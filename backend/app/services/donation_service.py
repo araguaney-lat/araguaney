@@ -1,0 +1,132 @@
+"""Alta y confirmación del pre-registro de donaciones (Fase 18).
+
+Doble opt-in calcado del patrón de solicitudes de centro: el token se genera
+con `secrets`, se guarda **solo hasheado** y es de un solo uso.
+"""
+
+import hashlib
+import secrets
+from datetime import datetime, timedelta, timezone
+
+from fastapi import BackgroundTasks
+
+from app.arq_pool import enqueue
+from app.models.donation import Donation, DonationItem
+from app.repositories.donation_repository import DonationRepository
+from app.repositories.donor_repository import DonorRepository
+from app.schemas.donation import DonationCreate
+from app.services.base import BaseService
+from app.utils.errors import api_error
+
+_MANAGE_TOKEN_DAYS = 30
+
+
+def _hash_token(token: str) -> str:
+    return hashlib.sha256(token.encode()).hexdigest()
+
+
+def _donation_code() -> str:
+    return f"DN-{secrets.token_urlsafe(6).upper()}"
+
+
+class DonationService(BaseService):
+
+    def submit(self, data: DonationCreate, background_tasks: BackgroundTasks) -> Donation:
+        """Registra la donación en estado PENDING_EMAIL y manda la confirmación.
+
+        Nada existe para el centro hasta que el correo se confirma: sin ese paso
+        el formulario público sería un vector de basura.
+        """
+        repo = DonationRepository(self.db)
+
+        if repo.has_open_for_email(data.donor.email):
+            raise api_error(
+                "DUPLICATE_DONATION",
+                "Ya tienes una donación registrada sin entregar. Consulta tu correo.",
+                field="email",
+            )
+
+        donor = DonorRepository(self.db).find_or_create_self(data.donor)
+        self.db.flush()
+
+        raw_token = secrets.token_urlsafe(32)
+        donor.email_verify_token_hash = _hash_token(raw_token)
+
+        donation = Donation(
+            code=_donation_code(),
+            donor_id=donor.id,
+            intended_center_id=data.intended_center_id,
+            intended_campaign_id=data.intended_campaign_id,
+            status="PENDING_EMAIL",
+            notes=data.notes,
+        )
+        donation.donor = donor
+        donation.items = [
+            DonationItem(
+                product_type_id=item.product_type_id,
+                free_text=item.free_text,
+                quantity=item.quantity,
+                unit=item.unit,
+                added_by="donor",
+            )
+            for item in data.items
+        ]
+        repo.save(donation)
+        repo.log_event(donation, to_status="PENDING_EMAIL")
+        repo.commit()
+
+        enqueue(
+            background_tasks,
+            "send_donation_confirmation_email_task",
+            donor.email,
+            donor.first_name,
+            raw_token,
+        )
+        return donation
+
+    def confirm_email(self, token: str, background_tasks: BackgroundTasks) -> Donation:
+        """Confirma el correo, deja la donación REGISTERED y emite el enlace de gestión."""
+        repo = DonationRepository(self.db)
+        donation = repo.find_by_verify_token_hash(_hash_token(token))
+
+        # Misma respuesta para token inexistente, ya usado o donación en otro
+        # estado: no se le confirma nada a quien prueba tokens al azar.
+        if donation is None or donation.status != "PENDING_EMAIL":
+            raise api_error("INVALID_TOKEN", "Enlace inválido o ya utilizado", status_code=404)
+
+        ahora = datetime.now(timezone.utc)
+        donation.donor.email_verify_token_hash = None   # un solo uso
+        donation.donor.email_verified_at = ahora
+
+        raw_manage = secrets.token_urlsafe(32)
+        donation.manage_token_hash = _hash_token(raw_manage)
+        donation.manage_token_expires_at = ahora + timedelta(days=_MANAGE_TOKEN_DAYS)
+
+        donation.status = "REGISTERED"
+        donation.registered_at = ahora
+
+        repo.log_event(donation, from_status="PENDING_EMAIL", to_status="REGISTERED")
+        repo.commit()
+
+        enqueue(
+            background_tasks,
+            "send_donation_registered_email_task",
+            donation.donor.email,
+            donation.code,
+            raw_manage,
+        )
+        return donation
+
+    def get_by_manage_token(self, token: str) -> Donation:
+        """Resuelve el enlace de gestión. Vencido o inexistente responden igual."""
+        donation = DonationRepository(self.db).find_by_manage_token_hash(_hash_token(token))
+        if donation is None:
+            raise api_error("INVALID_TOKEN", "Enlace inválido o vencido", status_code=404)
+
+        expira = donation.manage_token_expires_at
+        if expira is not None and expira.tzinfo is None:
+            expira = expira.replace(tzinfo=timezone.utc)
+        if expira is None or expira <= datetime.now(timezone.utc):
+            raise api_error("INVALID_TOKEN", "Enlace inválido o vencido", status_code=404)
+
+        return donation

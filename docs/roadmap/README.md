@@ -4,8 +4,8 @@
 
 ```mermaid
 pie title Tareas completadas (431 tareas)
-    "Listas" : 344
-    "Pendientes" : 87
+    "Listas" : 347
+    "Pendientes" : 84
 ```
 
 | Fase | Nombre | Listas | Pendientes | Progreso |
@@ -28,17 +28,17 @@ pie title Tareas completadas (431 tareas)
 | 15 | [Deliverability de emails + aviso de solicitudes](phase-15-email-deliverability.md) | 15 | 0 | ✅ 100% |
 | 16 | [Rediseño de plantillas de email con marca](phase-16-email-brand-redesign.md) | 10 | 0 | ✅ 100% |
 | 17 | [AEO/GEO + expansión de keywords](phase-17-aeo-keyword-expansion.md) | 15 | 6 | 🟡 71% |
-| 18 | [Pre-registro de donaciones por el donante](phase-18-donor-preregistration.md) | 0 | 22 | ⬜ 0% |
+| 18 | [Pre-registro de donaciones por el donante](phase-18-donor-preregistration.md) | 3 | 19 | 🟡 14% |
 | 19 | [Identidad estructurada del donante en el intake](phase-19-structured-donor-identity.md) | 9 | 0 | ✅ 100% |
 | 20 | [Prevención de riesgos: responsabilidad y anti-lavado en especie](phase-20-risk-prevention.md) | 0 | 10 | ⬜ 0% |
 | 21 | [Logística: pesaje, anexo Carta Porte y perfiles de paletizado](phase-21-logistics-weighing.md) | 0 | 12 | ⬜ 0% |
 | 22 | [Trazabilidad extendida: avión y destino](phase-22-extended-traceability.md) | 0 | 14 | ⬜ 0% |
 | 23 | [IA asistida: captura, catálogo y necesidades](phase-23-ai-assisted-capture.md) | 0 | 11 | ⬜ 0% |
-| **Total** | | **344** | **87** | **🟡 80%** |
+| **Total** | | **347** | **84** | **🟡 81%** |
 
-> **Pendientes (87):**
+> **Pendientes (84):**
 > El grupo A de la Fase 13 (privacidad, lo que aplica hoy) está completo.
-> - **22 de la Fase 18 (pre-registro de donaciones):** fase nueva, diseño aprobado en
+> - **19 de la Fase 18 (pre-registro de donaciones):** el tramo backend (modelos, repositorios y alta con doble opt-in) está listo; diseño en
 >   [el spec](../superpowers/specs/2026-07-29-donor-preregistration-design.md); aún sin arrancar.
 > - Los borradores legales de las fases 20 y 21 están escritos y esperando revisión profesional
 >   (abogado y fiscalista): [`docs/legal/drafts/`](../legal/drafts/README.md). Sus tareas siguen

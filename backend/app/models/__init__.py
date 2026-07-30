@@ -21,6 +21,7 @@ from app.models import box  # noqa: F401
 from app.models import campaign  # noqa: F401
 from app.models import center  # noqa: F401
 from app.models import center_application  # noqa: F401
+from app.models import donation  # noqa: F401
 from app.models import donor  # noqa: F401
 from app.models import email_failure  # noqa: F401
 from app.models import events  # noqa: F401
