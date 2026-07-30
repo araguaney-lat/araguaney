@@ -55,6 +55,33 @@ class DonorRepository(BaseRepository):
         self.db.add(donor)
         return donor
 
+    def find_or_create_self(self, data: DonorInput) -> Donor:
+        """Donante de autoservicio (Fase 18). Sin centro: el email es su identidad.
+
+        A diferencia del capturado por un centro, aquí el email es obligatorio y
+        único a nivel global, así que la misma persona reutiliza su registro
+        entre donaciones.
+        """
+        existente = self.db.execute(
+            select(Donor).where(Donor.email == data.email, Donor.source == "self")
+        ).scalar_one_or_none()
+        if existente is not None:
+            self._actualizar(existente, data)
+            return existente
+
+        donor = Donor(
+            donor_type=data.donor_type,
+            source="self",
+            center_id=None,
+            first_name=data.first_name,
+            last_name=data.last_name,
+            legal_name=data.legal_name,
+            email=data.email,
+            phone=data.phone,
+        )
+        self.db.add(donor)
+        return donor
+
     def search(self, q: str, center_id: UUID) -> list[Donor]:
         """Autocompletado sobre los donantes del propio centro."""
         q = (q or "").strip()

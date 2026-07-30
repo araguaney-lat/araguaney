@@ -18,6 +18,8 @@ class Campaign(Base):
     end_date = Column(Date, nullable=True)
     is_active = Column(Boolean, nullable=False, server_default="true")
     is_general = Column(Boolean, nullable=False, server_default="false")
+    # Visibilidad publica explicita: hasta ahora bastaba con tener slug.
+    is_public = Column(Boolean, nullable=False, server_default="false")
     weight_goal_kg = Column(Numeric(10, 3), nullable=True)
     created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
     updated_at = Column(DateTime(timezone=True), nullable=True, onupdate=func.now())

@@ -268,3 +268,43 @@ def send_center_application_admin_notice_email(
             review_url=f"{site_url}/dashboard/admin/center-applications",
         ),
     )
+
+
+def send_donation_confirmation_email(to: str, first_name: str, token: str) -> None:
+    """Doble opt-in del pre-registro: hasta confirmar, la donación no existe."""
+    site_url = settings.frontend_url.split(",")[0].strip()
+    _send(
+        to=to,
+        email_type="donation_confirm",
+        subject="Confirma tu donación",
+        html=_render(
+            "donation_confirm.html",
+            confirm_url=f"{site_url}/donar/confirmar?token={token}",
+            first_name=first_name,
+        ),
+    )
+
+
+def send_donation_registered_email(to: str, code: str, manage_token: str) -> None:
+    """Entrega el código para el QR y el enlace de gestión de esa donación."""
+    site_url = settings.frontend_url.split(",")[0].strip()
+    _send(
+        to=to,
+        email_type="donation_registered",
+        subject=f"Tu donación {code} está lista",
+        html=_render(
+            "donation_registered.html",
+            code=code,
+            manage_url=f"{site_url}/donacion/{manage_token}",
+        ),
+    )
+
+
+def send_donation_received_email(to: str, code: str, center_name: str, items: list) -> None:
+    """Resumen del doble check: qué se recibió y qué no."""
+    _send(
+        to=to,
+        email_type="donation_received",
+        subject=f"Recibimos tu donación {code}",
+        html=_render("donation_received.html", code=code, center_name=center_name, items=items),
+    )

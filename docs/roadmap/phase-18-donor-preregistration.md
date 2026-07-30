@@ -38,17 +38,17 @@
 
 | # | Tarea | Descripción | Complejidad | Estado |
 |---|-------|-------------|-------------|--------|
-| 1 | Modelos + migración `031` | `Donor`, `Donation` (incluye `intended_campaign_id` nullable), `DonationItem`, `DonationPhoto`, `DonationEvent` según spec. CHECKs de estado, `donation_items` con "exactamente uno de `product_type_id`/`free_text`". Añade `campaigns.is_public` (default `false`, backfill `true` donde hay `slug`). Importar en `alembic/env.py` y `app/models/__init__.py`. Reversible. | 🔴 Alta | ⬜ |
-| 2 | `DonorRepository` + `DonationRepository` | CRUD + búsqueda por hash de token, por `code`, listado scoped por centro (`TenantRepository.scoped()` sobre `received_center_id` / `intended_center_id`). | 🟠 Media | ⬜ |
-| 3 | `DonationService`: alta + doble opt-in | `submit` (dedupe por email+donación abierta, token verificación hasheado single-use, email), `confirm_email` (→ `REGISTERED`, genera token de gestión + email con QR), `resend` (rotación de token, Turnstile). Patrón `CenterApplicationService`. | 🔴 Alta | ⬜ |
+| 1 | Modelos + migración `031` | `Donor`, `Donation` (incluye `intended_campaign_id` nullable), `DonationItem`, `DonationPhoto`, `DonationEvent` según spec. CHECKs de estado, `donation_items` con "exactamente uno de `product_type_id`/`free_text`". Añade `campaigns.is_public` (default `false`, backfill `true` donde hay `slug`). Importar en `alembic/env.py` y `app/models/__init__.py`. Reversible. | 🔴 Alta | ✅ Done |
+| 2 | `DonorRepository` + `DonationRepository` | CRUD + búsqueda por hash de token, por `code`, listado scoped por centro (`TenantRepository.scoped()` sobre `received_center_id` / `intended_center_id`). | 🟠 Media | ✅ Done |
+| 3 | `DonationService`: alta + doble opt-in | `submit` (dedupe por email+donación abierta, token verificación hasheado single-use, email), `confirm_email` (→ `REGISTERED`, genera token de gestión + email con QR), `resend` (rotación de token, Turnstile). Patrón `CenterApplicationService`. | 🔴 Alta | ✅ Done |
 | 4 | `DonationService`: gestión del donante | Autenticación por token de gestión (hash + expiración 30 d + rotación), editar/añadir/quitar renglones y fotos solo en `REGISTERED`, `cancel`. Cada transición escribe `DonationEvent`. | 🟠 Media | ⬜ |
 | 5 | `DonationService`: recepción | `receive` (doble check por renglón, renglones extra `added_by=center`, `received_center_id` por `tenant_scope`, → `RECEIVED` + evento) y armado del **borrador de intake** a partir de renglones con `product_type_id`; liga `donation.intake_id` al intake creado. | 🔴 Alta | ⬜ |
 | 6 | Routers públicos `/v1/donations/public/*` | Alta, confirmación, reenvío, ficha `/d/{code}` (mínima, sin PII, cacheable), gestión por token. Turnstile + `@limiter.limit()` en todos; 404 genérico anti-enumeración. | 🟠 Media | ⬜ |
 | 7 | Router autenticado `/v1/donations/*` | Listado scoped (dirigidas a mi centro / recibidas por mi centro; `national_admin` ve todo), detalle por `code`, `receive`. | 🟠 Media | ⬜ |
 | 8 | Fotos en R2 | upload-url → confirm (patrón `messaging`), allowlist JPEG/PNG/WebP, 5 MB, máx 5 por donación. Subida pública exige `REGISTERED` + token de gestión; lectura con URL firmada corta. | 🟠 Media | ⬜ |
-| 9 | QR `DN-` | `donation_qr_png` en `app/utils/qr.py` → `/d/{code}`. | 🟢 Baja | ⬜ |
+| 9 | QR `DN-` | `donation_qr_png` en `app/utils/qr.py` → `/d/{code}`. | 🟢 Baja | ✅ Done |
 | 9b | Campañas públicas | `GET /v1/campaigns/public` (solo `is_active AND is_public`, sin auth, rate-limited, cacheable). Toggle "mostrar en la página pública" en el gestor de campañas (crear + editar). Índice público `/eventos` que lista esas campañas y enlaza las fichas `/eventos/[slug]` existentes (i18n ES/EN); `[slug]` responde 404 para campañas no públicas. | 🟠 Media | ⬜ |
-| 10 | Emails (3 plantillas) | Confirmación de email, QR + enlace de gestión, resumen de recepción. Marca de Fase 16; envío via ARQ. | 🟠 Media | ⬜ |
+| 10 | Emails (3 plantillas) | Confirmación de email, QR + enlace de gestión, resumen de recepción. Marca de Fase 16; envío via ARQ. | 🟠 Media | ✅ Done |
 | 11 | Purga y expiración | Job ARQ: `PENDING_EMAIL` > 7 días → `EXPIRED` + purga de PII del donante sin otras donaciones; tokens de gestión vencidos. Documentar en la tabla de retención. | 🟠 Media | ⬜ |
 
 ### Frontend — donante (público)
