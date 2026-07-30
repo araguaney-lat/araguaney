@@ -2,14 +2,15 @@
 
 Dos niveles de peso, y el orden importa:
 
-- **La caja lleva un estimado.** Sirve para documentos de contenido y se
-  pre-llena del catálogo. Nadie pesa caja por caja en un centro de acopio.
-- **La tarima lleva la verdad.** El peso que la cadena aérea valida es el bruto
-  de báscula por bulto. Cuando existe, manda sobre la suma de estimados: la
-  báscula tiene razón por definición.
+- **La caja se pesa** ya cerrada. Su peso incluye cartón, empaque y relleno, así
+  que nunca es la suma de los productos que lleva dentro: por eso el catálogo es
+  una referencia para cachar dedazos y no una fuente de peso.
+- **La tarima se pesa** armada. Incluye base y emplaye, así que tampoco es la
+  suma de sus cajas. Es el peso que la cadena aérea valida.
 
-La discrepancia entre ambos se muestra y no bloquea. Y el perfil de altura
-advierte, tampoco bloquea: quien está en el andén ve la tarima, el sistema no.
+Pesar dos veces es factible en un centro; pesar producto por producto no lo es.
+La diferencia entre niveles se muestra y no bloquea, igual que el perfil de
+altura: quien está en el andén ve la tarima, el sistema no.
 """
 
 from decimal import Decimal
@@ -21,7 +22,7 @@ from fastapi import HTTPException
 
 from app.utils.weight import (
     HEIGHT_PROFILES,
-    estimated_box_weight,
+    catalog_content_weight,
     height_warning,
     net_weight,
     weight_discrepancy,
@@ -30,20 +31,31 @@ from app.utils.weight import (
 CENTER = uuid4()
 
 
-# ── Estimado por caja (task 2) ───────────────────────────────────────────────
+# ── Referencia del catálogo (task 2) ─────────────────────────────────────────
 
-def test_el_estimado_sale_del_catalogo_por_cantidad():
-    """Nadie pesa caja por caja: el catálogo ya sabe cuánto pesa una unidad."""
-    assert estimated_box_weight(unit_weight_kg=Decimal("0.5"), quantity=20) == Decimal("10.000")
-
-
-def test_sin_peso_unitario_no_hay_estimado():
-    """Inventar un número sería peor que dejarlo vacío: viaja a documentos."""
-    assert estimated_box_weight(unit_weight_kg=None, quantity=20) is None
+def test_la_referencia_es_solo_el_contenido():
+    """Cuánto pesarían los productos solos. La caja pesa más: eso es el punto."""
+    assert catalog_content_weight(unit_weight_kg=Decimal("0.5"), quantity=20) == Decimal("10.000")
 
 
-def test_el_estimado_ignora_cantidades_sin_sentido():
-    assert estimated_box_weight(unit_weight_kg=Decimal("0.5"), quantity=0) is None
+def test_sin_peso_unitario_no_hay_referencia():
+    """Inventar un número sería peor que no mostrar nada."""
+    assert catalog_content_weight(unit_weight_kg=None, quantity=20) is None
+
+
+def test_la_referencia_ignora_cantidades_sin_sentido():
+    assert catalog_content_weight(unit_weight_kg=Decimal("0.5"), quantity=0) is None
+
+
+def test_la_referencia_no_llena_el_peso_de_la_caja():
+    """Regla del dominio: el catálogo no es fuente de peso, es una alerta de
+    dedazo. Quien captura escribe lo que marcó la báscula."""
+    from pathlib import Path
+
+    intake = (Path(__file__).resolve().parents[2] / "frontend" / "app" / "dashboard"
+              / "intake" / "new" / "page.tsx").read_text()
+    assert "weight_kg: catalogReference" not in intake
+    assert "catalogReference(" in intake
 
 
 # ── Neto y discrepancia (task 4) ─────────────────────────────────────────────
@@ -66,14 +78,19 @@ def test_la_tara_no_puede_dejar_un_neto_negativo():
     assert net_weight(gross=Decimal("10"), tare=Decimal("25")) is None
 
 
-def test_la_discrepancia_compara_el_neto_contra_la_suma_de_estimados():
-    d = weight_discrepancy(net=Decimal("275"), estimated=Decimal("250"))
-    assert d == Decimal("25")
+def test_la_diferencia_compara_el_neto_contra_la_suma_de_cajas():
+    """Se espera positiva y pequeña: la tarima carga emplaye y esquineros."""
+    assert weight_discrepancy(net=Decimal("275"), boxes_total=Decimal("250")) == Decimal("25")
 
 
-def test_sin_estimados_no_hay_discrepancia_que_mostrar():
-    assert weight_discrepancy(net=Decimal("275"), estimated=None) is None
-    assert weight_discrepancy(net=None, estimated=Decimal("250")) is None
+def test_una_diferencia_negativa_se_muestra_tal_cual():
+    """Señal de una caja sin pesar o un dedazo: ocultarla sería peor."""
+    assert weight_discrepancy(net=Decimal("240"), boxes_total=Decimal("250")) == Decimal("-10")
+
+
+def test_sin_alguno_de_los_dos_no_hay_diferencia_que_mostrar():
+    assert weight_discrepancy(net=Decimal("275"), boxes_total=None) is None
+    assert weight_discrepancy(net=None, boxes_total=Decimal("250")) is None
 
 
 # ── Perfiles de altura (task 9) ──────────────────────────────────────────────
@@ -181,7 +198,7 @@ def test_el_envio_declara_su_perfil_y_avisa_por_tarima():
         p.id, p.code, p.center_id, p.shipment_id = uuid4(), "TM-1", CENTER, envio.id
         p.status, p.notes, p.closed_at = "CLOSED", None, None
         p.created_at = datetime.now(timezone.utc)
-        p.gross_weight_kg = None
+        p.gross_weight_kg = p.tare_weight_kg = None
 
     svc = ShipmentService(MagicMock())
     with (
@@ -229,17 +246,12 @@ def test_el_manifiesto_muestra_el_peso_de_bascula_cuando_existe():
     assert "275.000" in html          # el neto, que es lo que viaja
 
 
-def test_el_manifiesto_marca_el_peso_por_caja_como_estimado():
-    """Un peso por caja que nadie pesó no puede leerse como dato de báscula."""
-    assert "est." in _manifiesto()
-
-
-def test_el_total_prefiere_la_bascula_sobre_la_suma_de_estimados():
-    """La báscula tiene razón por definición: el estimado solo llena huecos."""
+def test_el_total_prefiere_el_neto_de_la_tarima_sobre_la_suma_de_cajas():
+    """La tarima incluye base y emplaye: su neto es el peso que viaja."""
     html = _manifiesto(gross_weight_kg=Decimal("300"), tare_weight_kg=Decimal("25"))
-    assert "275.000 kg" in html and "(báscula)" in html
+    assert "275.000 kg" in html and "(tarimas pesadas)" in html
 
 
-def test_sin_pesar_el_total_se_declara_estimado():
+def test_sin_tarima_pesada_el_total_declara_que_suma_cajas():
     html = _manifiesto()
-    assert "10.000 kg" in html and "(estimado)" in html
+    assert "10.000 kg" in html and "suma de cajas" in html

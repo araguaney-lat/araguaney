@@ -35,8 +35,8 @@ class ManifestBoxRow:
 class ManifestPalletSection:
     code: str
     boxes: list[ManifestBoxRow] = field(default_factory=list)
-    # Pesaje de báscula (Fase 21). Cuando existe manda sobre la suma de
-    # estimados de las cajas: es el peso que la cadena aérea valida.
+    # Pesaje de la tarima (Fase 21). Incluye base y emplaye, así que no es la
+    # suma de sus cajas: es el peso que la cadena aérea valida.
     gross_weight_kg: Decimal | None = None
     tare_weight_kg: Decimal | None = None
     height_cm: int | None = None
@@ -48,7 +48,9 @@ class ManifestPalletSection:
         return net_weight(self.gross_weight_kg, self.tare_weight_kg)
 
     @property
-    def estimated_weight_kg(self) -> Decimal:
+    def boxes_weight_kg(self) -> Decimal:
+        """Suma de las cajas pesadas. Menos que el neto de la tarima, que además
+        carga la base y el emplaye."""
         return Decimal(sum(Decimal(b.weight_kg) for b in self.boxes if b.weight_kg))
 
 
@@ -68,10 +70,10 @@ def render_manifest_html(data: ManifestData) -> str:
 
     total_boxes = sum(len(p.boxes) for p in data.pallets)
     total_units = sum(b.quantity for p in data.pallets for b in p.boxes)
-    # El total del envío prefiere el neto de báscula por tarima; solo cae al
-    # estimado en las tarimas que nadie pesó.
+    # El total del envío prefiere el neto de la tarima; solo cae a la suma de
+    # cajas en las tarimas que nadie pesó.
     total_weight = float(sum(
-        (p.net_weight_kg if p.net_weight_kg is not None else p.estimated_weight_kg)
+        (p.net_weight_kg if p.net_weight_kg is not None else p.boxes_weight_kg)
         for p in data.pallets
     ))
     total_weighed = sum(1 for p in data.pallets if p.gross_weight_kg is not None)

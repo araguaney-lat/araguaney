@@ -241,7 +241,14 @@
       "weighing_title": "Pesaje (opcional)",
       "weighing_hint": "El peso de báscula es el que viaja en los documentos. Si no puedes pesar, cierra sin llenar nada.",
       "gross_placeholder": "Peso bruto (kg)",
-      "height_placeholder": "Altura (cm)"
+      "height_placeholder": "Altura (cm)",
+      "weighing_summary": "Pesaje de la tarima",
+      "gross_label": "Bruto",
+      "tare_label": "Tara",
+      "height_label": "Altura",
+      "boxes_weight_label": "Suma de sus cajas",
+      "difference_label": "Diferencia",
+      "difference_negative": "La tarima pesa menos que sus cajas. Revisa si alguna caja se pesó mal o si la tara está alta."
     },
     "shipments": {
       "title": "Envíos",
@@ -786,7 +793,8 @@
       "exception_title": "Esta captura necesita identificar al donante",
       "exception_body": "Por el volumen, esta donación no puede quedar anónima. Si la persona no quiso o no pudo identificarse, explica qué pasó: la captura entra igual y la coordinación revisa después.",
       "exception_placeholder": "Qué pasó (ej. la persona dejó las cajas y se fue sin dar datos)",
-      "weight_hint": "Estimado del catálogo, editable. El peso que viaja en los documentos es el de la báscula al cerrar la tarima."
+      "weight_hint": "Pesa la caja ya cerrada y anota lo que marque la báscula.",
+      "weight_reference": "Solo el contenido pesaría ~{kg} kg según el catálogo. La caja siempre pesa más."
     },
     "campaign_members": {
       "back": "← Campañas",

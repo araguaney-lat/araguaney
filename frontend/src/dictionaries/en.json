@@ -241,7 +241,14 @@
       "weighing_title": "Weighing (optional)",
       "weighing_hint": "The scale weight is the one that travels on the documents. If you cannot weigh, close without filling anything in.",
       "gross_placeholder": "Gross weight (kg)",
-      "height_placeholder": "Height (cm)"
+      "height_placeholder": "Height (cm)",
+      "weighing_summary": "Pallet weighing",
+      "gross_label": "Gross",
+      "tare_label": "Tare",
+      "height_label": "Height",
+      "boxes_weight_label": "Sum of its boxes",
+      "difference_label": "Difference",
+      "difference_negative": "The pallet weighs less than its boxes. Check whether a box was mis-weighed or the tare is too high."
     },
     "shipments": {
       "title": "Shipments",
@@ -786,7 +793,8 @@
       "exception_title": "This capture needs the donor identified",
       "exception_body": "Given the volume, this donation cannot stay anonymous. If the person would not or could not identify themselves, explain what happened: the capture still goes through and coordination reviews it afterwards.",
       "exception_placeholder": "What happened (e.g. the person left the boxes and walked away)",
-      "weight_hint": "Estimate from the catalog, editable. The weight that travels on the documents is the scale reading when the pallet is closed."
+      "weight_hint": "Weigh the box once it is packed and enter what the scale reads.",
+      "weight_reference": "Contents alone would weigh ~{kg} kg per the catalog. The box always weighs more."
     },
     "campaign_members": {
       "back": "← Campaigns",

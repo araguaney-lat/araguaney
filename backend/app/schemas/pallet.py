@@ -41,6 +41,10 @@ class PalletDetailOut(StrictModel):
     boxes: list[BoxOut]
     gross_weight_kg: Decimal | None = None
     height_cm: int | None = None
+    # Suma de las cajas pesadas y su diferencia contra el neto de la tarima.
+    # Se espera positiva y pequeña: la tarima carga base y emplaye.
+    boxes_weight_kg: Decimal | None = None
+    weight_discrepancy_kg: Decimal | None = None
 
 
 class PalletPublicOut(StrictModel):

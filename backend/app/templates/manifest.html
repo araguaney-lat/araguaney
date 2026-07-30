@@ -105,7 +105,7 @@
           <th>Caducidad</th>
           <th style="text-align:right">Cantidad</th>
           <th>Unidad</th>
-          <th style="text-align:right">Peso kg <span style="font-weight:normal">(est.)</span></th>
+          <th style="text-align:right">Peso kg</th>
         </tr>
       </thead>
       <tbody>
@@ -127,7 +127,7 @@
     </table>
     <div class="subtotal">
       Subtotal tarima: {{ pallet.boxes | map(attribute='quantity') | sum }} unid.
-      {% if pallet.estimated_weight_kg %} · {{ '%.3f'|format(pallet.estimated_weight_kg|float) }} kg estimados{% endif %}
+      {% if pallet.boxes_weight_kg %} · {{ '%.3f'|format(pallet.boxes_weight_kg|float) }} kg en cajas{% endif %}
       {% if pallet.gross_weight_kg %}
         <br><b>Báscula:</b> bruto {{ '%.3f'|format(pallet.gross_weight_kg|float) }} kg
         {%- if pallet.tare_weight_kg %} · tara {{ '%.3f'|format(pallet.tare_weight_kg|float) }} kg{% endif %}
@@ -148,9 +148,9 @@
         <td>Peso total:</td>
         <td>
           {{ '%.3f'|format(total_weight_kg) }} kg
-          {% if total_weighed_pallets == pallets|length and pallets %}(báscula)
-          {%- elif total_weighed_pallets %}({{ total_weighed_pallets }} de {{ pallets|length }} tarimas pesadas; el resto estimado)
-          {%- else %}(estimado){% endif %}
+          {% if total_weighed_pallets == pallets|length and pallets %}(tarimas pesadas)
+          {%- elif total_weighed_pallets %}({{ total_weighed_pallets }} de {{ pallets|length }} tarimas pesadas; en el resto se suman sus cajas)
+          {%- else %}(suma de cajas; ninguna tarima pesada){% endif %}
         </td>
       </tr>
     </table>

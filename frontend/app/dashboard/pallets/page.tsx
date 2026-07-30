@@ -300,6 +300,31 @@ export default function PalletsPage() {
               <button onClick={() => { setActivePallet(null); setPalletEvents([]) }} className="text-fnt hover:text-tx text-sm">✕</button>
             </div>
 
+            {activePallet.gross_weight_kg != null && (
+              <div className="rounded-lg border border-cardB bg-card2 p-3 text-xs text-fnt">
+                <p className="font-semibold text-mut">{t.weighing_summary}</p>
+                <p className="mt-1">
+                  {t.gross_label}: {Number(activePallet.gross_weight_kg).toFixed(3)} kg
+                  {activePallet.tare_weight_kg != null && ` · ${t.tare_label}: ${Number(activePallet.tare_weight_kg).toFixed(3)} kg`}
+                  {activePallet.height_cm != null && ` · ${t.height_label}: ${activePallet.height_cm} cm`}
+                </p>
+                {activePallet.boxes_weight_kg != null && (
+                  <p className="mt-1">
+                    {t.boxes_weight_label}: {Number(activePallet.boxes_weight_kg).toFixed(3)} kg
+                    {activePallet.weight_discrepancy_kg != null && (
+                      <span className={Number(activePallet.weight_discrepancy_kg) < 0 ? "text-[var(--dRejT)]" : ""}>
+                        {" "}· {t.difference_label}: {Number(activePallet.weight_discrepancy_kg) > 0 ? "+" : ""}
+                        {Number(activePallet.weight_discrepancy_kg).toFixed(3)} kg
+                      </span>
+                    )}
+                  </p>
+                )}
+                {activePallet.weight_discrepancy_kg != null && Number(activePallet.weight_discrepancy_kg) < 0 && (
+                  <p className="mt-1 text-[var(--dRejT)]">{t.difference_negative}</p>
+                )}
+              </div>
+            )}
+
             {activePallet.status === "OPEN" && (
               <div className="flex gap-2">
                 <input

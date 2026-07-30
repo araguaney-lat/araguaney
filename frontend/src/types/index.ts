@@ -199,6 +199,12 @@ export interface PalletOut {
 
 export interface PalletDetailOut extends PalletOut {
   boxes: BoxOut[]
+  gross_weight_kg?: string | number | null
+  tare_weight_kg?: string | number | null
+  height_cm?: number | null
+  // Suma de las cajas pesadas y su diferencia contra el neto de la tarima.
+  boxes_weight_kg?: string | number | null
+  weight_discrepancy_kg?: string | number | null
 }
 
 export interface PalletPublicOut {

@@ -1,17 +1,23 @@
 """Pesaje y perfiles de paletizado (Fase 21).
 
-El peso vive en dos niveles y no son intercambiables:
+El peso se mide dos veces, con báscula las dos, y una referencia que no se mide:
 
-- **Estimado por caja.** Sale del catálogo (`unit_weight_kg × cantidad`) y sirve
-  para los documentos de contenido. Nadie pesa caja por caja en un centro de
-  acopio con voluntarios y una sola báscula.
-- **Bruto por tarima.** Es el que la cadena aérea valida, y el que viaja a los
-  documentos de transporte. Cuando existe, manda sobre la suma de estimados: la
-  báscula tiene razón por definición.
+- **Referencia del catálogo** (`unit_weight_kg × cantidad`): cuánto pesaría solo
+  el contenido. **No es el peso de la caja.** Una caja llena lleva cartón,
+  empaque, separadores y relleno, así que la suma de productos siempre queda
+  corta. Sirve para cachar un dedazo al capturar, nada más.
+- **Caja pesada.** Se pesa la caja ya cerrada. Es un dato medido, y es el que
+  describe el contenido en los documentos.
+- **Tarima pesada.** Se pesa la tarima armada. Incluye la base y el emplaye,
+  así que tampoco es la suma de sus cajas. Es el peso que la cadena aérea valida
+  y el que viaja a los documentos de transporte.
 
-Todo lo de aquí son funciones puras. La discrepancia entre ambos niveles se
-muestra y nunca bloquea; el perfil de altura advierte y tampoco bloquea, porque
-quien está en el andén ve la tarima y el sistema no.
+Pesar dos veces es factible en un centro de acopio; pesar producto por producto
+no lo es, y por eso el catálogo nunca sustituye a la báscula.
+
+Todo lo de aquí son funciones puras. La diferencia entre niveles se muestra y
+nunca bloquea; el perfil de altura advierte y tampoco bloquea, porque quien está
+en el andén ve la tarima y el sistema no.
 """
 
 from decimal import Decimal
@@ -29,11 +35,12 @@ HEIGHT_PROFILES: dict[str, int | None] = {
 _MAX_HEIGHT_CM = 400            # más alto que cualquier bodega: es un dedazo
 
 
-def estimated_box_weight(unit_weight_kg: Decimal | None, quantity: int) -> Decimal | None:
-    """Peso estimado de una caja según el catálogo.
+def catalog_content_weight(unit_weight_kg: Decimal | None, quantity: int) -> Decimal | None:
+    """Cuánto pesaría solo el contenido, según el catálogo.
 
-    Sin peso unitario no se inventa un número: este dato viaja a documentos, y
-    un estimado falso es peor que un campo vacío.
+    **No es el peso de la caja** y no debe usarse como tal: falta el cartón, el
+    empaque y el relleno. Es una referencia para que quien captura note un
+    dedazo. Sin peso unitario no se inventa un número.
     """
     if unit_weight_kg is None or quantity is None or quantity <= 0:
         return None
@@ -50,15 +57,16 @@ def net_weight(gross: Decimal | None, tare: Decimal | None) -> Decimal | None:
     return neto if neto >= 0 else None
 
 
-def weight_discrepancy(net: Decimal | None, estimated: Decimal | None) -> Decimal | None:
-    """Diferencia entre lo pesado y lo estimado. Informativa, nunca bloqueante.
+def weight_discrepancy(net: Decimal | None, boxes_total: Decimal | None) -> Decimal | None:
+    """Diferencia entre el neto de la tarima y la suma de sus cajas pesadas.
 
-    Una diferencia grande suele significar que el catálogo tiene pesos unitarios
-    flojos, no que la tarima esté mal armada.
+    Se espera que sea **positiva y pequeña**: la tarima incluye emplaye y
+    esquineros que ninguna caja trae. Una diferencia negativa o grande apunta a
+    una caja sin pesar o a un dedazo. Informativa, nunca bloqueante.
     """
-    if net is None or estimated is None:
+    if net is None or boxes_total is None:
         return None
-    return Decimal(net) - Decimal(estimated)
+    return Decimal(net) - Decimal(boxes_total)
 
 
 def height_warning(height_cm: int | None, profile: str | None) -> str | None:
@@ -96,3 +104,9 @@ def validate_weighing(gross_weight_kg: Decimal | None, height_cm: int | None) ->
             f"La altura debe estar entre 1 y {_MAX_HEIGHT_CM} cm",
             field="height_cm",
         )
+
+
+def boxes_weight(boxes) -> Decimal | None:
+    """Suma de las cajas que sí se pesaron. `None` si ninguna trae peso."""
+    pesadas = [Decimal(b.weight_kg) for b in boxes if b.weight_kg is not None]
+    return sum(pesadas, Decimal(0)) if pesadas else None

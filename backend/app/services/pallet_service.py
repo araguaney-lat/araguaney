@@ -12,6 +12,7 @@ from app.schemas.pallet import PalletCreate, PalletDetailOut, PalletPublicOut
 from app.services.base import BaseService
 from app.utils.errors import api_error
 from app.utils.weight import validate_weighing
+from app.utils.weight import boxes_weight as _boxes_weight, net_weight, weight_discrepancy
 
 
 def _pallet_code() -> str:
@@ -140,6 +141,11 @@ class PalletService(BaseService):
             closed_at=pallet.closed_at,
             created_at=pallet.created_at,
             gross_weight_kg=pallet.gross_weight_kg,
+            tare_weight_kg=pallet.tare_weight_kg,
             height_cm=pallet.height_cm,
+            boxes_weight_kg=(suma := _boxes_weight(boxes)),
+            weight_discrepancy_kg=weight_discrepancy(
+                net_weight(pallet.gross_weight_kg, pallet.tare_weight_kg), suma
+            ),
             boxes=[BoxOut.model_validate(b) for b in boxes],
         )
