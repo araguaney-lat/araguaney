@@ -32,6 +32,19 @@ interface BoxRow {
   scannedGtin: string
 }
 
+/** Peso estimado de la caja según el catálogo. Sin peso unitario no se inventa
+uno: este dato viaja a los documentos de contenido. */
+function estimatedWeight(pt: ProductType, quantity: string): string | null {
+  const unidad = typeof pt.unit_weight_kg === "string"
+    ? parseFloat(pt.unit_weight_kg)
+    : pt.unit_weight_kg
+  const cantidad = parseInt(quantity, 10)
+  if (!unidad || !Number.isFinite(unidad) || !Number.isFinite(cantidad) || cantidad <= 0) {
+    return null
+  }
+  return (unidad * cantidad).toFixed(3)
+}
+
 function newRow(): BoxRow {
   return {
     key: crypto.randomUUID(),
@@ -116,14 +129,24 @@ function BoxRowInput({
   const [barcodeError, setBarcodeError] = useState<string | null>(null)
   const [scanning, setScanning] = useState(false)
 
-  const set = (field: keyof BoxRow) => (e: React.ChangeEvent<HTMLInputElement>) =>
-    onChange({ ...row, [field]: e.target.value })
+  const set = (field: keyof BoxRow) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    const updated = { ...row, [field]: e.target.value }
+    // Cambiar la cantidad recalcula el estimado; escribir el peso a mano lo fija.
+    if (field === "quantity" && row.product_type) {
+      const estimado = estimatedWeight(row.product_type, e.target.value)
+      if (estimado !== null) updated.weight_kg = estimado
+    }
+    onChange(updated)
+  }
 
   const selectProduct = (pt: ProductType, gtin?: string) => {
     onChange({
       ...row,
       product_type: pt,
       unit: pt.default_unit ?? row.unit,
+      // Estimado del catálogo: nadie pesa caja por caja en un centro de acopio.
+      // Es editable, y la verdad la pone la báscula al cerrar la tarima.
+      weight_kg: estimatedWeight(pt, row.quantity) ?? row.weight_kg,
       offlineBlocked: false,
       scannedGtin: gtin ?? row.scannedGtin,
     })
@@ -329,6 +352,9 @@ function BoxRowInput({
             onChange={set("weight_kg")}
             className="w-full rounded-lg border border-inpB bg-inp px-3 py-2 text-sm text-tx focus:outline-none focus:ring-2 focus:ring-[var(--gold)]"
           />
+          {/* Que quede claro que no es un peso medido: la báscula viene después,
+              una sola vez, cuando la tarima se cierra. */}
+          <p className="mt-1 text-[11px] text-fnt">{t.weight_hint}</p>
         </div>
       </div>
 

@@ -55,7 +55,7 @@ export default function ShipmentsPage() {
   const [campaigns, setCampaigns] = useState<Campaign[]>([])
   const [selectedPalletId, setSelectedPalletId] = useState("")
   const [showCreateForm, setShowCreateForm] = useState(false)
-  const [newShipment, setNewShipment] = useState({ campaign_id: "", destination: "Venezuela", carrier: "", reference: "", notes: "" })
+  const [newShipment, setNewShipment] = useState({ campaign_id: "", destination: "Venezuela", carrier: "", reference: "", notes: "", height_profile: "" })
   const [actionLoading, setActionLoading] = useState<string | null>(null)
   const manifestExport = useExportJob()
 
@@ -108,6 +108,7 @@ export default function ShipmentsPage() {
     const result = await createShipmentAction({
       ...newShipment,
       campaign_id: newShipment.campaign_id || undefined,
+      height_profile: newShipment.height_profile || undefined,
       center_id: isNationalAdmin ? selectedCenterId : undefined,
     })
     setActionLoading(null)
@@ -115,7 +116,7 @@ export default function ShipmentsPage() {
       setError(result.error)
     } else {
       setShowCreateForm(false)
-      setNewShipment({ campaign_id: "", destination: "Venezuela", carrier: "", reference: "", notes: "" })
+      setNewShipment({ campaign_id: "", destination: "Venezuela", carrier: "", reference: "", notes: "", height_profile: "" })
       await fetchShipments()
     }
   }
@@ -231,6 +232,21 @@ export default function ShipmentsPage() {
                 value={newShipment.carrier} onChange={(e) => setNewShipment({ ...newShipment, carrier: e.target.value })} placeholder={t.field_carrier_placeholder} />
             </label>
             <label className="space-y-1">
+              <span className="text-xs text-mut">{t.field_height_profile}</span>
+              <select
+                className="w-full rounded-lg border border-inpB bg-inp px-3 py-2 text-sm text-tx"
+                value={newShipment.height_profile}
+                onChange={(e) => setNewShipment({ ...newShipment, height_profile: e.target.value })}
+              >
+                <option value="">{t.height_profile_none}</option>
+                <option value="LOWER_DECK_160">{t.profile_lower_deck}</option>
+                <option value="XRAY_170">{t.profile_xray}</option>
+                <option value="MAIN_DECK_180">{t.profile_main_deck}</option>
+                <option value="SIN_RESTRICCION">{t.profile_unrestricted}</option>
+              </select>
+              <p className="mt-1 text-[11px] text-fnt">{t.height_profile_hint}</p>
+            </label>
+            <label className="block mt-3">
               <span className="text-xs text-mut">{t.field_reference}</span>
               <input className="w-full text-sm border border-inpB bg-inp text-tx rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--gold)]"
                 value={newShipment.reference} onChange={(e) => setNewShipment({ ...newShipment, reference: e.target.value })} placeholder={t.field_reference_placeholder} />
@@ -313,6 +329,16 @@ export default function ShipmentsPage() {
               <h2 className="font-semibold text-sm text-tx">
                 {activeShipment.destination}
                 {activeShipment.reference && <span className="ml-2 font-mono text-xs text-fnt">{activeShipment.reference}</span>}
+              {(activeShipment.height_warnings?.length ?? 0) > 0 && (
+                <div className="mt-3 rounded-lg border border-[var(--dDraftB)] bg-[var(--dDraftB)] p-3">
+                  <p className="text-xs font-semibold text-[var(--dDraftT)]">{t.height_warning_title}</p>
+                  <ul className="mt-1 space-y-0.5">
+                    {activeShipment.height_warnings!.map((w) => (
+                      <li key={w} className="text-xs text-[var(--dDraftT)]">{w}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
               </h2>
               <button onClick={() => { setActiveShipment(null); setShipmentEvents([]) }} className="text-fnt hover:text-tx text-sm">✕</button>
             </div>

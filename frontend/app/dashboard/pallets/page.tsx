@@ -75,6 +75,10 @@ export default function PalletsPage() {
   const [boxCodeInput, setBoxCodeInput] = useState("")
   const [scanning, setScanning] = useState(false)
   const [actionLoading, setActionLoading] = useState<string | null>(null)
+  // Cerrar es cuando la tarima sube a la báscula: el formulario aparece ahí, y
+  // ambos campos son opcionales (una báscula descompuesta no frena el cierre).
+  const [closingId, setClosingId] = useState<string | null>(null)
+  const [weighing, setWeighing] = useState({ gross: "", height: "" })
   const labelExport = useExportJob()
 
   const fetchPallets = async () => {
@@ -153,13 +157,20 @@ export default function PalletsPage() {
 
   const handleClose = async (palletId: string) => {
     setActionLoading(palletId)
-    const result = await closePalletAction(palletId)
+    const bruto = parseFloat(weighing.gross)
+    const altura = parseInt(weighing.height, 10)
+    const result = await closePalletAction(palletId, {
+      gross_weight_kg: Number.isFinite(bruto) && bruto > 0 ? bruto : undefined,
+      height_cm: Number.isFinite(altura) && altura > 0 ? altura : undefined,
+    })
     setActionLoading(null)
     if (result.error) {
       setError(result.error)
     } else {
       setPallets((prev) => prev.map((p) => p.id === palletId ? { ...p, status: "CLOSED" as PalletStatus } : p))
       if (activePallet?.id === palletId) setActivePallet({ ...activePallet, status: "CLOSED" })
+      setClosingId(null)
+      setWeighing({ gross: "", height: "" })
     }
   }
 
@@ -232,14 +243,41 @@ export default function PalletsPage() {
                   {t.status[pallet.status]}
                 </span>
               </div>
+              {closingId === pallet.id && (
+                <div className="mt-3 rounded-lg border border-cardB bg-card2 p-3" onClick={(e) => e.stopPropagation()}>
+                  <p className="text-xs font-semibold text-mut">{t.weighing_title}</p>
+                  <p className="mt-0.5 text-[11px] text-fnt">{t.weighing_hint}</p>
+                  <div className="mt-2 grid grid-cols-2 gap-2">
+                    <input
+                      type="number" min={0} step="0.001" inputMode="decimal"
+                      placeholder={t.gross_placeholder}
+                      value={weighing.gross}
+                      onChange={(e) => setWeighing((w) => ({ ...w, gross: e.target.value }))}
+                      className="rounded-lg border border-inpB bg-inp px-2 py-1.5 text-sm text-tx"
+                    />
+                    <input
+                      type="number" min={0} step="1" inputMode="numeric"
+                      placeholder={t.height_placeholder}
+                      value={weighing.height}
+                      onChange={(e) => setWeighing((w) => ({ ...w, height: e.target.value }))}
+                      className="rounded-lg border border-inpB bg-inp px-2 py-1.5 text-sm text-tx"
+                    />
+                  </div>
+                </div>
+              )}
+
               <div className="mt-2 flex gap-2">
                 {pallet.status === "OPEN" && (
                   <button
-                    onClick={(e) => { e.stopPropagation(); handleClose(pallet.id) }}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      if (closingId === pallet.id) handleClose(pallet.id)
+                      else { setClosingId(pallet.id); setWeighing({ gross: "", height: "" }) }
+                    }}
                     disabled={actionLoading === pallet.id}
                     className="text-xs px-2 py-1 rounded border border-[var(--dSealT)] text-dSealT hover:bg-dSealB disabled:opacity-50"
                   >
-                    {actionLoading === pallet.id ? t.closing : t.close}
+                    {actionLoading === pallet.id ? t.closing : closingId === pallet.id ? t.confirm_close : t.close}
                   </button>
                 )}
                 <button

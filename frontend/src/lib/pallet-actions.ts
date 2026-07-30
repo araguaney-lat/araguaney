@@ -38,14 +38,20 @@ export async function addBoxToPalletAction(palletId: string, boxCode: string) {
   }
 }
 
-export async function closePalletAction(palletId: string) {
+export async function closePalletAction(
+  palletId: string,
+  weighing?: { gross_weight_kg?: number; height_cm?: number },
+) {
   const session = await auth()
   if (!session?.accessToken) return { error: "No autenticado" }
 
   try {
+    // El pesaje viaja en el cierre porque es cuando ocurre: la tarima ya está
+    // armada y sube a la báscula una sola vez.
     const data = await apiFetch(`/v1/pallets/${palletId}/close`, {
       method: "POST",
       token: session.accessToken,
+      body: JSON.stringify(weighing ?? {}),
     })
     revalidatePath("/dashboard/pallets")
     return { data }

@@ -12,6 +12,7 @@ from app.schemas.pallet import PalletDetailOut
 from app.schemas.shipment import ShipmentCreate, ShipmentDetailOut
 from app.services.base import BaseService
 from app.utils.errors import api_error
+from app.utils.weight import height_warning
 
 
 class ShipmentService(BaseService):
@@ -25,6 +26,7 @@ class ShipmentService(BaseService):
             carrier=data.carrier,
             reference=data.reference,
             notes=data.notes,
+            height_profile=data.height_profile,
             status="OPEN",
         )
         shipment = repo.save(shipment)
@@ -167,6 +169,8 @@ class ShipmentService(BaseService):
                 notes=pallet.notes,
                 closed_at=pallet.closed_at,
                 created_at=pallet.created_at,
+                gross_weight_kg=pallet.gross_weight_kg,
+                height_cm=pallet.height_cm,
                 boxes=[BoxOut.model_validate(b) for b in boxes],
             ))
         return ShipmentDetailOut(
@@ -181,5 +185,12 @@ class ShipmentService(BaseService):
             closed_at=shipment.closed_at,
             shipped_at=shipment.shipped_at,
             created_at=shipment.created_at,
+            height_profile=shipment.height_profile,
+            # Se calcula al leer, no se guarda: cambiar el perfil del envío
+            # tiene que recalcularlo sin tocar cada tarima.
+            height_warnings=[
+                aviso for p in pallets
+                if (aviso := height_warning(p.height_cm, shipment.height_profile))
+            ],
             pallets=pallet_details,
         )

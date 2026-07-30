@@ -236,7 +236,12 @@
       },
       "scan_box": "Scan box",
       "scan_label": "Point at the box QR code",
-      "scanned_donation": "That is a donation code. Receive it from Donations; only sealed boxes go here."
+      "scanned_donation": "That is a donation code. Receive it from Donations; only sealed boxes go here.",
+      "confirm_close": "Confirm closing",
+      "weighing_title": "Weighing (optional)",
+      "weighing_hint": "The scale weight is the one that travels on the documents. If you cannot weigh, close without filling anything in.",
+      "gross_placeholder": "Gross weight (kg)",
+      "height_placeholder": "Height (cm)"
     },
     "shipments": {
       "title": "Shipments",
@@ -271,7 +276,15 @@
         "OPEN": "Open",
         "CLOSED": "Closed",
         "SHIPPED": "Dispatched"
-      }
+      },
+      "field_height_profile": "Height profile",
+      "height_profile_none": "— Not declared —",
+      "height_profile_hint": "The height limit of the aircraft or the X-ray arch. You get a warning if a pallet does not fit; it never blocks.",
+      "profile_lower_deck": "Lower deck — 160 cm",
+      "profile_xray": "X-ray arch — 170 cm",
+      "profile_main_deck": "Main deck — 180 cm",
+      "profile_unrestricted": "No restriction",
+      "height_warning_title": "Pallets that do not fit the declared profile"
     },
     "national": {
       "title": "National dashboard",
@@ -772,7 +785,8 @@
       "error_donor_terms": "A legal entity must accept the Donation Terms.",
       "exception_title": "This capture needs the donor identified",
       "exception_body": "Given the volume, this donation cannot stay anonymous. If the person would not or could not identify themselves, explain what happened: the capture still goes through and coordination reviews it afterwards.",
-      "exception_placeholder": "What happened (e.g. the person left the boxes and walked away)"
+      "exception_placeholder": "What happened (e.g. the person left the boxes and walked away)",
+      "weight_hint": "Estimate from the catalog, editable. The weight that travels on the documents is the scale reading when the pallet is closed."
     },
     "campaign_members": {
       "back": "← Campaigns",

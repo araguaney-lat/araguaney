@@ -12,7 +12,7 @@ from app.models.user import User
 from app.repositories.export_job_repository import ExportJobRepository
 from app.repositories.pallet_repository import PalletRepository
 from app.schemas.export_job import ExportJobOut
-from app.schemas.pallet import PalletCreate, PalletDetailOut, PalletOut, PalletPublicOut
+from app.schemas.pallet import PalletCloseIn, PalletCreate, PalletDetailOut, PalletOut, PalletPublicOut
 from app.schemas.qr_ficha import QrEventOut
 from app.services.pallet_service import PalletService
 from app.repositories.audit_repository import AuditRepository
@@ -131,11 +131,18 @@ def remove_box_from_pallet(
 def close_pallet(
     request: Request,
     pallet_id: UUID,
+    data: PalletCloseIn | None = None,
     db: Session = Depends(get_db),
     current_user: User = Depends(require_coordinator),
     scope: UUID | None = Depends(tenant_scope),
 ):
-    pallet = PalletService(db).close(pallet_id, center_id=scope, user_id=current_user.id)
+    """El pesaje viaja en el cierre porque es cuando ocurre: la tarima ya está
+    armada y sube a la báscula una sola vez."""
+    datos = data or PalletCloseIn()
+    pallet = PalletService(db).close(
+        pallet_id, center_id=scope, user_id=current_user.id,
+        gross_weight_kg=datos.gross_weight_kg, height_cm=datos.height_cm,
+    )
     AuditRepository(db).log("PALLET_CLOSED", "pallet",
         user_id=current_user.id, entity_id=str(pallet_id), ip=get_client_ip(request))
     db.commit()

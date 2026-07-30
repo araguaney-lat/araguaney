@@ -20,5 +20,9 @@ class Shipment(Base):
     notes = Column(String, nullable=True)
     closed_at = Column(DateTime(timezone=True), nullable=True)
     shipped_at = Column(DateTime(timezone=True), nullable=True)
+    # Restricción de altura declarada por el envío (Fase 21). Se advierte, no
+    # se bloquea: quien está en el andén ve la tarima y el sistema no.
+    height_profile = Column(String, nullable=True)
+
     created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
     updated_at = Column(DateTime(timezone=True), nullable=True, onupdate=func.now())
