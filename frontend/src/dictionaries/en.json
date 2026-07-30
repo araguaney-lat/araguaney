@@ -291,7 +291,9 @@
       "profile_xray": "X-ray arch — 170 cm",
       "profile_main_deck": "Main deck — 180 cm",
       "profile_unrestricted": "No restriction",
-      "height_warning_title": "Pallets that do not fit the declared profile"
+      "height_warning_title": "Pallets that do not fit the declared profile",
+      "carta_porte_title": "Carta Porte 3.1 annex",
+      "carta_porte_hint": "Goods data for the carrier's certification provider. It is not a tax document: Araguaney does not issue CFDIs. The file states up front whatever is missing before it can be certified."
     },
     "national": {
       "title": "National dashboard",

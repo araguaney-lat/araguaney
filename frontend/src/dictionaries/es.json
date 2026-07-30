@@ -291,7 +291,9 @@
       "profile_xray": "Arco de rayos X — 170 cm",
       "profile_main_deck": "Cubierta principal — 180 cm",
       "profile_unrestricted": "Sin restricción",
-      "height_warning_title": "Tarimas que no caben en el perfil declarado"
+      "height_warning_title": "Tarimas que no caben en el perfil declarado",
+      "carta_porte_title": "Anexo Carta Porte 3.1",
+      "carta_porte_hint": "Datos de mercancías para el PAC de quien transporta. No es un comprobante fiscal: Araguaney no timbra. El archivo declara arriba lo que falte para poder timbrar."
     },
     "national": {
       "title": "Panel nacional",
