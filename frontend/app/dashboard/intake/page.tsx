@@ -49,8 +49,16 @@ export default async function IntakePage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-tx">
-                    {intake.donante_libre || t.anonymous}
+                    {intake.donor
+                      ? intake.donor.legal_name ??
+                        `${intake.donor.first_name} ${intake.donor.last_name}`
+                      : intake.donante_libre || t.anonymous}
                   </p>
+                  {intake.donor?.legal_name && (
+                    <p className="text-xs text-mut">
+                      {intake.donor.first_name} {intake.donor.last_name}
+                    </p>
+                  )}
                   <p className="text-xs text-mut mt-0.5">
                     {new Date(intake.created_at).toLocaleString(dateFmt, {
                       dateStyle: "short",

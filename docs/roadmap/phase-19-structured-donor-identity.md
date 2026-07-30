@@ -36,15 +36,15 @@
 
 | # | Tarea | Descripción | Complejidad | Estado |
 |---|-------|-------------|-------------|--------|
-| 1 | Migración: `donors` unificada + `intakes.donor_id` | Crea (o extiende, si la Fase 18 llegó primero) la tabla `donors` con el esquema unificado: `donor_type` (fisica\|moral), `source` (self\|center), `center_id` nullable, `first_name`/`last_name`, `legal_name`, `email`, `phone`. Índices únicos parciales (`WHERE email IS NOT NULL`): email global para `source='self'`, `(email, center_id)` para `source='center'`; email nullable (opcional en física capturada). Añade `intakes.donor_id` FK nullable. `donante_libre` queda de solo lectura. Reversible. | 🔴 Alta | ⬜ |
-| 2 | `DonorRepository` (lado centro) | `find_or_create` por `(email, center_id)` con actualización de campos; sin email crea registro nuevo sin dedupe. Búsqueda para autocompletado (email / nombre / razón social) **scoped por centro**. | 🟠 Media | ⬜ |
-| 3 | Validaciones por tipo | Schema Pydantic discriminado: física (nombre y apellido obligatorios; email y teléfono opcionales) / moral (razón social, representante, email y teléfono obligatorios). Sanitización con `app.utils.sanitize`; teléfono con normalización laxa. | 🟠 Media | ⬜ |
-| 4 | `IntakeService` acepta bloque donante | Campo opcional `donor` en `IntakeCreate` → `find_or_create` + liga `intakes.donor_id`. Deja de escribir `donante_libre`. Intake anónimo intacto. | 🟠 Media | ⬜ |
-| 5 | `GET /v1/donors/search` | Autocompletado autenticado (`require_center_role`), rate-limited, scoped: solo donantes del centro del solicitante; `national_admin` puede filtrar por centro. | 🟠 Media | ⬜ |
-| 6 | Intake UI: check + formulario | Check "Registrar donante" (default apagado = anónima) → toggle física/moral con sus campos y autocompletado por email. Donde exista `donante_libre` histórico, se muestra como dato legado de solo lectura. i18n ES/EN. | 🔴 Alta | ⬜ |
-| 7 | Detalle de intake muestra donante | Visible solo para usuarios del centro y `national_admin`. Auditoría de acceso no requerida en MVP; ninguna superficie pública lo incluye. | 🟢 Baja | ⬜ |
+| 1 | Migración: `donors` unificada + `intakes.donor_id` | Crea (o extiende, si la Fase 18 llegó primero) la tabla `donors` con el esquema unificado: `donor_type` (fisica\|moral), `source` (self\|center), `center_id` nullable, `first_name`/`last_name`, `legal_name`, `email`, `phone`. Índices únicos parciales (`WHERE email IS NOT NULL`): email global para `source='self'`, `(email, center_id)` para `source='center'`; email nullable (opcional en física capturada). Añade `intakes.donor_id` FK nullable. `donante_libre` queda de solo lectura. Reversible. | 🔴 Alta | ✅ Done |
+| 2 | `DonorRepository` (lado centro) | `find_or_create` por `(email, center_id)` con actualización de campos; sin email crea registro nuevo sin dedupe. Búsqueda para autocompletado (email / nombre / razón social) **scoped por centro**. | 🟠 Media | ✅ Done |
+| 3 | Validaciones por tipo | Schema Pydantic discriminado: física (nombre y apellido obligatorios; email y teléfono opcionales) / moral (razón social, representante, email y teléfono obligatorios). Sanitización con `app.utils.sanitize`; teléfono con normalización laxa. | 🟠 Media | ✅ Done |
+| 4 | `IntakeService` acepta bloque donante | Campo opcional `donor` en `IntakeCreate` → `find_or_create` + liga `intakes.donor_id`. Deja de escribir `donante_libre`. Intake anónimo intacto. | 🟠 Media | ✅ Done |
+| 5 | `GET /v1/donors/search` | Autocompletado autenticado (`require_center_role`), rate-limited, scoped: solo donantes del centro del solicitante; `national_admin` puede filtrar por centro. | 🟠 Media | ✅ Done |
+| 6 | Intake UI: check + formulario | Check "Registrar donante" (default apagado = anónima) → toggle física/moral con sus campos y autocompletado por email. Donde exista `donante_libre` histórico, se muestra como dato legado de solo lectura. i18n ES/EN. | 🔴 Alta | ✅ Done |
+| 7 | Detalle de intake muestra donante | Visible solo para usuarios del centro y `national_admin`. Auditoría de acceso no requerida en MVP; ninguna superficie pública lo incluye. | 🟢 Baja | ✅ Done |
 | 8 | Legal | Aviso de privacidad (persona moral, teléfono), tabla de retención, ARCO. | 🟠 Media | ⬜ |
-| 9 | Tests | Validación por tipo, dedupe intra-centro / no-dedupe inter-centro, aislamiento tenant del buscador y del detalle (por búsqueda y por ID), fichas públicas sin rastro del donante, regresión del intake anónimo. | 🔴 Alta | ⬜ |
+| 9 | Tests | Validación por tipo, dedupe intra-centro / no-dedupe inter-centro, aislamiento tenant del buscador y del detalle (por búsqueda y por ID), fichas públicas sin rastro del donante, regresión del intake anónimo. | 🔴 Alta | ✅ Done |
 
 ---
 
