@@ -62,6 +62,9 @@ class Donation(Base):
     items = relationship(
         "DonationItem", cascade="all, delete-orphan", lazy="selectin", back_populates="donation"
     )
+    photos = relationship(
+        "DonationPhoto", cascade="all, delete-orphan", lazy="selectin", back_populates="donation"
+    )
 
 
 class DonationItem(Base):
@@ -109,6 +112,8 @@ class DonationPhoto(Base):
     size_bytes = Column(Integer, nullable=False)
     uploaded_by = Column(String, nullable=False, server_default="donor")  # donor | center
     created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
+
+    donation = relationship("Donation", back_populates="photos")
 
 
 class DonationEvent(Base):

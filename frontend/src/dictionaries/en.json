@@ -890,7 +890,9 @@
         "RECEIVED": "Received",
         "MISSING": "Did not arrive",
         "REJECTED": "Not accepted"
-      }
+      },
+      "photos_title": "Photos sent by the donor",
+      "photo_n": "Photo {n}"
     }
   },
   "studio": {

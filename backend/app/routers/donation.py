@@ -22,12 +22,17 @@ from app.models.user import User
 from app.schemas.donation import (
     _MAX_ITEMS,
     DonationCreate,
+    DonationPhotoOut,
     DonationItemInput,
     DonationOut,
     DonationPublicOut,
+    PhotoConfirmIn,
+    PhotoUploadUrlIn,
+    PhotoUploadUrlOut,
     PublicCenterOut,
 )
 from app.schemas._base import StrictModel, StrictUUID
+from app.services.donation_photo_service import DonationPhotoService
 from app.services.donation_service import DonationService
 from app.utils.rate_limit import limiter
 
@@ -140,6 +145,61 @@ def cancel_managed_donation(
     return DonationService(db).cancel(token)
 
 
+# ── Fotos de la donación (enlace de gestión) ─────────────────────────────────
+
+@router.post("/public/donations/manage/{token}/photos/upload-url", response_model=PhotoUploadUrlOut)
+@limiter.limit("20/hour")
+def photo_upload_url(
+    request: Request,
+    token: str,
+    data: PhotoUploadUrlIn,
+    db: Session = Depends(get_db),
+):
+    """URL firmada para subir directo a R2. La llave la arma el servidor."""
+    return DonationPhotoService(db).upload_url(
+        token, content_type=data.content_type, size_bytes=data.size_bytes
+    )
+
+
+@router.post("/public/donations/manage/{token}/photos", response_model=DonationPhotoOut, status_code=201)
+@limiter.limit("20/hour")
+def confirm_photo(
+    request: Request,
+    token: str,
+    data: PhotoConfirmIn,
+    db: Session = Depends(get_db),
+):
+    return DonationPhotoService(db).confirm(
+        token, storage_key=data.storage_key,
+        content_type=data.content_type, size_bytes=data.size_bytes,
+    )
+
+
+@router.get("/public/donations/manage/{token}/photos/{photo_id}/url")
+@limiter.limit("60/hour")
+def donor_photo_url(
+    request: Request,
+    token: str,
+    photo_id: StrictUUID,
+    response: Response,
+    db: Session = Depends(get_db),
+):
+    response.headers["Cache-Control"] = _NO_CACHE
+    return {"url": DonationPhotoService(db).donor_url(token, photo_id)}
+
+
+@router.delete("/public/donations/manage/{token}/photos/{photo_id}", status_code=204)
+@limiter.limit("30/hour")
+def delete_photo(
+    request: Request,
+    token: str,
+    photo_id: StrictUUID,
+    db: Session = Depends(get_db),
+):
+    DonationPhotoService(db).delete(token, photo_id)
+    return Response(status_code=204)
+
+
 # ── Ficha pública del QR ─────────────────────────────────────────────────────
 
 @router.get("/d/{code}", response_model=DonationPublicOut)
@@ -234,6 +294,21 @@ def get_donation(
     if donation is None or donation.status in ("PENDING_EMAIL", "EXPIRED"):
         raise _err("NOT_FOUND", "Donación no encontrada", status_code=404)
     return donation
+
+
+@router.get("/donations/{code}/photos/{photo_id}/url")
+@limiter.limit("120/minute")
+def center_photo_url(
+    request: Request,
+    code: str,
+    photo_id: StrictUUID,
+    response: Response,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_center_role),
+):
+    """El centro ve las fotos al preparar el doble check."""
+    response.headers["Cache-Control"] = _NO_CACHE
+    return {"url": DonationPhotoService(db).center_url(code, photo_id)}
 
 
 @router.post("/donations/{code}/receive", response_model=DonationOut)

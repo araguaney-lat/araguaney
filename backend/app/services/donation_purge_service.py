@@ -21,6 +21,7 @@ from sqlalchemy.orm import Session
 
 from app.models.donation import Donation, DonationEvent
 from app.models.donor import Donor
+from app.utils.r2 import delete_object
 
 logger = logging.getLogger(__name__)
 
@@ -38,6 +39,20 @@ def _retention_days() -> int:
         return int(os.environ.get("DONATION_PENDING_RETENTION_DAYS", _DEFAULT_RETENTION_DAYS))
     except ValueError:
         return _DEFAULT_RETENTION_DAYS
+
+
+def _borrar_fotos(donation: Donation) -> None:
+    """Las fotos se van con la donación que vence.
+
+    Conservar el objeto en R2 después de purgar la fila sería guardar el dato
+    personal justo donde nadie va a ir a buscarlo. Un fallo del almacenamiento no
+    detiene la purga: la fila igual deja de existir.
+    """
+    for foto in list(donation.photos):
+        try:
+            delete_object(foto.storage_key)
+        except Exception:                       # noqa: BLE001
+            logger.warning("No se pudo borrar la foto %s de R2", foto.storage_key)
 
 
 def _aware(valor: datetime | None) -> datetime | None:
@@ -79,6 +94,7 @@ class DonationPurgeService:
 
         vencidas = [d for d in candidatas if _reloj(d) < corte]
         for donation in vencidas:
+            _borrar_fotos(donation)
             donation.status = "EXPIRED"
             donation.manage_token_hash = None
             donation.manage_token_expires_at = None

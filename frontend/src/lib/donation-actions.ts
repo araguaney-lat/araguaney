@@ -159,3 +159,125 @@ export async function resendDonationConfirmation(input: unknown): Promise<Donati
     return { ok: false, error: MESSAGES.RESEND_GENERIC[locale] }
   }
 }
+
+// ── Gestión por la persona donante (enlace del correo, sin sesión) ───────────
+
+export interface ManagedItem {
+  id?: string
+  free_text: string | null
+  quantity: number
+  unit: string
+}
+
+export interface ManagedPhoto {
+  id: string
+  content_type: string
+  size_bytes: number
+  created_at: string
+}
+
+export interface ManagedDonation {
+  code: string
+  status: string
+  notes: string | null
+  items: ManagedItem[]
+  photos: ManagedPhoto[]
+}
+
+/** El token viaja en la URL del correo; el backend lo compara contra su hash. */
+export async function getManagedDonation(token: string): Promise<ManagedDonation | null> {
+  try {
+    return await apiFetch<ManagedDonation>(`/v1/public/donations/manage/${encodeURIComponent(token)}`)
+  } catch {
+    return null
+  }
+}
+
+export async function updateManagedItems(
+  token: string,
+  items: { free_text: string; quantity: number; unit: string }[],
+  locale: "es" | "en" = "es",
+): Promise<DonationResult> {
+  const parsed = z.array(itemSchema).min(1).max(50).safeParse(items)
+  if (!parsed.success) return { ok: false, error: MESSAGES.INVALID[locale] }
+
+  try {
+    await apiFetch(`/v1/public/donations/manage/${encodeURIComponent(token)}/items`, {
+      method: "PUT",
+      body: JSON.stringify({ items }),
+    })
+    return { ok: true }
+  } catch {
+    return { ok: false, error: MESSAGES.GENERIC[locale] }
+  }
+}
+
+export async function cancelManagedDonation(
+  token: string,
+  locale: "es" | "en" = "es",
+): Promise<DonationResult> {
+  try {
+    await apiFetch(`/v1/public/donations/manage/${encodeURIComponent(token)}/cancel`, {
+      method: "POST",
+    })
+    return { ok: true }
+  } catch {
+    return { ok: false, error: MESSAGES.GENERIC[locale] }
+  }
+}
+
+// ── Fotos ────────────────────────────────────────────────────────────────────
+
+/** La llave la arma el backend: aquí solo se le dice qué tipo y qué tamaño. */
+export async function getPhotoUploadUrl(
+  token: string,
+  contentType: string,
+  sizeBytes: number,
+): Promise<{ upload_url: string; storage_key: string } | null> {
+  try {
+    return await apiFetch(`/v1/public/donations/manage/${encodeURIComponent(token)}/photos/upload-url`, {
+      method: "POST",
+      body: JSON.stringify({ content_type: contentType, size_bytes: sizeBytes }),
+    })
+  } catch {
+    return null
+  }
+}
+
+export async function confirmPhoto(
+  token: string,
+  storageKey: string,
+  contentType: string,
+  sizeBytes: number,
+): Promise<ManagedPhoto | null> {
+  try {
+    return await apiFetch<ManagedPhoto>(`/v1/public/donations/manage/${encodeURIComponent(token)}/photos`, {
+      method: "POST",
+      body: JSON.stringify({ storage_key: storageKey, content_type: contentType, size_bytes: sizeBytes }),
+    })
+  } catch {
+    return null
+  }
+}
+
+export async function getPhotoUrl(token: string, photoId: string): Promise<string | null> {
+  try {
+    const res = await apiFetch<{ url: string }>(
+      `/v1/public/donations/manage/${encodeURIComponent(token)}/photos/${photoId}/url`
+    )
+    return res.url
+  } catch {
+    return null
+  }
+}
+
+export async function deletePhoto(token: string, photoId: string): Promise<boolean> {
+  try {
+    await apiFetch(`/v1/public/donations/manage/${encodeURIComponent(token)}/photos/${photoId}`, {
+      method: "DELETE",
+    })
+    return true
+  } catch {
+    return false
+  }
+}
