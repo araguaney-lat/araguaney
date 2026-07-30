@@ -25,6 +25,18 @@ from app.services.donation_photo_service import (
 DONATION_ID = uuid4()
 
 
+@pytest.fixture(autouse=True)
+def _r2_disponible():
+    """R2 se da por configurado en todos estos casos.
+
+    Sin esto, la suite pasa o falla según lo que tenga el `.env` de quien la
+    corre: en una máquina con R2 configurado prueba lo que dice probar, y en CI
+    todo muere en el 503 antes de llegar a la lógica.
+    """
+    with patch("app.services.donation_photo_service.is_configured", return_value=True):
+        yield
+
+
 def _donacion(status="REGISTERED", fotos=0):
     d = MagicMock()
     d.id = DONATION_ID

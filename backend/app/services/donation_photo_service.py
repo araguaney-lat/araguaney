@@ -109,14 +109,16 @@ class DonationPhotoService(BaseService):
         self, token: str, storage_key: str, content_type: str, size_bytes: int
     ) -> DonationPhoto:
         donation = self._editable(token)
-        self._require_r2()
 
+        # Antes que el almacenamiento: una llave ajena se rechaza siempre, y que
+        # R2 esté o no disponible no cambia que no era de esta donación.
         if not storage_key.startswith(f"donations/{donation.id}/"):
             raise api_error(
                 "FORBIDDEN",
                 "Esa foto no pertenece a esta donación",
                 status_code=403,
             )
+        self._require_r2()
         if len(donation.photos) >= MAX_PHOTOS_PER_DONATION:
             raise api_error(
                 "TOO_MANY_PHOTOS",
