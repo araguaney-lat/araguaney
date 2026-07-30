@@ -3,9 +3,9 @@
 ## Progreso general
 
 ```mermaid
-pie title Tareas completadas (353 tareas)
+pie title Tareas completadas (420 tareas)
     "Listas" : 335
-    "Pendientes" : 18
+    "Pendientes" : 85
 ```
 
 | Fase | Nombre | Listas | Pendientes | Progreso |
@@ -28,10 +28,29 @@ pie title Tareas completadas (353 tareas)
 | 15 | [Deliverability de emails + aviso de solicitudes](phase-15-email-deliverability.md) | 15 | 0 | ✅ 100% |
 | 16 | [Rediseño de plantillas de email con marca](phase-16-email-brand-redesign.md) | 10 | 0 | ✅ 100% |
 | 17 | [AEO/GEO + expansión de keywords](phase-17-aeo-keyword-expansion.md) | 15 | 6 | 🟡 71% |
-| **Total** | | **335** | **18** | **🟡 95%** |
+| 18 | [Pre-registro de donaciones por el donante](phase-18-donor-preregistration.md) | 0 | 22 | ⬜ 0% |
+| 19 | [Identidad estructurada del donante en el intake](phase-19-structured-donor-identity.md) | 0 | 9 | ⬜ 0% |
+| 20 | [Prevención de riesgos: responsabilidad y anti-lavado en especie](phase-20-risk-prevention.md) | 0 | 10 | ⬜ 0% |
+| 21 | [Logística: pesaje, anexo Carta Porte y perfiles de paletizado](phase-21-logistics-weighing.md) | 0 | 12 | ⬜ 0% |
+| 22 | [Trazabilidad extendida: avión y destino](phase-22-extended-traceability.md) | 0 | 14 | ⬜ 0% |
+| **Total** | | **335** | **85** | **🟡 80%** |
 
-> **Pendientes (18):**
+> **Pendientes (85):**
 > El grupo A de la Fase 13 (privacidad, lo que aplica hoy) está completo.
+> - **22 de la Fase 18 (pre-registro de donaciones):** fase nueva, diseño aprobado en
+>   [el spec](../superpowers/specs/2026-07-29-donor-preregistration-design.md); aún sin arrancar.
+> - **9 de la Fase 19 (identidad estructurada del donante):** fase nueva, comparte la tabla
+>   `donors` con la 18; diseño en [su spec](../superpowers/specs/2026-07-29-structured-donor-identity-design.md).
+> - **10 de la Fase 20 (prevención de riesgos):** cláusulas y controles anti-lavado en especie;
+>   diseño en [su spec](../superpowers/specs/2026-07-29-risk-prevention-design.md); la task 7
+>   (revisión de abogado) es gate de publicación.
+> - **12 de la Fase 21 (logística y pesaje):** báscula por tarima, anexo de datos Carta Porte
+>   (sin timbrado) y perfiles de altura; diseño en
+>   [su spec](../superpowers/specs/2026-07-29-logistics-weighing-design.md); la guía fiscal
+>   está gated por revisión de fiscalista.
+> - **14 de la Fase 22 (trazabilidad extendida):** hitos logísticos, recepción en destino con
+>   merma e incidencias; diseño en
+>   [su spec](../superpowers/specs/2026-07-29-extended-traceability-design.md).
 > - **12 gated por pago o por decisión de negocio:** Fase 4 → 2 (spend caps + alertas, requieren
 >   plan de pago de infra). Fase 13 → 10 (bloque de donativos/pagos: entidad receptora, asesoría
 >   legal/contable, procesador de pagos, T&C de donación, transparencia). Todo el bloque de
@@ -62,6 +81,14 @@ Fase 0 ─► Fase 1 ─► Fase 2 ─► Fase 3 ─► Fase 4
 ---
 
 ## Notas de edición
+
+> **Este repositorio es público.** El roadmap y los specs se leen desde fuera,
+> así que al escribirlos: nada de credenciales, correos de operación, hosts de
+> infraestructura ni datos de cuentas de prueba. Y en controles de seguridad o
+> antifraude, publica el **mecanismo** pero no el **parámetro** que determina
+> cuándo se activa (umbrales, límites, ventanas): esos viven en variables de
+> entorno. Documentar un hueco conocido está bien; escribir el paso a paso para
+> aprovecharlo, no.
 
 Cada fase vive en su propio archivo bajo `docs/roadmap/`. Al editar:
 

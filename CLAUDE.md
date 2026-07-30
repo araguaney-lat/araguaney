@@ -35,6 +35,32 @@ Todo cambio sigue este flujo sin excepción:
 
 ---
 
+## REGLA #2 — Este repositorio es público: revisa el diff antes de pushear
+
+**Después del push no hay vuelta atrás.** GitHub conserva los commits por SHA
+aunque después edites, aplastes la rama o hagas force-push; solo Soporte de
+GitHub los purga de verdad. La revisión va **antes**, no después.
+
+Antes de `git push` y antes de `gh pr create`, lee el diff completo
+(`git diff main..HEAD`) con ojos de lector externo, incluido uno adversario, y
+confirma que no va nada de esto:
+
+- Credenciales, tokens, hosts de infraestructura o URLs de base de datos.
+- Correos de operación (incluido el del superadmin) y datos de cuentas de prueba.
+- **Parámetros** de controles de seguridad o antifraude: umbrales, límites,
+  ventanas. Publica el **mecanismo**, nunca el valor que determina cuándo salta;
+  esos viven en variables de entorno.
+- Texto que explique cómo evadir un control, aunque la intención sea documentar
+  una limitación con honestidad. Descríbela como alcance del control, no como
+  receta.
+- Archivos colados por un `git add -A` sin mirar: capturas, artefactos, scratch.
+
+Documentar un hueco conocido está bien y es sano. Publicar el paso a paso para
+aprovecharlo, no. Las tipologías tipo banderas rojas sí se publican: FATF y los
+bancos publican las suyas y el valor disuasorio supera al riesgo.
+
+---
+
 ## 1. Resumen y problema
 
 Tras el doble terremoto del 24 de junio de 2026 en el norte de Venezuela, decenas de
