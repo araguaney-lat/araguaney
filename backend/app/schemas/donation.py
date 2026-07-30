@@ -63,6 +63,8 @@ class DonationCreate(StrictModel):
     intended_campaign_id: StrictUUID | None = None
     items: list[DonationItemInput] = Field(max_length=_MAX_ITEMS)
     notes: str | None = Field(default=None, max_length=_MAX_NOTES)
+    # Fase 20: sin aceptación no hay transferencia de propiedad que registrar.
+    terms_accepted: bool = False
 
     @model_validator(mode="after")
     def _con_renglones(self) -> "DonationCreate":
@@ -72,6 +74,8 @@ class DonationCreate(StrictModel):
             raise ValueError(f"Máximo {_MAX_ITEMS} renglones por donación")
         if not self.donor.email:
             raise ValueError("El correo electrónico es obligatorio para registrar en línea")
+        if not self.terms_accepted:
+            raise ValueError("Hay que aceptar los Términos de Donación para registrar")
         return self
 
 
@@ -118,6 +122,7 @@ class DonationOut(StrictORMModel):
     id: UUID
     code: str
     status: str
+    atypical_volume: bool = False
     intended_center_id: UUID | None
     intended_campaign_id: UUID | None
     received_center_id: UUID | None

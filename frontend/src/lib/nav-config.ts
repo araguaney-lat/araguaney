@@ -18,6 +18,7 @@ import {
   HelpCircle,
   Inbox,
   Gift,
+  ShieldAlert,
 } from "lucide-react"
 
 export type IconComponent = React.ComponentType<{ size?: number; className?: string }>
@@ -47,6 +48,7 @@ export type DashboardNav = {
   reports: string
   users: string
   center_applications: string
+  reviews: string
   audit: string
   team: string
   ayuda: string
@@ -92,6 +94,8 @@ export const OPS_ITEMS: NavItem[] = [
   { href: "/dashboard/donations", labelKey: "donations", roles: ["national_admin", "coordinator", "volunteer"], icon: Gift },
   { href: "/dashboard/scan", labelKey: "scan", roles: ["national_admin", "coordinator", "volunteer"], icon: ScanLine },
   { href: "/dashboard/transfers", labelKey: "transfers", roles: ["national_admin", "coordinator"], icon: ArrowLeftRight },
+  // Cola de banderas rojas: solo quien puede resolverlas la ve.
+  { href: "/dashboard/reviews", labelKey: "reviews", roles: ["national_admin", "coordinator"], icon: ShieldAlert },
   { href: "/dashboard/reports", labelKey: "reports", roles: ["national_admin", "coordinator", "volunteer"], icon: BarChart2 },
   // Team directory: open to everyone. Coordinator/volunteer see their own
   // center directly; national_admin gets a center selector (scoped to their

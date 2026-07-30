@@ -128,7 +128,8 @@
       "ayuda": "Help",
       "admin_section": "Administration",
       "ops_section": "Operations",
-      "menu": "Menu"
+      "menu": "Menu",
+      "reviews": "Reviews"
     },
     "role": {
       "national_admin": "National Admin",
@@ -766,7 +767,12 @@
         "hint_moral": "Organizations require legal name, who delivers, email and phone.",
         "matches_title": "Already registered at this center:"
       },
-      "from_donation": "Capture originated from donation {code}."
+      "from_donation": "Capture originated from donation {code}.",
+      "donor_terms": "The donor accepts the Donation Terms: the donation is irrevocable, without consideration, and carries no right to designate who receives the goods.",
+      "error_donor_terms": "A legal entity must accept the Donation Terms.",
+      "exception_title": "This capture needs the donor identified",
+      "exception_body": "Given the volume, this donation cannot stay anonymous. If the person would not or could not identify themselves, explain what happened: the capture still goes through and coordination reviews it afterwards.",
+      "exception_placeholder": "What happened (e.g. the person left the boxes and walked away)"
     },
     "campaign_members": {
       "back": "← Campaigns",
@@ -892,7 +898,23 @@
         "REJECTED": "Not accepted"
       },
       "photos_title": "Photos sent by the donor",
-      "photo_n": "Photo {n}"
+      "photo_n": "Photo {n}",
+      "atypical_title": "Unusual volume",
+      "atypical_body": "This donation exceeds what an individual usually brings. Nothing is wrong with that, but do the double check with the red-flag guide at hand and escalate to national coordination if something does not add up."
+    },
+    "reviews": {
+      "title": "Reviews",
+      "subtitle": "Captures that raised a flag and await your decision. Approving or rejecting records who and why.",
+      "empty": "No pending reviews.",
+      "kind_anonymous": "Unusual-volume donation with no identified donor",
+      "kind_volume": "Unusual-volume donation",
+      "boxes": "{n} boxes",
+      "note_placeholder": "What you found (required if you reject)",
+      "approve": "Approve",
+      "reject": "Reject",
+      "resolved": "Resolved",
+      "approved": "Approved",
+      "rejected": "Rejected"
     }
   },
   "studio": {

@@ -5,7 +5,9 @@ from uuid import UUID
 from app.models.box import Box
 from app.models.events import BoxEvent
 from app.models.intake import Intake
+from app.models.risk_review import RiskReview
 from app.repositories.campaign_repository import CampaignRepository
+from app.legal import CURRENT_DONATION_TERMS_VERSION
 from app.repositories.donor_repository import DonorRepository
 from app.repositories.intake_repository import IntakeRepository
 from app.repositories.product_type_repository import ProductTypeRepository
@@ -16,6 +18,7 @@ from app.services.base import BaseService
 from app.services.validation_service import validate_box
 from app.utils.gtin import normalize as normalize_gtin, validate as validate_gtin
 from app.utils.errors import api_error
+from app.utils.volume import exceeds_volume_threshold
 
 
 def _box_code() -> str:
@@ -71,11 +74,43 @@ class IntakeService(BaseService):
             if candidata is not None and candidata.received_center_id == center_id:
                 donation = candidata
 
+        # Fase 20 — el anonimato se acaba con el volumen. El escrutinio por tipo
+        # de donante tiene una evasión obvia (registrarse como física, o no
+        # registrarse); el umbral la cierra. Es escalamiento, no tope: exige
+        # identificar, no impide donar.
+        volumen_atipico = donation is None and exceeds_volume_threshold(
+            boxes=len(data.boxes),
+            kg=sum(bd.weight_kg or 0 for bd in data.boxes) or None,
+        )
+        motivo_excepcion = (getattr(data, "anonymous_exception_reason", None) or "").strip()
+
+        # Sobre el umbral se pide identificar. Si la persona se niega —que es en
+        # sí una bandera roja— la captura no se detiene: quien captura registra
+        # el motivo y la revisión queda abierta para la coordinación. Bloquear
+        # aquí le trasladaría el costo a la operación en plena emergencia, y no
+        # recuperaría nada: para cuando alguien revise, la persona ya se fue.
+        if volumen_atipico and data.donor is None and not motivo_excepcion:
+            raise api_error(
+                "DONOR_REQUIRED_FOR_VOLUME",
+                "Esta donación supera el volumen que puede quedar anónimo. "
+                "Registra a la persona o empresa donante, o pide la excepción "
+                "explicando por qué no fue posible.",
+                field="donor",
+            )
+
         # Donante identificado (opcional): sin bloque `donor` la donacion es
         # anonima. Se resuelve antes de crear el intake para que un dato
         # invalido no deje un intake a medias.
         donor = None
         if data.donor is not None:
+            # Quien dona a nombre de una empresa acepta los Términos siempre: es
+            # la parte del control que cierra el "yo dono, yo recibo en destino".
+            if data.donor.donor_type == "moral" and not data.donor_terms_accepted:
+                raise api_error(
+                    "TERMS_NOT_ACCEPTED",
+                    "La persona moral debe aceptar los Términos de Donación",
+                    field="donor_terms_accepted",
+                )
             donor = DonorRepository(self.db).find_or_create(data.donor, center_id)
             self.db.flush()  # asigna el id antes de ligarlo al intake
         elif donation is not None:
@@ -88,6 +123,11 @@ class IntakeService(BaseService):
             campaign_id=campaign_id,
             received_by_user_id=user_id,
             donor_id=donor.id if donor else None,
+            # Solo hay aceptación que registrar si alguien se identificó.
+            donor_terms_version=(
+                CURRENT_DONATION_TERMS_VERSION
+                if donor is not None and data.donor_terms_accepted else None
+            ),
             donante_libre=data.donante_libre,
             notes=data.notes,
         ))
@@ -134,6 +174,19 @@ class IntakeService(BaseService):
                 note=reject_reason,
             )
             self.db.add(event)
+
+        # La bandera se levanta con el intake ya creado: la revisión apunta a algo
+        # que existe, y quien revisa puede ver exactamente qué entró.
+        if volumen_atipico:
+            self.db.add(RiskReview(
+                center_id=center_id,
+                intake_id=intake.id,
+                kind="ANONYMOUS_EXCEPTION" if data.donor is None else "ATYPICAL_VOLUME",
+                status="PENDING",
+                reason=motivo_excepcion or None,
+                boxes=str(len(data.boxes)),
+                created_by_user_id=user_id,
+            ))
 
         # Cierra el circuito con el pre-registro: la donación apunta al intake
         # que la materializó en cajas.

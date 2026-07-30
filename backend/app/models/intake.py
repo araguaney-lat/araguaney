@@ -15,4 +15,8 @@ class Intake(Base):
     received_by_user_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
     donante_libre = Column(String, nullable=True)
     notes = Column(String, nullable=True)
+    # Versión de los Términos de Donación que aceptó el donante identificado
+    # (Fase 20). Nula en captura anónima: no hay a quién atribuirla.
+    donor_terms_version = Column(String, nullable=True)
+
     created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())

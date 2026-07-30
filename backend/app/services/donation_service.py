@@ -12,6 +12,7 @@ from datetime import datetime, timedelta, timezone
 from fastapi import BackgroundTasks
 
 from app.arq_pool import enqueue
+from app.legal import CURRENT_DONATION_TERMS_VERSION
 from app.models.center import Center
 from app.models.donation import Donation, DonationItem
 from app.repositories.donation_repository import DonationRepository
@@ -20,6 +21,7 @@ from app.schemas.donation import DonationCreate
 from app.services.base import BaseService
 from app.utils.errors import api_error
 from app.utils.r2 import delete_object
+from app.utils.volume import exceeds_volume_threshold
 
 logger = logging.getLogger(__name__)
 
@@ -76,6 +78,13 @@ class DonationService(BaseService):
             status="PENDING_EMAIL",
             notes=data.notes,
             confirmation_sent_at=datetime.now(timezone.utc),
+            terms_version=CURRENT_DONATION_TERMS_VERSION,
+            terms_accepted_at=datetime.now(timezone.utc),
+            # No bloquea: quien se pre-registra ya está identificado. Le avisa al
+            # centro que reciba con la guía de banderas rojas a la mano.
+            atypical_volume=exceeds_volume_threshold(
+                boxes=sum(item.quantity for item in data.items), kg=None
+            ),
         )
         donation.donor = donor
         donation.items = [

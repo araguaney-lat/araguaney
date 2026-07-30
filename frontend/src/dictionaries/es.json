@@ -128,7 +128,8 @@
       "ayuda": "Ayuda",
       "admin_section": "Administración",
       "ops_section": "Operaciones",
-      "menu": "Menú"
+      "menu": "Menú",
+      "reviews": "Revisiones"
     },
     "role": {
       "national_admin": "Admin Nacional",
@@ -766,7 +767,12 @@
         "hint_moral": "Para persona moral pedimos razón social, quien entrega, correo y teléfono.",
         "matches_title": "Ya registrado en este centro:"
       },
-      "from_donation": "Captura originada por la donación {code}."
+      "from_donation": "Captura originada por la donación {code}.",
+      "donor_terms": "La persona donante acepta los Términos de Donación: la donación es irrevocable, sin contraprestación y sin derecho a designar quién recibe en destino.",
+      "error_donor_terms": "Una persona moral debe aceptar los Términos de Donación.",
+      "exception_title": "Esta captura necesita identificar al donante",
+      "exception_body": "Por el volumen, esta donación no puede quedar anónima. Si la persona no quiso o no pudo identificarse, explica qué pasó: la captura entra igual y la coordinación revisa después.",
+      "exception_placeholder": "Qué pasó (ej. la persona dejó las cajas y se fue sin dar datos)"
     },
     "campaign_members": {
       "back": "← Campañas",
@@ -892,7 +898,23 @@
         "REJECTED": "No aceptado"
       },
       "photos_title": "Fotos que mandó el donante",
-      "photo_n": "Foto {n}"
+      "photo_n": "Foto {n}",
+      "atypical_title": "Volumen atípico",
+      "atypical_body": "Esta donación supera el volumen habitual de una persona. No hay nada malo en eso, pero haz el doble check con la guía de banderas rojas a la mano y escala a la coordinación nacional si algo no cuadra."
+    },
+    "reviews": {
+      "title": "Revisiones",
+      "subtitle": "Capturas que levantaron una bandera y esperan tu decisión. Aprobar o rechazar deja constancia de quién y por qué.",
+      "empty": "No hay revisiones pendientes.",
+      "kind_anonymous": "Donación de volumen atípico sin donante identificado",
+      "kind_volume": "Donación de volumen atípico",
+      "boxes": "{n} cajas",
+      "note_placeholder": "Qué encontraste (obligatorio si rechazas)",
+      "approve": "Aprobar",
+      "reject": "Rechazar",
+      "resolved": "Resueltas",
+      "approved": "Aprobada",
+      "rejected": "Rechazada"
     }
   },
   "studio": {

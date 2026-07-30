@@ -367,6 +367,12 @@ export default function NewIntakePage() {
     legal_name: "", email: "", phone: "",
   })
   const [notes, setNotes] = useState("")
+  // Fase 20: quien dona a nombre de una empresa acepta los Términos siempre.
+  const [donorTerms, setDonorTerms] = useState(false)
+  // Aparece solo cuando el backend responde que este volumen no puede quedar
+  // anónimo. No se muestra antes: el umbral no se anuncia en la interfaz.
+  const [needsException, setNeedsException] = useState(false)
+  const [exceptionReason, setExceptionReason] = useState("")
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -465,6 +471,10 @@ export default function NewIntakePage() {
     setError(null)
 
     if (!campaignId) { setError(t.error_campaign); return }
+    if (registrarDonante && donor.donor_type === "moral" && !donorTerms) {
+      setError(t.error_donor_terms)
+      return
+    }
     if (isNationalAdmin && !selectedCenterId) { setError(tc.select_center_label); return }
 
     for (const row of rows) {
@@ -493,11 +503,16 @@ export default function NewIntakePage() {
       boxes,
       center_id: isNationalAdmin ? selectedCenterId : undefined,
       donation_id: donation?.id,
+      donor_terms_accepted: registrarDonante && donorTerms,
+      anonymous_exception_reason: needsException ? exceptionReason.trim() || undefined : undefined,
     })
     setSubmitting(false)
 
     if (result.error) {
       setError(result.error)
+      // El backend pide identificar al donante por el volumen. Si no se puede,
+      // la salida es la excepción con motivo, que abre una revisión.
+      if (result.code === "DONOR_REQUIRED_FOR_VOLUME") setNeedsException(true)
     } else {
       router.push("/dashboard/intake")
     }
@@ -578,7 +593,23 @@ export default function NewIntakePage() {
             {t.donor.register_check}
           </label>
           <p className="text-xs text-fnt">{t.donor.anonymous_hint}</p>
-          {registrarDonante && <DonorForm value={donor} onChange={setDonor} />}
+          {registrarDonante && (
+            <>
+              <DonorForm value={donor} onChange={setDonor} />
+              <label className="mt-3 flex items-start gap-2 text-xs text-mut">
+                <input
+                  type="checkbox"
+                  checked={donorTerms}
+                  onChange={(e) => setDonorTerms(e.target.checked)}
+                  className="mt-0.5 h-4 w-4 shrink-0"
+                />
+                <span>
+                  {t.donor_terms}
+                  {donor.donor_type === "moral" && <span className="text-[var(--dRejT)]"> *</span>}
+                </span>
+              </label>
+            </>
+          )}
         </div>
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -616,7 +647,21 @@ export default function NewIntakePage() {
           </button>
         </div>
 
-        {error && (
+        {needsException && !registrarDonante && (
+        <div className="mb-4 rounded-xl border border-[var(--dDraftB)] bg-[var(--dDraftB)] p-4">
+          <p className="text-sm font-semibold text-[var(--dDraftT)]">{t.exception_title}</p>
+          <p className="mt-1 text-xs text-[var(--dDraftT)]">{t.exception_body}</p>
+          <textarea
+            className="mt-3 w-full rounded-lg border border-inpB bg-inp px-3 py-2 text-sm text-tx"
+            rows={2}
+            placeholder={t.exception_placeholder}
+            value={exceptionReason}
+            onChange={(e) => setExceptionReason(e.target.value)}
+          />
+        </div>
+      )}
+
+      {error && (
           <div className="rounded-lg bg-dRejB px-4 py-3 text-sm text-dRejT">
             {error}
           </div>

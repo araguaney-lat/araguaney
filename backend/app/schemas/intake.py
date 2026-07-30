@@ -2,6 +2,8 @@ from datetime import date, datetime
 from decimal import Decimal
 from uuid import UUID
 
+from pydantic import Field
+
 from app.schemas._base import StrictModel, StrictORMModel, StrictUUID, StrictDate, StrictDecimal
 from app.schemas.donor import DonorInput, DonorOut
 
@@ -26,6 +28,12 @@ class IntakeCreate(StrictModel):
     # Donación pre-registrada de la que sale este intake (Fase 18). Al crearlo
     # se liga en ambos sentidos: trazabilidad donante → cajas → tarima → envío.
     donation_id: StrictUUID | None = None
+    # Fase 20: aceptación de los Términos de Donación por el donante identificado.
+    # La persona moral acepta siempre; la física, si se registra.
+    donor_terms_accepted: bool = False
+    # Fase 20: por qué esta captura de volumen atípico queda sin identificar.
+    # Abre una revisión para la coordinación; no la resuelve quien captura.
+    anonymous_exception_reason: str | None = Field(default=None, max_length=500)
     # Legado: se conserva para no romper clientes viejos, pero la captura nueva
     # usa `donor`. El texto libre historico sigue visible en el detalle.
     donante_libre: str | None = None

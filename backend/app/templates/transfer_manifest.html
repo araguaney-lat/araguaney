@@ -33,6 +33,9 @@
   .totals h2 { border: none; margin-bottom: 2mm; }
   .totals table td { border: none; background: none; }
   .totals table td:first-child { font-weight: bold; width: 50%; }
+  .legend { margin-top: 8mm; border: 0.6pt solid #333; padding: 3mm 4mm; font-size: 8pt; line-height: 1.35; }
+  .legend p { margin: 0; }
+  .legend .legend-en { color: #555; font-style: italic; margin-top: 1mm; }
   .footer { margin-top: 12mm; font-size: 7pt; color: #999; text-align: center; border-top: 0.3pt solid #ddd; padding-top: 3mm; }
   .route { font-size: 12pt; font-weight: bold; margin: 3mm 0 1mm; }
   .arrow { color: #555; }
@@ -108,6 +111,11 @@
       <tr><td>Unidades totales:</td><td>{{ total_units }}</td></tr>
       <tr><td>Peso total estimado:</td><td>{{ '%.3f'|format(total_weight_kg) }} kg</td></tr>
     </table>
+  </div>
+
+  <div class="legend">
+    <p>{{ legend_es }}</p>
+    <p class="legend-en">{{ legend_en }}</p>
   </div>
 
   <div class="footer">

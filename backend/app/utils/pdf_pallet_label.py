@@ -8,6 +8,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 
 import qrcode
+from app.legal import CUSTOMS_LEGEND_EN, CUSTOMS_LEGEND_ES
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.utils import ImageReader
 from reportlab.lib.units import mm
@@ -22,6 +23,25 @@ class PalletLabelData:
     box_codes: list[str] = field(default_factory=list)
     closed_at: datetime | None = None
     base_url: str = "http://localhost:3000"
+
+
+# Nada del listado de cajas baja de aquí: abajo van la leyenda y el pie.
+_LEGEND_TOP = 30 * mm
+_ROW_HEIGHT = 5 * mm
+_COLUMNS = 3
+
+
+def fit_box_codes(codes: list[str], y_start: float) -> tuple[list[str], int]:
+    """Cuántas cajas caben antes de la leyenda, y cuántas quedan fuera.
+
+    Una tarima con muchas cajas escribía encima de la leyenda de aduana y hasta
+    fuera de la hoja. El detalle completo vive en el manifiesto, que es el
+    documento que lo sostiene; lo que esta etiqueta no puede perder es la
+    declaración.
+    """
+    filas = max(int((y_start - _LEGEND_TOP) / _ROW_HEIGHT), 0)
+    visibles = codes[: filas * _COLUMNS]
+    return visibles, len(codes) - len(visibles)
 
 
 def generate_pallet_label_pdf(pallet: PalletLabelData) -> bytes:
@@ -73,11 +93,29 @@ def generate_pallet_label_pdf(pallet: PalletLabelData) -> bytes:
         c.setFont("Helvetica", 8)
         y = y_start - 5 * mm
         col_w = (w - 50 * mm) / 3
-        for i, code in enumerate(pallet.box_codes):
+
+        visibles, restantes = fit_box_codes(pallet.box_codes, y)
+
+        for i, code in enumerate(visibles):
             col = i % 3
             row = i // 3
             x = 25 * mm + col * col_w
             c.drawString(x, y - row * 5 * mm, f"• {code}")
+
+        # Nunca se recorta en silencio: quien lee la etiqueta sabe que hay más.
+        if restantes:
+            c.setFont("Helvetica-Oblique", 8)
+            c.drawString(
+                25 * mm, y - (len(visibles) // 3 + 1) * 5 * mm,
+                f"… y {restantes} caja{'s' if restantes != 1 else ''} más — ver manifiesto",
+            )
+
+    # Leyenda de aduana: la tarima viaja sola y su etiqueta tiene que sostener
+    # la declaración sin depender de que el manifiesto llegue con ella.
+    c.setFont("Helvetica", 6.5)
+    c.drawCentredString(w / 2, 24 * mm, CUSTOMS_LEGEND_ES)
+    c.setFont("Helvetica-Oblique", 6)
+    c.drawCentredString(w / 2, 20.5 * mm, CUSTOMS_LEGEND_EN)
 
     c.setFont("Helvetica", 7)
     c.drawCentredString(w / 2, 15 * mm, "Araguaney · Coordinación humanitaria · araguaney.lat")

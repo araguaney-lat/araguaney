@@ -36,6 +36,8 @@ def _payload(**kwargs):
             {"free_text": "20 latas de atún", "quantity": 20, "unit": "latas"},
             {"product_type_id": uuid4(), "quantity": 3, "unit": "piezas"},
         ],
+        # Fase 20: el formulario público no deja registrar sin aceptar.
+        "terms_accepted": True,
     }
     data.update(kwargs)
     return DonationCreate(**data)

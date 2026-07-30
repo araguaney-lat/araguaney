@@ -209,6 +209,51 @@ Run through this before launch:
 
 ---
 
+## Controles estructurales del dominio (Fase 20)
+
+Además de los controles técnicos de arriba, hay decisiones de **diseño del
+dominio** que existen para prevenir el abuso de la donación en especie como
+canal de lavado basado en comercio. Se documentan aquí porque no parecen
+controles de seguridad al leer el código: parecen decisiones de producto, y
+alguien podría "arreglarlas" sin saber qué está desarmando.
+
+### El donante no designa consignatario
+
+No existe campo, endpoint ni flujo para que quien dona indique quién recibe sus
+bienes en destino. El centro y la campaña que elige al pre-registrarse son
+**intención, no destino**: cualquier centro puede recibir el código, y la
+asociación vinculante a campaña la hace el intake. Esto es deliberado. El
+esquema que cierra —"yo dono gratis, una parte relacionada recibe allá"—
+necesita exactamente esa capacidad.
+
+### El donante no rastrea sus bienes hasta la entrega
+
+La ficha pública de una donación muestra su estado y su contenido, no la ruta ni
+el destinatario final. Un donante no puede seguir "sus" cajas hasta quién las
+recibió. La trazabilidad existe para la operación y la aduana, no como servicio
+al donante.
+
+### La mezcla de cajas en tarimas es un control, no un accidente
+
+Una tarima es **mixta por diseño**: agrupa cajas selladas de distintos intakes y
+donantes según lo que convenga al envío. Esa mezcla es lo que hace que no exista
+un "lote de fulano" viajando junto, y por eso el sistema no ofrece forma de
+mantener juntas las cajas de una misma donación. Si alguna vez se agrega un
+agrupamiento por donante, se estará quitando un control anti-abuso.
+
+### Aceptación registrada y escalamiento
+
+Quien dona acepta que la transferencia es irrevocable y sin contraprestación, y
+queda registrada la versión de lo que aceptó. Por encima de cierto volumen —
+configurable por entorno, nunca en el repositorio — una donación no puede quedar
+anónima: se pide identificar, y si no es posible, la captura entra igual pero
+abre una revisión que resuelve la coordinación, nunca quien la capturó. El
+alcance de este control termina ahí: es escalamiento y registro, no verificación
+documental de identidad ni screening de sanciones, que serían desproporcionados
+para una plataforma que no maneja dinero (FATF R.8 pide proporcionalidad).
+
+---
+
 ## Reference implementations
 
 - `backend/app/utils/cloudflare.py` — Cloudflare IP extraction + CIDR validation
