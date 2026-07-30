@@ -11,6 +11,8 @@ export async function createShipmentAction(data: {
   reference?: string
   notes?: string
   center_id?: string
+  // Restricción de altura del envío (Fase 21): se advierte, no bloquea.
+  height_profile?: string
 }) {
   const session = await auth()
   if (!session?.accessToken) return { error: "No autenticado" }

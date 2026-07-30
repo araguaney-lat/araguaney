@@ -60,7 +60,13 @@ def _build_shipment_manifest_data(db: Session, shipment_id: UUID) -> ManifestDat
                 unit=box.unit,
                 weight_kg=box.weight_kg,
             ))
-        pallet_sections.append(ManifestPalletSection(code=pallet.code, boxes=rows))
+        pallet_sections.append(ManifestPalletSection(
+            code=pallet.code,
+            boxes=rows,
+            gross_weight_kg=pallet.gross_weight_kg,
+            tare_weight_kg=pallet.tare_weight_kg,
+            height_cm=pallet.height_cm,
+        ))
 
     return ManifestData(
         shipment_id=str(shipment.id),

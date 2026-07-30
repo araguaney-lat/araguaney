@@ -22,6 +22,8 @@ class PalletOut(StrictORMModel):
     status: str
     notes: str | None
     tare_weight_kg: Decimal | None
+    gross_weight_kg: Decimal | None = None
+    height_cm: int | None = None
     closed_at: datetime | None
     created_at: datetime
 
@@ -37,6 +39,12 @@ class PalletDetailOut(StrictModel):
     closed_at: datetime | None
     created_at: datetime
     boxes: list[BoxOut]
+    gross_weight_kg: Decimal | None = None
+    height_cm: int | None = None
+    # Suma de las cajas pesadas y su diferencia contra el neto de la tarima.
+    # Se espera positiva y pequeña: la tarima carga base y emplaye.
+    boxes_weight_kg: Decimal | None = None
+    weight_discrepancy_kg: Decimal | None = None
 
 
 class PalletPublicOut(StrictModel):
@@ -46,3 +54,11 @@ class PalletPublicOut(StrictModel):
     center_name: str
     box_count: int
     closed_at: datetime | None
+
+
+class PalletCloseIn(StrictModel):
+    """Pesaje al cerrar. Todo opcional: una báscula descompuesta no puede
+    impedir que se cierre una tarima ya armada."""
+
+    gross_weight_kg: StrictDecimal | None = None
+    height_cm: int | None = None

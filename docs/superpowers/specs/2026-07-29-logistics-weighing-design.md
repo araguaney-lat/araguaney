@@ -20,20 +20,27 @@ guías de PACs (Carta Porte 3.1, regla 2.7.1.51, excepciones), ship4wd/exfreight
 
 ## Diseño
 
-### 1. Pesaje en dos niveles: estimado por caja, verdad por tarima
+### 1. Pesaje en dos niveles: la caja y la tarima, ambas con báscula
 
-- **Caja:** `boxes.weight_kg` deja de pedirse a mano como norma. Se **pre-llena**
-  con `product_types.unit_weight_kg × cantidad` cuando el catálogo tiene el
-  dato, editable. Pasa a ser explícitamente un *estimado para documentos de
-  contenido*.
+> **Corregido durante la implementación.** El diseño original derivaba el peso
+> de la caja del catálogo. Es falso: una caja llena lleva cartón, empaque,
+> separadores y relleno, así que la suma de sus productos siempre queda corta.
+> Pesar la caja cerrada sí es factible; pesar producto por producto no lo es.
+
+- **Caja:** `boxes.weight_kg` es un **dato medido** — lo que marcó la báscula con
+  la caja ya cerrada. El catálogo (`unit_weight_kg × cantidad`) se muestra al
+  lado como referencia ("solo el contenido pesaría ~X kg") y **no** llena el
+  campo: sirve para cachar un dedazo, no para sustituir la medición.
 - **Tarima:** al cerrar, la UI pide el **peso bruto de báscula**
   (`pallets.gross_weight_kg`, nuevo) y la **altura** (`pallets.height_cm`,
-  nuevo). Neto = bruto − tara (la tara ya existe). Se muestra la discrepancia
-  contra la suma de estimados de caja: informativa, nunca bloqueante (la
-  báscula tiene razón por definición).
-- **Manifiesto y documentos:** los totales por tarima y por envío usan el peso
-  pesado cuando existe (bruto/tara/neto); la columna por caja se marca como
-  estimada. El peso que viaja al anexo Carta Porte es el pesado.
+  nuevo). Neto = bruto − tara (la tara ya existe). Se muestra la diferencia
+  contra la suma de las cajas pesadas: se espera **positiva y pequeña**, porque
+  la tarima carga base y emplaye. Negativa señala una caja mal pesada o una tara
+  alta. Informativa, nunca bloqueante.
+- **Manifiesto y documentos:** los totales por tarima y por envío usan el neto de
+  la tarima cuando existe (bruto/tara/neto), y caen a la suma de cajas solo donde
+  nadie pesó la tarima, diciéndolo. El peso que viaja al anexo Carta Porte es el
+  de la tarima: es el bulto que se transporta.
 
 ### 2. Anexo Carta Porte (datos, no timbrado)
 

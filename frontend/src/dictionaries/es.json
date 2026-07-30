@@ -236,7 +236,19 @@
       },
       "scan_box": "Escanear caja",
       "scan_label": "Apunta al QR de la caja",
-      "scanned_donation": "Ese es un código de donación. Recíbela desde Donaciones; aquí solo entran cajas selladas."
+      "scanned_donation": "Ese es un código de donación. Recíbela desde Donaciones; aquí solo entran cajas selladas.",
+      "confirm_close": "Confirmar cierre",
+      "weighing_title": "Pesaje (opcional)",
+      "weighing_hint": "El peso de báscula es el que viaja en los documentos. Si no puedes pesar, cierra sin llenar nada.",
+      "gross_placeholder": "Peso bruto (kg)",
+      "height_placeholder": "Altura (cm)",
+      "weighing_summary": "Pesaje de la tarima",
+      "gross_label": "Bruto",
+      "tare_label": "Tara",
+      "height_label": "Altura",
+      "boxes_weight_label": "Suma de sus cajas",
+      "difference_label": "Diferencia",
+      "difference_negative": "La tarima pesa menos que sus cajas. Revisa si alguna caja se pesó mal o si la tara está alta."
     },
     "shipments": {
       "title": "Envíos",
@@ -271,7 +283,15 @@
         "OPEN": "Abierto",
         "CLOSED": "Cerrado",
         "SHIPPED": "Despachado"
-      }
+      },
+      "field_height_profile": "Perfil de altura",
+      "height_profile_none": "— Sin declarar —",
+      "height_profile_hint": "La restricción de altura del avión o del arco de rayos X. Se avisa si una tarima no cabe; nunca bloquea.",
+      "profile_lower_deck": "Bodega inferior — 160 cm",
+      "profile_xray": "Arco de rayos X — 170 cm",
+      "profile_main_deck": "Cubierta principal — 180 cm",
+      "profile_unrestricted": "Sin restricción",
+      "height_warning_title": "Tarimas que no caben en el perfil declarado"
     },
     "national": {
       "title": "Panel nacional",
@@ -772,7 +792,9 @@
       "error_donor_terms": "Una persona moral debe aceptar los Términos de Donación.",
       "exception_title": "Esta captura necesita identificar al donante",
       "exception_body": "Por el volumen, esta donación no puede quedar anónima. Si la persona no quiso o no pudo identificarse, explica qué pasó: la captura entra igual y la coordinación revisa después.",
-      "exception_placeholder": "Qué pasó (ej. la persona dejó las cajas y se fue sin dar datos)"
+      "exception_placeholder": "Qué pasó (ej. la persona dejó las cajas y se fue sin dar datos)",
+      "weight_hint": "Pesa la caja ya cerrada y anota lo que marque la báscula.",
+      "weight_reference": "Solo el contenido pesaría ~{kg} kg según el catálogo. La caja siempre pesa más."
     },
     "campaign_members": {
       "back": "← Campañas",

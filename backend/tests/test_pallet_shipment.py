@@ -34,6 +34,10 @@ def _pallet(status="OPEN", **kwargs):
     p.notes = None
     p.closed_at = None
     p.created_at = _NOW
+    # Pesaje de Fase 21: sin báscula por default, como una tarima recién armada.
+    p.gross_weight_kg = None
+    p.tare_weight_kg = None
+    p.height_cm = None
     for k, v in kwargs.items():
         setattr(p, k, v)
     return p
@@ -74,6 +78,7 @@ def _shipment(status="OPEN", **kwargs):
     s.closed_at = None
     s.shipped_at = None
     s.created_at = _NOW
+    s.height_profile = None          # sin restricción de altura declarada
     for k, v in kwargs.items():
         setattr(s, k, v)
     return s

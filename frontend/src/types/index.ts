@@ -138,6 +138,8 @@ export interface ProductType {
   default_unit: string | null
   is_controlled: boolean
   min_shelf_life_days: number | null
+  // Peso de una unidad. Con esto el intake pre-llena el estimado de la caja.
+  unit_weight_kg: string | number | null
   created_at: string
 }
 
@@ -197,6 +199,12 @@ export interface PalletOut {
 
 export interface PalletDetailOut extends PalletOut {
   boxes: BoxOut[]
+  gross_weight_kg?: string | number | null
+  tare_weight_kg?: string | number | null
+  height_cm?: number | null
+  // Suma de las cajas pesadas y su diferencia contra el neto de la tarima.
+  boxes_weight_kg?: string | number | null
+  weight_discrepancy_kg?: string | number | null
 }
 
 export interface PalletPublicOut {
@@ -222,6 +230,9 @@ export interface ShipmentOut {
 
 export interface ShipmentDetailOut extends ShipmentOut {
   pallets: PalletDetailOut[]
+  height_profile?: string | null
+  // Tarimas que no caben en el perfil declarado. Aviso, no bloqueo.
+  height_warnings?: string[]
 }
 
 // ── Transfers ─────────────────────────────────────────────────────────────────

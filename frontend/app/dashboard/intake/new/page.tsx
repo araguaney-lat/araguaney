@@ -32,6 +32,22 @@ interface BoxRow {
   scannedGtin: string
 }
 
+/** Referencia del catálogo: cuánto pesaría solo el contenido.
+
+No llena el campo de peso. La caja se pesa, y su peso real incluye el cartón, el
+empaque y el relleno, así que la suma de productos siempre queda corta. Sirve
+para que quien captura note un dedazo — 2 kg donde la referencia dice 20. */
+function catalogReference(pt: ProductType, quantity: string): string | null {
+  const unidad = typeof pt.unit_weight_kg === "string"
+    ? parseFloat(pt.unit_weight_kg)
+    : pt.unit_weight_kg
+  const cantidad = parseInt(quantity, 10)
+  if (!unidad || !Number.isFinite(unidad) || !Number.isFinite(cantidad) || cantidad <= 0) {
+    return null
+  }
+  return (unidad * cantidad).toFixed(3)
+}
+
 function newRow(): BoxRow {
   return {
     key: crypto.randomUUID(),
@@ -329,6 +345,15 @@ function BoxRowInput({
             onChange={set("weight_kg")}
             className="w-full rounded-lg border border-inpB bg-inp px-3 py-2 text-sm text-tx focus:outline-none focus:ring-2 focus:ring-[var(--gold)]"
           />
+          <p className="mt-1 text-[11px] text-fnt">{t.weight_hint}</p>
+          {/* La referencia del catálogo se muestra, no se copia al campo: el
+              peso real de la caja incluye cartón, empaque y relleno. Sirve para
+              cachar un dedazo, no para sustituir la báscula. */}
+          {row.product_type && catalogReference(row.product_type, row.quantity) && (
+            <p className="mt-0.5 text-[11px] text-mut">
+              {t.weight_reference.replace("{kg}", catalogReference(row.product_type, row.quantity)!)}
+            </p>
+          )}
         </div>
       </div>
 

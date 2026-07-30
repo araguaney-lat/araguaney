@@ -11,6 +11,8 @@ from app.schemas.box import BoxOut
 from app.schemas.pallet import PalletCreate, PalletDetailOut, PalletPublicOut
 from app.services.base import BaseService
 from app.utils.errors import api_error
+from app.utils.weight import validate_weighing
+from app.utils.weight import boxes_weight as _boxes_weight, net_weight, weight_discrepancy
 
 
 def _pallet_code() -> str:
@@ -67,7 +69,14 @@ class PalletService(BaseService):
         box_repo.commit()
         return self._build_detail(pallet)
 
-    def close(self, pallet_id: UUID, center_id: UUID | None, user_id: UUID) -> Pallet:
+    def close(
+        self,
+        pallet_id: UUID,
+        center_id: UUID | None,
+        user_id: UUID,
+        gross_weight_kg=None,
+        height_cm: int | None = None,
+    ) -> Pallet:
         repo = PalletRepository(self.db)
         pallet = repo.find_by_id(pallet_id, center_id)
         if not pallet:
@@ -80,6 +89,14 @@ class PalletService(BaseService):
             )
         if not repo.find_boxes(pallet_id):
             raise api_error("EMPTY_PALLET", "Cannot close an empty pallet", status_code=400)
+
+        # El pesaje es opcional: una báscula descompuesta no puede impedir que se
+        # cierre una tarima que ya está armada.
+        validate_weighing(gross_weight_kg, height_cm)
+        if gross_weight_kg is not None:
+            pallet.gross_weight_kg = gross_weight_kg
+        if height_cm is not None:
+            pallet.height_cm = height_cm
 
         pallet.status = "CLOSED"
         pallet.closed_at = datetime.now(tz=timezone.utc)
@@ -123,5 +140,12 @@ class PalletService(BaseService):
             notes=pallet.notes,
             closed_at=pallet.closed_at,
             created_at=pallet.created_at,
+            gross_weight_kg=pallet.gross_weight_kg,
+            tare_weight_kg=pallet.tare_weight_kg,
+            height_cm=pallet.height_cm,
+            boxes_weight_kg=(suma := _boxes_weight(boxes)),
+            weight_discrepancy_kg=weight_discrepancy(
+                net_weight(pallet.gross_weight_kg, pallet.tare_weight_kg), suma
+            ),
             boxes=[BoxOut.model_validate(b) for b in boxes],
         )
