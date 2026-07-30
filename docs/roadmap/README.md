@@ -3,9 +3,9 @@
 ## Progreso general
 
 ```mermaid
-pie title Tareas completadas (420 tareas)
+pie title Tareas completadas (431 tareas)
     "Listas" : 335
-    "Pendientes" : 85
+    "Pendientes" : 96
 ```
 
 | Fase | Nombre | Listas | Pendientes | Progreso |
@@ -33,9 +33,10 @@ pie title Tareas completadas (420 tareas)
 | 20 | [Prevención de riesgos: responsabilidad y anti-lavado en especie](phase-20-risk-prevention.md) | 0 | 10 | ⬜ 0% |
 | 21 | [Logística: pesaje, anexo Carta Porte y perfiles de paletizado](phase-21-logistics-weighing.md) | 0 | 12 | ⬜ 0% |
 | 22 | [Trazabilidad extendida: avión y destino](phase-22-extended-traceability.md) | 0 | 14 | ⬜ 0% |
-| **Total** | | **335** | **85** | **🟡 80%** |
+| 23 | [IA asistida: captura, catálogo y necesidades](phase-23-ai-assisted-capture.md) | 0 | 11 | ⬜ 0% |
+| **Total** | | **335** | **96** | **🟡 78%** |
 
-> **Pendientes (85):**
+> **Pendientes (96):**
 > El grupo A de la Fase 13 (privacidad, lo que aplica hoy) está completo.
 > - **22 de la Fase 18 (pre-registro de donaciones):** fase nueva, diseño aprobado en
 >   [el spec](../superpowers/specs/2026-07-29-donor-preregistration-design.md); aún sin arrancar.
@@ -51,6 +52,9 @@ pie title Tareas completadas (420 tareas)
 > - **14 de la Fase 22 (trazabilidad extendida):** hitos logísticos, recepción en destino con
 >   merma e incidencias; diseño en
 >   [su spec](../superpowers/specs/2026-07-29-extended-traceability-design.md).
+> - **11 de la Fase 23 (IA asistida):** mapeo de texto libre, OCR de etiqueta, emparejamiento de
+>   necesidades y resumen nacional, con guardarraíles de gasto; diseño en
+>   [su spec](../superpowers/specs/2026-07-29-ai-assisted-capture-design.md).
 > - **12 gated por pago o por decisión de negocio:** Fase 4 → 2 (spend caps + alertas, requieren
 >   plan de pago de infra). Fase 13 → 10 (bloque de donativos/pagos: entidad receptora, asesoría
 >   legal/contable, procesador de pagos, T&C de donación, transparencia). Todo el bloque de
