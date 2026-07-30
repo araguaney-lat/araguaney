@@ -58,7 +58,7 @@ const CONTENT: Record<Locale, Content> = {
     ],
     privacyLabel: "Privacidad.",
     privacyText:
-      " No recopilamos datos personales de donantes ni beneficiarios. Este formulario solo nos sirve para contactar a tu organización.",
+      " No recopilamos ningún dato de personas beneficiarias. Este formulario solo nos sirve para contactar a tu organización.",
     footerPrivacy: "Aviso de Privacidad",
     footerTerms: "Términos",
     form: {
@@ -103,7 +103,7 @@ const CONTENT: Record<Locale, Content> = {
     ],
     privacyLabel: "Privacy.",
     privacyText:
-      " We don't collect personal data of donors or beneficiaries. This form only lets us contact your organization.",
+      " We don't collect any data about aid recipients. This form only lets us contact your organization.",
     footerPrivacy: "Privacy Notice",
     footerTerms: "Terms",
     form: {

@@ -83,7 +83,7 @@ const CONTENT: Record<Locale, Content> = {
       {
         title: "Privacidad y datos",
         faqs: [
-          { q: "¿Araguaney guarda datos personales de donantes o beneficiarios?", a: "No. Araguaney solo gestiona inventario, trazable de la caja al envío. No se registran datos personales de donantes ni de beneficiarios." },
+          { q: "¿Araguaney guarda datos personales de donantes o beneficiarios?", a: "De personas beneficiarias no se guarda absolutamente nada. De quien dona, solo si decide identificarse: la donación anónima sigue siendo la norma. Quien se registra en línea deja nombre y correo para recibir su código y poder modificar o cancelar su donación; un pre-registro que nadie confirma se elimina, y los plazos están declarados en el aviso de privacidad." },
           { q: "¿Araguaney gestiona dinero o donativos económicos?", a: "No. Araguaney gestiona únicamente donaciones en especie e inventario; no maneja dinero ni donativos económicos." },
         ],
       },
@@ -141,7 +141,7 @@ const CONTENT: Record<Locale, Content> = {
       {
         title: "Privacy and data",
         faqs: [
-          { q: "Does Araguaney store personal data of donors or beneficiaries?", a: "No. Araguaney only manages inventory, traceable from box to shipment. No personal data of donors or beneficiaries is stored." },
+          { q: "Does Araguaney store personal data of donors or beneficiaries?", a: "Nothing at all is stored about aid recipients. About donors, only if they choose to identify themselves: anonymous donation remains the norm. Whoever registers online leaves a name and email to get their code and be able to change or cancel the donation; a pre-registration nobody confirms is deleted, and the retention periods are declared in the privacy notice." },
           { q: "Does Araguaney handle money or financial donations?", a: "No. Araguaney manages only in-kind donations and inventory; it does not handle money or financial donations." },
         ],
       },

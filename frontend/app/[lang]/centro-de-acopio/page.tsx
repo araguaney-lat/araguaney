@@ -70,7 +70,7 @@ const CONTENT: Record<Locale, Content> = {
       { icon: "📋", title: "Manifiesto exportable", desc: "Packing list lista para aduana en un clic, generada a partir de las tarimas y cajas de cada envío." },
       { icon: "🗺️", title: "Panel nacional en tiempo real", desc: "Suma el stock de todos los centros de acopio conectados: qué hay, cuánto y dónde." },
       { icon: "💊", title: "Validación de medicamentos", desc: "Vida útil mínima, denominación INN y bloqueo de sustancias controladas según lineamientos de la OMS." },
-      { icon: "🔒", title: "Sin datos personales", desc: "No se registra información de donantes ni beneficiarios. Solo inventario, trazable de la caja al envío." },
+      { icon: "🔒", title: "Privacidad mínima por diseño", desc: "De personas beneficiarias no se registra nada. De donantes, solo si quieren identificarse, con plazo declarado y purga automática." },
     ],
     faqTitle: "Preguntas frecuentes",
     faq: [
@@ -110,7 +110,7 @@ const CONTENT: Record<Locale, Content> = {
       { icon: "📋", title: "Exportable manifest", desc: "A customs-ready packing list in one click, generated from each shipment's pallets and boxes." },
       { icon: "🗺️", title: "National dashboard in real time", desc: "Adds up the stock of every connected collection center: what there is, how much, and where." },
       { icon: "💊", title: "Medicine validation", desc: "Minimum shelf life, INN name, and blocking of controlled substances per WHO guidelines." },
-      { icon: "🔒", title: "No personal data", desc: "No donor or beneficiary information is stored. Only inventory, traceable from box to shipment." },
+      { icon: "🔒", title: "Minimal data by design", desc: "Nothing is recorded about aid recipients. About donors, only if they choose to identify themselves, with a declared retention period and automatic purge." },
     ],
     faqTitle: "Frequently asked questions",
     faq: [

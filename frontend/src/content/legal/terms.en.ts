@@ -47,7 +47,7 @@ export const termsEn: LegalDoc = {
           list: [
             "Use it solely for legitimate humanitarian aid coordination purposes.",
             "Register truthful and accurate information about donations and inventory.",
-            "Not enter personal data of donors or final beneficiaries (the platform is not designed for that).",
+            "Not enter personal data of final beneficiaries (the platform is not designed for that), nor donor data outside the fields provided for it.",
             "Not attempt to breach the platform's security, access other centers' data without authorization, or interfere with its operation.",
             "Not use the platform for unlawful, fraudulent or harmful activities.",
           ],

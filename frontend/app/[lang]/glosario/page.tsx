@@ -76,7 +76,7 @@ const CONTENT: Record<Locale, Content> = {
       {
         term: "Intake (recepción)",
         definition:
-          "Registro de una donación entrante en el centro de acopio. Se captura por ítem (categoría, lote, caducidad) y aplica las reglas de rechazo. No registra datos personales del donante.",
+          "Registro de una donación entrante en el centro de acopio. Se captura por ítem (categoría, lote, caducidad) y aplica las reglas de rechazo. El donante puede quedar anónimo, que es la norma, o identificarse si lo prefiere.",
       },
       {
         term: "Caja homogénea vs. bulto",
@@ -174,7 +174,7 @@ const CONTENT: Record<Locale, Content> = {
       {
         term: "Intake",
         definition:
-          "Registration of an incoming donation at the collection center. It's captured item by item (category, batch, expiry) and applies the rejection rules. It does not record the donor's personal data.",
+          "Registration of an incoming donation at the collection center. It's captured item by item (category, batch, expiry) and applies the rejection rules. The donor may stay anonymous, which is the norm, or identify themselves if they prefer.",
       },
       {
         term: "Homogeneous box vs. loose package",

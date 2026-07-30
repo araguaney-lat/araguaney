@@ -67,7 +67,7 @@ const CONTENT: Record<Locale, Content> = {
     metaTitle: "Nosotros",
     ogTitle: "Nosotros — Araguaney",
     description:
-      "Araguaney es el estándar común para coordinar centros de acopio y logística de ayuda humanitaria: registro por ítem, cajas con QR, manifiestos y panel nacional. Sin datos personales.",
+      "Araguaney es el estándar común para coordinar centros de acopio y logística de ayuda humanitaria: registro por ítem, cajas con QR, manifiestos y panel nacional. Sin datos de beneficiarios.",
     ogEyebrow: "Nosotros",
     eyebrow: "Nosotros",
     h1: "El estándar común para la logística de ayuda humanitaria en especie",
@@ -95,10 +95,10 @@ const CONTENT: Record<Locale, Content> = {
     ],
     privacyH2: "Privacidad por diseño",
     privacyP:
-      "Araguaney no registra datos personales de donantes ni de beneficiarios. Solo gestiona inventario, trazable de la caja al envío. Menos superficie de datos sensibles, menos riesgo, y una herramienta que se concentra en lo que importa: que la ayuda llegue.",
+      "Araguaney no registra ni un solo dato de las personas beneficiarias: gestiona inventario, trazable de la caja al envío. De quien dona guardamos lo mínimo y solo cuando hace falta — la donación anónima sigue siendo la norma, y quien se identifica lo hace para recibir su comprobante o para que el centro pueda contactarlo. Esos datos tienen plazo declarado y se purgan solos: lo que nadie confirma se borra. Menos superficie de datos sensibles, menos riesgo, y una herramienta concentrada en lo que importa: que la ayuda llegue.",
     openSourceH2: "Código abierto y auditable",
     openSourceP:
-      "El código de Araguaney es público y libre, bajo licencia AGPL-3.0. Cualquiera puede revisar cómo funciona por dentro: que el inventario de cada centro está aislado del de los demás, y que no se guardan datos personales de donantes ni de beneficiarios. Es la diferencia entre pedirte que confíes y darte cómo verificarlo. Además, si un día este proyecto se detiene, los centros pueden seguir operando su propia instancia.",
+      "El código de Araguaney es público y libre, bajo licencia AGPL-3.0. Cualquiera puede revisar cómo funciona por dentro: que el inventario de cada centro está aislado del de los demás, que no se guarda ningún dato de personas beneficiarias, y exactamente qué se guarda de quien dona y por cuánto tiempo. Es la diferencia entre pedirte que confíes y darte cómo verificarlo. Además, si un día este proyecto se detiene, los centros pueden seguir operando su propia instancia.",
     openSourceCta: "Ver el código en GitHub ↗",
     founderH2: "Quién está detrás",
     founderRole: "Ingeniero de Software y responsable de la plataforma detrás de Araguaney",
@@ -122,7 +122,7 @@ const CONTENT: Record<Locale, Content> = {
     metaTitle: "About",
     ogTitle: "About — Araguaney",
     description:
-      "Araguaney is the common standard for coordinating aid collection centers and humanitarian logistics: item-level intake, boxes with QR codes, manifests and a national dashboard. No personal data.",
+      "Araguaney is the common standard for coordinating aid collection centers and humanitarian logistics: item-level intake, boxes with QR codes, manifests and a national dashboard. No recipient data.",
     ogEyebrow: "About",
     eyebrow: "About",
     h1: "The common standard for in-kind humanitarian aid logistics",
@@ -150,10 +150,10 @@ const CONTENT: Record<Locale, Content> = {
     ],
     privacyH2: "Privacy by design",
     privacyP:
-      "Araguaney stores no personal data of donors or beneficiaries. It only manages inventory, traceable from box to shipment. Less sensitive-data surface, less risk, and a tool focused on what matters: getting aid delivered.",
+      "Araguaney stores no data whatsoever about aid recipients: it manages inventory, traceable from box to shipment. From donors we keep the minimum, and only when needed — anonymous donation remains the norm, and those who identify themselves do so to get their receipt or so the center can reach them. That data has a declared retention period and is purged automatically: whatever nobody confirms is deleted. Less sensitive-data surface, less risk, and a tool focused on what matters: getting aid delivered.",
     openSourceH2: "Open source and auditable",
     openSourceP:
-      "Araguaney's code is public and free, under the AGPL-3.0 license. Anyone can review how it works inside: that each center's inventory is isolated from the rest, and that no personal data of donors or beneficiaries is stored. That's the difference between asking you to trust us and giving you a way to verify it. And if this project ever stops, centers can keep running their own instance.",
+      "Araguaney's code is public and free, under the AGPL-3.0 license. Anyone can review how it works inside: that each center's inventory is isolated from the rest, that no data about aid recipients is stored at all, and exactly what is kept about donors and for how long. That's the difference between asking you to trust us and giving you a way to verify it. And if this project ever stops, centers can keep running their own instance.",
     openSourceCta: "View the code on GitHub ↗",
     founderH2: "Who's behind it",
     founderRole: "Software Engineer, responsible for the platform behind Araguaney",
