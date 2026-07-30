@@ -267,3 +267,118 @@ def test_la_firma_de_la_tarea_coincide_con_lo_que_encola_el_servicio():
 
     params = list(inspect.signature(worker.send_donation_confirmation_email_task).parameters)
     assert params == ["ctx", "to", "first_name", "token"]
+
+
+# ── Gestión del donante: solo en REGISTERED ──────────────────────────────────
+
+def _registrada(items=None):
+    d = MagicMock()
+    d.status = "REGISTERED"
+    d.manage_token_expires_at = datetime.now(timezone.utc) + timedelta(days=10)
+    d.items = items if items is not None else []
+    return d
+
+
+def _con_donacion(svc, donation):
+    return patch("app.services.donation_service.DonationRepository", **{
+        "return_value.find_by_manage_token_hash.return_value": donation,
+    })
+
+
+def test_el_donante_puede_reemplazar_sus_renglones():
+    svc, _ = _service()
+    d = _registrada()
+    with _con_donacion(svc, d):
+        svc.update_items("crudo", [DonationItemInput(free_text="5 cobijas", quantity=5, unit="piezas")])
+    assert len(d.items) == 1 and d.items[0].free_text == "5 cobijas"
+
+
+def test_los_renglones_del_donante_se_marcan_como_suyos():
+    svc, _ = _service()
+    d = _registrada()
+    with _con_donacion(svc, d):
+        svc.update_items("crudo", [DonationItemInput(free_text="5 cobijas", quantity=5, unit="piezas")])
+    assert d.items[0].added_by == "donor"
+
+
+def test_no_se_puede_editar_una_donacion_ya_recibida():
+    """Desde RECEIVED manda el inventario del centro, no el donante."""
+    svc, _ = _service()
+    d = _registrada()
+    d.status = "RECEIVED"
+    with _con_donacion(svc, d), pytest.raises(HTTPException) as exc:
+        svc.update_items("crudo", [DonationItemInput(free_text="x", quantity=1, unit="pieza")])
+    assert exc.value.status_code == 409
+
+
+def test_el_donante_puede_cancelar_mientras_no_la_entregue():
+    svc, _ = _service()
+    d = _registrada()
+    with _con_donacion(svc, d):
+        svc.cancel("crudo")
+    assert d.status == "CANCELLED"
+
+
+def test_no_se_puede_cancelar_una_donacion_ya_recibida():
+    svc, _ = _service()
+    d = _registrada()
+    d.status = "RECEIVED"
+    with _con_donacion(svc, d), pytest.raises(HTTPException):
+        svc.cancel("crudo")
+
+
+def test_editar_deja_rastro_en_los_eventos():
+    svc, _ = _service()
+    d = _registrada()
+    with _con_donacion(svc, d) as MockRepo:
+        svc.cancel("crudo")
+        assert MockRepo.return_value.log_event.called
+
+
+# ── Ficha pública: mínima y anti-enumeración ─────────────────────────────────
+
+def test_la_ficha_publica_no_lleva_datos_del_donante():
+    from app.schemas.donation import DonationPublicOut
+    campos = set(DonationPublicOut.model_fields)
+    assert campos == {"code", "status", "items"}
+
+
+def test_un_codigo_inexistente_responde_404_generico():
+    svc, _ = _service()
+    with patch("app.services.donation_service.DonationRepository") as MockRepo:
+        MockRepo.return_value.find_by_code.return_value = None
+        with pytest.raises(HTTPException) as exc:
+            svc.get_public("DN-NOEXISTE")
+    assert exc.value.status_code == 404
+
+
+def test_una_donacion_sin_confirmar_no_es_visible_en_la_ficha():
+    """PENDING_EMAIL no debe distinguirse de inexistente."""
+    svc, _ = _service()
+    d = MagicMock(status="PENDING_EMAIL")
+    with patch("app.services.donation_service.DonationRepository") as MockRepo:
+        MockRepo.return_value.find_by_code.return_value = d
+        with pytest.raises(HTTPException) as exc:
+            svc.get_public("DN-ABC123")
+    assert exc.value.status_code == 404
+
+
+# ── Superficie pública: toda ruta lleva límite de tasa ────────────────────────
+
+def test_toda_ruta_publica_de_donaciones_tiene_limite_de_tasa():
+    """Un endpoint público sin límite es una puerta abierta al abuso."""
+    import re
+    from pathlib import Path
+
+    src = Path("app/routers/donation.py").read_text()
+    rutas = re.findall(r"@router\.\w+\(", src)
+    limites = re.findall(r"@limiter\.limit\(", src)
+    assert len(rutas) == len(limites), "hay una ruta pública sin @limiter.limit"
+
+
+def test_la_ficha_publica_se_cachea_en_el_edge():
+    """Un QR compartido no debe golpear la base en cada escaneo."""
+    from pathlib import Path
+
+    src = Path("app/routers/donation.py").read_text()
+    assert "s-maxage" in src and "Cache-Control" in src

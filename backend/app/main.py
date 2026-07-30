@@ -22,7 +22,7 @@ from app.utils.cloudflare import get_client_ip
 from app.utils.rate_limit import limiter
 
 # ── Routers ────────────────────────────────────────────────────────────────────
-from app.routers import auth, box, campaign, catalog, center, dashboard, exports, intake, messaging, pallet, product_type, report, shipment, transfer, users, studio, requests as requests_router, center_application, email_failures, resend_webhook
+from app.routers import auth, box, campaign, catalog, center, dashboard, exports, intake, messaging, pallet, product_type, report, shipment, transfer, users, studio, requests as requests_router, center_application, donation, email_failures, resend_webhook
 
 # ── Models (ensure tables are registered with SQLAlchemy) ─────────────────────
 from app.models import user as _user_model                  # noqa: F401
@@ -35,6 +35,8 @@ from app.models import intake as _intake_model              # noqa: F401
 from app.models import box as _box_model                    # noqa: F401
 from app.models import events as _events_model              # noqa: F401
 from app.models import campaign as _campaign_model          # noqa: F401
+from app.models import donor as _donor_model                # noqa: F401
+from app.models import donation as _donation_model          # noqa: F401
 
 logging.basicConfig(
     level=logging.INFO,
@@ -314,6 +316,7 @@ app.include_router(dashboard.router, prefix=_V1)
 app.include_router(studio.router, prefix=_V1)
 app.include_router(requests_router.router, prefix=_V1)
 app.include_router(center_application.router, prefix=_V1)
+app.include_router(donation.router, prefix=_V1)
 app.include_router(email_failures.router, prefix=_V1)
 # Resend webhook is unversioned (third-party caller with a hardcoded URL).
 app.include_router(resend_webhook.router)
