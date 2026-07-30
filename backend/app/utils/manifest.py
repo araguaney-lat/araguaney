@@ -11,6 +11,8 @@ from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader
 
+from app.legal import CUSTOMS_LEGEND_EN, CUSTOMS_LEGEND_ES
+
 _TEMPLATE_DIR = Path(__file__).parent.parent / "templates"
 _jinja_env = Environment(loader=FileSystemLoader(str(_TEMPLATE_DIR)), autoescape=True)
 
@@ -62,6 +64,8 @@ def render_manifest_html(data: ManifestData) -> str:
         total_units=total_units,
         total_weight_kg=total_weight,
         generated_at=datetime.now(tz=timezone.utc).strftime("%d/%m/%Y %H:%M UTC"),
+        legend_es=CUSTOMS_LEGEND_ES,
+        legend_en=CUSTOMS_LEGEND_EN,
     )
 
 
@@ -82,16 +86,21 @@ class TransferManifestData:
     boxes: list[ManifestBoxRow] = field(default_factory=list)
 
 
-def generate_transfer_manifest_pdf(data: TransferManifestData) -> bytes:
-    from weasyprint import HTML
-
+def render_transfer_manifest_html(data: TransferManifestData) -> str:
     template = _jinja_env.get_template("transfer_manifest.html")
     total_units = sum(b.quantity for b in data.boxes)
     total_weight = sum(float(b.weight_kg) for b in data.boxes if b.weight_kg)
-    html_str = template.render(
+    return template.render(
         transfer=data,
         total_units=total_units,
         total_weight_kg=total_weight,
         generated_at=datetime.now(tz=timezone.utc).strftime("%d/%m/%Y %H:%M UTC"),
+        legend_es=CUSTOMS_LEGEND_ES,
+        legend_en=CUSTOMS_LEGEND_EN,
     )
-    return HTML(string=html_str).write_pdf()
+
+
+def generate_transfer_manifest_pdf(data: TransferManifestData) -> bytes:
+    from weasyprint import HTML
+
+    return HTML(string=render_transfer_manifest_html(data)).write_pdf()

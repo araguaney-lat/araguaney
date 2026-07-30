@@ -70,6 +70,19 @@ export const MANUAL_GROUPS: readonly ManualGroup[] = [
     ],
   },
   {
+    group: { es: "Criterio y riesgo", en: "Judgment and risk" },
+    items: [
+      {
+        slug: "banderas-rojas",
+        title: { es: "Banderas rojas", en: "Red flags" },
+        blurb: {
+          es: "Seis señales concretas en una donación, y qué hacer: registrar, escalar, rechazar.",
+          en: "Six concrete signals in a donation, and what to do: record, escalate, refuse.",
+        },
+      },
+    ],
+  },
+  {
     group: { es: "Módulos de apoyo", en: "Supporting modules" },
     items: [
       {

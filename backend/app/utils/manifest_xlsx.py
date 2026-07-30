@@ -12,6 +12,7 @@ from openpyxl import Workbook
 from openpyxl.styles import Alignment, Font, PatternFill
 from openpyxl.utils import get_column_letter
 
+from app.legal import CUSTOMS_LEGEND_EN, CUSTOMS_LEGEND_ES
 from app.utils.manifest import ManifestData
 
 _HEADER_FILL = PatternFill("solid", fgColor="1F5E8C")
@@ -118,6 +119,17 @@ def generate_manifest_xlsx(data: ManifestData) -> bytes:
     ws.cell(row=current_row, column=7).alignment = Alignment(horizontal="right")
     ws.cell(row=current_row, column=8, value=round(total_weight, 3)).font = Font(bold=True, size=9)
     ws.cell(row=current_row, column=8).alignment = Alignment(horizontal="right")
+
+    # ── Leyenda de aduana ─────────────────────────────────────────────────────
+    # Va en la hoja, no en una nota al margen: quien la imprime para aduana
+    # imprime la hoja.
+    legend_row = current_row + 2
+    for offset, texto in enumerate((CUSTOMS_LEGEND_ES, CUSTOMS_LEGEND_EN)):
+        fila = legend_row + offset
+        ws.merge_cells(f"A{fila}:L{fila}")
+        celda = ws.cell(row=fila, column=1, value=texto)
+        celda.font = Font(size=8, italic=offset == 1)
+        celda.alignment = Alignment(horizontal="left", vertical="center", wrap_text=True)
 
     # ── Freeze panes below header ─────────────────────────────────────────────
     ws.freeze_panes = ws.cell(row=header_row + 1, column=1)

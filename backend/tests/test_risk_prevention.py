@@ -446,3 +446,142 @@ def test_la_cola_de_revisiones_esta_montada_y_limitada():
 
     main = Path("app/main.py").read_text()
     assert "risk_review.router" in main
+
+
+# ── Leyenda de aduana (task 4) ───────────────────────────────────────────────
+#
+# El papel es donde el control rector se vuelve oponible: quien recibe en
+# aduana lee que los bienes se transfirieron de forma irrevocable, sin valor
+# comercial y sin consignatario designado por quien donó.
+
+def test_la_leyenda_es_bilingue_y_unica():
+    """Un solo texto para todos los documentos: si vive en cada plantilla, se
+    desfasa en cuanto alguien edite uno."""
+    from app.legal import CUSTOMS_LEGEND_EN, CUSTOMS_LEGEND_ES
+
+    assert "irrevocable" in CUSTOMS_LEGEND_ES.lower()
+    assert "sin valor comercial" in CUSTOMS_LEGEND_ES.lower()
+    assert "irrevocably" in CUSTOMS_LEGEND_EN.lower()
+
+
+def test_el_manifiesto_de_envio_lleva_la_leyenda():
+    from datetime import datetime, timezone
+
+    from app.legal import CUSTOMS_LEGEND_EN, CUSTOMS_LEGEND_ES
+    from app.utils.manifest import ManifestData, render_manifest_html
+
+    html = render_manifest_html(ManifestData(
+        shipment_id="x", destination="Caracas", carrier=None, reference="EN-0001",
+        status="CLOSED", closed_at=datetime.now(timezone.utc),
+    ))
+    assert CUSTOMS_LEGEND_ES in html
+    assert CUSTOMS_LEGEND_EN in html
+
+
+def test_el_manifiesto_de_transferencia_lleva_la_leyenda():
+    from datetime import datetime, timezone
+
+    from app.legal import CUSTOMS_LEGEND_ES
+    from app.utils.manifest import TransferManifestData, render_transfer_manifest_html
+
+    html = render_transfer_manifest_html(TransferManifestData(
+        transfer_id="x", from_center="A", to_center="B", status="APPROVED",
+        created_at=datetime.now(timezone.utc),
+    ))
+    assert CUSTOMS_LEGEND_ES in html
+
+
+def test_el_manifiesto_xlsx_lleva_la_leyenda():
+    import io
+
+    from openpyxl import load_workbook
+
+    from app.legal import CUSTOMS_LEGEND_ES
+    from app.utils.manifest import ManifestData
+    from app.utils.manifest_xlsx import generate_manifest_xlsx
+
+    data = ManifestData(
+        shipment_id="x", destination="Caracas", carrier=None, reference="EN-0001",
+        status="CLOSED", closed_at=None,
+    )
+    hoja = load_workbook(io.BytesIO(generate_manifest_xlsx(data))).active
+    textos = [c.value for row in hoja.iter_rows() for c in row if isinstance(c.value, str)]
+    assert any(CUSTOMS_LEGEND_ES in t for t in textos)
+
+
+def test_la_etiqueta_de_tarima_lleva_la_leyenda():
+    """La tarima viaja sola: su etiqueta tiene que sostener la declaración."""
+    from pathlib import Path
+
+    src = Path("app/utils/pdf_pallet_label.py").read_text()
+    assert "CUSTOMS_LEGEND" in src
+
+
+def test_una_tarima_con_muchas_cajas_no_tapa_la_leyenda():
+    """Antes el listado escribía encima de la leyenda y hasta fuera de la hoja."""
+    from reportlab.lib.units import mm
+
+    from app.utils.pdf_pallet_label import _LEGEND_TOP, fit_box_codes
+
+    codigos = [f"BX-{i:04d}" for i in range(300)]
+    visibles, restantes = fit_box_codes(codigos, y_start=162 * mm)
+
+    assert restantes > 0                       # con 300 cajas algo se queda fuera
+    assert len(visibles) + restantes == len(codigos)
+    # La última fila dibujada no baja de donde empieza la leyenda.
+    assert 162 * mm - (len(visibles) // 3) * 5 * mm >= _LEGEND_TOP
+
+
+def test_una_tarima_chica_muestra_todas_sus_cajas():
+    from reportlab.lib.units import mm
+
+    from app.utils.pdf_pallet_label import fit_box_codes
+
+    codigos = [f"BX-{i:04d}" for i in range(12)]
+    assert fit_box_codes(codigos, y_start=162 * mm) == (codigos, 0)
+
+
+def test_la_etiqueta_se_genera_con_una_tarima_enorme():
+    """Prueba de humo: el recorte no puede romper la generación."""
+    from app.utils.pdf_pallet_label import PalletLabelData, generate_pallet_label_pdf
+
+    pdf = generate_pallet_label_pdf(PalletLabelData(
+        code="TM-GRANDE", center_name="Centro A", status="CLOSED",
+        box_codes=[f"BX-{i:04d}" for i in range(300)],
+    ))
+    assert pdf.startswith(b"%PDF")
+
+
+# ── Guía de banderas rojas (task 5) ──────────────────────────────────────────
+
+def test_la_guia_de_banderas_rojas_existe_en_ambos_idiomas():
+    """Publicar tipologías es deliberado: FATF y los bancos publican las suyas,
+    y el valor disuasorio supera al riesgo."""
+    from pathlib import Path
+
+    raiz = Path(__file__).resolve().parents[2] / "frontend" / "content" / "manuals"
+    for ruta in (raiz / "banderas-rojas.html", raiz / "en" / "banderas-rojas.html"):
+        assert ruta.exists(), ruta
+        texto = ruta.read_text()
+        assert len(texto) > 2000
+
+
+def test_la_guia_no_publica_el_umbral():
+    """El mecanismo se explica; el valor que lo dispara vive en el entorno."""
+    import re
+    from pathlib import Path
+
+    raiz = Path(__file__).resolve().parents[2] / "frontend" / "content" / "manuals"
+    for ruta in (raiz / "banderas-rojas.html", raiz / "en" / "banderas-rojas.html"):
+        texto = ruta.read_text()
+        assert "DONATION_VOLUME_THRESHOLD" not in texto
+        # Sin cifras de cajas o kilos que revelen dónde salta el control.
+        assert not re.search(r"\b\d+\s*(cajas|kg|boxes)\b", texto, re.I)
+
+
+def test_la_guia_esta_registrada_en_el_indice_de_ayuda():
+    from pathlib import Path
+
+    registro = (Path(__file__).resolve().parents[2] / "frontend" / "app" / "dashboard"
+                / "ayuda" / "manuals.ts").read_text()
+    assert "banderas-rojas" in registro
