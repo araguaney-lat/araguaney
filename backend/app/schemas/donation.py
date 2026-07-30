@@ -85,20 +85,6 @@ class DonationItemOut(StrictORMModel):
     reception_status: str | None
 
 
-class DonationOut(StrictORMModel):
-    id: UUID
-    code: str
-    status: str
-    intended_center_id: UUID | None
-    intended_campaign_id: UUID | None
-    received_center_id: UUID | None
-    notes: str | None
-    created_at: datetime
-    registered_at: datetime | None
-    items: list[DonationItemOut] = []
-    photos: list[DonationPhotoOut] = []
-
-
 class DonationPhotoOut(StrictORMModel):
     """Lo que el cliente necesita para pintar la galería.
 
@@ -126,6 +112,20 @@ class PhotoConfirmIn(StrictModel):
     storage_key: str
     content_type: str
     size_bytes: int
+
+
+class DonationOut(StrictORMModel):
+    id: UUID
+    code: str
+    status: str
+    intended_center_id: UUID | None
+    intended_campaign_id: UUID | None
+    received_center_id: UUID | None
+    notes: str | None
+    created_at: datetime
+    registered_at: datetime | None
+    items: list[DonationItemOut] = []
+    photos: list[DonationPhotoOut] = []
 
 
 class DonationPublicOut(StrictORMModel):
