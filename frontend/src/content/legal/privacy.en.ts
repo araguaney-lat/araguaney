@@ -54,6 +54,20 @@ export const privacyEn: LegalDoc = {
           },
         },
         "This data is for the internal control of the center that captured it: it never appears on any public page, nor on the box or pallet records reachable by QR code, nor is it shared with other collection centers.",
+        "People who register their donation online. If you use the public form to register what you are donating before dropping it off at a center, we collect:",
+        {
+          table: {
+            head: ["Data", "What for", "Required"],
+            rows: [
+              ["First and last name", "So the center knows who is arriving with the donation.", "Yes"],
+              ["Email", "Confirming the registration is yours, sending your QR code and the link to change or cancel your donation.", "Yes"],
+              ["Phone", "Only in case the center needs to reach you.", "No"],
+              ["Description of what you are donating", "So the center can prepare and verify what you bring without re-entering it.", "Yes"],
+              ["Center and campaign you choose", "To orient your donation. It does not commit you: you may take it to any other center.", "No"],
+            ],
+          },
+        },
+        "Your registration does not exist for anyone until you confirm your email. If you do not confirm it, it is deleted (see \"Retention periods\"). The public page your QR code opens shows the status and contents of your donation, never your name, email or phone. Once you deliver the donation, your details become visible to the center that receives it.",
       ],
     },
     {
@@ -65,6 +79,7 @@ export const privacyEn: LegalDoc = {
             "Create and manage your user account.",
             "Authenticate you and control your access based on your role and center.",
             "Enable platform operations: donation intake, box sealing, pallets, shipments and manifests.",
+            "Let you register your donation online before dropping it off: confirming your email, issuing your QR code and giving you the link to change or cancel it.",
             "Ensure platform security: fraud and abuse prevention, rate limiting and detection of unauthorized access.",
             "Keep audit and traceability records of operations.",
             "Send you operational and service communications (invitation, password reset, system notifications).",

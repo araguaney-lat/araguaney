@@ -3,13 +3,18 @@
 from datetime import datetime
 from uuid import UUID
 
-from pydantic import field_validator, model_validator
+from pydantic import Field, field_validator, model_validator
 
 from app.schemas._base import StrictModel, StrictORMModel, StrictUUID
 from app.schemas.donor import DonorInput
 
 _MAX_ITEMS = 50          # tope anti-abuso del formulario público
 _MAX_QUANTITY = 100_000
+# Topes de longitud. El formulario es público y sin sesión: sin ellos, un solo
+# request puede meter megabytes de texto a la base.
+_MAX_FREE_TEXT = 200
+_MAX_UNIT = 40
+_MAX_NOTES = 500
 
 
 class DonationItemInput(StrictModel):
@@ -20,9 +25,9 @@ class DonationItemInput(StrictModel):
     """
 
     product_type_id: StrictUUID | None = None
-    free_text: str | None = None
+    free_text: str | None = Field(default=None, max_length=_MAX_FREE_TEXT)
     quantity: int
-    unit: str
+    unit: str = Field(max_length=_MAX_UNIT)
 
     @field_validator("free_text", "unit", mode="before")
     @classmethod
@@ -56,8 +61,8 @@ class DonationCreate(StrictModel):
     donor: DonorInput
     intended_center_id: StrictUUID | None = None
     intended_campaign_id: StrictUUID | None = None
-    items: list[DonationItemInput]
-    notes: str | None = None
+    items: list[DonationItemInput] = Field(max_length=_MAX_ITEMS)
+    notes: str | None = Field(default=None, max_length=_MAX_NOTES)
 
     @model_validator(mode="after")
     def _con_renglones(self) -> "DonationCreate":

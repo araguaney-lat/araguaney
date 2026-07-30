@@ -55,6 +55,20 @@ export const privacyEs: LegalDoc = {
           },
         },
         "Estos datos son de control interno del centro que los captura: no aparecen en ninguna página pública, ni en las fichas de caja o tarima accesibles por código QR, ni se comparten con otros centros de acopio.",
+        "Personas que registran su donación en línea. Si usas el formulario público para registrar lo que vas a donar antes de llevarlo a un centro, recabamos:",
+        {
+          table: {
+            head: ["Dato", "Para qué", "Obligatorio"],
+            rows: [
+              ["Nombre y apellido", "Que el centro sepa quién llega con la donación.", "Sí"],
+              ["Correo electrónico", "Confirmar que el registro es tuyo, enviarte tu código QR y el enlace para modificar o cancelar tu donación.", "Sí"],
+              ["Teléfono", "Solo por si el centro necesita contactarte.", "No"],
+              ["Descripción de lo que vas a donar", "Que el centro pueda prepararse y verificar lo que traes sin capturarlo de nuevo.", "Sí"],
+              ["Centro y campaña que eliges", "Orientar tu donación. No te compromete: puedes llevarla a cualquier otro centro.", "No"],
+            ],
+          },
+        },
+        "Tu registro no existe para nadie hasta que confirmas tu correo. Si no lo confirmas, se elimina (ver \"Plazos de conservación\"). La ficha pública que abre tu código QR muestra el estado y qué contiene tu donación, nunca tu nombre, tu correo ni tu teléfono. Cuando entregas la donación, tus datos quedan visibles para el centro que la recibe.",
       ],
     },
     {
@@ -66,6 +80,7 @@ export const privacyEs: LegalDoc = {
             "Crear y administrar tu cuenta de persona usuaria.",
             "Autenticarte y controlar tu acceso según tu rol y centro.",
             "Permitir la operación de la plataforma: registro de donaciones, sellado de cajas, tarimas, envíos y manifiestos.",
+            "Permitir que registres tu donación en línea antes de llevarla: confirmar tu correo, emitir tu código QR y darte el enlace para modificarla o cancelarla.",
             "Garantizar la seguridad de la plataforma: prevención de fraude y abuso, límites de tasa y detección de accesos indebidos.",
             "Mantener registros de auditoría y trazabilidad de las operaciones.",
             "Enviarte comunicaciones operativas y de servicio (invitación, restablecimiento de contraseña, notificaciones del sistema).",

@@ -25,14 +25,20 @@ class DonationRepository(BaseRepository):
         self.db.flush()
         return donation
 
-    def has_open_for_email(self, email: str) -> bool:
-        """Evita que un formulario público acumule donaciones abiertas del mismo correo."""
+    def find_open_for_email(self, email: str) -> Donation | None:
+        """La donación abierta de este correo, si la hay.
+
+        Evita que el formulario público acumule donaciones abiertas del mismo
+        correo. Devuelve la fila, no un booleano, porque quien sí es dueño del
+        correo necesita que se le reenvíe su confirmación.
+        """
         return self.db.execute(
-            select(Donation.id)
+            select(Donation)
             .join(Donor, Donor.id == Donation.donor_id)
             .where(Donor.email == email, Donation.status.in_(_ABIERTAS))
+            .order_by(Donation.created_at.desc())
             .limit(1)
-        ).first() is not None
+        ).scalars().first()
 
     def find_pending_by_email(self, email: str) -> Donation | None:
         """La donación sin confirmar de este correo. La más reciente, si hay varias."""
@@ -60,6 +66,28 @@ class DonationRepository(BaseRepository):
         return self.db.execute(
             select(Donation).where(Donation.code == code)
         ).scalar_one_or_none()
+
+    def find_donations_for_shipment(self, shipment_id: UUID) -> list[Donation]:
+        """Donaciones pre-registradas cuya carga va en este envío.
+
+        El camino es donación → intake → cajas → tarima → envío. Solo las que
+        dejaron un correo: al resto no hay a quién avisarle.
+        """
+        from app.models.box import Box
+        from app.models.pallet import Pallet
+
+        return list(self.db.execute(
+            select(Donation)
+            .join(Donor, Donor.id == Donation.donor_id)
+            .join(Box, Box.intake_id == Donation.intake_id)
+            .join(Pallet, Pallet.id == Box.pallet_id)
+            .where(
+                Pallet.shipment_id == shipment_id,
+                Donation.intake_id.is_not(None),
+                Donor.email.is_not(None),
+            )
+            .distinct()
+        ).scalars().all())
 
     def log_event(
         self,

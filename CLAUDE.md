@@ -91,8 +91,11 @@ nacional** que suma el stock de todos los centros.
 1. No gestiona dinero ni donativos económicos.
 2. No gestiona beneficiarios finales. Solo inventario.
 3. No gestiona rutas/transporte ni trámite aduanero end-to-end (solo produce el documento).
-4. No es un CRM de donantes. **No se registran datos personales del donante** (solo un
-   campo de texto libre opcional `donante_libre`, sin PII).
+4. No es un CRM de donantes. La donación **anónima sigue siendo el default**, pero el
+   donante puede identificarse: en ventanilla (Fase 19) o pre-registrando su donación
+   en línea (Fase 18). Esos datos son de control interno del centro que los captura,
+   nunca aparecen en una página pública, y el pre-registro sin confirmar se purga.
+   El `donante_libre` de texto libre se conserva como legado.
 5. No reemplaza a RITA/Sahana Eden; cuando aplique, interopera con sus formatos.
 
 ---
@@ -142,7 +145,7 @@ def scoped(self, stmt, center_id: uuid.UUID | None):
 |---|---|---|
 | `/dashboard` | volunteers, coordinators, national_admins | `users.role = user` (cualquier `center_role`) |
 | `/studio` | superadmin de plataforma | `users.role = superadmin` |
-| público | sin login | rutas `/`, `/qr/[code]`, `/necesidades` |
+| público | sin login | rutas `/`, `/qr/[code]`, `/necesidades`, `/donar`, `/d/[code]` |
 
 > `users.role` del boilerplate (`user|admin|superadmin`) gobierna el acceso a secciones.
 > `center_role` (`volunteer|coordinator|national_admin`) controla qué ve cada usuario dentro de `/dashboard`.
@@ -219,7 +222,9 @@ Centro (tenant)
 | `Center` | El tenant | |
 | `User` (+`center_id`,`center_role`) | Operadores | national_admin con center_id NULL |
 | `ProductType` | El SKU | Discriminado por atributos (p.ej. `strength`). Ibuprofeno 500mg ≠ 900mg |
-| `Intake` | Recepción | `donante_libre` texto opcional, sin PII |
+| `Intake` | Recepción | Donante opcional (`donor_id`); `donante_libre` texto libre, legado |
+| `Donor` | Donante identificado | `source`: `self` (se pre-registró) o `center` (lo capturó un centro) |
+| `Donation` | Pre-registro en línea | `DN-` → QR. Se liga al `Intake` al recibirse |
 | `Box` | Caja homogénea | 1 product_type + 1 batch + 1 expiry (garantizado por esquema). `code` → QR |
 | `Pallet` | Tarima de transporte | Mixta; agrupa cajas selladas. `code` → QR |
 | `Shipment` | Envío | Agrupa tarimas; genera manifiesto |
@@ -279,7 +284,8 @@ tiene un solo `batch` y una sola `expiry_date`. Si llega mezcla → se divide en
 5. **Cache en el edge** de toda lectura pública (ficha QR, panel "qué falta").
 6. **Spend caps** en Vercel + alertas de presupuesto.
 7. Endpoints caros (PDF/export) detrás de auth + `slowapi` + cola ARQ.
-8. Sin PII de beneficiarios → menor superficie LFPDPPP.
+8. Sin PII de beneficiarios → menor superficie LFPDPPP. La del donante es opcional,
+   vive con plazo de conservación declarado y se purga sola si nunca se confirma.
 
 ---
 
@@ -377,7 +383,8 @@ schemas/    → Pydantic I/O models (extend StrictModel or StrictORMModel from s
 - Endpoint público nuevo: cacheable o explícitamente rate-limited.
 - Cambio de estado escribe su `*_event`.
 - Migración Alembic reversible (`upgrade`/`downgrade`).
-- Sin PII de donante/beneficiario introducida.
+- Sin PII de beneficiario introducida. La del donante solo por las vías previstas
+  (pre-registro o captura en ventanilla), nunca en superficie pública.
 
 ---
 

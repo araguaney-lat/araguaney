@@ -300,6 +300,16 @@ def send_donation_registered_email(to: str, code: str, manage_token: str) -> Non
     )
 
 
+def send_donation_shipped_email(to: str, code: str, shipment_reference: str) -> None:
+    """Cierra el círculo: lo que donó esta persona salió en un envío."""
+    _send(
+        to=to,
+        email_type="donation_shipped",
+        subject=f"Tu donación {code} salió en un envío",
+        html=_render("donation_shipped.html", code=code, shipment_reference=shipment_reference),
+    )
+
+
 def send_donation_received_email(to: str, code: str, center_name: str, items: list) -> None:
     """Resumen del doble check: qué se recibió y qué no."""
     _send(
