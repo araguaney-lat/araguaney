@@ -16,6 +16,7 @@ import app.models.product_gtin    # noqa: F401
 import app.models.shipment        # noqa: F401
 import app.models.pallet          # noqa: F401
 import app.models.intake          # noqa: F401
+import app.models.donor           # noqa: F401
 import app.models.box             # noqa: F401
 import app.models.events          # noqa: F401
 import app.models.campaign        # noqa: F401

@@ -6,9 +6,11 @@ from app.models.box import Box
 from app.models.events import BoxEvent
 from app.models.intake import Intake
 from app.repositories.campaign_repository import CampaignRepository
+from app.repositories.donor_repository import DonorRepository
 from app.repositories.intake_repository import IntakeRepository
 from app.repositories.product_type_repository import ProductTypeRepository
 from app.repositories.user_campaign_repository import UserCampaignRepository
+from app.schemas.donor import DonorOut
 from app.schemas.intake import BoxDraft, IntakeCreate, IntakeOut, BoxOut
 from app.services.base import BaseService
 from app.services.validation_service import validate_box
@@ -59,10 +61,19 @@ class IntakeService(BaseService):
                     )
                 product_types[bd.product_type_id] = pt
 
+        # Donante identificado (opcional): sin bloque `donor` la donacion es
+        # anonima. Se resuelve antes de crear el intake para que un dato
+        # invalido no deje un intake a medias.
+        donor = None
+        if data.donor is not None:
+            donor = DonorRepository(self.db).find_or_create(data.donor, center_id)
+            self.db.flush()  # asigna el id antes de ligarlo al intake
+
         intake = intake_repo.save_intake(Intake(
             center_id=center_id,
             campaign_id=campaign_id,
             received_by_user_id=user_id,
+            donor_id=donor.id if donor else None,
             donante_libre=data.donante_libre,
             notes=data.notes,
         ))
@@ -121,6 +132,7 @@ class IntakeService(BaseService):
             center_id=intake.center_id,
             campaign_id=campaign_id,
             donante_libre=intake.donante_libre,
+            donor=DonorOut.model_validate(donor) if donor else None,
             notes=intake.notes,
             created_at=intake.created_at,
             boxes=[
