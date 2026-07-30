@@ -4,8 +4,8 @@
 
 ```mermaid
 pie title Tareas completadas (431 tareas)
-    "Listas" : 335
-    "Pendientes" : 96
+    "Listas" : 344
+    "Pendientes" : 87
 ```
 
 | Fase | Nombre | Listas | Pendientes | Progreso |
@@ -29,19 +29,20 @@ pie title Tareas completadas (431 tareas)
 | 16 | [Rediseño de plantillas de email con marca](phase-16-email-brand-redesign.md) | 10 | 0 | ✅ 100% |
 | 17 | [AEO/GEO + expansión de keywords](phase-17-aeo-keyword-expansion.md) | 15 | 6 | 🟡 71% |
 | 18 | [Pre-registro de donaciones por el donante](phase-18-donor-preregistration.md) | 0 | 22 | ⬜ 0% |
-| 19 | [Identidad estructurada del donante en el intake](phase-19-structured-donor-identity.md) | 0 | 9 | ⬜ 0% |
+| 19 | [Identidad estructurada del donante en el intake](phase-19-structured-donor-identity.md) | 9 | 0 | ✅ 100% |
 | 20 | [Prevención de riesgos: responsabilidad y anti-lavado en especie](phase-20-risk-prevention.md) | 0 | 10 | ⬜ 0% |
 | 21 | [Logística: pesaje, anexo Carta Porte y perfiles de paletizado](phase-21-logistics-weighing.md) | 0 | 12 | ⬜ 0% |
 | 22 | [Trazabilidad extendida: avión y destino](phase-22-extended-traceability.md) | 0 | 14 | ⬜ 0% |
 | 23 | [IA asistida: captura, catálogo y necesidades](phase-23-ai-assisted-capture.md) | 0 | 11 | ⬜ 0% |
-| **Total** | | **335** | **96** | **🟡 78%** |
+| **Total** | | **344** | **87** | **🟡 80%** |
 
-> **Pendientes (96):**
+> **Pendientes (87):**
 > El grupo A de la Fase 13 (privacidad, lo que aplica hoy) está completo.
 > - **22 de la Fase 18 (pre-registro de donaciones):** fase nueva, diseño aprobado en
 >   [el spec](../superpowers/specs/2026-07-29-donor-preregistration-design.md); aún sin arrancar.
-> - **9 de la Fase 19 (identidad estructurada del donante):** fase nueva, comparte la tabla
->   `donors` con la 18; diseño en [su spec](../superpowers/specs/2026-07-29-structured-donor-identity-design.md).
+> - Los borradores legales de las fases 20 y 21 están escritos y esperando revisión profesional
+>   (abogado y fiscalista): [`docs/legal/drafts/`](../legal/drafts/README.md). Sus tareas siguen
+>   abiertas hasta que esa revisión ocurra.
 > - **10 de la Fase 20 (prevención de riesgos):** cláusulas y controles anti-lavado en especie;
 >   diseño en [su spec](../superpowers/specs/2026-07-29-risk-prevention-design.md); la task 7
 >   (revisión de abogado) es gate de publicación.

@@ -159,7 +159,8 @@ export interface IntakeOut {
   id: string
   center_id: string
   campaign_id: string
-  donante_libre: string | null
+  donante_libre: string | null   // legado, solo lectura
+  donor?: Donor | null           // identificado, cuando lo hay
   notes: string | null
   created_at: string
   boxes: BoxOut[]
@@ -347,4 +348,26 @@ export interface ProductGtin {
   gtin: string
   source: string
   created_at: string
+}
+
+/** Donante identificado (Fase 19). Sin bloque donante, la donación es anónima. */
+export interface Donor {
+  id: string
+  donor_type: "fisica" | "moral"
+  first_name: string
+  last_name: string
+  legal_name: string | null
+  email: string | null
+  phone: string | null
+  created_at: string
+}
+
+/** Lo que captura el formulario; se convierte a payload solo si el check está activo. */
+export interface DonorDraft {
+  donor_type: "fisica" | "moral"
+  first_name: string
+  last_name: string
+  legal_name: string
+  email: string
+  phone: string
 }

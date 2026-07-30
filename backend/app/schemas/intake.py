@@ -3,6 +3,7 @@ from decimal import Decimal
 from uuid import UUID
 
 from app.schemas._base import StrictModel, StrictORMModel, StrictUUID, StrictDate, StrictDecimal
+from app.schemas.donor import DonorInput, DonorOut
 
 
 class BoxDraft(StrictModel):
@@ -19,6 +20,11 @@ class BoxDraft(StrictModel):
 
 class IntakeCreate(StrictModel):
     campaign_id: StrictUUID | None = None
+    # Sin `donor` la donacion es anonima, que es la norma del dominio. El check
+    # "Registrar donante" del intake es lo que llena este bloque.
+    donor: DonorInput | None = None
+    # Legado: se conserva para no romper clientes viejos, pero la captura nueva
+    # usa `donor`. El texto libre historico sigue visible en el detalle.
     donante_libre: str | None = None
     notes: str | None = None
     boxes: list[BoxDraft]
@@ -45,7 +51,8 @@ class IntakeOut(StrictORMModel):
     id: UUID
     center_id: UUID
     campaign_id: UUID
-    donante_libre: str | None
+    donante_libre: str | None       # legado, solo lectura
+    donor: DonorOut | None = None   # identificado, cuando lo hay
     notes: str | None
     created_at: datetime
     boxes: list[BoxOut] = []

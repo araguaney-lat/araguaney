@@ -317,8 +317,18 @@ export interface BoxDraft {
   gtin?: string
 }
 
+export interface DonorPayload {
+  donor_type: "fisica" | "moral"
+  first_name: string
+  last_name: string
+  legal_name?: string
+  email?: string
+  phone?: string
+}
+
 export interface CreateIntakePayload {
   campaign_id?: string
+  donor?: DonorPayload
   donante_libre?: string
   notes?: string
   boxes: BoxDraft[]

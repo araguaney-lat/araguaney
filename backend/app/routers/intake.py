@@ -6,10 +6,13 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.dependencies import require_center_role, resolve_write_center_id, tenant_scope
 from app.models.user import User
+from app.repositories.donor_repository import DonorRepository
+from app.schemas.donor import DonorOut
 from app.schemas.intake import IntakeCreate, IntakeOut
 from app.services.intake_service import IntakeService
 from app.utils.audit import fire_audit
 from app.utils.cloudflare import get_client_ip
+from app.utils.errors import api_error
 from app.utils.rate_limit import limiter
 
 router = APIRouter(prefix="/intakes", tags=["intakes"])
@@ -56,3 +59,27 @@ def list_intakes(
         )
         for i in intakes
     ]
+
+
+@router.get("/donors/search", response_model=list[DonorOut])
+@limiter.limit("60/minute")
+def search_donors(
+    request: Request,
+    q: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_center_role),
+    scope: UUID | None = Depends(tenant_scope),
+):
+    """Autocompletado de donantes del propio centro.
+
+    Scoped siempre: la cartera de donantes no cruza entre centros. Un
+    national_admin (scope None) no tiene centro propio, así que debe indicar
+    cuál consulta.
+    """
+    if scope is None:
+        raise api_error(
+            "CENTER_REQUIRED",
+            "Indica el centro cuyos donantes quieres consultar",
+            field="center_id",
+        )
+    return DonorRepository(db).search(q, scope)

@@ -747,7 +747,23 @@
       "error_offline_boxes": "Hay cajas bloqueadas por falta de conexión. Restablece la conexión o elimínalas.",
       "error_no_product": "Selecciona un producto para cada caja.",
       "error_controlled": "Elimina productos controlados antes de guardar.",
-      "error_unit": "Indica la unidad para cada caja."
+      "error_unit": "Indica la unidad para cada caja.",
+      "donor": {
+        "register_check": "Registrar donante (opcional)",
+        "anonymous_hint": "Sin marcar, la donación queda anónima. Es lo normal y no requiere ningún dato.",
+        "type_fisica": "Persona física",
+        "type_moral": "Persona moral",
+        "legal_name": "Razón social",
+        "first_name": "Nombre",
+        "last_name": "Apellido",
+        "rep_first_name": "Nombre del representante",
+        "rep_last_name": "Apellido del representante",
+        "email": "Correo electrónico",
+        "phone": "Teléfono",
+        "hint_fisica": "Solo el nombre es obligatorio. Sin correo no podremos reconocer al donante en futuras donaciones.",
+        "hint_moral": "Para persona moral pedimos razón social, quien entrega, correo y teléfono.",
+        "matches_title": "Ya registrado en este centro:"
+      }
     },
     "campaign_members": {
       "back": "← Campañas",

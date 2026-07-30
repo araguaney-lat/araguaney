@@ -747,7 +747,23 @@
       "error_offline_boxes": "Some boxes are blocked due to no connection. Restore connection or remove them.",
       "error_no_product": "Select a product for each box.",
       "error_controlled": "Remove controlled products before saving.",
-      "error_unit": "Indicate the unit for each box."
+      "error_unit": "Indicate the unit for each box.",
+      "donor": {
+        "register_check": "Register donor (optional)",
+        "anonymous_hint": "Leave unchecked for an anonymous donation. That is the norm and requires no data.",
+        "type_fisica": "Individual",
+        "type_moral": "Organization",
+        "legal_name": "Legal name",
+        "first_name": "First name",
+        "last_name": "Last name",
+        "rep_first_name": "Representative first name",
+        "rep_last_name": "Representative last name",
+        "email": "Email",
+        "phone": "Phone",
+        "hint_fisica": "Only the name is required. Without an email we cannot recognize this donor next time.",
+        "hint_moral": "Organizations require legal name, who delivers, email and phone.",
+        "matches_title": "Already registered at this center:"
+      }
     },
     "campaign_members": {
       "back": "← Campaigns",

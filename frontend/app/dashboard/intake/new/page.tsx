@@ -5,8 +5,9 @@ import { useRouter } from "next/navigation"
 import dynamic from "next/dynamic"
 import { useSession } from "next-auth/react"
 import { apiFetch } from "@/lib/api"
-import type { Campaign, Center, ProductType, BarcodeResult } from "@/types"
-import { createIntakeAction, type BoxDraft } from "@/lib/actions"
+import type { Campaign, Center, ProductType, BarcodeResult, DonorDraft } from "@/types"
+import { createIntakeAction, type BoxDraft, type DonorPayload } from "@/lib/actions"
+import { DonorForm } from "@/components/DonorForm"
 import { useOnlineStatus } from "@/components/ConnectivityBanner"
 import { useDict } from "@/context/DictionaryContext"
 
@@ -359,6 +360,12 @@ export default function NewIntakePage() {
   const [campaignId, setCampaignId] = useState("")
   const [campaigns, setCampaigns] = useState<Campaign[]>([])
   const [donante, setDonante] = useState("")
+  // Anonimo por default: el check es lo que despliega la identificacion.
+  const [registrarDonante, setRegistrarDonante] = useState(false)
+  const [donor, setDonor] = useState<DonorDraft>({
+    donor_type: "fisica", first_name: "", last_name: "",
+    legal_name: "", email: "", phone: "",
+  })
   const [notes, setNotes] = useState("")
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -399,6 +406,15 @@ export default function NewIntakePage() {
 
   const addRow = () => setRows((prev) => [...prev, newRow()])
 
+  const donorPayload = (): DonorPayload => ({
+    donor_type: donor.donor_type,
+    first_name: donor.first_name.trim(),
+    last_name: donor.last_name.trim(),
+    legal_name: donor.legal_name.trim() || undefined,
+    email: donor.email.trim() || undefined,
+    phone: donor.phone.trim() || undefined,
+  })
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
@@ -426,6 +442,7 @@ export default function NewIntakePage() {
     setSubmitting(true)
     const result = await createIntakeAction({
       campaign_id: campaignId,
+      donor: registrarDonante ? donorPayload() : undefined,
       donante_libre: donante.trim() || undefined,
       notes: notes.trim() || undefined,
       boxes,
@@ -498,17 +515,21 @@ export default function NewIntakePage() {
           </select>
         </div>
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <div>
-            <label className="block text-xs font-medium text-mut mb-1">{t.donor_label}</label>
+        <div className="space-y-3">
+          <label className="flex items-center gap-2 text-sm text-tx">
             <input
-              type="text"
-              value={donante}
-              placeholder={t.donor_placeholder}
-              onChange={(e) => setDonante(e.target.value)}
-              className="w-full rounded-lg border border-inpB bg-inp px-3 py-2 text-sm text-tx focus:outline-none focus:ring-2 focus:ring-[var(--gold)]"
+              type="checkbox"
+              checked={registrarDonante}
+              onChange={(e) => setRegistrarDonante(e.target.checked)}
+              className="rounded border-inpB"
             />
-          </div>
+            {t.donor.register_check}
+          </label>
+          <p className="text-xs text-fnt">{t.donor.anonymous_hint}</p>
+          {registrarDonante && <DonorForm value={donor} onChange={setDonor} />}
+        </div>
+
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <label className="block text-xs font-medium text-mut mb-1">{t.notes_label}</label>
             <input

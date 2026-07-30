@@ -40,6 +40,7 @@ def _service_with(boxes):
     data.boxes = boxes
     data.campaign_id = CAMPAIGN_ID
     data.donante_libre = None
+    data.donor = None            # intake anonimo: la norma del dominio
     data.notes = None
     return svc, data, db
 
