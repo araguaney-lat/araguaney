@@ -43,7 +43,7 @@
 | 5 | `GET /v1/donors/search` | Autocompletado autenticado (`require_center_role`), rate-limited, scoped: solo donantes del centro del solicitante; `national_admin` puede filtrar por centro. | 🟠 Media | ✅ Done |
 | 6 | Intake UI: check + formulario | Check "Registrar donante" (default apagado = anónima) → toggle física/moral con sus campos y autocompletado por email. Donde exista `donante_libre` histórico, se muestra como dato legado de solo lectura. i18n ES/EN. | 🔴 Alta | ✅ Done |
 | 7 | Detalle de intake muestra donante | Visible solo para usuarios del centro y `national_admin`. Auditoría de acceso no requerida en MVP; ninguna superficie pública lo incluye. | 🟢 Baja | ✅ Done |
-| 8 | Legal | Aviso de privacidad (persona moral, teléfono), tabla de retención, ARCO. | 🟠 Media | ⬜ |
+| 8 | Legal | Aviso de privacidad (persona moral, teléfono), tabla de retención, ARCO. | 🟠 Media | ✅ Done |
 | 9 | Tests | Validación por tipo, dedupe intra-centro / no-dedupe inter-centro, aislamiento tenant del buscador y del detalle (por búsqueda y por ID), fichas públicas sin rastro del donante, regresión del intake anónimo. | 🔴 Alta | ✅ Done |
 
 ---

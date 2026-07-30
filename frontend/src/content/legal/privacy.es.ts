@@ -6,13 +6,13 @@ import type { LegalDoc } from "./types"
 
 export const privacyEs: LegalDoc = {
   title: "Aviso de Privacidad",
-  version: "1.0",
-  updatedISO: "2026-07-02",
-  updatedLabel: "2 de julio de 2026",
+  version: "1.1",
+  updatedISO: "2026-07-29",
+  updatedLabel: "29 de julio de 2026",
   versionLabel: "Versión",
   updatedPrefix: "Última actualización:",
   intro:
-    "Este Aviso de Privacidad describe qué datos personales tratamos de las personas que operan la plataforma Araguaney (coordinadores, voluntarios y administradores), con qué fines y cómo puedes ejercer tus derechos. Araguaney está diseñada para NO recabar datos personales de donantes ni de beneficiarios finales: solo tratamos los datos mínimos de las personas usuarias que operan el sistema.",
+    "Este Aviso de Privacidad describe qué datos personales tratamos, con qué fines y cómo puedes ejercer tus derechos. Tratamos datos de dos grupos: las personas que operan la plataforma (coordinadores, voluntarios y administradores) y, cuando así lo deciden, las personas donantes que piden quedar registradas. Araguaney sigue sin recabar datos de beneficiarios finales, y la donación anónima sigue siendo la norma: registrar al donante es siempre opcional.",
   sections: [
     {
       heading: "Responsable del tratamiento",
@@ -42,8 +42,19 @@ export const privacyEs: LegalDoc = {
         },
         {
           emphasis:
-            "No recabamos datos personales de donantes ni de beneficiarios finales. La plataforma solo gestiona inventario de donaciones en especie. El campo de donante es texto libre y opcional, sin información personal identificable.",
+            "No recabamos datos personales de beneficiarios finales. La plataforma gestiona inventario de donaciones en especie.",
         },
+        "Datos de personas donantes. La donación es anónima por defecto y así se queda salvo que la persona pida ser registrada. Cuando lo pide, el centro captura únicamente:",
+        {
+          table: {
+            head: ["Tipo de donante", "Datos", "Obligatorios"],
+            rows: [
+              ["Persona física", "Nombre y apellido; correo electrónico y teléfono si desea proporcionarlos", "Solo nombre y apellido"],
+              ["Persona moral", "Razón social, nombre y apellido de quien entrega la donación, correo electrónico y teléfono", "Todos"],
+            ],
+          },
+        },
+        "Estos datos son de control interno del centro que los captura: no aparecen en ninguna página pública, ni en las fichas de caja o tarima accesibles por código QR, ni se comparten con otros centros de acopio.",
       ],
     },
     {
@@ -120,6 +131,7 @@ export const privacyEs: LegalDoc = {
               ["Adjuntos de mensajería", "90 días", "El archivo se elimina del almacenamiento automáticamente"],
               ["Archivos de exportación (manifiestos, reportes)", "1 hora", "Se eliminan tras la descarga; 24 horas si la generación falló"],
               ["Registros de fallos de envío de correo", "90 días", "Se borran de forma automática"],
+              ["Datos de personas donantes registradas (nombre, razón social, correo, teléfono)", "Mientras el centro los conserve", "Se eliminan a solicitud de la persona donante o cuando el centro los da de baja"],
               ["Eventos de inventario (quién selló una caja, cerró una tarima o despachó un envío)", "Indefinido", "No se eliminan: sostienen la trazabilidad de la ayuda enviada"],
             ],
           },

@@ -5,13 +5,13 @@ import type { LegalDoc } from "./types"
 
 export const privacyEn: LegalDoc = {
   title: "Privacy Notice",
-  version: "1.0",
-  updatedISO: "2026-07-02",
-  updatedLabel: "July 2, 2026",
+  version: "1.1",
+  updatedISO: "2026-07-29",
+  updatedLabel: "July 29, 2026",
   versionLabel: "Version",
   updatedPrefix: "Last updated:",
   intro:
-    "This Privacy Notice describes what personal data we process about the people who operate the Araguaney platform (coordinators, volunteers and administrators), for what purposes, and how you can exercise your rights. Araguaney is designed NOT to collect personal data of donors or final beneficiaries: we only process the minimal data of the users who operate the system.",
+    "This Privacy Notice describes what personal data we process, for what purposes, and how you can exercise your rights. We process data about two groups: the people who operate the platform (coordinators, volunteers and administrators) and, when they choose it, donors who ask to be registered. Araguaney still does not collect data about final beneficiaries, and anonymous donation remains the norm: registering a donor is always optional.",
   sections: [
     {
       heading: "Data controller",
@@ -41,8 +41,19 @@ export const privacyEn: LegalDoc = {
         },
         {
           emphasis:
-            "We do not collect personal data of donors or final beneficiaries. The platform only manages in-kind donation inventory. The donor field is free text and optional, with no personally identifiable information.",
+            "We do not collect personal data of final beneficiaries. The platform manages in-kind donation inventory.",
         },
+        "Donor data. A donation is anonymous by default and stays that way unless the person asks to be registered. When they do, the center captures only:",
+        {
+          table: {
+            head: ["Donor type", "Data", "Required"],
+            rows: [
+              ["Individual", "First and last name; email and phone if they wish to provide them", "Name only"],
+              ["Organization", "Legal name, first and last name of the person delivering the donation, email and phone", "All of them"],
+            ],
+          },
+        },
+        "This data is for the internal control of the center that captured it: it never appears on any public page, nor on the box or pallet records reachable by QR code, nor is it shared with other collection centers.",
       ],
     },
     {
@@ -119,6 +130,7 @@ export const privacyEn: LegalDoc = {
               ["Message attachments", "90 days", "The file is automatically removed from storage"],
               ["Export files (manifests, reports)", "1 hour", "Deleted after download; 24 hours if generation failed"],
               ["Email delivery failure records", "90 days", "Automatically deleted"],
+              ["Registered donor data (name, legal name, email, phone)", "While the center keeps it", "Deleted at the donor's request or when the center removes it"],
               ["Inventory events (who sealed a box, closed a pallet or dispatched a shipment)", "Indefinite", "Not deleted: they sustain the traceability of the aid that was shipped"],
             ],
           },
