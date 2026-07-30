@@ -52,6 +52,14 @@ export const MANUAL_GROUPS: readonly ManualGroup[] = [
         },
       },
       {
+        slug: "paletizado",
+        title: { es: "Paletizado", en: "Palletizing" },
+        blurb: {
+          es: "Cómo armar una tarima que llegue entera: alturas, apilado, emplaye y fleje.",
+          en: "How to build a pallet that arrives in one piece: heights, stacking, wrap and strapping.",
+        },
+      },
+      {
         slug: "tarimas",
         title: { es: "Tarimas", en: "Pallets" },
         blurb: {
