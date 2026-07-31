@@ -23,6 +23,11 @@ class CenterCreate(StrictModel):
     contact_phone: str | None = None
     country_code: str | None = None
     state_name: str | None = None
+    # Identidad del centro como emisor de documentos de transporte (Fase 21).
+    # Se imprime tal cual: no se valida el formato, porque un RFC, un RIF y
+    # un EIN no se parecen en nada.
+    legal_name: str | None = None
+    tax_id: str | None = None
 
     @field_validator("country_code")
     @classmethod
@@ -39,6 +44,11 @@ class CenterUpdate(StrictModel):
     is_active: bool | None = None
     country_code: str | None = None
     state_name: str | None = None
+    # Identidad del centro como emisor de documentos de transporte (Fase 21).
+    # Se imprime tal cual: no se valida el formato, porque un RFC, un RIF y
+    # un EIN no se parecen en nada.
+    legal_name: str | None = None
+    tax_id: str | None = None
 
     @field_validator("country_code")
     @classmethod
@@ -55,5 +65,7 @@ class CenterOut(StrictORMModel):
     contact_phone: str | None
     country_code: str | None
     state_name: str | None
+    legal_name: str | None = None
+    tax_id: str | None = None
     is_active: bool
     created_at: datetime

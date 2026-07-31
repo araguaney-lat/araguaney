@@ -154,9 +154,9 @@ def download_manifest(
     return ExportJobOut(id=job.id, kind=job.kind, status=job.status, error=None)
 
 
-@router.post("/{shipment_id}/carta-porte.xlsx", response_model=ExportJobOut, status_code=202)
+@router.post("/{shipment_id}/declaracion.xlsx", response_model=ExportJobOut, status_code=202)
 @limiter.limit("2/minute")
-def download_carta_porte_xlsx(
+def download_declaration_xlsx(
     request: Request,
     shipment_id: UUID,
     background_tasks: BackgroundTasks,
@@ -164,21 +164,23 @@ def download_carta_porte_xlsx(
     current_user: User = Depends(require_coordinator),
     scope: UUID | None = Depends(tenant_scope),
 ):
-    """Anexo de datos Carta Porte 3.1 en hoja de cálculo.
+    """Declaración de mercancías del envío, en hoja de cálculo.
 
-    Es el insumo para el PAC de quien transporta, no un comprobante fiscal:
-    Araguaney no timbra. Lo que falte para poder timbrar viene declarado arriba
-    del archivo.
+    Lleva lo que sabemos —qué va, cuánto pesa, cuántos bultos, de dónde a
+    dónde— y los datos que el propio centro capturó sobre sí mismo. No es un
+    comprobante fiscal ni una declaración aduanal: es el insumo para quien
+    despacha. Si el envío declara un perfil de país, además trae los nombres de
+    campo de ese régimen.
     """
-    return _queue_carta_porte(
+    return _queue_declaration(
         request, shipment_id, background_tasks, db, current_user, scope,
-        kind="SHIPMENT_CARTA_PORTE_XLSX", task="generate_shipment_carta_porte_xlsx_task",
+        kind="SHIPMENT_DECLARATION_XLSX", task="generate_shipment_declaration_xlsx_task",
     )
 
 
-@router.post("/{shipment_id}/carta-porte.json", response_model=ExportJobOut, status_code=202)
+@router.post("/{shipment_id}/declaracion.json", response_model=ExportJobOut, status_code=202)
 @limiter.limit("2/minute")
-def download_carta_porte_json(
+def download_declaration_json(
     request: Request,
     shipment_id: UUID,
     background_tasks: BackgroundTasks,
@@ -186,14 +188,14 @@ def download_carta_porte_json(
     current_user: User = Depends(require_coordinator),
     scope: UUID | None = Depends(tenant_scope),
 ):
-    """El mismo anexo en JSON, para quien integra con su PAC."""
-    return _queue_carta_porte(
+    """El mismo documento en JSON, para quien lo integra con otro sistema."""
+    return _queue_declaration(
         request, shipment_id, background_tasks, db, current_user, scope,
-        kind="SHIPMENT_CARTA_PORTE_JSON", task="generate_shipment_carta_porte_json_task",
+        kind="SHIPMENT_DECLARATION_JSON", task="generate_shipment_declaration_json_task",
     )
 
 
-def _queue_carta_porte(request, shipment_id, background_tasks, db, current_user, scope,
+def _queue_declaration(request, shipment_id, background_tasks, db, current_user, scope,
                        *, kind: str, task: str):
     from app.utils.errors import api_error
 

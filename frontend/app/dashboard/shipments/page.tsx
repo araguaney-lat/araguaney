@@ -58,7 +58,7 @@ export default function ShipmentsPage() {
   const [newShipment, setNewShipment] = useState({ campaign_id: "", destination: "Venezuela", carrier: "", reference: "", notes: "", height_profile: "" })
   const [actionLoading, setActionLoading] = useState<string | null>(null)
   const manifestExport = useExportJob()
-  const cartaPorteExport = useExportJob()
+  const declarationExport = useExportJob()
 
   const fetchShipments = async () => {
     setLoading(true)
@@ -97,8 +97,8 @@ export default function ShipmentsPage() {
   }, [manifestExport.error])
 
   useEffect(() => {
-    if (cartaPorteExport.error) setError(cartaPorteExport.error)
-  }, [cartaPorteExport.error])
+    if (declarationExport.error) setError(declarationExport.error)
+  }, [declarationExport.error])
 
   useEffect(() => {
     fetch("/api/campaigns?active_only=true")
@@ -170,12 +170,13 @@ export default function ShipmentsPage() {
     manifestExport.start(`/v1/shipments/${shipmentId}/manifest.pdf`)
   }
 
-  // El anexo Carta Porte es insumo para el PAC de quien transporta, no un
-  // comprobante fiscal: Araguaney no timbra. Vive en el detalle y no en la
-  // tarjeta, porque no es un documento de uso diario.
-  const handleDownloadCartaPorte = (shipmentId: string, formato: "xlsx" | "json") => {
+  // La declaración de mercancías es el insumo para quien despacha: lleva lo que
+  // sabemos (qué va, cuánto pesa, cuántos bultos) más los datos que el propio
+  // centro capturó sobre sí mismo. No es un comprobante fiscal ni una
+  // declaración aduanal, y Araguaney no interpreta el régimen de ningún país.
+  const handleDownloadDeclaration = (shipmentId: string, formato: "xlsx" | "json") => {
     setError(null)
-    cartaPorteExport.start(`/v1/shipments/${shipmentId}/carta-porte.${formato}`)
+    declarationExport.start(`/v1/shipments/${shipmentId}/declaracion.${formato}`)
   }
 
   return (
@@ -343,24 +344,24 @@ export default function ShipmentsPage() {
                 {activeShipment.destination}
                 {activeShipment.reference && <span className="ml-2 font-mono text-xs text-fnt">{activeShipment.reference}</span>}
               <div className="mt-3 rounded-lg border border-cardB bg-card2 p-3">
-                <p className="text-xs font-semibold text-mut">{t.carta_porte_title}</p>
-                <p className="mt-1 text-[11px] text-fnt">{t.carta_porte_hint}</p>
+                <p className="text-xs font-semibold text-mut">{t.declaration_title}</p>
+                <p className="mt-1 text-[11px] text-fnt">{t.declaration_hint}</p>
                 <div className="mt-2 flex gap-2">
                   <button
                     type="button"
-                    onClick={() => handleDownloadCartaPorte(activeShipment.id, "xlsx")}
-                    disabled={cartaPorteExport.isBusy}
+                    onClick={() => handleDownloadDeclaration(activeShipment.id, "xlsx")}
+                    disabled={declarationExport.isBusy}
                     className="text-xs px-2 py-1 rounded border border-cardB text-mut hover:bg-card disabled:opacity-50"
                   >
-                    {cartaPorteExport.isBusy ? dict.dashboard.common.exporting : "XLSX"}
+                    {declarationExport.isBusy ? dict.dashboard.common.exporting : "XLSX"}
                   </button>
                   <button
                     type="button"
-                    onClick={() => handleDownloadCartaPorte(activeShipment.id, "json")}
-                    disabled={cartaPorteExport.isBusy}
+                    onClick={() => handleDownloadDeclaration(activeShipment.id, "json")}
+                    disabled={declarationExport.isBusy}
                     className="text-xs px-2 py-1 rounded border border-cardB text-mut hover:bg-card disabled:opacity-50"
                   >
-                    {cartaPorteExport.isBusy ? dict.dashboard.common.exporting : "JSON"}
+                    {declarationExport.isBusy ? dict.dashboard.common.exporting : "JSON"}
                   </button>
                 </div>
               </div>

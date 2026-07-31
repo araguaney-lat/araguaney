@@ -54,3 +54,17 @@ Ninguno de estos textos fue redactado por un profesional del derecho. Contienen
 el contenido técnico-operativo que el producto necesita expresar, con la
 estructura y el vocabulario que la práctica sugiere, pero la redacción con
 validez legal la firma quien esté habilitado para ello.
+
+
+---
+
+## `guia-carta-porte.md` — sin uso desde el 2026-07-30
+
+Este borrador explicaba el régimen de Carta Porte de México para orientar a los
+centros. Quedó sin uso cuando la declaración de mercancías dejó de ser específica
+de un país: Araguaney genera datos de carga y los datos que el centro captura
+sobre sí mismo, y no opina sobre el régimen tributario de nadie.
+
+Se conserva por si algún día un centro mexicano quiere material propio, pero no
+es contenido de la plataforma y no necesita revisión de fiscalista para nada de
+lo que hoy está publicado.

@@ -1,10 +1,19 @@
 # Fase 21 — Logística: pesaje por bulto, anexo Carta Porte y perfiles de paletizado
 
-> El peso que rige en la cadena aérea es el bruto de báscula por tarima, no la
+> El peso que rige en la cadena aérea es el bruto de báscula por bulto, no la
 > suma de renglones: el pesaje se traslada a donde ocurre de verdad. El envío
-> gana un anexo de datos Carta Porte 3.1 (insumo para quien timbra: Araguaney no
-> se convierte en emisor fiscal) y las tarimas, perfiles de altura configurables
-> porque no existe un estándar único (160 cm lower deck / arcos de 170–180 cm).
+> gana una **declaración de mercancías** universal —qué va, cuánto pesa, cuántos
+> bultos, de dónde a dónde, con los datos que el propio centro capturó sobre sí
+> mismo— y las tarimas, perfiles de altura configurables porque no existe un
+> estándar único (160 cm lower deck / arcos de 170–180 cm).
+>
+> **Corregido durante la implementación:** el diseño original producía un anexo
+> Carta Porte específico de México. Araguaney es software y opera en varios
+> países: cubrir el régimen fiscal de cada uno es una carrera que se pierde
+> sola, y nos pondría a opinar sobre reglas tributarias que no nos tocan. El
+> documento es genérico, el código de mercancía es **HS** (el que usan casi 200
+> países en aduana) y México queda como un perfil opcional que solo traduce
+> nombres de campo.
 >
 > **Spec:** `docs/superpowers/specs/2026-07-29-logistics-weighing-design.md`
 > **Premisas validadas** contra fuentes de carga aérea (chargeable weight,
@@ -43,9 +52,9 @@
 | 3 | Poblar `unit_weight_kg` del catálogo | `app/seeds/unit_weights.py` con 62 pesos de referencia (alimentos, higiene, agua) y migración `037` que **solo llena lo vacío**: si un centro curó el peso de un producto, ese valor manda. Son tamaños comerciales típicos, no medición: el número existe para comparar órdenes de magnitud y cachar un dedazo. Los recipientes de agua pesan **vacíos**, que es el error más fácil de sembrar mal. | 🟠 Media | ✅ Done |
 | 4 | Cierre de tarima con báscula | El cierre pide peso bruto y altura, ambos opcionales — una báscula descompuesta no puede impedir cerrar una tarima ya armada. Neto = bruto − tara. El detalle muestra la suma de las cajas pesadas y su diferencia contra el neto: se espera positiva y pequeña (base y emplaye); negativa señala una caja mal pesada o una tara alta, y se avisa. | 🟠 Media | ✅ Done |
 | 5 | Manifiestos con peso pesado | Bruto/tara/neto y altura por tarima; el total del envío usa el neto de la tarima y declara cuántas se pesaron, cayendo a la suma de cajas solo donde no hubo báscula. Ningún total mezclado se presenta sin decir que es mixto. | 🟠 Media | ✅ Done |
-| 6 | Anexo Carta Porte 3.1 (datos) | Export XLSX + JSON por envío, encolado en ARQ como el resto y con `@limiter.limit`. Mercancías agrupadas por tipo de producto (cien cajas del mismo producto son un renglón de cantidad cien, no cien renglones), peso bruto del **neto de báscula** por tarima, número de bultos = tarimas. Regla rectora: **un dato que no tenemos se declara faltante, nunca se inventa** — el archivo abre con la lista de lo que falta para poder timbrar, y las celdas vacías van resaltadas. Sin RFC, CSD ni sello: Araguaney no es emisor fiscal. | 🔴 Alta | ✅ Done |
-| 7 | Claves SAT en el catálogo | `product_types.sat_product_key` (migración `038`, nullable). **Sin seed a propósito:** `ClaveProdServCP` es un subconjunto propio del SAT, y aunque su catálogo nació de UNSPSC, copiar el código UNSPSC que ya guardamos inventaría un dato fiscal con apariencia de correcto. Los valores los confirma quien timbra; hay test que fija que el anexo no haga esa copia. | 🟠 Media | ✅ Done |
-| 8 | Guía Carta Porte para centros (GATED fiscalista) | Manual en `/dashboard/ayuda` (ES/EN): quién emite según quién transporta (transportista → CFDI ingreso; medios propios → CFDI traslado), excepción 30 km / C2, valor cero no exime en tramo federal. Publicación tras revisión de fiscalista (Regla 2.7.7 RMF). | 🔴 Alta | ⬜ |
+| 6 | Declaración de mercancías (universal) | Export XLSX + JSON por envío, encolado en ARQ y rate-limited. Lleva lo que sí sabemos —qué va, cuánto pesa, cuántos bultos, origen y destino— más la identidad que el centro capturó de sí mismo. Un dato que no tenemos se declara faltante, nunca se inventa: el archivo abre con la lista de lo que falta. **Perfil de país opcional** (`MX_CARTA_PORTE`) que solo traduce nombres de campo: no siembra códigos, no valida formatos y no explica reglas fiscales, y hay test que lo fija. | 🔴 Alta | ✅ Done |
+| 7 | Código de mercancía en el catálogo | `product_types.hs_code` (Sistema Armonizado de la OMA), no una clave de un solo régimen: la carga cruza fronteras y el HS lo usan casi 200 países. `centers` gana razón social e identificación fiscal, que captura el national_admin y Araguaney solo imprime — sin validar formato, porque un RFC, un RIF y un EIN no se parecen. Migración `039`. | 🟠 Media | ✅ Done |
+| 8 | Guía de documentos de transporte | Ya no es una guía fiscal de México. Explica qué datos produce Araguaney y cuáles tiene que poner el centro, y remite a su despachante o contador para todo lo demás: no opinamos sobre el régimen de ningún país. Sin gate de fiscalista — al no dar orientación tributaria, no hay nada que un profesional deba aprobar. | 🟢 Baja | ⬜ |
 | 9 | Perfiles de altura en envíos | Selector al crear el envío (`LOWER_DECK_160`, `XRAY_170`, `MAIN_DECK_180`, `SIN_RESTRICCION`, constantes en código). La advertencia se calcula al leer el detalle —cambiar el perfil no toca ninguna tarima— y nunca bloquea: quien está en el andén ve la tarima y el sistema no. | 🟠 Media | ✅ Done |
 | 10 | Guía de paletizado | `content/manuals/paletizado.html` (ES/EN) en `/dashboard/ayuda`: alturas por escenario empezando por que **la base de la tarima se come ~15 cm**, el arco de rayos X que puede ser más bajo que la puerta del avión, apilado en columna contra ladrillo, nada fuera del borde, y emplaye anclado a la tarima con esquineros bajo el fleje. | 🟢 Baja | ✅ Done |
 | 11 | Tests | Neto/tara/discrepancia, manifiesto con pesado vs estimado, mapeo completo del anexo contra fixture, advertencias de perfil en ambos lados del límite, regresión de cierre sin báscula. | 🔴 Alta | ⬜ |

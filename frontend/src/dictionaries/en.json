@@ -292,8 +292,8 @@
       "profile_main_deck": "Main deck — 180 cm",
       "profile_unrestricted": "No restriction",
       "height_warning_title": "Pallets that do not fit the declared profile",
-      "carta_porte_title": "Carta Porte 3.1 annex",
-      "carta_porte_hint": "Goods data for the carrier's certification provider. It is not a tax document: Araguaney does not issue CFDIs. The file states up front whatever is missing before it can be certified."
+      "declaration_title": "Goods declaration",
+      "declaration_hint": "What is in the shipment, how much it weighs and how many packages, with your center's details. It is not a tax or customs document: it is the input for your broker or accountant. The file states up front which data is missing."
     },
     "national": {
       "title": "National dashboard",
@@ -479,7 +479,12 @@
       "saving": "Saving...",
       "toggle_deactivate": "Click to deactivate",
       "toggle_activate": "Click to activate",
-      "select_country": "— Select country —"
+      "select_country": "— Select country —",
+      "field_legal_name": "Legal name",
+      "field_legal_name_placeholder": "The organization's legal name",
+      "field_tax_id": "Tax identification",
+      "field_tax_id_placeholder": "Tax ID as used in your country",
+      "field_tax_id_hint": "Used as-is on the goods declaration of your shipments. Araguaney neither validates nor interprets it: it just prints it."
     },
     "reports": {
       "title": "Reports",
