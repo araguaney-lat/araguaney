@@ -115,7 +115,7 @@ def alert_on_cron_failure(fn):
     @functools.wraps(fn)
     async def wrapper(ctx: dict, *args, **kwargs):
         try:
-            return await fn(ctx, *args, **kwargs)
+            resultado = await fn(ctx, *args, **kwargs)
         except Exception as exc:
             consecuencia = _PURGE_PROMISES.get(fn.__name__, "")
             logger.error("%s falló: %s", fn.__name__, exc)
@@ -124,8 +124,22 @@ def alert_on_cron_failure(fn):
                 + (f"{consecuencia}\n" if consecuencia else "")
                 + f"```{type(exc).__name__}: {str(exc)[:300]}```"
             )
+            return None
+
+        # El latido se anota al final y solo si todo salió bien: un cron que
+        # falló no corrió, por más que se haya ejecutado.
+        await asyncio.to_thread(_record_heartbeat, fn.__name__)
+        return resultado
 
     return wrapper
+
+
+def _record_heartbeat(name: str) -> None:
+    from app.database import SessionLocal
+    from app.services.cron_heartbeat import record_success
+
+    with SessionLocal() as db:
+        record_success(db, name)
 
 
 async def _alert(mensaje: str) -> None:
@@ -366,6 +380,29 @@ async def purge_email_failures_cron(ctx) -> None:
     logger.info("Email failure purge: deleted %d rows older than 90 days", deleted)
 
 
+@alert_on_cron_failure
+async def heartbeat_watchdog_cron(ctx) -> None:
+    """Revisa que ningún cron se haya quedado atrás.
+
+    **Un vigilante no puede detectar su propia muerte.** Si el worker entero deja
+    de arrancar, este cron muere con los demás y nadie avisa nada — por eso el
+    latido se expone además en `/health/jobs`, para que la pregunta pueda
+    hacerse desde fuera del proceso que podría estar muerto.
+    """
+    from app.database import SessionLocal
+    from app.services.cron_heartbeat import stale_crons
+
+    with SessionLocal() as db:
+        rezagados = await asyncio.to_thread(stale_crons, db)
+
+    if rezagados:
+        await _alert(
+            ":rotating_light: *Hay trabajo de fondo que dejó de correr*\n"
+            + "\n".join(f"· `{nombre}` — {_PURGE_PROMISES.get(nombre, 'sin correr')}"
+                        for nombre in rezagados)
+        )
+
+
 # ── Fallbacks (called directly when Redis is unavailable) ──────────────────────
 # These are the underlying callables, invoked WITHOUT the ARQ ctx argument.
 
@@ -491,6 +528,9 @@ class WorkerSettings:
         # Export jobs expire 1h after DONE (see ExportJobRepository.DOWNLOAD_TTL_SECONDS) —
         # runs hourly, not daily like the other purges, to keep R2/db lean on that timescale.
         cron(purge_export_jobs_cron, minute=15),
+        # Cada hora: detecta que un cron se quedó atrás. Lo que NO puede
+        # detectar es su propia ausencia — para eso está /health/jobs.
+        cron(heartbeat_watchdog_cron, minute=45),
     ]
     redis_settings = RedisSettings.from_dsn(os.environ.get("REDIS_URL", "redis://localhost:6379"))
     max_jobs = 10

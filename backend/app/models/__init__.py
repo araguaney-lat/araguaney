@@ -25,6 +25,7 @@ from app.models import donation  # noqa: F401
 from app.models import donor  # noqa: F401
 from app.models import email_failure  # noqa: F401
 from app.models import risk_review  # noqa: F401
+from app.models import cron_run  # noqa: F401
 from app.models import events  # noqa: F401
 from app.models import export_job  # noqa: F401
 from app.models import intake  # noqa: F401

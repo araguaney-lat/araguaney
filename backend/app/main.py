@@ -8,7 +8,10 @@ import sentry_sdk
 from sentry_sdk.integrations.fastapi import FastApiIntegration
 from sentry_sdk.integrations.sqlalchemy import SqlalchemyIntegration
 
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import Depends, FastAPI, HTTPException, Request, Response
+from sqlalchemy.orm import Session
+
+from app.database import get_db
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, Response
@@ -333,4 +336,36 @@ app.include_router(exports.router)
 
 @app.get("/health")
 def health():
+    return {"status": "ok"}
+
+
+@app.get("/health/jobs")
+def health_jobs(response: Response, db: Session = Depends(get_db)):
+    """Estado del trabajo de fondo, para vigilancia externa.
+
+    Existe por una limitación estructural: el vigilante interno es un cron, así
+    que si el worker entero deja de arrancar, muere con los demás y no avisa
+    nada. Un vigilante no puede detectar su propia muerte. Esta pregunta se hace
+    desde fuera del proceso que podría estar muerto.
+
+    Responde **503 cuando algo se quedó atrás** porque un servicio de uptime
+    gratuito solo entiende códigos de estado; un 200 con un cuerpo triste no lo
+    notaría nadie.
+
+    Es público y sin sesión, así que dice *que* algo va atrasado y no *qué*:
+    publicar qué cron, desde cuándo y cada cuánto corre sería detalle interno sin
+    ninguna necesidad.
+    """
+    from app.services.cron_heartbeat import stale_crons
+
+    try:
+        rezagados = stale_crons(db)
+    except Exception:
+        # Si ni siquiera se puede consultar, algo más grande está roto.
+        response.status_code = 503
+        return {"status": "unknown"}
+
+    if rezagados:
+        response.status_code = 503
+        return {"status": "stale", "count": len(rezagados)}
     return {"status": "ok"}
