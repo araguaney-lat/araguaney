@@ -253,7 +253,7 @@ async def _alert_500(path: str, exc: Exception) -> None:
     await notify_slack(
         f":rotating_light: *Backend 500* — `{path}`\n"
         f"```{type(exc).__name__}: {exc}```" + context,
-        channel="#backend-alerts",
+        channel=settings.slack_alert_channel,
     )
 
 

@@ -88,6 +88,11 @@ class Settings(BaseSettings):
     # Bot Token from api.slack.com → Your App → OAuth & Permissions (xoxb-...)
     # One token covers all channels; invite bot to each channel with /invite @bot
     slack_bot_token: str = ""
+    # Canal al que van las alertas. Vive en el entorno y no en el código porque
+    # es el espacio de trabajo de quien opera, no una constante del software:
+    # este repositorio es público y quien lo forkee no debe heredar el canal de
+    # nadie. Vacío = las alertas se registran en el log y no salen a ningún lado.
+    slack_alert_channel: str = ""
 
     # ── OAuth — Google (optional) ─────────────────────────────────────────────
     google_client_id: str = ""
