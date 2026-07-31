@@ -546,6 +546,7 @@
       "permission_denied": "Camera permission denied",
       "open_camera": "📷 Open camera",
       "manual_label": "You can also enter the code manually:",
+      "code_placeholder": "BX-XXXX, TM-XXXX or DN-XXXX",
       "go": "Go",
       "camera_label": "Point at the QR code of the box or pallet",
       "subtitle_detail": "Scan the QR code of a box or pallet to view its details.",
