@@ -11,6 +11,8 @@ import { useDict } from "@/context/DictionaryContext"
 const EMPTY_FORM = {
   name: "",
   address: "",
+  legal_name: "",
+  tax_id: "",
   contact_name: "",
   contact_email: "",
   contact_phone: "",
@@ -59,6 +61,8 @@ export default function CentersPage() {
       const created = await createCenterAction({
         name: form.name.trim(),
         address: form.address || undefined,
+        legal_name: form.legal_name || undefined,
+        tax_id: form.tax_id || undefined,
         contact_name: form.contact_name || undefined,
         contact_email: form.contact_email || undefined,
         contact_phone: form.contact_phone || undefined,
@@ -137,7 +141,23 @@ export default function CentersPage() {
               />
             </div>
             <div>
-              <label className="text-xs text-mut">{t.field_address}</label>
+              <label className="text-xs text-mut">{t.field_legal_name}</label>
+              <input
+                className="w-full rounded-lg border border-inpB bg-inp px-3 py-2 text-sm text-tx"
+                value={form.legal_name}
+                onChange={(e) => setForm({ ...form, legal_name: e.target.value })}
+                placeholder={t.field_legal_name_placeholder}
+              />
+              <label className="mt-3 block text-xs text-mut">{t.field_tax_id}</label>
+              <input
+                className="w-full rounded-lg border border-inpB bg-inp px-3 py-2 text-sm text-tx"
+                value={form.tax_id}
+                onChange={(e) => setForm({ ...form, tax_id: e.target.value })}
+                placeholder={t.field_tax_id_placeholder}
+              />
+              <p className="mt-1 text-[11px] text-fnt">{t.field_tax_id_hint}</p>
+
+              <label className="mt-3 block text-xs text-mut">{t.field_address}</label>
               <input
                 value={form.address}
                 onChange={field("address")}

@@ -38,17 +38,19 @@ pie title Tareas completadas (431 tareas)
 
 > **Pendientes (50):**
 > El grupo A de la Fase 13 (privacidad, lo que aplica hoy) está completo.
-> - Los borradores legales de las fases 20 y 21 están escritos y esperando revisión profesional
->   (abogado y fiscalista): [`docs/legal/drafts/`](../legal/drafts/README.md). Sus tareas siguen
->   abiertas hasta que esa revisión ocurra.
+> - Los borradores legales de la Fase 20 están escritos y esperando revisión de abogado:
+>   [`docs/legal/drafts/`](../legal/drafts/README.md). Sus tareas siguen abiertas hasta que esa
+>   revisión ocurra. El borrador fiscal de la Fase 21 quedó sin uso: la declaración de mercancías
+>   dejó de ser específica de un país, así que ya no hay orientación tributaria que revisar.
 > - **4 de la Fase 20 (prevención de riesgos):** los controles de producto están puestos (aceptación
 >   registrada, umbral con escalamiento, leyenda de aduana, guía de banderas rojas y controles
 >   estructurales documentados). Lo que queda son los tres textos legales (tasks 1, 2 y 6), que la
 >   task 7 —revisión de abogado— gatea antes de publicar; los borradores ya están escritos en
 >   [`docs/legal/drafts/`](../legal/drafts/README.md).
 > - **3 de la Fase 21 (logística y pesaje):** el pesaje, los perfiles de altura, los pesos de
->   referencia, la guía de paletizado y el anexo Carta Porte ya están. Falta la guía fiscal (gated
->   por revisión de fiscalista), los tests de cierre y el registro en `CLAUDE.md`. Diseño en
+>   referencia, la guía de paletizado y la declaración de mercancías ya están. Falta la guía de
+>   documentos de transporte (ya sin gate de fiscalista: se reescribió para no dar orientación
+>   tributaria), los tests de cierre y el registro en `CLAUDE.md`. Diseño en
 >   [su spec](../superpowers/specs/2026-07-29-logistics-weighing-design.md).
 > - **14 de la Fase 22 (trazabilidad extendida):** hitos logísticos, recepción en destino con
 >   merma e incidencias; diseño en

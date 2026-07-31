@@ -27,6 +27,8 @@ class CenterService(BaseService):
             contact_phone=data.contact_phone,
             country_code=data.country_code,
             state_name=data.state_name,
+            legal_name=data.legal_name,
+            tax_id=data.tax_id,
         )
         return CenterRepository(self.db).save(center)
 

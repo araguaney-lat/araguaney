@@ -42,7 +42,15 @@ guías de PACs (Carta Porte 3.1, regla 2.7.1.51, excepciones), ship4wd/exfreight
   nadie pesó la tarima, diciéndolo. El peso que viaja al anexo Carta Porte es el
   de la tarima: es el bulto que se transporta.
 
-### 2. Anexo Carta Porte (datos, no timbrado)
+### 2. Declaración de mercancías (datos, no timbrado)
+
+> **Corregido durante la implementación.** El diseño original producía un anexo
+> Carta Porte específico de México. Araguaney es software y opera en varios
+> países: cubrir el régimen fiscal de cada uno es una carrera que se pierde
+> sola, y nos pondría a opinar sobre reglas tributarias que no son nuestras. El
+> documento es genérico, el código de mercancía es **HS** (el que usan casi 200
+> países en aduana), la identidad del emisor la captura el propio centro, y
+> México queda como un perfil opcional que solo traduce nombres de campo.
 
 - Export por envío (`XLSX` + `JSON`) con el mapeo a los campos del complemento
   Carta Porte 3.1 de autotransporte: mercancías (descripción, clave

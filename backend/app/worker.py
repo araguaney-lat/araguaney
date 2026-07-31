@@ -183,12 +183,12 @@ async def generate_transfer_manifest_pdf_task(ctx, job_id: str) -> None:
     await asyncio.to_thread(run_export_job, job_id)
 
 
-async def generate_shipment_carta_porte_xlsx_task(ctx, job_id: str) -> None:
+async def generate_shipment_declaration_xlsx_task(ctx, job_id: str) -> None:
     from app.services.export_generation import run_export_job
     await asyncio.to_thread(run_export_job, job_id)
 
 
-async def generate_shipment_carta_porte_json_task(ctx, job_id: str) -> None:
+async def generate_shipment_declaration_json_task(ctx, job_id: str) -> None:
     from app.services.export_generation import run_export_job
     await asyncio.to_thread(run_export_job, job_id)
 
@@ -309,8 +309,8 @@ def _build_fallbacks() -> dict:
         "generate_pallet_label_pdf_task": run_export_job,
         "generate_transfer_manifest_pdf_task": run_export_job,
         "generate_report_export_csv_task": run_export_job,
-        "generate_shipment_carta_porte_xlsx_task": run_export_job,
-        "generate_shipment_carta_porte_json_task": run_export_job,
+        "generate_shipment_declaration_xlsx_task": run_export_job,
+        "generate_shipment_declaration_json_task": run_export_job,
     }
 
 
@@ -364,8 +364,8 @@ class WorkerSettings:
         func(generate_pallet_label_pdf_task, timeout=300),
         func(generate_transfer_manifest_pdf_task, timeout=300),
         func(generate_report_export_csv_task, timeout=300),
-        func(generate_shipment_carta_porte_xlsx_task, timeout=300),
-        func(generate_shipment_carta_porte_json_task, timeout=300),
+        func(generate_shipment_declaration_xlsx_task, timeout=300),
+        func(generate_shipment_declaration_json_task, timeout=300),
     ]
     cron_jobs = [
         cron(purge_audit_logs_cron, hour=3, minute=0),

@@ -13,6 +13,9 @@ export interface CenterFormData {
   contact_phone?: string
   country_code?: string
   state_name?: string
+  // Identidad del centro como emisor de documentos de transporte (Fase 21).
+  legal_name?: string
+  tax_id?: string
 }
 
 export async function createCenterAction(data: CenterFormData): Promise<Center> {

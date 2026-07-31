@@ -292,8 +292,8 @@
       "profile_main_deck": "Cubierta principal — 180 cm",
       "profile_unrestricted": "Sin restricción",
       "height_warning_title": "Tarimas que no caben en el perfil declarado",
-      "carta_porte_title": "Anexo Carta Porte 3.1",
-      "carta_porte_hint": "Datos de mercancías para el PAC de quien transporta. No es un comprobante fiscal: Araguaney no timbra. El archivo declara arriba lo que falte para poder timbrar."
+      "declaration_title": "Declaración de mercancías",
+      "declaration_hint": "Qué va en el envío, cuánto pesa y cuántos bultos son, con los datos de tu centro. No es un comprobante fiscal ni una declaración aduanal: es el insumo para tu despachante o tu contador. El archivo dice arriba qué datos faltan."
     },
     "national": {
       "title": "Panel nacional",
@@ -479,7 +479,12 @@
       "saving": "Guardando...",
       "toggle_deactivate": "Clic para desactivar",
       "toggle_activate": "Clic para activar",
-      "select_country": "— Seleccionar país —"
+      "select_country": "— Seleccionar país —",
+      "field_legal_name": "Razón social",
+      "field_legal_name_placeholder": "Nombre legal de la organización",
+      "field_tax_id": "Identificación fiscal",
+      "field_tax_id_placeholder": "RFC, RIF, NIT… según tu país",
+      "field_tax_id_hint": "Se usa tal cual en la declaración de mercancías de tus envíos. Araguaney no lo valida ni lo interpreta: solo lo imprime."
     },
     "reports": {
       "title": "Reportes",
