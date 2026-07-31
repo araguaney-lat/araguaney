@@ -21,7 +21,7 @@ These are active out of the box — no configuration needed beyond env vars.
 | ProxyHeadersMiddleware | `main.py` | Trusts proxy headers from `TRUSTED_PROXY_IPS` |
 | Sentry (optional) | `main.py` | Disabled if `SENTRY_DSN` not set; `send_default_pii=False` |
 | Generic 500 responses | `main.py` | No stack traces exposed to clients |
-| Slack alert on 500 | `main.py` | Fires to `#backend-alerts` |
+| Slack alert on 500 | `main.py` | Posts to the channel in `SLACK_ALERT_CHANNEL`; silent when unset |
 | Email verification required | `routers/auth.py` | Login blocked until email verified |
 | Password reset with expiry | `routers/auth.py` | 1-hour token, `secrets.token_urlsafe(32)` |
 | User enumeration protection | `routers/auth.py` | Same response for existing/non-existing emails |

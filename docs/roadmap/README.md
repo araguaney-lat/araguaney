@@ -34,10 +34,10 @@ pie title Tareas completadas (431 tareas)
 | 21 | [Logística: pesaje, declaración de mercancías y perfiles de paletizado](phase-21-logistics-weighing.md) | 12 | 0 | ✅ 100% |
 | 22 | [Trazabilidad extendida: avión y destino](phase-22-extended-traceability.md) | 0 | 14 | ⬜ 0% |
 | 23 | [IA asistida: captura, catálogo y necesidades](phase-23-ai-assisted-capture.md) | 0 | 11 | ⬜ 0% |
-| 24 | [Observabilidad: que un fallo silencioso deje de serlo](phase-24-observability.md) | 0 | 10 | ⬜ 0% |
-| **Total** | | **385** | **57** | **🟡 87%** |
+| 24 | [Observabilidad: que un fallo silencioso deje de serlo](phase-24-observability.md) | 0 | 11 | ⬜ 0% |
+| **Total** | | **385** | **58** | **🟡 87%** |
 
-> **Pendientes (57):**
+> **Pendientes (58):**
 > El grupo A de la Fase 13 (privacidad, lo que aplica hoy) está completo.
 > - Los borradores legales de la Fase 20 están escritos y esperando revisión de abogado:
 >   [`docs/legal/drafts/`](../legal/drafts/README.md). Sus tareas siguen abiertas hasta que esa
@@ -51,7 +51,7 @@ pie title Tareas completadas (431 tareas)
 > - **14 de la Fase 22 (trazabilidad extendida):** hitos logísticos, recepción en destino con
 >   merma e incidencias; diseño en
 >   [su spec](../superpowers/specs/2026-07-29-extended-traceability-design.md).
-> - **10 de la Fase 24 (observabilidad):** hoy se avisa cuando un request revienta, pero no cuando
+> - **11 de la Fase 24 (observabilidad):** hoy se avisa cuando un request revienta, pero no cuando
 >   falla algo que nadie está mirando. Hay cinco crons de purga corriendo de madrugada y ninguno
 >   avisa si muere — y cuatro sostienen plazos de conservación **publicados en el aviso de
 >   privacidad**. Sin costo: Sentry y Slack en plan gratuito.
