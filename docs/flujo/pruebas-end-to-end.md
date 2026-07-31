@@ -265,21 +265,25 @@ Dos comportamientos que se leen como bug y no lo son:
 
 ---
 
-## Problemas conocidos a verificar en cada corrida
+## Regresiones a verificar en cada corrida
 
-1. **El QR de tarima apunta a una ruta inexistente en el front.**
-   `app/utils/qr.py` y `app/utils/pdf_pallet_label.py` codifican
-   `{base_url}/p/{code}`, y el backend sirve `GET /p/{code}`, pero no existe
-   `frontend/app/p/[code]/page.tsx` ni un rewrite en `next.config.ts`. Escanear
-   una etiqueta de tarima cae en 404. La ruta que sí resuelve ambos es
-   `/qr/{code}`.
-2. **Prefijos desalineados en el escáner manual.**
-   `frontend/app/dashboard/scan/page.tsx` sugiere `"B-XXXX o P-XXXX"` y rutea a
-   `/p/` solo si el texto empieza con `P-`. Los códigos reales son `BX-`, `TM-`
-   y `DN-`, así que un `TM-` tecleado a mano termina en `/b/TM-...`.
-3. **El catálogo es cuello de botella en demo.** Solo `national_admin` da de alta
-   productos. Si falta un SKU durante una captura en vivo, nadie más lo
-   desbloquea.
+Los prefijos de código son `BX-` (caja), `TM-` (tarima) y `DN-` (donación
+pre-registrada). Dos rutas dependen de eso y ya se rompieron una vez:
+
+- [ ] **Etiqueta física de tarima.** El PDF codifica `{FRONT}/p/{code}`
+      (`app/utils/qr.py`, `app/utils/pdf_pallet_label.py`). Esa ruta no tiene
+      página propia: `next.config.ts` la redirige (307) a `/qr/{code}`, que es
+      la ficha que resuelve caja y tarima. Escanear una etiqueta impresa debe
+      abrir la ficha, no un 404.
+- [ ] **Escáner manual** (`/dashboard/scan`): tecleando `BX-…` cae en `/b/`,
+      `TM-…` en `/qr/`, `DN-…` en el detalle de la donación. Probar también en
+      minúsculas: el código se normaliza a mayúsculas.
+
+Y una limitación operativa que no es bug pero muerde en demo:
+
+- **El catálogo es cuello de botella.** Solo `national_admin` da de alta
+  productos. Si falta un SKU durante una captura en vivo, nadie más lo
+  desbloquea.
 
 ---
 

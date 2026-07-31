@@ -546,6 +546,7 @@
       "permission_denied": "Permiso de cámara denegado",
       "open_camera": "📷 Abrir cámara",
       "manual_label": "También puedes escribir el código manualmente:",
+      "code_placeholder": "BX-XXXX, TM-XXXX o DN-XXXX",
       "go": "Ir",
       "camera_label": "Apunta al QR de la caja o tarima",
       "subtitle_detail": "Escanea el QR de una caja o tarima para ver su ficha.",

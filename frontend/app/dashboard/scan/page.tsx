@@ -38,12 +38,18 @@ export default function ScanPage() {
       // not a URL — treat as bare code
     }
 
-    if (text.startsWith("DN-")) {
-      router.push(`/dashboard/donations/${text}`)
-    } else if (text.startsWith("P-")) {
-      router.push(`/p/${text}`)
+    // Los códigos se generan en mayúsculas (`secrets.token_urlsafe(6).upper()`),
+    // así que teclear en minúsculas es un dedazo, no otro código.
+    const code = text.trim().toUpperCase()
+
+    if (code.startsWith("DN-")) {
+      // Donación pre-registrada: su ficha operativa vive en el panel.
+      router.push(`/dashboard/donations/${code}`)
+    } else if (code.startsWith("TM-")) {
+      // La tarima no tiene página propia; /qr resuelve caja y tarima por igual.
+      router.push(`/qr/${code}`)
     } else {
-      router.push(`/b/${text}`)
+      router.push(`/b/${code}`)
     }
   }, [router])
 
@@ -79,7 +85,7 @@ export default function ScanPage() {
         <input
           name="code"
           type="text"
-          placeholder="B-XXXX o P-XXXX"
+          placeholder={t.code_placeholder}
           className="flex-1 rounded-lg border border-inpB bg-inp px-3 py-2 text-sm text-tx focus:outline-none focus:ring-2 focus:ring-[var(--gold)]"
         />
         <button

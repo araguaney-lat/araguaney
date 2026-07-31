@@ -47,6 +47,18 @@ const nextConfig: NextConfig = {
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }]
   },
+  async redirects() {
+    return [
+      // La etiqueta impresa de una tarima codifica `{FRONT}/p/{code}`
+      // (`app/utils/qr.py`), pero esa ruta nunca tuvo página: la ficha que
+      // resuelve caja y tarima es /qr/[code]. Sin esto, escanear una tarima
+      // cae en 404.
+      // Temporal (307) a propósito: las etiquetas ya impresas viven en cajas
+      // reales, y un 308 se queda cacheado en el navegador aunque después /p/
+      // tenga su propia página.
+      { source: "/p/:code", destination: "/qr/:code", permanent: false },
+    ]
+  },
   // The /dashboard/ayuda/[slug] pages read content/manuals/*.html via fs at
   // request time (the dashboard is auth-gated, so these render dynamically).
   // The slug is dynamic, so trace the whole folder into the serverless bundle.
