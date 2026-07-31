@@ -1,0 +1,86 @@
+<div class="doc">
+  <div class="wrap">
+
+    <header>
+      <span class="eyebrow">Operations · Documents</span>
+      <h1>What Araguaney gives you, and what you have to fill in</h1>
+      <p class="lede">Araguaney knows what is in your boxes and how much they weigh, because you recorded it box by box. What it does not know — and does not pretend to know — is what your country's authorities require. This guide draws that line clearly, so you know exactly what you bring to your customs broker and what is theirs to handle.</p>
+      <p class="crumbs">Panel &rsaquo; <b>Help</b> &rsaquo; Transport documents</p>
+    </header>
+
+    <section>
+      <div class="intro-card">
+        <p><b>Araguaney is software, not a foundation and not a tax adviser.</b> It issues no tax documents, files nothing with any customs authority, and interprets no country's tax regime. It generates your cargo data and prints it alongside the details you captured about your own organization.</p>
+        <p>That is not a limitation we are apologizing for: it is what lets the tool work the same in Mexico, in Colombia, or wherever it is needed next year.</p>
+      </div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <span class="eyebrow">What the platform produces</span>
+        <h2>Three documents per shipment</h2>
+      </div>
+
+      <div class="steps">
+        <div class="step"><span class="n">1</span><div>
+          <h3>Manifest / packing list</h3>
+          <p>The full detail: every pallet, every box, with product, batch, expiry, quantity and weight. It is the document that proves what the shipment contains and who prepared it. Available as PDF to print and as Excel for whoever needs it in columns.</p>
+        </div></div>
+
+        <div class="step"><span class="n">2</span><div>
+          <h3>Goods declaration</h3>
+          <p>The summary whoever moves the cargo asks for: which goods are travelling (grouped by product, not box by box), how much they weigh, how many packages, where they leave from and where they are going, and who is dispatching. Available as Excel and JSON, in case your carrier or broker feeds it into their system.</p>
+          <p>At the top of the file you get the list of <b>missing data</b>. If it says the gross weight is missing, no pallet was weighed; if it says your tax identification is missing, it has not been captured in your center.</p>
+        </div></div>
+
+        <div class="step"><span class="n">3</span><div>
+          <h3>Box and pallet labels</h3>
+          <p>With their QR codes, so anyone along the chain can see the details without opening anything. The pallet label also carries the humanitarian donation, no commercial value statement.</p>
+        </div></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <span class="eyebrow">What you fill in</span>
+        <h2>Your organization's details</h2>
+        <p class="sect-note">Captured once, under <b>Centers</b>, and they appear on every document. We print them as-is: we neither validate nor interpret them.</p>
+      </div>
+
+      <div class="steps">
+        <div class="step"><span class="n">1</span><div>
+          <h3>Legal name</h3>
+          <p>Your organization's legal name, which is rarely the same as the name the center operates under. Documents carry the legal one.</p>
+        </div></div>
+
+        <div class="step"><span class="n">2</span><div>
+          <h3>Tax identification</h3>
+          <p>Whatever your country uses: RFC, RIF, NIT, EIN, any of them. We deliberately do not check the format — validating one country's would break every other.</p>
+        </div></div>
+
+        <div class="step"><span class="n">3</span><div>
+          <h3>Address</h3>
+          <p>Of the center dispatching the shipment. It is the origin that travels on the declaration.</p>
+        </div></div>
+
+        <div class="step"><span class="n">4</span><div>
+          <h3>Tariff code for your products (optional)</h3>
+          <p>In the catalog, each product type can carry its <b>HS</b> code (Harmonized System), the one nearly 200 countries use at customs. If you load it, it travels on the declaration and saves your broker work. If not, the document flags it as missing.</p>
+        </div></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <span class="eyebrow">Not ours to handle</span>
+        <h2>Take this to your broker</h2>
+      </div>
+      <div class="intro-card">
+        <p><b>Who issues the transport document and under what rules</b> depends on your country, on who moves the cargo, and on the type of transfer. Your customs broker, your carrier or your accountant resolves that — we give them the data.</p>
+        <p><b>If your country requires a specific complement or format</b>, tell us. We can add a profile that translates the declaration's field names into that format. What we will not do is interpret the rules for you: a wrong tax figure coming out of our system is worse than a missing one, because nobody double-checks it.</p>
+        <p><b>A donation having no commercial value does not by itself exempt it from anything.</b> Ask a professional in your country what applies in your case; the answer changes with where you are and who is transporting.</p>
+      </div>
+    </section>
+
+  </div>
+</div>

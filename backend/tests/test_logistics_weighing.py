@@ -293,3 +293,51 @@ def test_la_guia_esta_registrada_en_el_indice_de_ayuda():
     registro = (Path(__file__).resolve().parents[2] / "frontend" / "app" / "dashboard"
                 / "ayuda" / "manuals.ts").read_text()
     assert "paletizado" in registro
+
+
+# ── Guía de documentos de transporte (task 8) ────────────────────────────────
+
+def test_la_guia_de_documentos_existe_en_ambos_idiomas():
+    from pathlib import Path
+
+    raiz = Path(__file__).resolve().parents[2] / "frontend" / "content" / "manuals"
+    for ruta in (raiz / "documentos-de-transporte.html",
+                 raiz / "en" / "documentos-de-transporte.html"):
+        assert ruta.exists(), ruta
+        assert len(ruta.read_text()) > 2000
+
+
+def test_la_guia_no_da_orientacion_tributaria():
+    """Es la razón por la que esta tarea dejó de necesitar un fiscalista."""
+    from pathlib import Path
+
+    raiz = Path(__file__).resolve().parents[2] / "frontend" / "content" / "manuals"
+    for ruta in (raiz / "documentos-de-transporte.html",
+                 raiz / "en" / "documentos-de-transporte.html"):
+        texto = ruta.read_text().lower()
+        for prohibido in ("regla 2.7.7", "rmf", "30 km", "deducible", "exento de"):
+            assert prohibido not in texto, f"{ruta.name}: {prohibido}"
+
+
+def test_la_guia_dice_a_quien_le_toca_lo_demas():
+    from pathlib import Path
+
+    raiz = Path(__file__).resolve().parents[2] / "frontend" / "content" / "manuals"
+    assert "despachante" in (raiz / "documentos-de-transporte.html").read_text()
+
+
+def test_la_guia_esta_registrada_en_el_indice_de_ayuda():
+    from pathlib import Path
+
+    registro = (Path(__file__).resolve().parents[2] / "frontend" / "app" / "dashboard"
+                / "ayuda" / "manuals.ts").read_text()
+    assert "documentos-de-transporte" in registro
+
+
+def test_claude_md_registra_las_politicas_de_la_fase():
+    """El contexto del proyecto tiene que describir el sistema que existe."""
+    from pathlib import Path
+
+    src = (Path(__file__).resolve().parents[2] / "CLAUDE.md").read_text()
+    assert "El peso de verdad vive en la tarima" in src
+    assert "los datos son nuestros, las reglas no" in src.lower()

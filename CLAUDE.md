@@ -253,6 +253,38 @@ tiene un solo `batch` y una sola `expiry_date`. Si llega mezcla → se divide en
 - `Pallet`: `OPEN → CLOSED → SHIPPED`. Solo cajas `SEALED` entran; solo tarimas `CLOSED` entran a envío.
 - `Shipment`: `OPEN → CLOSED → SHIPPED`. Al `SHIPPED` se congela todo.
 
+**El peso de verdad vive en la tarima** (Fase 21). El peso se mide dos veces, con
+báscula las dos, y hay una referencia que no se mide:
+
+1. **Referencia del catálogo** (`unit_weight_kg × cantidad`): cuánto pesaría solo
+   el contenido. **No es el peso de la caja** y no llena ese campo — una caja
+   llena lleva cartón, empaque y relleno. Sirve para cachar un dedazo.
+2. **Caja pesada**: dato medido, describe el contenido.
+3. **Tarima pesada**: incluye base y emplaye, así que tampoco es la suma de sus
+   cajas. Es el peso que la cadena aérea valida y el que viaja a los documentos.
+
+Pesar dos veces es factible en un centro; pesar producto por producto no lo es.
+La diferencia entre niveles se muestra y nunca bloquea, igual que el perfil de
+altura del envío: quien está en el andén ve la tarima y el sistema no.
+
+**Multi-país: los datos son nuestros, las reglas no** (Fase 21). Araguaney es un
+software, no una fundación ni un asesor fiscal, y opera en varios países. Al
+construir cualquier documento de transporte o aduana:
+
+- **Nuestro:** qué hay en las cajas, cuánto pesa, cuántos bultos, de dónde a
+  dónde. Lo registramos caja por caja y es igual de cierto en cualquier país.
+- **Del centro:** razón social, identificación fiscal y domicilio, capturados por
+  el `national_admin`. Se **imprimen tal cual**, sin validar formato: un RFC, un
+  RIF y un EIN no se parecen en nada.
+- **De nadie de aquí:** cualquier regla tributaria o aduanal. Se remite al
+  despachante o al contador del centro.
+
+Lo específico de un país va como **perfil opcional que solo traduce nombres de
+campo** (`MX_CARTA_PORTE` en `app/utils/goods_declaration.py`); nunca siembra
+códigos ni explica reglas. El código de mercancía universal es **HS** (OMA), no
+la clave de un régimen local. Cubrir el régimen fiscal de cada país es una
+carrera que se pierde sola.
+
 **Prevención de riesgos en donaciones** (Fase 20). Existe para cerrar el uso de la
 donación en especie como canal de lavado basado en comercio: una empresa "dona"
 producto y una parte relacionada lo recibe en destino.

@@ -52,6 +52,14 @@ export const MANUAL_GROUPS: readonly ManualGroup[] = [
         },
       },
       {
+        slug: "documentos-de-transporte",
+        title: { es: "Documentos de transporte", en: "Transport documents" },
+        blurb: {
+          es: "Qué documentos genera Araguaney, qué datos pones tú y qué le toca a tu despachante.",
+          en: "Which documents Araguaney generates, what you fill in, and what is your broker's job.",
+        },
+      },
+      {
         slug: "paletizado",
         title: { es: "Paletizado", en: "Palletizing" },
         blurb: {
