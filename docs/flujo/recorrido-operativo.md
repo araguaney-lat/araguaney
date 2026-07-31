@@ -139,12 +139,11 @@ persona quiere identificarse, y en ese caso se capturan sus datos y su aceptaci�
 de los términos de donación. Quien dona a nombre de una empresa siempre acepta
 los términos.
 
-Hay una excepción: cuando una donación supera cierto volumen, deja de poder ser
-anónima. El sistema pide identificar a quien dona. Si la persona se niega (que es
-en sí una señal de alerta), la captura **no se detiene**: quien recibe anota el
-motivo y el caso queda abierto para que la coordinación lo revise después. La
-lógica es simple: bloquear en el mostrador, en plena emergencia, no recupera
-nada, porque para cuando alguien revise la persona ya se fue.
+Hay una excepción: por encima de cierto volumen, una donación deja de poder
+quedar anónima y el sistema pide identificar a quien dona. Cualquier excepción a
+esa regla queda registrada con su motivo y escala a la coordinación. Es un
+control de escalamiento, no un freno en el mostrador: en plena emergencia,
+detener la fila no recupera nada, y lo que sí sirve es que quede el rastro.
 
 Esos casos aparecen en **Revisiones**, donde la administración nacional los
 aprueba o los rechaza.

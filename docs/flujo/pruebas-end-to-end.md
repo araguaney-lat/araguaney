@@ -139,9 +139,8 @@ El umbral vive en variables de entorno y **no se documenta aquí** (ver
 - [ ] Capturar por encima del umbral, sin donante y sin motivo →
       `DONOR_REQUIRED_FOR_VOLUME`.
 - [ ] Repetir identificando al donante → pasa.
-- [ ] Repetir con `anonymous_exception_reason` → pasa **y** abre un `RiskReview`
-      en `PENDING`. El escalamiento no es un tope: exige identificar, no impide
-      donar.
+- [ ] Repetir con `anonymous_exception_reason` → abre un `RiskReview` en
+      `PENDING` con el motivo capturado. El control escala, no topa.
 - [ ] Un intake que viene de una donación pre-registrada no dispara el umbral: ya
       hay identidad.
 
