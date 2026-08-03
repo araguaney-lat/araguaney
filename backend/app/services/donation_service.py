@@ -255,12 +255,12 @@ class DonationService(BaseService):
 
         # Quien cancela retira su donación entera. Dejar las fotos en R2 sería
         # conservar el dato personal justo donde nadie irá a buscarlo.
-        for foto in list(donation.photos):
+        for photo in list(donation.photos):
             try:
-                delete_object(foto.storage_key)
+                delete_object(photo.storage_key)
             except Exception:                   # noqa: BLE001
-                logger.warning("No se pudo borrar la foto %s de R2", foto.storage_key)
-            self.db.delete(foto)
+                logger.warning("No se pudo borrar la foto %s de R2", photo.storage_key)
+            self.db.delete(photo)
 
         donation.status = "CANCELLED"
         donation.manage_token_hash = None   # el enlace deja de servir
