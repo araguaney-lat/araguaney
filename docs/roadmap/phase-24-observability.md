@@ -70,7 +70,7 @@
 | 6 | Alerta de correo rebotado en volumen | Ya existe el registro de fallos de envío (Fase 15). Falta avisar cuando el volumen se dispara: un dominio bloqueando nuestros correos rompe el doble opt-in del pre-registro sin que nadie lo note. | 🟠 Media | ⬜ |
 | 7 | Presupuesto de ruido | Revisar qué alerta de verdad hace falta. Agrupar lo repetitivo, silenciar lo que nadie acciona y dejar el canal en un estado donde una alerta signifique algo. | 🟢 Baja | ⬜ |
 | 8 | Uptime externo | Un servicio gratuito que golpee `/health` y `/health/jobs` desde fuera. El endpoint ya existe (task 3); falta darlo de alta. Si Railway se cae entero, ninguna alerta interna va a salir — por definición. | 🟢 Baja | ⬜ |
-| 9 | Documentar qué se vigila | Sección en `docs/security.md` o en un `docs/observability.md`: qué dispara una alerta, a qué canal llega, qué se espera que haga quien la recibe, y **qué no está cubierto**. Un hueco documentado se puede planear; uno implícito no. | 🟢 Baja | ⬜ |
+| 9 | Documentar qué se vigila | [`docs/observability.md`](../observability.md): qué dispara cada alerta, a qué canal llega, qué se espera de quien la recibe, y **siete huecos declarados** con nombre y consecuencia. Incluye cómo agregar una alerta nueva sin romper la política. Un hueco documentado se puede planear; uno implícito no. | 🟢 Baja | ✅ Done |
 | 10 | Roadmap + `CLAUDE.md` | Registrar la política: todo trabajo de fondo que sostenga una promesa avisa cuando falla. Totales. | 🟢 Baja | ⬜ |
 
 ---
