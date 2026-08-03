@@ -61,6 +61,39 @@ bancos publican las suyas y el valor disuasorio supera al riesgo.
 
 ---
 
+## REGLA #3 — Los PR se escriben en inglés y español, en registro formal
+
+El PR es la puerta de entrada al proyecto para quien llega de fuera. Se lee
+antes que el código, queda indexado y sobrevive a la rama. En un repositorio
+público eso lo convierte en documentación, no en una nota interna.
+
+**Idioma.** Título en inglés. Cuerpo en dos bloques, `## English` primero y
+`## Español` después, con el **mismo contenido**: el bloque en español no es un
+resumen recortado del otro. Quien contribuya desde fuera lee el primero; quien
+opera los centros lee el segundo.
+
+**Registro.** Formal y preciso. Sin coloquialismos ni regionalismos, sin bromas
+internas, sin guiños a la conversación que originó el cambio. Se describe el
+cambio, no el proceso de escribirlo.
+
+**Estructura mínima:**
+
+1. Qué problema resuelve, con el contexto suficiente para entenderlo sin abrir
+   el código.
+2. Cómo lo resuelve, y por qué así y no de otra forma cuando hubo alternativa.
+3. Qué **no** cambia: límites públicos, contratos, migraciones. En un refactor
+   es lo que más le importa a quien revisa.
+4. Cómo se verificó, con la evidencia concreta (comandos y su salida).
+5. Plan de prueba, cuando el cambio se toca desde la interfaz.
+
+La REGLA #2 aplica igual al texto del PR: nada de credenciales, parámetros de
+controles ni recetas de evasión.
+
+**Alcance.** Esta regla cubre el título y el cuerpo del PR. Los mensajes de
+commit siguen en español, según la sección 10.
+
+---
+
 ## 1. Resumen y problema
 
 Tras el doble terremoto del 24 de junio de 2026 en el norte de Venezuela, decenas de
@@ -359,6 +392,9 @@ nombres de archivo. Sin excepciones nuevas.
 **Toda la prosa va en español.** Comentarios, docstrings, mensajes de commit,
 documentación, textos de error al usuario y contenido de alertas. El proyecto
 opera en español y una alerta la lee alguien de guardia a las tres de la mañana.
+
+> **Excepción: el texto de los PR va en inglés y español**, porque se dirige
+> también a quien llega de fuera del proyecto. Ver REGLA #3.
 
 ```python
 # CORRECTO
