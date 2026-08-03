@@ -179,6 +179,9 @@ Qué esperar en operación normal: `200` y un cuerpo que dice que no hay nada
 rezagado. El endpoint es público y no revela qué cron va atrasado, así que no hay
 nada sensible en exponerlo a un tercero.
 
+Está limitado a 30 consultas por minuto y por IP, holgado para un monitor cada
+cinco minutos y suficiente para que nadie lo use como grifo contra la base.
+
 ---
 
 ## Runbook: verificar Sentry de punta a punta

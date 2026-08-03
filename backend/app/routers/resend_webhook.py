@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from app.config import settings
 from app.database import get_db
 from app.services.email_failure_service import EmailFailureService
+from app.utils.rate_limit import limiter
 
 logger = logging.getLogger(__name__)
 
@@ -14,7 +15,13 @@ logger = logging.getLogger(__name__)
 router = APIRouter(tags=["webhooks"])
 
 
+# Tope alto y deliberado. Quien firma es Svix, así que el límite no autentica
+# nada: es solo un techo de gasto contra un tercero que dispare en ráfaga o
+# contra quien encuentre la URL. Un límite estrecho aquí perdería eventos
+# legítimos, porque todas las entregas de Resend llegan desde el mismo puñado
+# de direcciones y comparten cubeta.
 @router.post("/webhooks/resend")
+@limiter.limit("600/minute")
 async def resend_webhook(request: Request, db: Session = Depends(get_db)) -> Response:
     if not settings.resend_webhook_secret:
         logger.warning("Resend webhook hit but RESEND_WEBHOOK_SECRET is unset")

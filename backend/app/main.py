@@ -344,13 +344,19 @@ app.include_router(exports.router)
 
 # ── Health ─────────────────────────────────────────────────────────────────────
 
+# Sin rate limit a propósito, y es la única excepción declarada del proyecto: la
+# plataforma golpea esta ruta para decidir si el contenedor está vivo, y un
+# límite que la bloquee convierte un pico de tráfico en un reinicio en bucle.
+# Puede permitírselo porque devuelve una constante: no consulta la base, no
+# toca Redis y no revela nada.
 @app.get("/health")
 def health():
     return {"status": "ok"}
 
 
 @app.get("/health/jobs")
-def health_jobs(response: Response, db: Session = Depends(get_db)):
+@limiter.limit("30/minute")
+def health_jobs(request: Request, response: Response, db: Session = Depends(get_db)):
     """Estado del trabajo de fondo, para vigilancia externa.
 
     Existe por una limitación estructural: el vigilante interno es un cron, así
