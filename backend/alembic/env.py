@@ -30,6 +30,7 @@ import app.models.export_job      # noqa: F401
 import app.models.center_application  # noqa: F401
 import app.models.email_failure    # noqa: F401
 import app.models.risk_review      # noqa: F401
+import app.models.cron_run        # noqa: F401
 
 config = context.config
 # Use the direct (non-PgBouncer) URL for migrations when available — PgBouncer

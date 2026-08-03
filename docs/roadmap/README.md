@@ -3,9 +3,9 @@
 ## Progreso general
 
 ```mermaid
-pie title Tareas completadas (431 tareas)
-    "Listas" : 355
-    "Pendientes" : 76
+pie title Tareas completadas (443 tareas)
+    "Listas" : 389
+    "Pendientes" : 54
 ```
 
 | Fase | Nombre | Listas | Pendientes | Progreso |
@@ -34,10 +34,10 @@ pie title Tareas completadas (431 tareas)
 | 21 | [Logística: pesaje, declaración de mercancías y perfiles de paletizado](phase-21-logistics-weighing.md) | 12 | 0 | ✅ 100% |
 | 22 | [Trazabilidad extendida: avión y destino](phase-22-extended-traceability.md) | 0 | 14 | ⬜ 0% |
 | 23 | [IA asistida: captura, catálogo y necesidades](phase-23-ai-assisted-capture.md) | 0 | 11 | ⬜ 0% |
-| 24 | [Observabilidad: que un fallo silencioso deje de serlo](phase-24-observability.md) | 3 | 8 | 🟡 27% |
-| **Total** | | **388** | **55** | **🟡 88%** |
+| 24 | [Observabilidad: que un fallo silencioso deje de serlo](phase-24-observability.md) | 4 | 7 | 🟡 36% |
+| **Total** | | **389** | **54** | **🟡 88%** |
 
-> **Pendientes (55):**
+> **Pendientes (54):**
 > El grupo A de la Fase 13 (privacidad, lo que aplica hoy) está completo.
 > - Los borradores legales de la Fase 20 están escritos y esperando revisión de abogado:
 >   [`docs/legal/drafts/`](../legal/drafts/README.md). Sus tareas siguen abiertas hasta que esa
@@ -51,10 +51,10 @@ pie title Tareas completadas (431 tareas)
 > - **14 de la Fase 22 (trazabilidad extendida):** hitos logísticos, recepción en destino con
 >   merma e incidencias; diseño en
 >   [su spec](../superpowers/specs/2026-07-29-extended-traceability-design.md).
-> - **8 de la Fase 24 (observabilidad):** los crons y las tareas de fondo ya avisan cuando fallan, y
->   el worker ya manda a Sentry. Falta el latido (un cron que **nunca corre** no falla, así que no
->   alerta), blindar la llave pública de Sentry, uptime externo y documentar qué se vigila. Sin
->   costo: Sentry y Slack en plan gratuito.
+> - **7 de la Fase 24 (observabilidad):** las tareas y los crons avisan al fallar, el worker manda a
+>   Sentry y el latido detecta lo que dejó de correr. Falta dar de alta el uptime externo —el
+>   endpoint ya existe—, blindar la llave pública de Sentry y documentar qué se vigila. Sin costo:
+>   Sentry y Slack en plan gratuito.
 > - **11 de la Fase 23 (IA asistida):** mapeo de texto libre, OCR de etiqueta, emparejamiento de
 >   necesidades y resumen nacional, con guardarraíles de gasto; diseño en
 >   [su spec](../superpowers/specs/2026-07-29-ai-assisted-capture-design.md).
