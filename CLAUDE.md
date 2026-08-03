@@ -90,7 +90,8 @@ La REGLA #2 aplica igual al texto del PR: nada de credenciales, parámetros de
 controles ni recetas de evasión.
 
 **Alcance.** Esta regla cubre el título y el cuerpo del PR. Los mensajes de
-commit siguen en español, según la sección 10.
+commit van en inglés y sin traducción: son para quien lee `git log`, no
+documentación de producto (sección 10).
 
 ---
 
@@ -389,12 +390,14 @@ no maneja dinero (FATF R.8 pide controles proporcionales al riesgo).
 parámetros, constantes, clases, columnas, campos de esquema, rutas de API y
 nombres de archivo. Sin excepciones nuevas.
 
-**Toda la prosa va en español.** Comentarios, docstrings, mensajes de commit,
+**La prosa del producto va en español.** Comentarios, docstrings,
 documentación, textos de error al usuario y contenido de alertas. El proyecto
 opera en español y una alerta la lee alguien de guardia a las tres de la mañana.
 
-> **Excepción: el texto de los PR va en inglés y español**, porque se dirige
-> también a quien llega de fuera del proyecto. Ver REGLA #3.
+**La prosa dirigida a quien contribuye va en inglés.** Mensajes de commit y
+texto de los PR: se leen desde fuera del proyecto, quedan indexados y son lo
+primero que encuentra quien evalúa si adoptar el software. Para los PR, además,
+se acompañan de su versión en español (REGLA #3).
 
 ```python
 # CORRECTO

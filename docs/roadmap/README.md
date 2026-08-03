@@ -4,8 +4,8 @@
 
 ```mermaid
 pie title Tareas completadas (443 tareas)
-    "Listas" : 390
-    "Pendientes" : 53
+    "Listas" : 392
+    "Pendientes" : 51
 ```
 
 | Fase | Nombre | Listas | Pendientes | Progreso |
@@ -34,10 +34,10 @@ pie title Tareas completadas (443 tareas)
 | 21 | [Logística: pesaje, declaración de mercancías y perfiles de paletizado](phase-21-logistics-weighing.md) | 12 | 0 | ✅ 100% |
 | 22 | [Trazabilidad extendida: avión y destino](phase-22-extended-traceability.md) | 0 | 14 | ⬜ 0% |
 | 23 | [IA asistida: captura, catálogo y necesidades](phase-23-ai-assisted-capture.md) | 0 | 11 | ⬜ 0% |
-| 24 | [Observabilidad: que un fallo silencioso deje de serlo](phase-24-observability.md) | 5 | 6 | 🟡 45% |
-| **Total** | | **390** | **53** | **🟡 88%** |
+| 24 | [Observabilidad: que un fallo silencioso deje de serlo](phase-24-observability.md) | 7 | 4 | 🟡 64% |
+| **Total** | | **392** | **51** | **🟡 88%** |
 
-> **Pendientes (53):**
+> **Pendientes (51):**
 > El grupo A de la Fase 13 (privacidad, lo que aplica hoy) está completo.
 > - Los borradores legales de la Fase 20 están escritos y esperando revisión de abogado:
 >   [`docs/legal/drafts/`](../legal/drafts/README.md). Sus tareas siguen abiertas hasta que esa
@@ -51,11 +51,13 @@ pie title Tareas completadas (443 tareas)
 > - **14 de la Fase 22 (trazabilidad extendida):** hitos logísticos, recepción en destino con
 >   merma e incidencias; diseño en
 >   [su spec](../superpowers/specs/2026-07-29-extended-traceability-design.md).
-> - **6 de la Fase 24 (observabilidad):** las tareas y los crons avisan al fallar, el worker manda a
->   Sentry, el latido detecta lo que dejó de correr y
->   [`docs/observability.md`](../observability.md) declara qué se vigila y qué no. Falta dar de alta
->   el uptime externo (el endpoint ya existe), verificar Sentry de punta a punta y blindar su llave
->   pública. Sin costo: Sentry y Slack en plan gratuito.
+> - **4 de la Fase 24 (observabilidad):** las tareas y los crons avisan al fallar, el worker manda a
+>   Sentry, el latido detecta lo que dejó de correr, los rebotes de correo se vigilan por volumen y
+>   por dominio, y el presupuesto de ruido agrupa lo repetitivo.
+>   [`docs/observability.md`](../observability.md) declara qué se vigila, qué no, y trae el runbook
+>   de las dos que quedan: dar de alta el uptime externo y verificar Sentry de punta a punta, ambas
+>   trabajo de consola. Falta además blindar la llave pública de Sentry. Sin costo: Sentry y Slack
+>   en plan gratuito.
 > - **11 de la Fase 23 (IA asistida):** mapeo de texto libre, OCR de etiqueta, emparejamiento de
 >   necesidades y resumen nacional, con guardarraíles de gasto; diseño en
 >   [su spec](../superpowers/specs/2026-07-29-ai-assisted-capture-design.md).

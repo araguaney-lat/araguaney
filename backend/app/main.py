@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import secrets
 import sys
@@ -243,9 +244,18 @@ async def rate_limit_handler(request: Request, exc: RateLimitExceeded) -> JSONRe
 
 
 async def _alert_500(path: str, exc: Exception) -> None:
-    """Send a Slack 500 alert enriched with Railway/Vercel infra status."""
+    """Send a Slack 500 alert enriched with Railway/Vercel infra status.
+
+    Una ruta rota se rompe para todo el mundo a la vez: sin agrupar, un endpoint
+    caído llena el canal en un minuto y esconde lo demás. La identidad del
+    problema es la ruta más el tipo de excepción (Fase 24, task 7).
+    """
     from app.utils.slack import notify_slack
+    from app.utils.alert_budget import should_send
     from app.utils.infra_status import get_infra_status, build_slack_context
+
+    if not await asyncio.to_thread(should_send, f"500:{path}:{type(exc).__name__}"):
+        return
 
     context = ""
     try:

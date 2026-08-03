@@ -52,6 +52,30 @@ class EmailFailureRepository(BaseRepository[EmailFailure]):
         stmt = stmt.order_by(EmailFailure.created_at.desc()).limit(limit)
         return list(self.db.execute(stmt).scalars().all())
 
+    def count_unresolved_by_domain_since(self, cutoff: datetime) -> dict[str, int]:
+        """Rebotes sin resolver desde `cutoff`, agrupados por dominio destino.
+
+        Se agrupa por **dominio y no por dirección** a propósito: la señal que
+        importa es "un proveedor nos está bloqueando", y el dominio la da entera
+        sin mover una sola dirección de correo fuera de la base.
+        """
+        rows = (
+            self.db.execute(
+                select(EmailFailure.to_email).where(
+                    EmailFailure.created_at >= cutoff,
+                    EmailFailure.resolved_at.is_(None),
+                )
+            )
+            .scalars()
+            .all()
+        )
+
+        by_domain: dict[str, int] = {}
+        for address in rows:
+            domain = (address or "").rsplit("@", 1)[-1].strip().lower() or "desconocido"
+            by_domain[domain] = by_domain.get(domain, 0) + 1
+        return by_domain
+
     def purge_older_than(self, days: int) -> int:
         cutoff = datetime.now(timezone.utc) - timedelta(days=days)
         rows = (
