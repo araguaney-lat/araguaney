@@ -354,7 +354,11 @@ def health():
     return {"status": "ok"}
 
 
-@app.get("/health/jobs")
+# GET y HEAD: los servicios de uptime gratuitos comprueban con HEAD y varios no
+# dejan elegir el método. Esta versión de FastAPI no agrega HEAD sola al declarar
+# GET, así que un monitor recibiría 405 en la ruta que existe justamente para que
+# la consulte. HEAD sale gratis: mismo código de estado, sin cuerpo.
+@app.api_route("/health/jobs", methods=["GET", "HEAD"])
 @limiter.limit("30/minute")
 def health_jobs(request: Request, response: Response, db: Session = Depends(get_db)):
     """Estado del trabajo de fondo, para vigilancia externa.

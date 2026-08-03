@@ -194,7 +194,7 @@ def test_el_vigilante_tambien_anota_su_propio_latido():
 # línea de más los rompía sin que nada estuviera mal. Ahora preguntan por la
 # respuesta, que es lo que un servicio de uptime va a ver.
 
-def _consultar_health_jobs(rezagados: list[str]):
+def _consultar_health_jobs(rezagados: list[str], metodo: str = "GET"):
     from fastapi.testclient import TestClient
 
     from app.database import get_db
@@ -204,7 +204,7 @@ def _consultar_health_jobs(rezagados: list[str]):
     try:
         with patch("app.services.cron_heartbeat.stale_crons", return_value=rezagados):
             with TestClient(app) as client:
-                return client.get("/health/jobs")
+                return client.request(metodo, "/health/jobs")
     finally:
         app.dependency_overrides.pop(get_db, None)
 
@@ -234,3 +234,15 @@ def test_el_endpoint_no_publica_los_internos():
 
     assert "purge_" not in cuerpo
     assert respuesta.json() == {"status": "stale", "count": 2}
+
+
+def test_el_endpoint_tambien_responde_a_head():
+    """Los servicios de uptime gratuitos comprueban con HEAD y varios no dejan
+    elegir el método. Esta versión de FastAPI no agrega HEAD sola al declarar
+    GET, así que el monitor recibía 405 en la ruta hecha para que la consulte."""
+    assert _consultar_health_jobs([], metodo="HEAD").status_code == 200
+
+
+def test_head_tambien_avisa_cuando_algo_se_quedo_atras():
+    """De nada sirve aceptar HEAD si siempre contesta que todo está bien."""
+    assert _consultar_health_jobs(["purge_donations_cron"], metodo="HEAD").status_code == 503
