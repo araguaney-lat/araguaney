@@ -32,10 +32,9 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     description: site_description,
     manifest: "/manifest.webmanifest",
-    icons: {
-      icon: "/icons/icon.svg",
-      apple: "/icons/icon.svg",
-    },
+    // Sin `icons` a propósito: los declara la convención de archivos de Next
+    // (app/favicon.ico y app/apple-icon.png). Declararlos aquí los sobrescribe,
+    // que es como el árbol de marcador de posición sobrevivió al logo real.
     // Note: openGraph/twitter images intentionally omitted here so the
     // file-convention card (app/opengraph-image.tsx, app/twitter-image.tsx)
     // is used as the site-wide default. Pages that set their own
