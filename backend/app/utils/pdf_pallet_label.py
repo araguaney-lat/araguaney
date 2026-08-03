@@ -39,9 +39,9 @@ def fit_box_codes(codes: list[str], y_start: float) -> tuple[list[str], int]:
     documento que lo sostiene; lo que esta etiqueta no puede perder es la
     declaración.
     """
-    filas = max(int((y_start - _LEGEND_TOP) / _ROW_HEIGHT), 0)
-    visibles = codes[: filas * _COLUMNS]
-    return visibles, len(codes) - len(visibles)
+    rows = max(int((y_start - _LEGEND_TOP) / _ROW_HEIGHT), 0)
+    visible = codes[: rows * _COLUMNS]
+    return visible, len(codes) - len(visible)
 
 
 def generate_pallet_label_pdf(pallet: PalletLabelData) -> bytes:
@@ -94,20 +94,20 @@ def generate_pallet_label_pdf(pallet: PalletLabelData) -> bytes:
         y = y_start - 5 * mm
         col_w = (w - 50 * mm) / 3
 
-        visibles, restantes = fit_box_codes(pallet.box_codes, y)
+        visible, remaining = fit_box_codes(pallet.box_codes, y)
 
-        for i, code in enumerate(visibles):
+        for i, code in enumerate(visible):
             col = i % 3
             row = i // 3
             x = 25 * mm + col * col_w
             c.drawString(x, y - row * 5 * mm, f"• {code}")
 
         # Nunca se recorta en silencio: quien lee la etiqueta sabe que hay más.
-        if restantes:
+        if remaining:
             c.setFont("Helvetica-Oblique", 8)
             c.drawString(
-                25 * mm, y - (len(visibles) // 3 + 1) * 5 * mm,
-                f"… y {restantes} caja{'s' if restantes != 1 else ''} más — ver manifiesto",
+                25 * mm, y - (len(visible) // 3 + 1) * 5 * mm,
+                f"… y {remaining} caja{'s' if remaining != 1 else ''} más — ver manifiesto",
             )
 
     # Leyenda de aduana: la tarima viaja sola y su etiqueta tiene que sostener

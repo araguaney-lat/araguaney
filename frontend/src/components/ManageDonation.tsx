@@ -91,22 +91,22 @@ export default function ManageDonation({
       return
     }
     if (file.size > MAX_FOTO_BYTES) {
-      setError("Cada foto puede pesar hasta 5 MB.")
+      setError("Cada photo puede pesar hasta 5 MB.")
       return
     }
 
     setUploading(true)
     // Tres pasos: pedir la URL firmada, subir directo al almacenamiento y
-    // avisarle al backend. La foto nunca pasa por nuestro servidor.
-    const destino = await getPhotoUploadUrl(token, file.type, file.size)
-    if (destino === null) {
+    // avisarle al backend. La photo nunca pasa por nuestro servidor.
+    const target = await getPhotoUploadUrl(token, file.type, file.size)
+    if (target === null) {
       setUploading(false)
       setError("No pudimos preparar la subida. Inténtalo de nuevo.")
       return
     }
 
     try {
-      const put = await fetch(destino.upload_url, {
+      const put = await fetch(target.upload_url, {
         method: "PUT",
         headers: { "Content-Type": file.type },
         body: file,
@@ -114,14 +114,14 @@ export default function ManageDonation({
       if (!put.ok) throw new Error("upload failed")
     } catch {
       setUploading(false)
-      setError("No pudimos subir la foto. Revisa tu conexión e inténtalo de nuevo.")
+      setError("No pudimos subir la photo. Revisa tu conexión e inténtalo de nuevo.")
       return
     }
 
-    const foto = await confirmPhoto(token, destino.storage_key, file.type, file.size)
+    const photo = await confirmPhoto(token, target.storage_key, file.type, file.size)
     setUploading(false)
-    if (foto === null) setError("La foto se subió pero no pudimos registrarla. Inténtalo de nuevo.")
-    else setPhotos((ps) => [...ps, foto])
+    if (photo === null) setError("La photo se subió pero no pudimos registrarla. Inténtalo de nuevo.")
+    else setPhotos((ps) => [...ps, photo])
   }
 
   async function ver(photoId: string) {
@@ -133,7 +133,7 @@ export default function ManageDonation({
     if (await deletePhoto(token, photoId)) {
       setPhotos((ps) => ps.filter((p) => p.id !== photoId))
     } else {
-      setError("No pudimos borrar la foto.")
+      setError("No pudimos borrar la photo.")
     }
   }
 
@@ -239,7 +239,7 @@ export default function ManageDonation({
 
         {editable && photos.length < MAX_FOTOS && (
           <label className="inline-block cursor-pointer rounded-lg border border-zinc-300 bg-white px-4 py-2 text-sm text-zinc-700 hover:bg-zinc-50">
-            {uploading ? "Subiendo…" : "Agregar una foto"}
+            {uploading ? "Subiendo…" : "Agregar una photo"}
             <input
               type="file"
               accept={TIPOS_FOTO.join(",")}

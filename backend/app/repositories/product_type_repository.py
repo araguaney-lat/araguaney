@@ -60,13 +60,13 @@ class ProductTypeRepository(BaseRepository):
 
     def find_by_gtin(self, gtin: str) -> ProductType | None:
         """Busca por código de barras: primero lo aprendido del uso, luego el catálogo."""
-        aprendido = self.db.execute(
+        learned = self.db.execute(
             select(ProductType)
             .join(ProductGtin, ProductGtin.product_type_id == ProductType.id)
             .where(ProductGtin.gtin == gtin)
         ).scalar_one_or_none()
-        if aprendido is not None:
-            return aprendido
+        if learned is not None:
+            return learned
 
         return self.db.execute(
             select(ProductType).where(ProductType.gtin == gtin)
@@ -86,20 +86,20 @@ class ProductTypeRepository(BaseRepository):
         producto, y None si pertenece a otro: gana quien lo capturó primero, para
         que una captura equivocada no reescriba el catálogo de todos los centros.
         """
-        existente = self.db.execute(
+        existing = self.db.execute(
             select(ProductGtin).where(ProductGtin.gtin == gtin)
         ).scalar_one_or_none()
-        if existente is not None:
-            return existente if existente.product_type_id == product_type_id else None
+        if existing is not None:
+            return existing if existing.product_type_id == product_type_id else None
 
-        enlace = ProductGtin(
+        link = ProductGtin(
             product_type_id=product_type_id,
             gtin=gtin,
             source=source,
             created_by_user_id=user_id,
         )
-        self.db.add(enlace)
-        return enlace
+        self.db.add(link)
+        return link
 
     def list_gtins(self, product_type_id: UUID) -> list[ProductGtin]:
         return list(self.db.execute(
@@ -111,9 +111,9 @@ class ProductTypeRepository(BaseRepository):
     def find_gtin(self, gtin_id: UUID) -> ProductGtin | None:
         return self.db.get(ProductGtin, gtin_id)
 
-    def delete_gtin(self, enlace: ProductGtin) -> None:
+    def delete_gtin(self, link: ProductGtin) -> None:
         """Desliga el código. Queda libre para que otra captura lo reclame."""
-        self.db.delete(enlace)
+        self.db.delete(link)
 
     def exists_in_scope(
         self,

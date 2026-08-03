@@ -34,20 +34,20 @@ def _threshold(name: str) -> float | None:
     if not raw:
         return None
     try:
-        valor = float(raw)
+        value = float(raw)
     except ValueError:
         return None
-    return valor if valor > 0 else None
+    return value if value > 0 else None
 
 
 def exceeds_volume_threshold(boxes: int, kg: float | None) -> bool:
     """¿Esta donación entra en volumen atípico? Cualquiera de los dos basta."""
-    tope_cajas = _threshold(_BOXES_ENV)
-    if tope_cajas is not None and boxes > tope_cajas:
+    max_boxes = _threshold(_BOXES_ENV)
+    if max_boxes is not None and boxes > max_boxes:
         return True
 
-    tope_kg = _threshold(_KG_ENV)
-    if tope_kg is not None and kg is not None and kg > tope_kg:
+    max_kg = _threshold(_KG_ENV)
+    if max_kg is not None and kg is not None and kg > max_kg:
         return True
 
     return False

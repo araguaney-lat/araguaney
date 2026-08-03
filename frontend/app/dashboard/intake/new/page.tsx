@@ -38,14 +38,14 @@ No llena el campo de peso. La caja se pesa, y su peso real incluye el cartón, e
 empaque y el relleno, así que la suma de productos siempre queda corta. Sirve
 para que quien captura note un dedazo — 2 kg donde la referencia dice 20. */
 function catalogReference(pt: ProductType, quantity: string): string | null {
-  const unidad = typeof pt.unit_weight_kg === "string"
+  const unitWeight = typeof pt.unit_weight_kg === "string"
     ? parseFloat(pt.unit_weight_kg)
     : pt.unit_weight_kg
-  const cantidad = parseInt(quantity, 10)
-  if (!unidad || !Number.isFinite(unidad) || !Number.isFinite(cantidad) || cantidad <= 0) {
+  const parsedQuantity = parseInt(quantity, 10)
+  if (!unitWeight || !Number.isFinite(unitWeight) || !Number.isFinite(parsedQuantity) || parsedQuantity <= 0) {
     return null
   }
-  return (unidad * cantidad).toFixed(3)
+  return (unitWeight * parsedQuantity).toFixed(3)
 }
 
 function newRow(): BoxRow {

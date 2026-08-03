@@ -124,12 +124,12 @@ def generate_manifest_xlsx(data: ManifestData) -> bytes:
     # Va en la hoja, no en una nota al margen: quien la imprime para aduana
     # imprime la hoja.
     legend_row = current_row + 2
-    for offset, texto in enumerate((CUSTOMS_LEGEND_ES, CUSTOMS_LEGEND_EN)):
-        fila = legend_row + offset
-        ws.merge_cells(f"A{fila}:L{fila}")
-        celda = ws.cell(row=fila, column=1, value=texto)
-        celda.font = Font(size=8, italic=offset == 1)
-        celda.alignment = Alignment(horizontal="left", vertical="center", wrap_text=True)
+    for offset, text in enumerate((CUSTOMS_LEGEND_ES, CUSTOMS_LEGEND_EN)):
+        row = legend_row + offset
+        ws.merge_cells(f"A{row}:L{row}")
+        cell = ws.cell(row=row, column=1, value=text)
+        cell.font = Font(size=8, italic=offset == 1)
+        cell.alignment = Alignment(horizontal="left", vertical="center", wrap_text=True)
 
     # ── Freeze panes below header ─────────────────────────────────────────────
     ws.freeze_panes = ws.cell(row=header_row + 1, column=1)

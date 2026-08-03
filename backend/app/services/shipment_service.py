@@ -122,10 +122,10 @@ class ShipmentService(BaseService):
         self.db.add(ShipmentEvent(shipment_id=shipment.id, user_id=user_id, from_status="CLOSED", to_status="SHIPPED"))
         repo.commit()
 
-        self._avisar_a_donantes(shipment_id, shipment.reference, background_tasks)
+        self._notify_donors(shipment_id, shipment.reference, background_tasks)
         return shipment
 
-    def _avisar_a_donantes(self, shipment_id: UUID, reference: str, background_tasks) -> None:
+    def _notify_donors(self, shipment_id: UUID, reference: str, background_tasks) -> None:
         """Cierra el círculo con quien se pre-registró: su donación ya salió.
 
         Va después del commit: un fallo mandando correos no puede deshacer un

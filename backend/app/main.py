@@ -359,13 +359,13 @@ def health_jobs(response: Response, db: Session = Depends(get_db)):
     from app.services.cron_heartbeat import stale_crons
 
     try:
-        rezagados = stale_crons(db)
+        stale = stale_crons(db)
     except Exception:
         # Si ni siquiera se puede consultar, algo más grande está roto.
         response.status_code = 503
         return {"status": "unknown"}
 
-    if rezagados:
+    if stale:
         response.status_code = 503
-        return {"status": "stale", "count": len(rezagados)}
+        return {"status": "stale", "count": len(stale)}
     return {"status": "ok"}

@@ -138,10 +138,10 @@ def close_pallet(
 ):
     """El pesaje viaja en el cierre porque es cuando ocurre: la tarima ya está
     armada y sube a la báscula una sola vez."""
-    datos = data or PalletCloseIn()
+    payload = data or PalletCloseIn()
     pallet = PalletService(db).close(
         pallet_id, center_id=scope, user_id=current_user.id,
-        gross_weight_kg=datos.gross_weight_kg, height_cm=datos.height_cm,
+        gross_weight_kg=payload.gross_weight_kg, height_cm=payload.height_cm,
     )
     AuditRepository(db).log("PALLET_CLOSED", "pallet",
         user_id=current_user.id, entity_id=str(pallet_id), ip=get_client_ip(request))

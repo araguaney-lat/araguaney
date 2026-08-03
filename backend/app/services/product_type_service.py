@@ -50,10 +50,10 @@ class ProductTypeService(BaseService):
         en auditoría porque afecta al catálogo de todos los centros.
         """
         repo = ProductTypeRepository(self.db)
-        enlace = repo.find_gtin(gtin_id)
+        link = repo.find_gtin(gtin_id)
         # Si el código cuelga de otro producto se responde igual que si no
         # existiera: la ruta declara a qué producto pertenece.
-        if not enlace or enlace.product_type_id != pt_id:
+        if not link or link.product_type_id != pt_id:
             raise api_error("GTIN_NOT_FOUND", "Barcode link not found", status_code=404)
 
         AuditRepository(self.db).log(
@@ -61,9 +61,9 @@ class ProductTypeService(BaseService):
             "product_type",
             user_id=user_id,
             entity_id=str(pt_id),
-            extra={"gtin": enlace.gtin, "source": enlace.source},
+            extra={"gtin": link.gtin, "source": link.source},
         )
-        repo.delete_gtin(enlace)
+        repo.delete_gtin(link)
         repo.commit()
 
     def promote(self, pt_id: UUID) -> ProductType:

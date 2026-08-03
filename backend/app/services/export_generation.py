@@ -252,16 +252,16 @@ def _build_declaration_data(db: Session, shipment_id: UUID):
     pt_repo = ProductTypeRepository(db)
     pt_cache: dict = {}
 
-    agrupado: dict = {}
+    grouped: dict = {}
     for pallet in pallets:
         for box in boxes_by_pallet[pallet.id]:
             if box.product_type_id not in pt_cache:
                 pt_cache[box.product_type_id] = pt_repo.find_by_id(box.product_type_id)
             pt = pt_cache[box.product_type_id]
-            clave = (box.product_type_id, box.unit)
-            actual = agrupado.get(clave)
-            if actual is None:
-                agrupado[clave] = DeclarationLine(
+            key = (box.product_type_id, box.unit)
+            current = grouped.get(key)
+            if current is None:
+                grouped[key] = DeclarationLine(
                     description=pt.display_name if pt else "—",
                     hs_code=getattr(pt, "hs_code", None) if pt else None,
                     quantity=box.quantity,
@@ -269,34 +269,34 @@ def _build_declaration_data(db: Session, shipment_id: UUID):
                     weight_kg=Decimal(box.weight_kg) if box.weight_kg else None,
                 )
             else:
-                actual.quantity += box.quantity
+                current.quantity += box.quantity
                 if box.weight_kg:
-                    actual.weight_kg = (actual.weight_kg or Decimal(0)) + Decimal(box.weight_kg)
+                    current.weight_kg = (current.weight_kg or Decimal(0)) + Decimal(box.weight_kg)
 
     # El peso que se declara es el de báscula por tarima. Sin ninguna pesada no
     # hay peso bruto que declarar, y el documento lo dice en vez de sumar
     # pesos de caja, que no incluyen la tarima ni el emplaye.
-    netos = [
+    net_weights = [
         n for p in pallets
         if (n := net_weight(p.gross_weight_kg, p.tare_weight_kg)) is not None
     ]
 
     # El emisor es el centro que despacha, con los datos que él mismo capturó.
-    centro = CenterRepository(db).find_by_id(shipment.center_id) if shipment.center_id else None
+    center = CenterRepository(db).find_by_id(shipment.center_id) if shipment.center_id else None
 
     return DeclarationData(
         reference=shipment.reference,
         issuer=DeclarationIssuer(
-            legal_name=getattr(centro, "legal_name", None),
-            tax_id=getattr(centro, "tax_id", None),
-            address=getattr(centro, "address", None),
-            country_code=getattr(centro, "country_code", None),
+            legal_name=getattr(center, "legal_name", None),
+            tax_id=getattr(center, "tax_id", None),
+            address=getattr(center, "address", None),
+            country_code=getattr(center, "country_code", None),
         ),
-        origin=getattr(centro, "address", None),
+        origin=getattr(center, "address", None),
         destination=shipment.destination,
-        gross_weight_kg=sum(netos, Decimal(0)) if netos else None,
+        gross_weight_kg=sum(net_weights, Decimal(0)) if net_weights else None,
         packages=len(pallets),
-        lines=list(agrupado.values()),
+        lines=list(grouped.values()),
     ), getattr(shipment, "declaration_profile", None)
 
 

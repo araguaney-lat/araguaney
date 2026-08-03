@@ -61,6 +61,39 @@ bancos publican las suyas y el valor disuasorio supera al riesgo.
 
 ---
 
+## REGLA #3 — Los PR se escriben en inglés y español, en registro formal
+
+El PR es la puerta de entrada al proyecto para quien llega de fuera. Se lee
+antes que el código, queda indexado y sobrevive a la rama. En un repositorio
+público eso lo convierte en documentación, no en una nota interna.
+
+**Idioma.** Título en inglés. Cuerpo en dos bloques, `## English` primero y
+`## Español` después, con el **mismo contenido**: el bloque en español no es un
+resumen recortado del otro. Quien contribuya desde fuera lee el primero; quien
+opera los centros lee el segundo.
+
+**Registro.** Formal y preciso. Sin coloquialismos ni regionalismos, sin bromas
+internas, sin guiños a la conversación que originó el cambio. Se describe el
+cambio, no el proceso de escribirlo.
+
+**Estructura mínima:**
+
+1. Qué problema resuelve, con el contexto suficiente para entenderlo sin abrir
+   el código.
+2. Cómo lo resuelve, y por qué así y no de otra forma cuando hubo alternativa.
+3. Qué **no** cambia: límites públicos, contratos, migraciones. En un refactor
+   es lo que más le importa a quien revisa.
+4. Cómo se verificó, con la evidencia concreta (comandos y su salida).
+5. Plan de prueba, cuando el cambio se toca desde la interfaz.
+
+La REGLA #2 aplica igual al texto del PR: nada de credenciales, parámetros de
+controles ni recetas de evasión.
+
+**Alcance.** Esta regla cubre el título y el cuerpo del PR. Los mensajes de
+commit siguen en español, según la sección 10.
+
+---
+
 ## 1. Resumen y problema
 
 Tras el doble terremoto del 24 de junio de 2026 en el norte de Venezuela, decenas de
@@ -349,6 +382,42 @@ no maneja dinero (FATF R.8 pide controles proporcionales al riesgo).
 ---
 
 ## 10. Convenciones de código
+
+### Idioma: código en inglés, prosa en español
+
+**Todo identificador va en inglés.** Nombres de funciones, métodos, variables,
+parámetros, constantes, clases, columnas, campos de esquema, rutas de API y
+nombres de archivo. Sin excepciones nuevas.
+
+**Toda la prosa va en español.** Comentarios, docstrings, mensajes de commit,
+documentación, textos de error al usuario y contenido de alertas. El proyecto
+opera en español y una alerta la lee alguien de guardia a las tres de la mañana.
+
+> **Excepción: el texto de los PR va en inglés y español**, porque se dirige
+> también a quien llega de fuera del proyecto. Ver REGLA #3.
+
+```python
+# CORRECTO
+def _notify_donors(self, shipment_id: UUID) -> None:
+    """Avisa a quien donó que su donación ya viajó."""
+    stale = [row for row in rows if row.expires_at < cutoff]
+
+# INCORRECTO — el identificador en español
+def _avisar_a_donantes(self, shipment_id: UUID) -> None:
+    rezagados = [fila for fila in filas if fila.expira < corte]
+```
+
+Los nombres de los tests siguen la misma regla: `test_expired_donation_is_purged`,
+no `test_una_donacion_vencida_se_purga`. Lo que el test explica va en su docstring
+o en el `assert`, donde sí cabe una frase completa en español.
+
+**Deuda conocida, acotada:** `donante_libre` es un campo legado del esquema (ver
+sección 6) y renombrarlo pediría migración a cambio de nada. Y quedan tests con
+nombre en español de antes de esta regla, pendientes de una limpieza aparte:
+mientras tanto, todo test **nuevo** va en inglés.
+
+> Sin esta regla escrita, la mezcla vuelve. Pasó entre las fases 18 y 24: el
+> dominio se piensa en español y el identificador se escribe como se piensa.
 
 ### Capas del backend
 

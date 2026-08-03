@@ -27,5 +27,5 @@ class CronRun(Base):
     @property
     def reference_time(self) -> datetime:
         """Desde cuándo se mide el rezago: la última corrida, o el alta si nunca corrió."""
-        valor = self.last_success_at or self.created_at
-        return valor if valor.tzinfo else valor.replace(tzinfo=timezone.utc)
+        value = self.last_success_at or self.created_at
+        return value if value.tzinfo else value.replace(tzinfo=timezone.utc)

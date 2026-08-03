@@ -20,7 +20,7 @@ _COLS = (
     ("Unidad", 16),
     ("Peso kg", 14),
 )
-_CAMPOS = ("description", "hs_code", "quantity", "unit", "weight_kg")
+_FIELDS = ("description", "hs_code", "quantity", "unit", "weight_kg")
 
 _HEADER_FILL = PatternFill("solid", fgColor="E5E7EB")
 _ALERT_FILL = PatternFill("solid", fgColor="FDE8E8")
@@ -41,30 +41,30 @@ def build_declaration_xlsx(doc: dict) -> bytes:
     ws["A2"].alignment = Alignment(wrap_text=True, vertical="top")
     ws.row_dimensions[2].height = 32
 
-    fila = 4
+    row = 4
 
     # Lo que falta va antes que los datos: quien abre esto necesita saber qué
     # completar antes de leer nada más.
     if doc["_missing"]:
-        ws.merge_cells(f"A{fila}:E{fila}")
-        celda = ws.cell(row=fila, column=1, value="DATOS QUE FALTAN")
-        celda.font = Font(bold=True, size=10)
-        celda.fill = _ALERT_FILL
-        fila += 1
-        for texto in doc["_missing"]:
-            ws.merge_cells(f"A{fila}:E{fila}")
-            c = ws.cell(row=fila, column=1, value=f"· {texto}")
+        ws.merge_cells(f"A{row}:E{row}")
+        cell = ws.cell(row=row, column=1, value="DATOS QUE FALTAN")
+        cell.font = Font(bold=True, size=10)
+        cell.fill = _ALERT_FILL
+        row += 1
+        for text in doc["_missing"]:
+            ws.merge_cells(f"A{row}:E{row}")
+            c = ws.cell(row=row, column=1, value=f"· {text}")
             c.font = Font(size=9)
             c.fill = _ALERT_FILL
             c.alignment = Alignment(wrap_text=True)
-            fila += 1
-        fila += 1
+            row += 1
+        row += 1
 
-    emisor = doc.get("issuer") or {}
-    for etiqueta, valor in (
-        ("Emisor (razón social)", emisor.get("legal_name")),
-        ("Identificación fiscal", emisor.get("tax_id")),
-        ("Domicilio", emisor.get("address")),
+    issuer = doc.get("issuer") or {}
+    for label, value in (
+        ("Emisor (razón social)", issuer.get("legal_name")),
+        ("Identificación fiscal", issuer.get("tax_id")),
+        ("Domicilio", issuer.get("address")),
         ("Origen", doc.get("origin")),
         ("Destino", doc.get("destination")),
         ("Peso bruto total", doc.get("gross_weight_kg")),
@@ -72,29 +72,29 @@ def build_declaration_xlsx(doc: dict) -> bytes:
         ("Número de bultos", doc.get("packages")),
         ("Total de renglones", doc.get("total_lines")),
     ):
-        ws.cell(row=fila, column=1, value=etiqueta).font = Font(bold=True, size=9)
-        c = ws.cell(row=fila, column=2, value=valor if valor is not None else "—")
-        if valor is None:
+        ws.cell(row=row, column=1, value=label).font = Font(bold=True, size=9)
+        c = ws.cell(row=row, column=2, value=value if value is not None else "—")
+        if value is None:
             c.fill = _ALERT_FILL
-        fila += 1
+        row += 1
 
-    fila += 1
+    row += 1
     for i, (nombre, ancho) in enumerate(_COLS, start=1):
-        c = ws.cell(row=fila, column=i, value=nombre)
+        c = ws.cell(row=row, column=i, value=nombre)
         c.font = Font(bold=True, size=9)
         c.fill = _HEADER_FILL
         ws.column_dimensions[c.column_letter].width = ancho
-    fila += 1
+    row += 1
 
-    for linea in doc["lines"]:
-        for i, clave in enumerate(_CAMPOS, start=1):
-            valor = linea.get(clave)
-            c = ws.cell(row=fila, column=i, value=valor if valor is not None else "—")
+    for line in doc["lines"]:
+        for i, key in enumerate(_FIELDS, start=1):
+            value = line.get(key)
+            c = ws.cell(row=row, column=i, value=value if value is not None else "—")
             c.font = Font(size=9)
             # La celda vacía se ve: es la que alguien tiene que llenar.
-            if valor is None:
+            if value is None:
                 c.fill = _ALERT_FILL
-        fila += 1
+        row += 1
 
     buf = io.BytesIO()
     wb.save(buf)

@@ -76,23 +76,23 @@ class DonorInput(StrictModel):
         return ("+" if plus else "") + digits
 
     @model_validator(mode="after")
-    def _por_tipo(self) -> "DonorInput":
+    def _by_type(self) -> "DonorInput":
         if not self.first_name or not self.last_name:
             raise ValueError("Nombre y apellido son obligatorios")
 
         if self.donor_type == "moral":
-            faltan = [
-                etiqueta
-                for etiqueta, valor in (
+            missing = [
+                label
+                for label, value in (
                     ("razón social", self.legal_name),
                     ("correo electrónico", self.email),
                     ("teléfono", self.phone),
                 )
-                if not valor
+                if not value
             ]
-            if faltan:
+            if missing:
                 raise ValueError(
-                    "Para persona moral son obligatorios: " + ", ".join(faltan)
+                    "Para persona moral son obligatorios: " + ", ".join(missing)
                 )
         elif self.legal_name:
             raise ValueError("La razón social solo aplica a persona moral")

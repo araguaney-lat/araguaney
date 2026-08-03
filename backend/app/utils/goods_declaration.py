@@ -73,32 +73,32 @@ def missing_fields(data: DeclarationData) -> list[str]:
     Es la parte más útil del módulo: quien lo recibe sabe qué completar antes de
     llevarlo a su despachante, en vez de descubrirlo en la ventanilla.
     """
-    faltantes: list[str] = []
+    missing: list[str] = []
 
     if data.gross_weight_kg is None:
-        faltantes.append(
+        missing.append(
             "Peso bruto total: ninguna tarima de este envío tiene peso de báscula."
         )
     if not data.issuer.legal_name:
-        faltantes.append("Razón social del centro que despacha (se captura en el centro).")
+        missing.append("Razón social del centro que despacha (se captura en el centro).")
     if not data.issuer.tax_id:
-        faltantes.append(
+        missing.append(
             "Identificación fiscal del centro que despacha (se captura en el centro)."
         )
     if not data.issuer.address:
-        faltantes.append("Domicilio del centro que despacha.")
+        missing.append("Domicilio del centro que despacha.")
     if not data.destination:
-        faltantes.append("Destino del envío.")
+        missing.append("Destino del envío.")
 
-    for linea in data.lines:
-        if linea.weight_kg is None:
-            faltantes.append(f"«{linea.description}»: falta el peso en kg.")
-        if not linea.hs_code:
-            faltantes.append(
-                f"«{linea.description}»: falta el código arancelario (HS) del producto."
+    for line in data.lines:
+        if line.weight_kg is None:
+            missing.append(f"«{line.description}»: falta el peso en kg.")
+        if not line.hs_code:
+            missing.append(
+                f"«{line.description}»: falta el código arancelario (HS) del producto."
             )
 
-    return faltantes
+    return missing
 
 
 def _universal(data: DeclarationData) -> dict:
@@ -120,13 +120,13 @@ def _universal(data: DeclarationData) -> dict:
         "total_lines": len(data.lines),
         "lines": [
             {
-                "description": linea.description,
-                "hs_code": linea.hs_code or None,
-                "quantity": linea.quantity,
-                "unit": linea.unit,
-                "weight_kg": _decimal(linea.weight_kg),
+                "description": line.description,
+                "hs_code": line.hs_code or None,
+                "quantity": line.quantity,
+                "unit": line.unit,
+                "weight_kg": _decimal(line.weight_kg),
             }
-            for linea in data.lines
+            for line in data.lines
         ],
     }
 
@@ -147,14 +147,14 @@ def _mx_carta_porte(doc: dict) -> dict:
         "NumTotalMercancias": doc["total_lines"],
         "mercancias": [
             {
-                "Descripcion": linea["description"],
+                "Descripcion": line["description"],
                 "ClaveProdServCP": None,
-                "FraccionArancelaria": linea["hs_code"],
-                "Cantidad": linea["quantity"],
-                "Unidad": linea["unit"],
-                "PesoEnKg": linea["weight_kg"],
+                "FraccionArancelaria": line["hs_code"],
+                "Cantidad": line["quantity"],
+                "Unidad": line["unit"],
+                "PesoEnKg": line["weight_kg"],
             }
-            for linea in doc["lines"]
+            for line in doc["lines"]
         ],
     }
 
@@ -171,8 +171,8 @@ def build_declaration(data: DeclarationData, profile: str | None = None) -> dict
     escrito no puede dejar sin documento a quien está por despachar.
     """
     doc = _universal(data)
-    traductor = COUNTRY_PROFILES.get(profile or "")
-    return traductor(doc) if traductor else doc
+    translator = COUNTRY_PROFILES.get(profile or "")
+    return translator(doc) if translator else doc
 
 
 def _decimal(valor: Decimal | None) -> str | None:
