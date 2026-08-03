@@ -39,7 +39,7 @@ class DonationItemInput(StrictModel):
 
     @field_validator("quantity")
     @classmethod
-    def _cantidad(cls, v: int) -> int:
+    def _quantity(cls, v: int) -> int:
         if v <= 0:
             raise ValueError("La cantidad debe ser mayor que cero")
         if v > _MAX_QUANTITY:
@@ -47,7 +47,7 @@ class DonationItemInput(StrictModel):
         return v
 
     @model_validator(mode="after")
-    def _uno_u_otro(self) -> "DonationItemInput":
+    def _one_or_other(self) -> "DonationItemInput":
         if bool(self.product_type_id) == bool(self.free_text):
             raise ValueError(
                 "Cada renglón lleva un producto del catálogo o una descripción, no ambos"
@@ -67,7 +67,7 @@ class DonationCreate(StrictModel):
     terms_accepted: bool = False
 
     @model_validator(mode="after")
-    def _con_renglones(self) -> "DonationCreate":
+    def _requires_items(self) -> "DonationCreate":
         if not self.items:
             raise ValueError("La donación necesita al menos un renglón")
         if len(self.items) > _MAX_ITEMS:

@@ -58,8 +58,8 @@ export default function RiskReviewsPage() {
     }
   }
 
-  const pendientes = rows.filter((r) => r.status === "PENDING")
-  const resueltas = rows.filter((r) => r.status !== "PENDING")
+  const pending = rows.filter((r) => r.status === "PENDING")
+  const resolved = rows.filter((r) => r.status !== "PENDING")
 
   return (
     <div className="max-w-3xl">
@@ -73,12 +73,12 @@ export default function RiskReviewsPage() {
       ) : (
         <>
           <div className="mt-6 space-y-3">
-            {pendientes.length === 0 ? (
+            {pending.length === 0 ? (
               <p className="rounded-xl border border-cardB bg-card p-6 text-center text-sm text-fnt">
                 {t.empty}
               </p>
             ) : (
-              pendientes.map((r) => (
+              pending.map((r) => (
                 <div key={r.id} className="rounded-xl border border-cardB bg-card p-4">
                   <div className="flex items-start justify-between gap-3">
                     <div>
@@ -127,11 +127,11 @@ export default function RiskReviewsPage() {
             )}
           </div>
 
-          {resueltas.length > 0 && (
+          {resolved.length > 0 && (
             <div className="mt-8">
               <p className="text-xs font-semibold uppercase tracking-wide text-mut">{t.resolved}</p>
               <ul className="mt-2 space-y-2">
-                {resueltas.map((r) => (
+                {resolved.map((r) => (
                   <li key={r.id} className="rounded-lg border border-cardB bg-card px-4 py-3 text-sm">
                     <span className={r.status === "APPROVED" ? "text-dSealT" : "text-[var(--dRejT)]"}>
                       {r.status === "APPROVED" ? t.approved : t.rejected}

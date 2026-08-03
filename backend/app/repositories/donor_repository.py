@@ -31,16 +31,16 @@ class DonorRepository(BaseRepository):
         preferible a fusionar por nombre, que juntaría a dos personas distintas.
         """
         if data.email:
-            existente = self.db.execute(
+            existing = self.db.execute(
                 select(Donor).where(
                     Donor.email == data.email,
                     Donor.center_id == center_id,
                     Donor.source == "center",
                 )
             ).scalar_one_or_none()
-            if existente is not None:
-                self._actualizar(existente, data)
-                return existente
+            if existing is not None:
+                self._update(existing, data)
+                return existing
 
         donor = Donor(
             donor_type=data.donor_type,
@@ -62,12 +62,12 @@ class DonorRepository(BaseRepository):
         único a nivel global, así que la misma persona reutiliza su registro
         entre donaciones.
         """
-        existente = self.db.execute(
+        existing = self.db.execute(
             select(Donor).where(Donor.email == data.email, Donor.source == "self")
         ).scalar_one_or_none()
-        if existente is not None:
-            self._actualizar(existente, data)
-            return existente
+        if existing is not None:
+            self._update(existing, data)
+            return existing
 
         donor = Donor(
             donor_type=data.donor_type,
@@ -92,17 +92,17 @@ class DonorRepository(BaseRepository):
                 field="q",
             )
 
-        patron = f"%{q}%"
+        pattern = f"%{q}%"
         stmt = (
             select(Donor)
             .where(
                 Donor.center_id == center_id,
                 Donor.source == "center",
                 or_(
-                    Donor.email.ilike(patron),
-                    Donor.first_name.ilike(patron),
-                    Donor.last_name.ilike(patron),
-                    Donor.legal_name.ilike(patron),
+                    Donor.email.ilike(pattern),
+                    Donor.first_name.ilike(pattern),
+                    Donor.last_name.ilike(pattern),
+                    Donor.legal_name.ilike(pattern),
                 ),
             )
             .order_by(Donor.created_at.desc())
@@ -118,7 +118,7 @@ class DonorRepository(BaseRepository):
         return self.db.execute(stmt).scalar_one_or_none()
 
     @staticmethod
-    def _actualizar(donor: Donor, data: DonorInput) -> None:
+    def _update(donor: Donor, data: DonorInput) -> None:
         """Los datos más recientes ganan: quien captura tiene al donante enfrente."""
         donor.donor_type = data.donor_type
         donor.first_name = data.first_name

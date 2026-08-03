@@ -7,7 +7,7 @@ from app.models.donation import Donation, DonationEvent
 from app.models.donor import Donor
 from app.repositories.base import BaseRepository
 
-_ABIERTAS = ("PENDING_EMAIL", "REGISTERED")
+_OPEN_STATUSES = ("PENDING_EMAIL", "REGISTERED")
 
 
 class DonationRepository(BaseRepository):
@@ -35,7 +35,7 @@ class DonationRepository(BaseRepository):
         return self.db.execute(
             select(Donation)
             .join(Donor, Donor.id == Donation.donor_id)
-            .where(Donor.email == email, Donation.status.in_(_ABIERTAS))
+            .where(Donor.email == email, Donation.status.in_(_OPEN_STATUSES))
             .order_by(Donation.created_at.desc())
             .limit(1)
         ).scalars().first()

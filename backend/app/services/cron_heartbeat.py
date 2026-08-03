@@ -36,11 +36,11 @@ def record_success(db, name: str) -> None:
     reventara se perdería la señal de un trabajo que sí se hizo.
     """
     try:
-        fila = db.get(CronRun, name)
-        if fila is None:
-            fila = CronRun(name=name)
-            db.add(fila)
-        fila.last_success_at = datetime.now(timezone.utc)
+        row = db.get(CronRun, name)
+        if row is None:
+            row = CronRun(name=name)
+            db.add(row)
+        row.last_success_at = datetime.now(timezone.utc)
         db.commit()
     except Exception:
         logger.warning("No se pudo registrar el latido de %s", name, exc_info=True)
@@ -53,12 +53,12 @@ def stale_crons(db) -> list[str]:
     entonces no hay nada que afirmar. Un cron que ya no existe en `CRON_MAX_AGE`
     tampoco, para que una fila vieja no alerte para siempre.
     """
-    ahora = datetime.now(timezone.utc)
-    rezagados = []
-    for fila in db.query(CronRun).all():
-        ventana = CRON_MAX_AGE.get(fila.name)
-        if ventana is None:
+    now = datetime.now(timezone.utc)
+    stale = []
+    for row in db.query(CronRun).all():
+        max_age = CRON_MAX_AGE.get(row.name)
+        if max_age is None:
             continue
-        if ahora - fila.reference_time > ventana:
-            rezagados.append(fila.name)
-    return sorted(rezagados)
+        if now - row.reference_time > max_age:
+            stale.append(row.name)
+    return sorted(stale)

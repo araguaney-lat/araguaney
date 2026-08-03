@@ -34,11 +34,11 @@ class RiskReviewService(BaseService):
             )
 
         review = RiskReviewRepository(self.db).find_by_id(review_id)
-        es_nacional = actor.center_role == "national_admin"
+        is_national = actor.center_role == "national_admin"
 
         # Fuera de su centro responde como inexistente: un coordinador no debe
         # poder averiguar qué se está revisando en otro centro.
-        if review is None or (not es_nacional and review.center_id != actor.center_id):
+        if review is None or (not is_national and review.center_id != actor.center_id):
             raise api_error("NOT_FOUND", "Revisión no encontrada", status_code=404)
         if review.status != "PENDING":
             raise api_error("ALREADY_RESOLVED", "Esta revisión ya fue resuelta", status_code=409)
@@ -46,16 +46,16 @@ class RiskReviewService(BaseService):
         # Separación de funciones: escalar no sirve de nada si quien capturó se
         # autoriza a sí mismo. El national_admin es la excepción — es el
         # escalamiento final, y sin él la revisión quedaría muerta.
-        if review.created_by_user_id == actor.id and not es_nacional:
+        if review.created_by_user_id == actor.id and not is_national:
             raise api_error(
                 "SELF_REVIEW",
                 "No puedes resolver una revisión que abriste tú. Escala a la coordinación nacional.",
                 status_code=403,
             )
 
-        nota = (note or "").strip()
+        cleaned_note = (note or "").strip()
         # Un rechazo sin motivo no le sirve ni a quien capturó ni a la auditoría.
-        if resolution == "REJECTED" and not nota:
+        if resolution == "REJECTED" and not cleaned_note:
             raise api_error(
                 "REASON_REQUIRED",
                 "Un rechazo necesita motivo",
@@ -63,7 +63,7 @@ class RiskReviewService(BaseService):
             )
 
         review.status = resolution
-        review.review_note = nota or None
+        review.review_note = cleaned_note or None
         review.reviewed_by_user_id = actor.id
         review.reviewed_at = datetime.now(timezone.utc)
         RiskReviewRepository(self.db).commit()

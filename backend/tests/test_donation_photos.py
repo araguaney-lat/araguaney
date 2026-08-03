@@ -94,7 +94,7 @@ def test_no_se_pueden_subir_mas_fotos_de_las_permitidas():
 def test_una_donacion_ya_recibida_no_acepta_fotos():
     """Desde RECEIVED manda el inventario del centro, no el donante."""
     svc = DonationPhotoService(MagicMock())
-    with patch.object(DonationPhotoService, "_resolver", return_value=_donacion(status="RECEIVED")):
+    with patch.object(DonationPhotoService, "_resolve", return_value=_donacion(status="RECEIVED")):
         with pytest.raises(HTTPException) as exc:
             svc.upload_url("tok", content_type="image/jpeg", size_bytes=1000)
     assert exc.value.status_code == 409

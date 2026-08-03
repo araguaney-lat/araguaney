@@ -29,7 +29,7 @@ _MANAGE_TOKEN_DAYS = 30
 _RECEPTION_STATES = ("RECEIVED", "MISSING", "REJECTED")
 
 # Lo que el donante lee en su correo. El estado interno no le dice nada.
-_ETIQUETA_RECEPCION = {
+_RECEPTION_LABEL = {
     "RECEIVED": "Recibido",
     "MISSING": "No llegó",
     "REJECTED": "No aceptado",
@@ -59,9 +59,9 @@ class DonationService(BaseService):
         """
         repo = DonationRepository(self.db)
 
-        abierta = repo.find_open_for_email(data.donor.email)
-        if abierta is not None:
-            self._reenviar_si_procede(abierta, background_tasks)
+        open_donation = repo.find_open_for_email(data.donor.email)
+        if open_donation is not None:
+            self._resend_if_pending(open_donation, background_tasks)
             return None
 
         donor = DonorRepository(self.db).find_or_create_self(data.donor)
@@ -110,26 +110,26 @@ class DonationService(BaseService):
         )
         return donation
 
-    def _reenviar_si_procede(self, abierta: Donation, background_tasks: BackgroundTasks) -> None:
+    def _resend_if_pending(self, open_donation: Donation, background_tasks: BackgroundTasks) -> None:
         """Quien de verdad es dueño del correo recibe su enlace otra vez.
 
         Solo aplica a la que sigue sin confirmar. Una donación ya confirmada tiene
         su QR en el buzón, y rotarle el enlace de gestión dejaría que cualquiera
         que conozca el correo se lo tumbara a voluntad.
         """
-        if abierta.status != "PENDING_EMAIL":
+        if open_donation.status != "PENDING_EMAIL":
             return
 
         raw_token = secrets.token_urlsafe(32)
-        abierta.donor.email_verify_token_hash = _hash_token(raw_token)
-        abierta.confirmation_sent_at = datetime.now(timezone.utc)
+        open_donation.donor.email_verify_token_hash = _hash_token(raw_token)
+        open_donation.confirmation_sent_at = datetime.now(timezone.utc)
         DonationRepository(self.db).commit()
 
         enqueue(
             background_tasks,
             "send_donation_confirmation_email_task",
-            abierta.donor.email,
-            abierta.donor.first_name,
+            open_donation.donor.email,
+            open_donation.donor.first_name,
             raw_token,
         )
 
@@ -143,16 +143,16 @@ class DonationService(BaseService):
         if donation is None or donation.status != "PENDING_EMAIL":
             raise api_error("INVALID_TOKEN", "Enlace inválido o ya utilizado", status_code=404)
 
-        ahora = datetime.now(timezone.utc)
+        now = datetime.now(timezone.utc)
         donation.donor.email_verify_token_hash = None   # un solo uso
-        donation.donor.email_verified_at = ahora
+        donation.donor.email_verified_at = now
 
         raw_manage = secrets.token_urlsafe(32)
         donation.manage_token_hash = _hash_token(raw_manage)
-        donation.manage_token_expires_at = ahora + timedelta(days=_MANAGE_TOKEN_DAYS)
+        donation.manage_token_expires_at = now + timedelta(days=_MANAGE_TOKEN_DAYS)
 
         donation.status = "REGISTERED"
-        donation.registered_at = ahora
+        donation.registered_at = now
 
         repo.log_event(donation, from_status="PENDING_EMAIL", to_status="REGISTERED")
         repo.commit()
@@ -204,10 +204,10 @@ class DonationService(BaseService):
         if donation is None:
             raise api_error("INVALID_TOKEN", "Enlace inválido o vencido", status_code=404)
 
-        expira = donation.manage_token_expires_at
-        if expira is not None and expira.tzinfo is None:
-            expira = expira.replace(tzinfo=timezone.utc)
-        if expira is None or expira <= datetime.now(timezone.utc):
+        expires_at = donation.manage_token_expires_at
+        if expires_at is not None and expires_at.tzinfo is None:
+            expires_at = expires_at.replace(tzinfo=timezone.utc)
+        if expires_at is None or expires_at <= datetime.now(timezone.utc):
             raise api_error("INVALID_TOKEN", "Enlace inválido o vencido", status_code=404)
 
         return donation
@@ -287,7 +287,7 @@ class DonationService(BaseService):
     def receive(
         self,
         code: str,
-        resultados: dict,
+        results: dict,
         extras: list,
         center_id,
         user_id,
@@ -312,16 +312,16 @@ class DonationService(BaseService):
                 status_code=409 if donation is not None else 404,
             )
 
-        invalidos = set(resultados.values()) - set(_RECEPTION_STATES)
-        if invalidos:
+        invalid = set(results.values()) - set(_RECEPTION_STATES)
+        if invalid:
             raise api_error(
                 "INVALID_RECEPTION_STATUS",
-                f"Estado de recepción inválido: {', '.join(sorted(invalidos))}",
+                f"Estado de recepción inválido: {', '.join(sorted(invalid))}",
                 field="reception_status",
             )
 
         for item in donation.items:
-            item.reception_status = resultados.get(str(item.id), "RECEIVED")
+            item.reception_status = results.get(str(item.id), "RECEIVED")
 
         for extra in extras:
             donation.items.append(
@@ -351,29 +351,29 @@ class DonationService(BaseService):
         )
         repo.commit()
 
-        self._avisar_recepcion(donation, background_tasks)
+        self._notify_reception(donation, background_tasks)
         return donation
 
-    def _avisar_recepcion(self, donation: Donation, background_tasks) -> None:
+    def _notify_reception(self, donation: Donation, background_tasks) -> None:
         """Resumen del doble check. Sin correo no hay a quién avisar: un donante
         capturado en ventanilla puede no haberlo dado."""
-        correo = getattr(donation.donor, "email", None)
-        if background_tasks is None or not correo:
+        email = getattr(donation.donor, "email", None)
+        if background_tasks is None or not email:
             return
 
-        centro = self.db.get(Center, donation.received_center_id)
-        renglones = [
+        center = self.db.get(Center, donation.received_center_id)
+        rows = [
             {
                 "label": item.free_text or "",
-                "status": _ETIQUETA_RECEPCION.get(item.reception_status, item.reception_status),
+                "status": _RECEPTION_LABEL.get(item.reception_status, item.reception_status),
             }
             for item in donation.items
         ]
         enqueue(
             background_tasks,
             "send_donation_received_email_task",
-            correo,
+            email,
             donation.code,
-            getattr(centro, "name", ""),
-            renglones,
+            getattr(center, "name", ""),
+            rows,
         )

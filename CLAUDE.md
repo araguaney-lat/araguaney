@@ -350,6 +350,39 @@ no maneja dinero (FATF R.8 pide controles proporcionales al riesgo).
 
 ## 10. Convenciones de código
 
+### Idioma: código en inglés, prosa en español
+
+**Todo identificador va en inglés.** Nombres de funciones, métodos, variables,
+parámetros, constantes, clases, columnas, campos de esquema, rutas de API y
+nombres de archivo. Sin excepciones nuevas.
+
+**Toda la prosa va en español.** Comentarios, docstrings, mensajes de commit,
+documentación, textos de error al usuario y contenido de alertas. El proyecto
+opera en español y una alerta la lee alguien de guardia a las tres de la mañana.
+
+```python
+# CORRECTO
+def _notify_donors(self, shipment_id: UUID) -> None:
+    """Avisa a quien donó que su donación ya viajó."""
+    stale = [row for row in rows if row.expires_at < cutoff]
+
+# INCORRECTO — el identificador en español
+def _avisar_a_donantes(self, shipment_id: UUID) -> None:
+    rezagados = [fila for fila in filas if fila.expira < corte]
+```
+
+Los nombres de los tests siguen la misma regla: `test_expired_donation_is_purged`,
+no `test_una_donacion_vencida_se_purga`. Lo que el test explica va en su docstring
+o en el `assert`, donde sí cabe una frase completa en español.
+
+**Deuda conocida, acotada:** `donante_libre` es un campo legado del esquema (ver
+sección 6) y renombrarlo pediría migración a cambio de nada. Y quedan tests con
+nombre en español de antes de esta regla, pendientes de una limpieza aparte:
+mientras tanto, todo test **nuevo** va en inglés.
+
+> Sin esta regla escrita, la mezcla vuelve. Pasó entre las fases 18 y 24: el
+> dominio se piensa en español y el identificador se escribe como se piensa.
+
 ### Capas del backend
 
 ```

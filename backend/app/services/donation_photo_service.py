@@ -45,7 +45,7 @@ class DonationPhotoService(BaseService):
 
     # ── Resolución del token ─────────────────────────────────────────────────
 
-    def _resolver(self, token: str):
+    def _resolve(self, token: str):
         """La donación detrás del enlace de gestión, en el estado que tenga."""
         return DonationService(self.db).get_by_manage_token(token)
 
@@ -55,7 +55,7 @@ class DonationPhotoService(BaseService):
         Desde RECEIVED manda el inventario del centro: lo que se despachó es un
         registro inmutable.
         """
-        donation = self._resolver(token)
+        donation = self._resolve(token)
         if donation.status != "REGISTERED":
             raise api_error(
                 "NOT_EDITABLE",
@@ -146,33 +146,33 @@ class DonationPhotoService(BaseService):
 
     def donor_url(self, token: str, photo_id: UUID) -> str:
         """Enlace firmado para quien tiene el enlace de gestión."""
-        donation = self._resolver(token)     # también después de recibida
-        return self._url_de(donation, photo_id)
+        donation = self._resolve(token)     # también después de recibida
+        return self._url_for(donation, photo_id)
 
     def center_url(self, code: str, photo_id: UUID) -> str:
         """Enlace firmado para el centro que abre el detalle de la donación."""
         donation = DonationRepository(self.db).find_by_code(code)
         if donation is None or donation.status in ("PENDING_EMAIL", "EXPIRED"):
             raise api_error("NOT_FOUND", "Donación no encontrada", status_code=404)
-        return self._url_de(donation, photo_id)
+        return self._url_for(donation, photo_id)
 
-    def _url_de(self, donation, photo_id: UUID) -> str:
+    def _url_for(self, donation, photo_id: UUID) -> str:
         self._require_r2()
-        foto = next((p for p in donation.photos if p.id == photo_id), None)
-        if foto is None:
+        photo = next((p for p in donation.photos if p.id == photo_id), None)
+        if photo is None:
             raise api_error("NOT_FOUND", "Foto no encontrada", status_code=404)
-        return generate_download_url(foto.storage_key, expires_in=PHOTO_URL_TTL)
+        return generate_download_url(photo.storage_key, expires_in=PHOTO_URL_TTL)
 
     # ── Borrado ──────────────────────────────────────────────────────────────
 
     def delete(self, token: str, photo_id: UUID) -> None:
         donation = self._editable(token)
-        foto = next((p for p in donation.photos if p.id == photo_id), None)
-        if foto is None:
+        photo = next((p for p in donation.photos if p.id == photo_id), None)
+        if photo is None:
             raise api_error("NOT_FOUND", "Foto no encontrada", status_code=404)
 
         # Primero el objeto: una fila sin archivo es un hueco visible, un archivo
         # sin fila es un dato personal que nadie sabe que sigue ahí.
-        delete_object(foto.storage_key)
-        self.db.delete(foto)
+        delete_object(photo.storage_key)
+        self.db.delete(photo)
         DonationRepository(self.db).commit()

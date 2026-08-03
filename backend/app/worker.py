@@ -115,13 +115,13 @@ def alert_on_cron_failure(fn):
     @functools.wraps(fn)
     async def wrapper(ctx: dict, *args, **kwargs):
         try:
-            resultado = await fn(ctx, *args, **kwargs)
+            result = await fn(ctx, *args, **kwargs)
         except Exception as exc:
-            consecuencia = _PURGE_PROMISES.get(fn.__name__, "")
+            consequence = _PURGE_PROMISES.get(fn.__name__, "")
             logger.error("%s falló: %s", fn.__name__, exc)
             await _alert(
                 f":rotating_light: *La purga no corrió* — `{fn.__name__}`\n"
-                + (f"{consecuencia}\n" if consecuencia else "")
+                + (f"{consequence}\n" if consequence else "")
                 + f"```{type(exc).__name__}: {str(exc)[:300]}```"
             )
             return None
@@ -129,7 +129,7 @@ def alert_on_cron_failure(fn):
         # El latido se anota al final y solo si todo salió bien: un cron que
         # falló no corrió, por más que se haya ejecutado.
         await asyncio.to_thread(_record_heartbeat, fn.__name__)
-        return resultado
+        return result
 
     return wrapper
 
@@ -393,13 +393,13 @@ async def heartbeat_watchdog_cron(ctx) -> None:
     from app.services.cron_heartbeat import stale_crons
 
     with SessionLocal() as db:
-        rezagados = await asyncio.to_thread(stale_crons, db)
+        stale = await asyncio.to_thread(stale_crons, db)
 
-    if rezagados:
+    if stale:
         await _alert(
             ":rotating_light: *Hay trabajo de fondo que dejó de correr*\n"
-            + "\n".join(f"· `{nombre}` — {_PURGE_PROMISES.get(nombre, 'sin correr')}"
-                        for nombre in rezagados)
+            + "\n".join(f"· `{name}` — {_PURGE_PROMISES.get(name, 'sin correr')}"
+                        for name in stale)
         )
 
 
