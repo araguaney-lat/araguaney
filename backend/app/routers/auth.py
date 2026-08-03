@@ -106,13 +106,19 @@ async def forgot_password(
     return AuthService(db).forgot_password(data.email, background_tasks)
 
 
+# El dashboard pide estas dos en cada carga: el límite es holgado porque su
+# trabajo no es proteger contra el uso normal, sino contra un token robado
+# usado para barrer datos.
 @router.get("/me", response_model=UserOut)
-def get_me(current_user: User = Depends(get_current_user)):
+@limiter.limit("120/minute")
+def get_me(request: Request, current_user: User = Depends(get_current_user)):
     return current_user
 
 
 @router.get("/me/profile", response_model=UserProfileOut)
+@limiter.limit("120/minute")
 def get_my_profile(
+    request: Request,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):

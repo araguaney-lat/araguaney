@@ -190,32 +190,47 @@ def test_el_vigilante_tambien_anota_su_propio_latido():
 
 # ── La mitad que se mira desde fuera ─────────────────────────────────────────
 
+# Estos tres se hacían leyendo una ventana fija del texto de `main.py`, y una
+# línea de más los rompía sin que nada estuviera mal. Ahora preguntan por la
+# respuesta, que es lo que un servicio de uptime va a ver.
+
+def _consultar_health_jobs(rezagados: list[str]):
+    from fastapi.testclient import TestClient
+
+    from app.database import get_db
+    from app.main import app
+
+    app.dependency_overrides[get_db] = lambda: None
+    try:
+        with patch("app.services.cron_heartbeat.stale_crons", return_value=rezagados):
+            with TestClient(app) as client:
+                return client.get("/health/jobs")
+    finally:
+        app.dependency_overrides.pop(get_db, None)
+
+
 def test_existe_un_endpoint_para_vigilancia_externa():
     """El vigilante es un cron: si el worker muere, muere con él. La única forma
     de notar eso es preguntando desde fuera del proceso que podría estar muerto."""
-    from pathlib import Path
+    respuesta = _consultar_health_jobs([])
 
-    src = Path("app/main.py").read_text()
-    assert "/health/jobs" in src
+    assert respuesta.status_code == 200
+    assert respuesta.json()["status"] == "ok"
 
 
 def test_el_endpoint_responde_error_cuando_algo_se_quedo_atras():
     """Un servicio de uptime gratuito solo entiende códigos de estado: si
     devolviera 200 con un cuerpo triste, nadie se enteraría."""
-    from pathlib import Path
+    respuesta = _consultar_health_jobs(["purge_donations_cron"])
 
-    src = Path("app/main.py").read_text()
-    i = src.index("/health/jobs")
-    assert "503" in src[i:i + 900]
+    assert respuesta.status_code == 503
 
 
 def test_el_endpoint_no_publica_los_internos():
     """Es público y sin sesión. Decir 'algo va atrasado' no compromete nada;
     publicar qué cron, desde cuándo y cada cuánto corre, sí sobra."""
-    from pathlib import Path
+    respuesta = _consultar_health_jobs(["purge_donations_cron", "purge_audit_logs_cron"])
+    cuerpo = respuesta.text
 
-    src = Path("app/main.py").read_text()
-    i = src.index("/health/jobs")
-    bloque = src[i:i + 900]
-    assert "purge_" not in bloque
-    assert "stale_crons" in bloque      # consulta el estado, no lo detalla
+    assert "purge_" not in cuerpo
+    assert respuesta.json() == {"status": "stale", "count": 2}
