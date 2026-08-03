@@ -31,6 +31,7 @@ Por eso hay dos familias de señal: **algo falló** y **algo dejó de ocurrir**.
 | `La purga no corrió` | Un cron de purga falló | Slack, diciendo qué promesa queda incumplida | Los plazos del aviso de privacidad dependen de esa purga. No es un error técnico cualquiera |
 | `Hay trabajo de fondo que dejó de correr` | El vigilante horario detecta un cron rezagado | Slack, con la lista y su consecuencia | Revisar si el worker está vivo. Suele ser un deploy que no levantó |
 | `/health/jobs` responde 503 | Hay al menos un cron rezagado, preguntado desde fuera | El servicio de uptime externo | Igual que el anterior, pero es la señal que sobrevive a la muerte del worker |
+| `Rebotes de correo por encima de lo normal` | Los rebotes sin resolver superan el total de la ventana, o se concentran en un dominio | Slack, nombrando dominios y nunca direcciones | Revisar reputación, SPF/DKIM y el panel de Resend. El pre-registro de donaciones depende de que el correo llegue |
 | Excepción del worker | Cualquier fallo en el proceso del worker | Sentry | Diagnóstico. El worker corre aparte y sus trazas no aparecerían en ningún lado |
 | Error del frontend | Excepción en cliente, servidor o edge de Next | Sentry | Diagnóstico |
 
@@ -96,6 +97,9 @@ desde cuándo ni cada cuánto corre. Hay test que lo fija.
 | `SENTRY_DSN` | Errores de API y worker | El SDK ni siquiera se inicializa |
 | `SENTRY_ENVIRONMENT` | Separar producción de lo demás | Todo cae en el mismo cubo |
 | `NEXT_PUBLIC_SENTRY_DSN` | Errores del frontend | El frontend no reporta |
+| `BOUNCE_ALERT_WINDOW_HOURS` | Ventana de medición de rebotes | Se usan 24 h |
+| `BOUNCE_ALERT_TOTAL` | Rebotes en la ventana que disparan aviso | Se usa el valor por defecto |
+| `BOUNCE_ALERT_PER_DOMAIN` | Rebotes de un solo dominio que disparan aviso | Se usa el valor por defecto |
 
 Sentry y Slack operan en plan gratuito.
 
@@ -115,21 +119,95 @@ verificar la cadena de punta a punta es una tarea propia, no un supuesto.
 Huecos conocidos, a la fecha de este documento:
 
 1. **Uptime externo sin dar de alta.** El endpoint existe; falta el servicio
-   gratuito que lo golpee desde fuera. Mientras tanto, si Railway se cae entero,
-   ninguna alerta interna va a salir: por definición.
-2. **Rebotes de correo en volumen.** Ya se registran los fallos de envío, pero
-   nada avisa cuando el volumen se dispara. Un dominio bloqueando nuestros
-   correos rompe el doble opt-in del pre-registro sin que nadie lo note.
-3. **Presupuesto de ruido sin revisar.** Nadie ha agrupado lo repetitivo ni
-   silenciado lo que nadie acciona. Un canal ruidoso es un canal ignorado.
-4. **Slack caído se traga la alerta.** Es deliberado: la observabilidad no puede
+   gratuito que lo golpee desde fuera (ver el runbook más abajo). Mientras tanto,
+   si Railway se cae entero, ninguna alerta interna va a salir: por definición.
+2. **Sentry sin verificar de punta a punta.** El SDK se inicializa, que no es lo
+   mismo que un error llegando al dashboard (ver el runbook).
+3. **Slack caído se traga la alerta.** Es deliberado: la observabilidad no puede
    tumbar una petición. Pero significa que hay un modo de fallo en el que el
    error ocurre y el aviso no llega. Sentry cubre parte de ese hueco.
-5. **Sin señales de rendimiento ni de saturación.** No hay alerta de latencia, de
+4. **Sin señales de rendimiento ni de saturación.** No hay alerta de latencia, de
    agotamiento del pool de conexiones ni de crecimiento de la base.
-6. **Sin alertas de gasto.** Los topes y avisos de presupuesto requieren plan de
+5. **Sin alertas de gasto.** Los topes y avisos de presupuesto requieren plan de
    pago de la infraestructura.
-7. **La llave pública de Sentry no está blindada** todavía.
+6. **La llave pública de Sentry no está blindada** todavía.
+
+---
+
+## El presupuesto de ruido
+
+Una alerta vale por lo que provoca, y un canal donde el mismo mensaje aparece
+cuarenta veces seguidas no provoca nada: entrena a quien lo lee a ignorarlo.
+
+Por eso la primera aparición de un problema sale completa y las repeticiones
+dentro de su ventana se callan. Lo que se agrupa es la **identidad del
+problema**, no el texto ni la severidad:
+
+| Señal | Qué la identifica |
+|---|---|
+| 500 del backend | ruta + tipo de excepción |
+| Tarea de fondo fallida | nombre de la tarea + tipo de excepción |
+| Purga que falla | nombre del cron + tipo de excepción |
+| Crons rezagados | la lista de crons rezagados |
+| Rebotes en volumen | la ventana de medición |
+
+Un problema distinto siempre suena. Y el agrupador **falla abierto**: sin Redis
+no hay dónde recordar qué se mandó, así que se manda todo. Entre un canal ruidoso
+y un canal mudo, el ruidoso es el que se puede arreglar leyéndolo.
+
+---
+
+## Runbook: dar de alta el uptime externo
+
+Cierra el hueco número uno. Sin esto, una caída total de Railway no produce
+ninguna alerta, porque el que tendría que avisar se cayó con todo lo demás.
+
+1. Elegir un servicio gratuito de uptime que soporte comprobar por código de
+   estado (UptimeRobot, Better Stack y Hetrix tienen plan gratuito suficiente).
+2. Crear un monitor **HTTP(s)** contra `https://<API>/health/jobs`.
+3. Intervalo de 5 minutos. Más seguido no aporta: la ventana de tolerancia más
+   corta que vigila ese endpoint es de horas.
+4. Condición de alerta: **cualquier código distinto de 200**. El endpoint
+   responde 503 cuando hay trabajo de fondo rezagado, justamente para que un
+   servicio que solo entiende códigos pueda notarlo.
+5. Notificación al mismo canal que el resto de las alertas, para que quien esté
+   de guardia mire un solo lugar.
+6. Verificar que el monitor está vivo: pausarlo y reanudarlo debe producir una
+   notificación de recuperación.
+
+Qué esperar en operación normal: `200` y un cuerpo que dice que no hay nada
+rezagado. El endpoint es público y no revela qué cron va atrasado, así que no hay
+nada sensible en exponerlo a un tercero.
+
+---
+
+## Runbook: verificar Sentry de punta a punta
+
+Cierra el hueco número dos. El SDK inicializado no prueba nada: sin DSN,
+`sentry_sdk.init` ni se llama y todo parece sano.
+
+**Backend (Railway)**
+
+1. Confirmar que `SENTRY_DSN` y `SENTRY_ENVIRONMENT` están puestos en el servicio
+   de la API **y** en el del worker. Son dos procesos distintos y cada uno lee su
+   propio entorno.
+2. Provocar un error real y comprobar que aparece en el dashboard con el
+   `environment` correcto.
+3. Comprobar que ese mismo error llegó a Slack. Si llega a Sentry y no a Slack,
+   el problema es el canal o la invitación del bot, no la instrumentación.
+
+**Frontend (Vercel)**
+
+4. Confirmar `NEXT_PUBLIC_SENTRY_DSN` en el proyecto, para producción y para
+   preview.
+5. Provocar un error en una página y comprobar que llega.
+
+**Cierre**
+
+6. Anotar en este documento la fecha de la última verificación. Una verificación
+   sin fecha no distingue "se probó y funciona" de "se probó hace dos años".
+
+> Última verificación de punta a punta: _pendiente_.
 
 ---
 
@@ -147,6 +225,11 @@ Si agregas un cron nuevo:
 
 1. Decóralo con `alert_on_cron_failure`.
 2. Si sostiene una promesa (un plazo, una purga declarada), agrégale su texto en
-   `_PURGE_PROMISES`: es lo que se leerá de madrugada.
+   `_CRON_PROMISES`: es lo que se leerá de madrugada.
 3. Agrega su ventana en `CRON_MAX_AGE`, con holgura sobre su periodo real.
 4. Actualiza la tabla de este documento.
+
+Si agregas una alerta nueva, pásale un `budget_key` que identifique el
+**problema** y no el mensaje. Una alerta sin clave siempre suena, que es el
+comportamiento correcto para lo excepcional y el equivocado para lo que puede
+repetirse en ráfaga.

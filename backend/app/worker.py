@@ -75,7 +75,8 @@ def alert_on_final_failure(fn):
                 await _alert(
                     f":rotating_light: *Tarea de fondo fallida* — `{fn.__name__}`\n"
                     f"Se agotaron los {MAX_TRIES} intentos y quedó sin hacerse.\n"
-                    f"```{type(exc).__name__}: {str(exc)[:300]}```"
+                    f"```{type(exc).__name__}: {str(exc)[:300]}```",
+                    budget_key=f"job:{fn.__name__}:{type(exc).__name__}",
                 )
             raise
 
@@ -85,7 +86,7 @@ def alert_on_final_failure(fn):
 # Qué promete cada purga. La alerta dice qué se rompió, no qué excepción salió:
 # "TimeoutError en purge_donations_cron" le sirve a quien escribió el cron; esto
 # le sirve a quien lo lee a las tres de la mañana.
-_PURGE_PROMISES = {
+_CRON_PROMISES = {
     "purge_donations_cron":
         "Los pre-registros de donación sin confirmar dejan de vencerse y los "
         "datos de quien donó dejan de purgarse. El aviso de privacidad declara "
@@ -101,6 +102,11 @@ _PURGE_PROMISES = {
         "privacidad declara un plazo de conservación para ellos.",
     "purge_export_jobs_cron":
         "Los archivos de exportación dejan de eliminarse de R2 al vencer.",
+    "heartbeat_watchdog_cron":
+        "Nadie está revisando que los demás crons sigan corriendo.",
+    "bounce_watchdog_cron":
+        "Los rebotes de correo dejan de vigilarse: un proveedor puede estar "
+        "bloqueando el doble opt-in del pre-registro sin que nadie lo note.",
 }
 
 
@@ -117,12 +123,13 @@ def alert_on_cron_failure(fn):
         try:
             result = await fn(ctx, *args, **kwargs)
         except Exception as exc:
-            consequence = _PURGE_PROMISES.get(fn.__name__, "")
+            consequence = _CRON_PROMISES.get(fn.__name__, "")
             logger.error("%s falló: %s", fn.__name__, exc)
             await _alert(
                 f":rotating_light: *La purga no corrió* — `{fn.__name__}`\n"
                 + (f"{consequence}\n" if consequence else "")
-                + f"```{type(exc).__name__}: {str(exc)[:300]}```"
+                + f"```{type(exc).__name__}: {str(exc)[:300]}```",
+                budget_key=f"cron:{fn.__name__}:{type(exc).__name__}",
             )
             return None
 
@@ -142,12 +149,24 @@ def _record_heartbeat(name: str) -> None:
         record_success(db, name)
 
 
-async def _alert(mensaje: str) -> None:
-    """Manda la alerta sin que un Slack caído se trague el error original."""
+async def _alert(message: str, budget_key: str | None = None) -> None:
+    """Manda la alerta sin que un Slack caído se trague el error original.
+
+    Con `budget_key`, la repetición del mismo problema dentro de su ventana se
+    calla (Fase 24, task 7). Sin clave, la alerta siempre sale: quien no declara
+    identidad de problema no puede agruparse.
+    """
+    if budget_key is not None:
+        from app.utils.alert_budget import should_send
+
+        if not await asyncio.to_thread(should_send, budget_key):
+            logger.info("Alerta agrupada por presupuesto de ruido: %s", budget_key)
+            return
+
     try:
         from app.utils.slack import notify_slack
 
-        await notify_slack(mensaje, settings.slack_alert_channel)
+        await notify_slack(message, settings.slack_alert_channel)
     except Exception:
         logger.exception("No se pudo publicar la alerta en Slack")
 
@@ -398,9 +417,31 @@ async def heartbeat_watchdog_cron(ctx) -> None:
     if stale:
         await _alert(
             ":rotating_light: *Hay trabajo de fondo que dejó de correr*\n"
-            + "\n".join(f"· `{name}` — {_PURGE_PROMISES.get(name, 'sin correr')}"
-                        for name in stale)
+            + "\n".join(f"· `{name}` — {_CRON_PROMISES.get(name, 'sin correr')}"
+                        for name in stale),
+            budget_key=f"heartbeat:{','.join(stale)}",
         )
+
+
+@alert_on_cron_failure
+async def bounce_watchdog_cron(ctx) -> None:
+    """Avisa cuando los rebotes de correo se disparan.
+
+    Registrar un rebote no es avisar de él: los fallos de envío se guardan desde
+    la Fase 15 y nadie los mira. Lo que importa no es el rebote suelto, es el
+    cambio de régimen, porque el pre-registro de donaciones vive de un doble
+    opt-in que un proveedor bloqueándonos rompe entero y en silencio.
+    """
+    from app.database import SessionLocal
+    from app.services.bounce_watch import bounce_report
+
+    with SessionLocal() as db:
+        message, window_hours = await asyncio.to_thread(bounce_report, db)
+
+    if message:
+        # La identidad es la ventana, no el conteo: si el problema sigue vivo, el
+        # número cambia cada hora y sin agrupar volvería a sonar cada hora.
+        await _alert(message, budget_key=f"bounces:{window_hours}h")
 
 
 # ── Fallbacks (called directly when Redis is unavailable) ──────────────────────
@@ -531,6 +572,10 @@ class WorkerSettings:
         # Cada hora: detecta que un cron se quedó atrás. Lo que NO puede
         # detectar es su propia ausencia — para eso está /health/jobs.
         cron(heartbeat_watchdog_cron, minute=45),
+        # Cada hora: la ventana de medición es mucho más larga, pero preguntar
+        # seguido acorta el tiempo entre que un proveedor empieza a bloquearnos y
+        # que alguien se entera.
+        cron(bounce_watchdog_cron, minute=50),
     ]
     redis_settings = RedisSettings.from_dsn(os.environ.get("REDIS_URL", "redis://localhost:6379"))
     max_jobs = 10
