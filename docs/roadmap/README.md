@@ -3,9 +3,9 @@
 ## Progreso general
 
 ```mermaid
-pie title Tareas completadas (431 tareas)
-    "Listas" : 355
-    "Pendientes" : 76
+pie title Tareas completadas (443 tareas)
+    "Listas" : 389
+    "Pendientes" : 54
 ```
 
 | Fase | Nombre | Listas | Pendientes | Progreso |
