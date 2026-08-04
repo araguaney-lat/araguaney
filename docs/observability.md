@@ -118,22 +118,18 @@ verificar la cadena de punta a punta es una tarea propia, no un supuesto.
 
 Huecos conocidos, a la fecha de este documento:
 
-1. **Sentry sin verificar de punta a punta.** El SDK se inicializa, que no es lo
-   mismo que un error llegando al dashboard (ver el runbook). Vale la pena
-   insistir en esto: el SDK del navegador estuvo **sin cargarse** por un archivo
-   con el nombre de una versión anterior, y nada en el panel lo delataba.
-2. **Source maps por confirmar.** El token está puesto, pero la organización
-   estaba mal escrita en `next.config.ts` y la subida llevaba desde el 6 de julio
-   sin completarse, con el build siempre en verde. Corregido; queda comprobar en
-   el próximo deploy que vuelven a llegar paquetes nuevos.
-3. **Slack caído se traga la alerta.** Es deliberado: la observabilidad no puede
+1. **El entorno `preview` no se probó.** La verificación se hizo contra
+   producción. Que un error de preview caiga en su propio entorno depende de que
+   `NEXT_PUBLIC_VERCEL_ENV` llegue al navegador, y eso no se comprobó con un
+   evento real: decisión consciente, no olvido.
+2. **Slack caído se traga la alerta.** Es deliberado: la observabilidad no puede
    tumbar una petición. Pero significa que hay un modo de fallo en el que el
    error ocurre y el aviso no llega. Sentry cubre parte de ese hueco.
-4. **Sin señales de rendimiento ni de saturación.** No hay alerta de latencia, de
+3. **Sin señales de rendimiento ni de saturación.** No hay alerta de latencia, de
    agotamiento del pool de conexiones ni de crecimiento de la base.
-5. **Sin alertas de gasto.** Los topes y avisos de presupuesto requieren plan de
+4. **Sin alertas de gasto.** Los topes y avisos de presupuesto requieren plan de
    pago de la infraestructura.
-6. **La llave pública de Sentry no está blindada** todavía.
+5. **La llave pública de Sentry no está blindada** todavía.
 
 ---
 
@@ -267,7 +263,15 @@ Cierra el hueco número dos. El SDK inicializado no prueba nada: sin DSN,
 7. Anotar en este documento la fecha de la última verificación. Una verificación
    sin fecha no distingue "se probó y funciona" de "se probó hace dos años".
 
-> Última verificación de punta a punta: _pendiente_.
+> **Última verificación de punta a punta: 3 de agosto de 2026.** Un error de
+> navegador provocado en producción llegó como issue con entorno `production`,
+> release asociado y traza resuelta a código fuente (`.ts`, no `.js`
+> minificado), **con un bloqueador de anuncios activo**, que es lo que el túnel
+> vino a resolver. El backend ya venía reportando: 35.890 spans de
+> `sentry.python.fastapi` en los 30 días previos.
+>
+> Lo que esa verificación **no** cubrió: un error desde un preview. Queda
+> declarado arriba como hueco conocido.
 
 ---
 
