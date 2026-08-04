@@ -88,12 +88,24 @@ const nextConfig: NextConfig = {
   },
 }
 
+// Organización y proyecto de Sentry salen del entorno, nunca del código: un
+// renombrado en Sentry cambia el slug, y tenerlo escrito aquí obliga a un commit
+// para algo que es configuración de la cuenta.
+//
+// El guardia existe porque ya pasó lo contrario: con el slug viejo, el build
+// seguía en verde y los source maps dejaron de subirse durante un mes. Tener el
+// token y no tener destino es una equivocación sin lectura ambigua, así que se
+// falla fuerte en vez de callar. Sin token no hay nada que subir y no estorba.
+if (process.env.SENTRY_AUTH_TOKEN && !(process.env.SENTRY_ORG && process.env.SENTRY_PROJECT)) {
+  throw new Error(
+    "SENTRY_AUTH_TOKEN está definido pero falta SENTRY_ORG o SENTRY_PROJECT: " +
+    "el build subiría source maps sin destino y lo haría en silencio."
+  )
+}
+
 export default withSentryConfig(nextConfig, {
-  // La organización es `casanovas`. Decía `bioflow`, que no existe como slug, y
-  // por eso la subida de source maps lleva desde el 6 de julio sin completarse:
-  // el build sigue en verde y los mapas simplemente no llegan.
-  org: "casanovas",
-  project: "araguaney",
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
   // Los eventos del navegador salen por una ruta de este dominio en vez de ir
   // directo a sentry.io. Las listas de los bloqueadores de anuncios incluyen el
   // dominio de ingesta, así que sin esto se pierden los errores de quien navega
