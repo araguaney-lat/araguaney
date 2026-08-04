@@ -249,8 +249,8 @@ resta.
 - **Topes de gasto y alertas de presupuesto en Vercel** (Fase 4, task 9), que
   requieren plan de pago.
 - **Alertas de Sentry a Slack.** Hoy la única regla del proyecto avisa por correo
-  y no hay integraciones instaladas. Enrutarlas al canal donde ya se mira exige
-  autorizar la integración desde la consola de Sentry.
+  y no hay integraciones instaladas. Exige autorización OAuth desde la consola;
+  los pasos están en su runbook, más abajo.
 - **Cuota de Sentry**: en plan gratuito no hay facturación por exceso, así que el
   riesgo no es la factura sino quedarse ciego. Sentry avisa por correo a quien sea
   propietario de la organización cuando la cuota se agota.
@@ -344,6 +344,41 @@ Cierra el hueco número dos. El SDK inicializado no prueba nada: sin DSN,
 >
 > Lo que esa verificación **no** cubrió: un error desde un preview. Queda
 > declarado arriba como hueco conocido.
+
+---
+
+## Runbook: llevar las alertas de Sentry al canal de Slack
+
+Hoy Sentry avisa **solo por correo**. El proyecto tiene una única regla,
+`Send a notification for high priority issues` (id `17244932`), y su acción es
+`NotifyEmailAction`. Todo lo demás de esta capa (500 del backend, tareas de fondo,
+crons rezagados, rebotes) llega a Slack, así que Sentry es el único que obliga a
+mirar en otro lado.
+
+Eso importa por la misma razón que el resto del documento: **quien está de guardia
+mira un solo lugar**. Un aviso que llega a un buzón que nadie abre a las tres de
+la mañana es un aviso perdido, y encima da la sensación de que hay alertas.
+
+**No se puede automatizar la primera parte.** La integración exige autorización
+OAuth desde la consola: hay que aceptar permisos en Sentry y en Slack, y ninguna
+API lo sustituye.
+
+1. En Sentry: **Settings → Integrations → Slack → Add Workspace Installation**.
+2. Autorizar en Slack y elegir el espacio de trabajo.
+3. **Invitar al bot al canal de alertas** (`/invite @Sentry`). Sin esto la
+   integración queda instalada y los mensajes no llegan: mismo patrón que el bot
+   propio del proyecto.
+4. Verificar con `sentry api "/api/0/organizations/casanovas/integrations/"`, que
+   debe dejar de responder una lista vacía.
+5. Agregar la acción de Slack a la regla existente, dejando el correo puesto: dos
+   canales para el mismo aviso no estorban, y uno de los dos sobrevive si el otro
+   falla.
+6. Probar de verdad: provocar un error y confirmar que **el mensaje aparece en el
+   canal**, no solo que la regla lo diga. La Fase 24 se pasó entera aprendiendo que
+   configurado y funcionando son cosas distintas.
+
+Mientras tanto, el correo sigue llegando: no hay ventana ciega, solo un aviso en
+un lugar distinto al resto.
 
 ---
 
