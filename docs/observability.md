@@ -122,9 +122,10 @@ Huecos conocidos, a la fecha de este documento:
    mismo que un error llegando al dashboard (ver el runbook). Vale la pena
    insistir en esto: el SDK del navegador estuvo **sin cargarse** por un archivo
    con el nombre de una versión anterior, y nada en el panel lo delataba.
-2. **Source maps sin subir.** Requiere `SENTRY_AUTH_TOKEN` en el entorno del
-   build. Sin él, las trazas del navegador llegan minificadas: se ve el error,
-   no la línea que lo causó.
+2. **Source maps por confirmar.** El token está puesto, pero la organización
+   estaba mal escrita en `next.config.ts` y la subida llevaba desde el 6 de julio
+   sin completarse, con el build siempre en verde. Corregido; queda comprobar en
+   el próximo deploy que vuelven a llegar paquetes nuevos.
 3. **Slack caído se traga la alerta.** Es deliberado: la observabilidad no puede
    tumbar una petición. Pero significa que hay un modo de fallo en el que el
    error ocurre y el aviso no llega. Sentry cubre parte de ese hueco.
@@ -156,6 +157,35 @@ problema**, no el texto ni la severidad:
 Un problema distinto siempre suena. Y el agrupador **falla abierto**: sin Redis
 no hay dónde recordar qué se mandó, así que se manda todo. Entre un canal ruidoso
 y un canal mudo, el ruidoso es el que se puede arreglar leyéndolo.
+
+---
+
+## Por qué los eventos del navegador salen por nuestro dominio
+
+Los bloqueadores de anuncios y las extensiones de privacidad filtran el dominio
+de ingesta de Sentry por defecto. Sin hacer nada al respecto, el SDK intenta
+enviar, la petición se corta y el error se pierde.
+
+Y no se pierde al azar. Desaparece exactamente el segmento de gente que navega
+con bloqueador, así que el panel queda con una foto **sesgada que parece
+completa**: es el mismo fallo silencioso que ataca toda esta fase, pero disfrazado
+de calma.
+
+Por eso `tunnelRoute: "/monitoring"` en `next.config.ts`. El navegador envía a
+una ruta de este dominio y Next la reescribe hacia Sentry desde el servidor.
+Ninguna lista de bloqueo filtra el dominio propio.
+
+Dos precisiones para no confiarse:
+
+- **El DSN sigue estando en el bundle del cliente.** El SDK lo necesita para
+  construir el sobre; el túnel cambia el destino, no esconde la llave. Blindarla
+  sigue siendo tarea aparte.
+- **El tráfico pasa por funciones de Vercel.** Son unos pocos KB por evento, pero
+  ya no es gratis del todo.
+
+Cómo comprobar que el túnel está vivo: en el navegador, las peticiones de Sentry
+deben ir a `/monitoring?o=…&p=…&r=…` sobre el propio dominio, no a
+`ingest.sentry.io`.
 
 ---
 
