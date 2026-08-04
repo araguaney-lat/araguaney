@@ -4,8 +4,8 @@
 
 ```mermaid
 pie title Tareas completadas (443 tareas)
-    "Listas" : 393
-    "Pendientes" : 50
+    "Listas" : 394
+    "Pendientes" : 49
 ```
 
 | Fase | Nombre | Listas | Pendientes | Progreso |
@@ -34,10 +34,10 @@ pie title Tareas completadas (443 tareas)
 | 21 | [Logística: pesaje, declaración de mercancías y perfiles de paletizado](phase-21-logistics-weighing.md) | 12 | 0 | ✅ 100% |
 | 22 | [Trazabilidad extendida: avión y destino](phase-22-extended-traceability.md) | 0 | 14 | ⬜ 0% |
 | 23 | [IA asistida: captura, catálogo y necesidades](phase-23-ai-assisted-capture.md) | 0 | 11 | ⬜ 0% |
-| 24 | [Observabilidad: que un fallo silencioso deje de serlo](phase-24-observability.md) | 8 | 3 | 🟡 73% |
-| **Total** | | **393** | **50** | **🟡 89%** |
+| 24 | [Observabilidad: que un fallo silencioso deje de serlo](phase-24-observability.md) | 9 | 2 | 🟡 82% |
+| **Total** | | **394** | **49** | **🟡 89%** |
 
-> **Pendientes (50):**
+> **Pendientes (49):**
 > El grupo A de la Fase 13 (privacidad, lo que aplica hoy) está completo.
 > - Los borradores legales de la Fase 20 están escritos y esperando revisión de abogado:
 >   [`docs/legal/drafts/`](../legal/drafts/README.md). Sus tareas siguen abiertas hasta que esa
@@ -51,12 +51,11 @@ pie title Tareas completadas (443 tareas)
 > - **14 de la Fase 22 (trazabilidad extendida):** hitos logísticos, recepción en destino con
 >   merma e incidencias; diseño en
 >   [su spec](../superpowers/specs/2026-07-29-extended-traceability-design.md).
-> - **3 de la Fase 24 (observabilidad):** las tareas y los crons avisan al fallar, el worker manda a
->   Sentry, el latido detecta lo que dejó de correr, un monitor externo vigila `/health/jobs` desde
->   fuera, los rebotes de correo se vigilan por volumen y por dominio, y el presupuesto de ruido
->   agrupa lo repetitivo. [`docs/observability.md`](../observability.md) declara qué se vigila y qué
->   no. Queda verificar Sentry de punta a punta, subir source maps y blindar su llave pública. Sin
->   costo: Sentry y Slack en plan gratuito.
+> - **2 de la Fase 24 (observabilidad):** el trabajo de fondo avisa cuando falla, el latido detecta
+>   lo que dejó de correr, un monitor externo vigila `/health/jobs`, los rebotes de correo se
+>   vigilan por volumen y por dominio, el presupuesto de ruido agrupa lo repetitivo y Sentry quedó
+>   verificado de punta a punta el 3/8/2026. Queda blindar la llave pública de Sentry y registrar la
+>   política en `CLAUDE.md`. Sin costo: Sentry y Slack en plan gratuito.
 > - **11 de la Fase 23 (IA asistida):** mapeo de texto libre, OCR de etiqueta, emparejamiento de
 >   necesidades y resumen nacional, con guardarraíles de gasto; diseño en
 >   [su spec](../superpowers/specs/2026-07-29-ai-assisted-capture-design.md).
