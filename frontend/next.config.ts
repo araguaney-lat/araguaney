@@ -89,8 +89,17 @@ const nextConfig: NextConfig = {
 }
 
 export default withSentryConfig(nextConfig, {
-  org: "bioflow",
+  // La organización es `casanovas`. Decía `bioflow`, que no existe como slug, y
+  // por eso la subida de source maps lleva desde el 6 de julio sin completarse:
+  // el build sigue en verde y los mapas simplemente no llegan.
+  org: "casanovas",
   project: "araguaney",
+  // Los eventos del navegador salen por una ruta de este dominio en vez de ir
+  // directo a sentry.io. Las listas de los bloqueadores de anuncios incluyen el
+  // dominio de ingesta, así que sin esto se pierden los errores de quien navega
+  // con bloqueador — y no se pierden al azar: desaparece justo ese segmento,
+  // dejando una foto sesgada que parece completa.
+  tunnelRoute: "/monitoring",
   silent: !process.env.CI,
   // Applies to both webpack and turbopack builds.
   widenClientFileUpload: true,
