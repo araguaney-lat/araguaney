@@ -118,11 +118,13 @@ verificar la cadena de punta a punta es una tarea propia, no un supuesto.
 
 Huecos conocidos, a la fecha de este documento:
 
-1. **Uptime externo sin dar de alta.** El endpoint existe; falta el servicio
-   gratuito que lo golpee desde fuera (ver el runbook más abajo). Mientras tanto,
-   si Railway se cae entero, ninguna alerta interna va a salir: por definición.
-2. **Sentry sin verificar de punta a punta.** El SDK se inicializa, que no es lo
-   mismo que un error llegando al dashboard (ver el runbook).
+1. **Sentry sin verificar de punta a punta.** El SDK se inicializa, que no es lo
+   mismo que un error llegando al dashboard (ver el runbook). Vale la pena
+   insistir en esto: el SDK del navegador estuvo **sin cargarse** por un archivo
+   con el nombre de una versión anterior, y nada en el panel lo delataba.
+2. **Source maps sin subir.** Requiere `SENTRY_AUTH_TOKEN` en el entorno del
+   build. Sin él, las trazas del navegador llegan minificadas: se ve el error,
+   no la línea que lo causó.
 3. **Slack caído se traga la alerta.** Es deliberado: la observabilidad no puede
    tumbar una petición. Pero significa que hay un modo de fallo en el que el
    error ocurre y el aviso no llega. Sentry cubre parte de ese hueco.
@@ -159,8 +161,10 @@ y un canal mudo, el ruidoso es el que se puede arreglar leyéndolo.
 
 ## Runbook: dar de alta el uptime externo
 
-Cierra el hueco número uno. Sin esto, una caída total de Railway no produce
-ninguna alerta, porque el que tendría que avisar se cayó con todo lo demás.
+**Hecho.** Queda escrito para cuando haya que rehacerlo o replicarlo.
+
+Sin esto, una caída total de Railway no produce ninguna alerta, porque el que
+tendría que avisar se cayó con todo lo demás.
 
 1. Elegir un servicio gratuito de uptime que soporte comprobar por código de
    estado (UptimeRobot, Better Stack y Hetrix tienen plan gratuito suficiente).
@@ -174,6 +178,16 @@ ninguna alerta, porque el que tendría que avisar se cayó con todo lo demás.
    de guardia mire un solo lugar.
 6. Verificar que el monitor está vivo: pausarlo y reanudarlo debe producir una
    notificación de recuperación.
+
+Dos trampas que este montaje ya se encontró, por si hay que repetirlo:
+
+- **El método importa.** UptimeRobot comprueba con `HEAD` en su plan gratuito y
+  no deja elegir. Hubo que permitir `HEAD` en la regla de métodos de Cloudflare
+  (`TRACE` y compañía siguen bloqueados) y registrar la ruta para `GET` y `HEAD`,
+  porque esta versión de FastAPI no agrega `HEAD` sola al declarar `GET`.
+- **De dónde viene el error se lee en las cabeceras.** Un 403 con
+  `content-type: text/html` y sin cabeceras del backend es Cloudflare; un 405 con
+  `allow: GET` es el origen. Distinguirlos ahorra buscar en el lado equivocado.
 
 Qué esperar en operación normal: `200` y un cuerpo que dice que no hay nada
 rezagado. El endpoint es público y no revela qué cron va atrasado, así que no hay
@@ -194,6 +208,11 @@ Cierra el hueco número dos. El SDK inicializado no prueba nada: sin DSN,
 1. Confirmar que `SENTRY_DSN` y `SENTRY_ENVIRONMENT` están puestos en el servicio
    de la API **y** en el del worker. Son dos procesos distintos y cada uno lee su
    propio entorno.
+
+   Cómo saber si falta, sin entrar al panel de Railway: con
+   `traces_sample_rate=0.1` el backend manda transacciones aunque no haya ningún
+   error. Si el proyecto lleva días sin recibir **nada**, el DSN no está puesto.
+   Se consulta con `sentry api "/api/0/projects/<org>/<proyecto>/stats/?stat=received&resolution=1d"`.
 2. Provocar un error real y comprobar que aparece en el dashboard con el
    `environment` correcto.
 3. Comprobar que ese mismo error llegó a Slack. Si llega a Sentry y no a Slack,
@@ -202,12 +221,20 @@ Cierra el hueco número dos. El SDK inicializado no prueba nada: sin DSN,
 **Frontend (Vercel)**
 
 4. Confirmar `NEXT_PUBLIC_SENTRY_DSN` en el proyecto, para producción y para
-   preview.
-5. Provocar un error en una página y comprobar que llega.
+   preview, y `SENTRY_AUTH_TOKEN` para que el build suba source maps.
+5. Provocar un error en una página y comprobar que llega **con la línea de código
+   correcta**, no una traza minificada.
+6. Comprobar que el error de un preview cae en su propio entorno y no en
+   `production`. El nombre sale de `SENTRY_ENVIRONMENT` si existe y si no de
+   `VERCEL_ENV`, porque `NODE_ENV` vale `production` también al construir un
+   preview. **Del lado del navegador solo llegan las variables con prefijo
+   `NEXT_PUBLIC_`**, así que Vercel necesita tener activado "Automatically expose
+   System Environment Variables" o `NEXT_PUBLIC_VERCEL_ENV` definida a mano; sin
+   eso el cliente cae a `NODE_ENV` en silencio.
 
 **Cierre**
 
-6. Anotar en este documento la fecha de la última verificación. Una verificación
+7. Anotar en este documento la fecha de la última verificación. Una verificación
    sin fecha no distingue "se probó y funciona" de "se probó hace dos años".
 
 > Última verificación de punta a punta: _pendiente_.
