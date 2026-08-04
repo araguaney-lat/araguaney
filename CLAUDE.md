@@ -462,6 +462,39 @@ schemas/    → Pydantic I/O models (extend StrictModel or StrictORMModel from s
 - Cache: `app.utils.cache` (no-op sin Redis; tratar miss como "carga de DB").
 - PDF/export: siempre encolado en ARQ.
 
+### Observabilidad: todo trabajo de fondo que sostenga una promesa avisa cuando falla
+
+Un error con alguien enfrente se nota solo: alguien lo reporta. El trabajo de
+fondo corre de madrugada y sin nadie mirando, así que si no avisa, no existe.
+Cuatro de los cinco crons de purga sostienen plazos publicados en el aviso de
+privacidad: una purga que lleva un mes sin correr no produce ningún error visible
+mientras el aviso le sigue prometiendo a las personas donantes que lo no
+confirmado se borra.
+
+Al agregar trabajo de fondo:
+
+1. **Los crons se decoran con `alert_on_cron_failure`.** Si el cron sostiene una
+   promesa, su texto va en `_CRON_PROMISES`: la alerta dice qué queda incumplido,
+   no qué excepción salió. `TimeoutError en purge_donations_cron` le sirve a quien
+   escribió el cron; a quien la lee a las tres de la mañana, no.
+2. **Cada cron declara su ventana en `CRON_MAX_AGE`.** Un cron que **nunca corre**
+   no falla, y por eso no alerta: el latido es lo único que atrapa una ausencia.
+3. **Las alertas que pueden repetirse llevan `budget_key`**, con la identidad del
+   problema y no el texto del mensaje. Un canal ruidoso es un canal ignorado.
+4. **Lo que quede sin cubrir se escribe** en [`docs/observability.md`](docs/observability.md),
+   con nombre y consecuencia. Un hueco documentado se puede planear; uno implícito
+   no.
+
+Dos límites que esta política acepta a propósito: la observabilidad **nunca
+tumba** una petición de usuario (Slack caído se traga la alerta antes que romper
+un intake), y **falla abierta** donde puede (sin Redis se manda todo, porque un
+canal ruidoso se arregla leyéndolo y uno mudo no se nota hasta que es tarde).
+
+> Verificar que la cadena funciona es tarea propia y no un supuesto. Un SDK
+> inicializado no prueba nada, y un panel vacío se ve igual esté sano o mudo: en
+> la Fase 24 esa verificación destapó un SDK que no cargaba, una subida de source
+> maps rota un mes atrás y eventos frenados antes de salir del navegador.
+
 ### Seguridad del código
 
 - Columnas sensibles en DB: `encrypt_value` / `decrypt_value` de `app.utils.crypto`.
@@ -514,6 +547,7 @@ schemas/    → Pydantic I/O models (extend StrictModel or StrictORMModel from s
 - Endpoint público nuevo: cacheable o explícitamente rate-limited.
 - Cambio de estado escribe su `*_event`.
 - Migración Alembic reversible (`upgrade`/`downgrade`).
+- Trabajo de fondo nuevo: avisa cuando falla y declara su ventana de latido.
 - Sin PII de beneficiario introducida. La del donante solo por las vías previstas
   (pre-registro o captura en ventanilla), nunca en superficie pública.
 
