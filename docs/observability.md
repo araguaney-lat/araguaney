@@ -208,6 +208,11 @@ Cierra el hueco número dos. El SDK inicializado no prueba nada: sin DSN,
 1. Confirmar que `SENTRY_DSN` y `SENTRY_ENVIRONMENT` están puestos en el servicio
    de la API **y** en el del worker. Son dos procesos distintos y cada uno lee su
    propio entorno.
+
+   Cómo saber si falta, sin entrar al panel de Railway: con
+   `traces_sample_rate=0.1` el backend manda transacciones aunque no haya ningún
+   error. Si el proyecto lleva días sin recibir **nada**, el DSN no está puesto.
+   Se consulta con `sentry api "/api/0/projects/<org>/<proyecto>/stats/?stat=received&resolution=1d"`.
 2. Provocar un error real y comprobar que aparece en el dashboard con el
    `environment` correcto.
 3. Comprobar que ese mismo error llegó a Slack. Si llega a Sentry y no a Slack,
@@ -219,9 +224,13 @@ Cierra el hueco número dos. El SDK inicializado no prueba nada: sin DSN,
    preview, y `SENTRY_AUTH_TOKEN` para que el build suba source maps.
 5. Provocar un error en una página y comprobar que llega **con la línea de código
    correcta**, no una traza minificada.
-6. Comprobar que el error de un preview cae en el entorno `preview` y no en
-   `production`. El entorno sale de `VERCEL_ENV`, porque `NODE_ENV` vale
-   `production` también al construir un preview.
+6. Comprobar que el error de un preview cae en su propio entorno y no en
+   `production`. El nombre sale de `SENTRY_ENVIRONMENT` si existe y si no de
+   `VERCEL_ENV`, porque `NODE_ENV` vale `production` también al construir un
+   preview. **Del lado del navegador solo llegan las variables con prefijo
+   `NEXT_PUBLIC_`**, así que Vercel necesita tener activado "Automatically expose
+   System Environment Variables" o `NEXT_PUBLIC_VERCEL_ENV` definida a mano; sin
+   eso el cliente cae a `NODE_ENV` en silencio.
 
 **Cierre**
 
