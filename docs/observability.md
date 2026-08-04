@@ -129,7 +129,9 @@ Huecos conocidos, a la fecha de este documento:
    agotamiento del pool de conexiones ni de crecimiento de la base.
 4. **Sin alertas de gasto.** Los topes y avisos de presupuesto requieren plan de
    pago de la infraestructura.
-5. **La llave pública de Sentry no está blindada** todavía.
+5. **La llave pública de Sentry es legible en el bundle**, y así seguirá: el SDK
+   la necesita. Lo que se puede acotar está acotado (ver la sección propia); lo
+   que falta es de pago o de consola.
 
 ---
 
@@ -182,6 +184,76 @@ Dos precisiones para no confiarse:
 Cómo comprobar que el túnel está vivo: en el navegador, las peticiones de Sentry
 deben ir a `/monitoring?o=…&p=…&r=…` sobre el propio dominio, no a
 `ingest.sentry.io`.
+
+---
+
+## Qué protege la llave pública de Sentry, y qué no
+
+El DSN del frontend viaja en el bundle del navegador. Es **público por diseño**,
+no por descuido: el SDK lo necesita para construir el sobre, y el túnel cambia a
+dónde se envía, no si la llave se puede leer.
+
+Lo que se hizo, y por qué esa combinación:
+
+| Control | Estado | Por qué |
+|---|---|---|
+| Purgado de IP | **Activo** | Sentry ya no almacena la IP de quien navega. El proyecto declara no acumular PII y esto lo alinea |
+| Dominios permitidos | **`*`, a propósito** | Ver abajo |
+| Límite de tasa por llave | **No disponible** | Es función de pago; la API acepta el cambio y devuelve `null` |
+| Límite en el borde, sobre `/monitoring` | **Activo** | Regla de Vercel Firewall, 200 req/min por IP, hoy en modo registro |
+
+### Por qué los dominios permitidos están en `*`
+
+Se probó lo contrario y se midió. Con la lista puesta en los dominios del sitio,
+se enviaron eventos sintéticos por el túnel variando la cabecera `Origin`, y
+**todos fueron aceptados, incluido uno con origen ajeno**.
+
+La razón es el túnel: los eventos ya no salen del navegador sino del servidor de
+Vercel, así que Sentry no ve el origen real y el control no tiene nada que
+evaluar. Ese control, además, solo estorba a un navegador en otro sitio: cualquier
+cliente que no sea navegador falsifica esa cabecera con una línea de `curl`.
+
+Queda en `*` para no dar una falsa sensación de protección. **Si alguien lo
+"arregla" en el futuro, no endurece nada**, y sí puede confundir el diagnóstico
+del día que falte un evento.
+
+### Dónde vive la protección real
+
+En el borde de Vercel, que es por donde ahora pasa todo el tráfico de Sentry:
+
+- Regla `Rate limit tunel de Sentry`: `path` empieza con `/monitoring`, 200
+  peticiones por minuto y por IP.
+- Hoy con acción **registro**: anota quién excede sin bloquear a nadie. Con datos
+  reales se sube a `rate_limit` y empieza a rechazar.
+- **Vercel no factura el tráfico que bloquea** su firewall ni sus mitigaciones de
+  DDoS, así que una inundación contra el túnel se corta sin costo. Ese es el punto
+  que cierra el riesgo que el propio túnel abrió.
+
+### Por qué el frontend no está detrás de Cloudflare
+
+Cloudflare protege `api.araguaney.lat` porque **Railway no trae WAF ni límite de
+tasa**: sin ella, el backend estaría expuesto tal cual.
+
+Vercel sí los trae, y su mitigación de DDoS está activa en todos los planes sin
+configurar nada. Poner un proxy externo por delante **degrada su firewall**: la IP
+real del cliente se vuelve opaca, las señales de detección pierden fiabilidad y
+los usuarios legítimos empiezan a recibir desafíos. La documentación de Vercel lo
+desaconseja salvo con la figura de *Verified Proxy*.
+
+Dicho corto: en Railway, Cloudflare suma porque no había nada; delante de Vercel,
+resta.
+
+### Lo que queda como trabajo de consola
+
+- **Subir la regla del túnel de registro a bloqueo**, tras unos días de datos.
+- **Topes de gasto y alertas de presupuesto en Vercel** (Fase 4, task 9), que
+  requieren plan de pago.
+- **Alertas de Sentry a Slack.** Hoy la única regla del proyecto avisa por correo
+  y no hay integraciones instaladas. Enrutarlas al canal donde ya se mira exige
+  autorizar la integración desde la consola de Sentry.
+- **Cuota de Sentry**: en plan gratuito no hay facturación por exceso, así que el
+  riesgo no es la factura sino quedarse ciego. Sentry avisa por correo a quien sea
+  propietario de la organización cuando la cuota se agota.
 
 ---
 
