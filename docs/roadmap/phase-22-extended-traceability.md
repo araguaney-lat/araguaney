@@ -39,9 +39,9 @@
 
 | # | Tarea | Descripción | Complejidad | Estado |
 |---|-------|-------------|-------------|--------|
-| 1 | Migración: estados, hitos y tablas de destino | `shipments.status` amplía CHECK con `DELIVERED` y `RECONCILED`; `shipment_events.milestone` (nullable + CHECK con los 7 hitos); tablas `shipment_receptions`, `reception_lines` (outcome RECEIVED\|MISSING\|DAMAGED\|RETAINED_CUSTOMS), `incidents` (type, status OPEN\|RESOLVED). Reversible. | 🔴 Alta | ⬜ |
-| 2 | Repositorios | `ReceptionRepository` + `IncidentRepository`, scoped por el centro del envío (`TenantRepository.scoped()`). | 🟠 Media | ⬜ |
-| 3 | `ShipmentService`: hitos y llegada | `add_milestone` (evento sin cambio de estado, solo en `SHIPPED`+), `mark_delivered` (→ `DELIVERED` + evento). Transiciones inválidas rechazadas. | 🟠 Media | ⬜ |
+| 1 | Migración: estados, hitos y tablas de destino | `shipments.status` amplía CHECK con `DELIVERED` y `RECONCILED`; `shipment_events.milestone` (nullable + CHECK con los 7 hitos); tablas `shipment_receptions`, `reception_lines` (outcome RECEIVED\|MISSING\|DAMAGED\|RETAINED_CUSTOMS), `incidents` (type, status OPEN\|RESOLVED). Reversible. | 🔴 Alta | ✅ Done |
+| 2 | Repositorios | `ReceptionRepository` + `IncidentRepository`, scoped por el centro del envío (`TenantRepository.scoped()`). | 🟠 Media | ✅ Done |
+| 3 | `ShipmentService`: hitos y llegada | `add_milestone` (evento sin cambio de estado, solo en `SHIPPED`+), `mark_delivered` (→ `DELIVERED` + evento). Transiciones inválidas rechazadas. | 🟠 Media | ✅ Done |
 | 4 | `ReceptionService`: reconciliación | `reconcile`: checklist pre-llenado `RECEIVED`, excepciones marcadas, peso recibido por tarima opcional → `RECONCILED` + evento. **No muta cajas ni tarimas** (invariante de congelamiento). Auto-incidencias: línea ≠ RECEIVED y diferencia de peso sobre umbral configurable (default 5%). | 🔴 Alta | ⬜ |
 | 5 | `IncidentService` | Crear manual (envío/tarima/caja), resolver con nota, listar scoped. Auditoría en cada transición. | 🟠 Media | ⬜ |
 | 6 | Routers | Hitos, llegada y recepción: `national_admin`. Lectura e incidencia manual: también `coordinator` del centro emisor. Rate-limited, scoped. | 🟠 Media | ⬜ |

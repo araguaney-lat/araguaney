@@ -5,12 +5,23 @@ from sqlalchemy.orm import Session
 
 from app.arq_pool import enqueue
 from app.database import get_db
-from app.dependencies import require_coordinator, resolve_write_center_id, tenant_scope
+from app.dependencies import (
+    require_coordinator,
+    require_national_admin,
+    resolve_write_center_id,
+    tenant_scope,
+)
 from app.models.user import User
 from app.repositories.export_job_repository import ExportJobRepository
 from app.repositories.shipment_repository import ShipmentRepository
 from app.schemas.export_job import ExportJobOut
-from app.schemas.shipment import ShipmentCreate, ShipmentDetailOut, ShipmentOut
+from app.schemas.shipment import (
+    DeliveredIn,
+    MilestoneIn,
+    ShipmentCreate,
+    ShipmentDetailOut,
+    ShipmentOut,
+)
 from app.services.shipment_service import ShipmentService
 from app.repositories.audit_repository import AuditRepository
 from app.utils.cloudflare import get_client_ip
@@ -122,6 +133,53 @@ def ship_shipment(
         background_tasks=background_tasks,
     )
     AuditRepository(db).log("SHIPMENT_SHIPPED", "shipment",
+        user_id=current_user.id, entity_id=str(shipment_id), ip=get_client_ip(request))
+    db.commit()
+    return shipment
+
+
+# ── Después de despachar (Fase 22) ────────────────────────────────────────────
+#
+# Hitos y llegada los registra `national_admin` con el reporte del consignatario:
+# quien recibe en destino no tiene cuenta en el sistema, y crear una superficie
+# de autenticación para una zona de desastre sería resolver el problema
+# equivocado. El coordinador del centro emisor los ve en el timeline.
+
+@router.post("/{shipment_id}/milestones", response_model=ShipmentOut)
+@limiter.limit("30/minute")
+def add_milestone(
+    request: Request,
+    shipment_id: UUID,
+    data: MilestoneIn,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_national_admin),
+    scope: UUID | None = Depends(tenant_scope),
+):
+    shipment = ShipmentService(db).add_milestone(
+        shipment_id, center_id=scope, user_id=current_user.id,
+        milestone=data.milestone, note=data.note, occurred_at=data.occurred_at,
+    )
+    AuditRepository(db).log("SHIPMENT_MILESTONE", "shipment",
+        user_id=current_user.id, entity_id=str(shipment_id), ip=get_client_ip(request))
+    db.commit()
+    return shipment
+
+
+@router.post("/{shipment_id}/delivered", response_model=ShipmentOut)
+@limiter.limit("10/minute")
+def mark_delivered(
+    request: Request,
+    shipment_id: UUID,
+    data: DeliveredIn,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_national_admin),
+    scope: UUID | None = Depends(tenant_scope),
+):
+    shipment = ShipmentService(db).mark_delivered(
+        shipment_id, center_id=scope, user_id=current_user.id,
+        note=data.note, delivered_at=data.delivered_at,
+    )
+    AuditRepository(db).log("SHIPMENT_DELIVERED", "shipment",
         user_id=current_user.id, entity_id=str(shipment_id), ip=get_client_ip(request))
     db.commit()
     return shipment

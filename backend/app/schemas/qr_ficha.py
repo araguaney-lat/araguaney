@@ -9,6 +9,9 @@ from app.schemas._base import StrictModel
 class QrEventOut(StrictModel):
     from_status: str | None
     to_status: str
+    # Presente solo en hitos logísticos (Fase 22): el evento no cambió de estado,
+    # anotó que algo ocurrió en el camino.
+    milestone: str | None = None
     note: str | None
     ts: datetime
 
