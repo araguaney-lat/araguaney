@@ -536,7 +536,9 @@
       "col_boxes": "Cajas",
       "col_units": "Unidades",
       "country_boxes": "cajas",
-      "tooltip_boxes": "{count} cajas"
+      "tooltip_boxes": "{count} cajas",
+      "kpi_shrinkage": "Merma en destino",
+      "shrinkage_sub": "{missing} faltantes · {damaged} dañadas · {retained} retenidas"
     },
     "scan": {
       "title": "Escanear QR",

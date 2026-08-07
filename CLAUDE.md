@@ -537,6 +537,11 @@ canal ruidoso se arregla leyéndolo y uno mudo no se nota hasta que es tarde).
 3. Nº de envíos con manifiesto.
 4. % de donaciones `REJECTED` en intake.
 5. Tiempo medio de captura por caja.
+6. **% de merma en destino**: cajas despachadas que no llegaron bien, sobre las
+   de envíos con recepción registrada. Es el espejo de la métrica 4 — una mide
+   lo que no se aceptó al entrar, esta lo que no llegó al salir. Se calcula solo
+   sobre envíos reconciliados: uno que nadie recibió todavía no tiene merma de
+   cero, tiene merma desconocida.
 
 ---
 

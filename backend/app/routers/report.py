@@ -17,6 +17,7 @@ from app.schemas.report import (
     CenterBreakdown,
     CountryPoint,
     ReportSummary,
+    ShrinkageSummary,
 )
 from app.utils.errors import api_error
 from app.utils.cloudflare import get_client_ip
@@ -60,6 +61,22 @@ def get_summary(
     _require_campaign_access(repo, current_user, campaign_id)
     s, e = _resolve_dates(start, end)
     return repo.summary(campaign_id, tenant_scope(current_user), s, e)
+
+
+@router.get("/campaign/{campaign_id}/shrinkage", response_model=ShrinkageSummary)
+@limiter.limit("60/minute")
+def get_shrinkage(
+    request: Request,
+    campaign_id: UUID,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+    scope: UUID | None = Depends(tenant_scope),
+):
+    """Merma de la campaña. Sin rango de fechas: un envío se recibe semanas
+    después de despacharse, y la ventana del resto del reporte lo dejaría fuera."""
+    repo = ReportRepository(db)
+    _require_campaign_access(repo, current_user, campaign_id)
+    return repo.shrinkage(campaign_id, scope)
 
 
 @router.get("/campaign/{campaign_id}/activity", response_model=list[ActivityPoint])

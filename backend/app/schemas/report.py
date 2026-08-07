@@ -14,6 +14,18 @@ class ReportSummary(StrictModel):
     rejection_rate: float
 
 
+class ShrinkageSummary(StrictModel):
+    """Merma de la campaña. `reconciled_boxes` es la base: sin envíos recibidos
+    no hay merma que reportar, y cero cajas no es lo mismo que cero merma."""
+
+    reconciled_boxes: int
+    received: int
+    missing: int
+    damaged: int
+    retained: int
+    shrinkage_pct: float
+
+
 class ActivityPoint(StrictModel):
     date: str
     total: int

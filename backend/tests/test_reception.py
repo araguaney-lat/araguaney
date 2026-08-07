@@ -304,3 +304,75 @@ def test_shrinkage_of_a_clean_reception_is_zero(db):
 
     lines = db.query(ReceptionLine).filter(ReceptionLine.reception_id == reception.id).all()
     assert ReceptionService.shrinkage(lines)["shrinkage_pct"] == 0.0
+
+
+# ── Merma en reportes (task 11) ──────────────────────────────────────────────
+
+def test_campaign_shrinkage_counts_only_reconciled_shipments(db):
+    """Un envío que nadie recibió no tiene merma de cero: tiene merma desconocida.
+
+    Promediarlo como cero mentiría hacia abajo justo en la métrica que existe
+    para detectar que algo se perdió en el camino.
+    """
+    from uuid import uuid4 as _uuid4
+
+    from app.repositories.report_repository import ReportRepository
+
+    campaign_id = _uuid4()
+
+    recibido, _, cajas = _shipment_with_cargo(db, boxes=4)
+    recibido.campaign_id = campaign_id
+    sin_recibir, _, _ = _shipment_with_cargo(db, boxes=10)
+    sin_recibir.campaign_id = campaign_id
+    db.commit()
+
+    ReceptionService(db).reconcile(
+        recibido.id, center_id=CENTER, user_id=USER,
+        exceptions={cajas[0].id: {"outcome": "MISSING"}},
+    )
+
+    merma = ReportRepository(db).shrinkage(campaign_id, center_id=None)
+
+    # Solo las 4 del envío reconciliado entran a la base del cálculo.
+    assert merma["reconciled_boxes"] == 4
+    assert merma["missing"] == 1
+    assert merma["shrinkage_pct"] == 25.0
+
+
+def test_a_campaign_without_receptions_reports_no_shrinkage(db):
+    from uuid import uuid4 as _uuid4
+
+    from app.repositories.report_repository import ReportRepository
+
+    campaign_id = _uuid4()
+    envio, _, _ = _shipment_with_cargo(db, boxes=3)
+    envio.campaign_id = campaign_id
+    db.commit()
+
+    merma = ReportRepository(db).shrinkage(campaign_id, center_id=None)
+
+    assert merma == {"reconciled_boxes": 0, "received": 0, "missing": 0,
+                     "damaged": 0, "retained": 0, "shrinkage_pct": 0.0}
+
+
+def test_shrinkage_is_scoped_to_the_center(db):
+    from uuid import uuid4 as _uuid4
+
+    from app.repositories.report_repository import ReportRepository
+
+    campaign_id = _uuid4()
+    mio, _, mias = _shipment_with_cargo(db, boxes=2)
+    mio.campaign_id = campaign_id
+    ajeno, _, ajenas = _shipment_with_cargo(db, boxes=2, center_id=OTHER_CENTER)
+    ajeno.campaign_id = campaign_id
+    db.commit()
+
+    service = ReceptionService(db)
+    service.reconcile(mio.id, CENTER, USER, exceptions={mias[0].id: {"outcome": "MISSING"}})
+    service.reconcile(ajeno.id, OTHER_CENTER, USER, exceptions={})
+
+    propio = ReportRepository(db).shrinkage(campaign_id, center_id=CENTER)
+    nacional = ReportRepository(db).shrinkage(campaign_id, center_id=None)
+
+    assert propio["reconciled_boxes"] == 2 and propio["shrinkage_pct"] == 50.0
+    assert nacional["reconciled_boxes"] == 4 and nacional["shrinkage_pct"] == 25.0
