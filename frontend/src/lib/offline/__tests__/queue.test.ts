@@ -1,5 +1,5 @@
 import { beforeEach, afterEach, describe, expect, it, vi } from "vitest"
-import { offlineDB } from "../db"
+import { clearOfflineData, offlineDB } from "../db"
 import {
   MAX_ATTEMPTS,
   dueCaptures,
@@ -246,6 +246,21 @@ describe("con conexión permanente", () => {
 
     expect(peticiones).not.toHaveBeenCalled()
     expect(outcome).toEqual({ synced: 0, rejected: 0, retry: 0, needsLogin: false })
+  })
+})
+
+describe("cerrar sesión", () => {
+  it("borra el catálogo y los códigos, nunca las capturas", async () => {
+    // Un teléfono de centro se comparte entre turnos: el catálogo y el bloque
+    // de códigos de otro centro no tienen por qué quedarse. El trabajo de
+    // alguien, sí.
+    await seedCodes(2)
+    await enqueue()
+
+    await clearOfflineData()
+
+    expect(await listCaptures()).toHaveLength(1)
+    expect(await availableCodes(CENTER)).toBe(0)
   })
 })
 

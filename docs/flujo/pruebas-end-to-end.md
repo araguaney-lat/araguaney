@@ -24,6 +24,11 @@ deben poder provocar a propósito.
    `ShipmentEvent`, eventos de donación y de transferencia).
 5. Ningún dato cruza de un centro a otro sin pasar por una transferencia
    explícita.
+6. **El inventario despachado nunca se muta hacia atrás.** `DELIVERED` y
+   `RECONCILED` no tocan cajas ni tarimas: lo que llegó vive en las tablas de
+   recepción. De esa separación depende poder medir la merma.
+7. **Reintentar una captura no duplica inventario.** El `capture_id` lo genera
+   el cliente antes del primer intento y es único en la base.
 
 ---
 
@@ -144,7 +149,41 @@ El umbral vive en variables de entorno y **no se documenta aquí** (ver
 - [ ] Un intake que viene de una donación pre-registrada no dispara el umbral: ya
       hay identidad.
 
-### 2.5 Revisiones — `coordinator` o `national_admin`
+### 2.5 Captura sin conexión (Fase 25) — `volunteer` o `coordinator`
+
+Se prueba con DevTools → Network → **Offline**, y con `next build && next start`:
+el modo desarrollo no es referencia fiable para esto.
+
+**Preparación, con señal.** Abrir `/dashboard/intake/new` y verificar en
+`/dashboard/intake/pending` que hay catálogo descargado y códigos apartados
+(`POST /v1/boxes/codes/reserve`, `GET /v1/boxes/codes/available`).
+
+- [ ] Sin conexión, buscar un producto: resuelve contra el catálogo local. Un
+      producto de **otra** campaña no debe aparecer — la visibilidad local es la
+      misma que la del servidor.
+- [ ] Sin conexión, leer un código de barras ya conocido: resuelve local. Uno
+      desconocido no bloquea: se elige el producto a mano.
+- [ ] Guardar: aterriza en la hoja de etiquetas con el QR dibujado en el
+      cliente. Escanearlo apunta a `/b/{code}`, que da 404 hasta sincronizar
+      (correcto: la caja todavía no existe).
+- [ ] El contador de pendientes aparece en el marco del panel y la captura sale
+      marcada en la lista de recepciones.
+- [ ] Cerrar la pestaña con cola pendiente → el navegador avisa.
+- [ ] Volver a conectar: el contador baja a cero y las capturas aparecen **una
+      sola vez** en la lista real. Repetir la sincronización dos veces más para
+      confirmar que no duplica.
+- [ ] Caso de rechazo: capturar sin conexión algo que el servidor rechace (un
+      producto controlado). Al sincronizar queda en `/dashboard/intake/pending`
+      con el motivo del servidor. **No se descarta solo.**
+- [ ] Descartar una captura desde esa pantalla libera sus códigos; un rechazo
+      **no** los libera (la etiqueta ya está pegada a una caja física).
+- [ ] Con `national_admin` sin centro propio, capturar sin conexión se rechaza
+      con un mensaje, no en silencio.
+
+Con conexión permanente, la aplicación se comporta exactamente como antes: no
+hay peticiones extra ni estado nuevo.
+
+### 2.6 Revisiones — `coordinator` o `national_admin`
 
 - [ ] **Revisiones** → `GET /v1/risk-reviews` (pendientes, con scope de centro) →
       `POST /v1/risk-reviews/{id}/resolve` con `APPROVED` o `REJECTED`.
@@ -202,7 +241,8 @@ El umbral vive en variables de entorno y **no se documenta aquí** (ver
 - [ ] `POST /{id}/close`: `OPEN → CLOSED`. Sin tarimas → `EMPTY_SHIPMENT`.
 - [ ] `POST /{id}/ship`: `CLOSED → SHIPPED`. Verificar la cascada: todas las
       tarimas y todas sus cajas quedan `SHIPPED`. Después de esto, cualquier
-      edición debe fallar.
+      edición debe fallar — **y sigue fallando** tras `DELIVERED` y
+      `RECONCILED` (Fase 6 de este guion).
 - [ ] Documentos, todos encolados en ARQ y con poll de export:
       - `POST /{id}/manifest.pdf`
       - `POST /{id}/manifest.xlsx`
@@ -212,9 +252,69 @@ El umbral vive en variables de entorno y **no se documenta aquí** (ver
       imprimen **tal cual**, sin validación de formato (un RFC, un RIF y un EIN
       no se parecen). El código de mercancía es HS, no un catálogo de un país.
 
+### 5.1 Revisión de los documentos generados
+
+No basta con que el trabajo termine en `SUCCESS`: un PDF de cero páginas se ve
+igual de "generado" desde fuera. Abrir cada uno y confirmar:
+
+- [ ] **Etiquetas de caja** (`box_labels`): 10 por hoja A4 vertical, con QR,
+      código, producto, cantidad, lote, caducidad y centro. Con 23 cajas deben
+      salir 3 hojas. Una caja sin lote ni caducidad no debe dejar huecos rotos.
+- [ ] **Etiqueta de tarima**: QR, código, centro, estado, número de cajas y la
+      lista completa de códigos en tres columnas, más la leyenda de aduana
+      bilingüe al pie.
+- [ ] **Manifiesto de envío** (A4 **apaisado**): las diez columnas caben sin
+      partir fechas ni lotes. El encabezado de la tabla **se repite** en cada
+      hoja de continuación — sin él, una tabla partida son columnas de números
+      sin nombre. La primera hoja debe traer ya la primera tarima, no solo el
+      encabezado del envío.
+- [ ] Subtotales por tarima (unidades, kg en cajas, báscula: bruto/tara/neto/
+      altura) y el bloque de totales con la nota de cuántas tarimas se pesaron.
+- [ ] **Manifiesto de transferencia**: centro origen, centro destino, estado y
+      la tabla de cajas.
+- [ ] Los `.xlsx` abren en Excel y LibreOffice; el `.json` de la declaración
+      valida.
+
 ---
 
-## Fase 6 · Transferencias entre centros
+## Fase 6 · El viaje y la recepción en destino (Fase 22) — `coordinator`
+
+Despachar no es el final. Todo este bloque ocurre **sin tocar** las cajas ni las
+tarimas: si algo de aquí muta el inventario despachado, es un bug.
+
+### 6.1 Hitos
+
+- [ ] `POST /v1/shipments/{id}/milestones` con su fecha. Un hito es un evento con
+      `from_status = to_status`: aparece en la línea de tiempo y **no** cambia el
+      estado del envío.
+- [ ] La fecha la manda quien registra, no el servidor. Un hito de ayer tiene que
+      poder quedar con la fecha de ayer.
+
+### 6.2 Entrega y reconciliación
+
+- [ ] `SHIPPED → DELIVERED`. Verificar que las cajas siguen `SHIPPED` y que su
+      contenido no cambió.
+- [ ] `POST /v1/shipments/{id}/reception` con una línea por caja: llegó bien,
+      faltante, dañada o retenida. Estado final `RECONCILED`.
+- [ ] Registrar la recepción dos veces → error, no una segunda recepción.
+- [ ] Confirmar de nuevo que **ninguna caja cambió**: lo que llegó vive en
+      `ShipmentReception` / `ReceptionLine`.
+
+### 6.3 Incidencias
+
+- [ ] Abrir una incidencia de cada tipo (faltante, daño, retención, diferencia de
+      peso), acotada a tarima o a caja cuando aplique.
+- [ ] `OPEN → RESOLVED` exige nota de resolución.
+- [ ] Un `coordinator` de otro centro no ve las incidencias ajenas.
+
+### 6.4 Merma
+
+- [ ] La métrica sale **solo** de envíos reconciliados. Un envío `SHIPPED` sin
+      recepción registrada no debe contar como merma cero: es merma desconocida.
+
+---
+
+## Fase 7 · Transferencias entre centros
 
 - [ ] `POST /v1/transfers` con cajas `SEALED`, del centro origen, sin tarima y
       sin transferencia activa. Casos negativos: `SAME_CENTER`, `BOX_NOT_SEALED`,
@@ -227,7 +327,7 @@ El umbral vive en variables de entorno y **no se documenta aquí** (ver
 
 ---
 
-## Fase 7 · Reportes y agregados
+## Fase 8 · Reportes y agregados
 
 ### Reportes de campaña
 
@@ -264,6 +364,27 @@ Dos comportamientos que se leen como bug y no lo son:
 
 ---
 
+## Fase 9 · Plataforma (`/studio`) — `superadmin`
+
+- [ ] `/studio/users`: crear un `national_admin`, bloquear y desbloquear
+      usuarios, reiniciar contraseñas.
+- [ ] `/studio/audit`: la bitácora general de la plataforma.
+- [ ] `/studio/emails`: rebotes y quejas de Resend, con reenvío.
+- [ ] `/studio/ai` (Fase 23): las cuatro capacidades se listan **aunque tengan
+      cero llamadas** —una apagada y una encendida sin uso piden acciones
+      opuestas—, con el gasto del mes, la serie diaria y el gasto por centro.
+      Sin llave de proveedor debe salir el aviso de "sin proveedor" y todas las
+      capacidades en apagado.
+- [ ] El panel de IA **solo lee**: no hay forma de encender una capacidad desde
+      ahí. Los interruptores viven en variables de entorno.
+- [ ] Un `national_admin` que entra a `/studio` recibe redirección, no la página.
+
+**Estado esperado por defecto:** todas las capacidades de IA apagadas. Con todo
+apagado, la aplicación se comporta exactamente como antes de la Fase 23; ninguna
+prueba de este guion debe depender de que la IA esté encendida.
+
+---
+
 ## Regresiones a verificar en cada corrida
 
 Los prefijos de código son `BX-` (caja), `TM-` (tarima) y `DN-` (donación
@@ -290,4 +411,27 @@ Y una limitación operativa que no es bug pero muerde en demo:
 
 Centros y catálogo → campaña con miembros → pre-registro de una donación →
 recepción (incluyendo un rechazo a propósito) → sellado y etiqueta → tarima
-cerrada con peso → envío despachado con manifiesto → reporte de la campaña.
+cerrada con peso → envío despachado con manifiesto → un hito del viaje →
+recepción en destino con una incidencia → reporte de la campaña.
+
+## Recorrido completo, para una corrida de regresión
+
+El mismo camino, sin recortar, en el orden en que las dependencias lo permiten:
+
+1. **Fase 0** — centros (con razón social y RFC/RIF), usuarios de los cuatro
+   roles, catálogo con los cuatro casos de rechazo, campaña con miembros.
+2. **Fase 1** — una donación pre-registrada, confirmada por correo.
+3. **Fase 2** — doble check, captura con y sin conexión, los cinco rechazos, el
+   escalamiento por volumen y su revisión.
+4. **Fase 3** — sellar, imprimir etiquetas, ficha pública por QR.
+5. **Fase 4** — tarima con peso y altura; una tarima cerrada sin peso.
+6. **Fase 5** — envío despachado, los cuatro documentos, y su revisión visual.
+7. **Fase 6** — hitos, entrega, reconciliación caja por caja, una incidencia
+   abierta y resuelta.
+8. **Fase 7** — una transferencia completa entre dos centros.
+9. **Fase 8** — reportes, panel nacional, `/necesidades`, auditoría.
+10. **Fase 9** — `/studio` con el panel de gasto de IA.
+
+Una corrida completa toca las tres cosas que sostienen el producto: que el
+manifiesto sea cierto, que nada cruce entre centros sin permiso, y que lo que se
+envió y lo que llegó se puedan comparar.

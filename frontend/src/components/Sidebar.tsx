@@ -4,7 +4,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useEffect, useRef, useState } from "react"
-import { logoutAction } from "@/lib/actions"
+import { LogoutForm } from "@/components/LogoutForm"
 import type { CenterRole } from "@/types"
 import { LogOut, PanelLeftClose, PanelLeftOpen, Wrench } from "lucide-react"
 import { LanguageSwitcher } from "@/components/LanguageSwitcher"
@@ -226,7 +226,7 @@ export function Sidebar({ centerRole, platformRole, centerName, nav, roleLabels,
           </Link>
         )}
 
-        <form action={logoutAction}>
+        <LogoutForm>
           <button
             type="submit"
             title={collapsed ? nav.logout : undefined}
@@ -235,7 +235,7 @@ export function Sidebar({ centerRole, platformRole, centerName, nav, roleLabels,
             <LogOut size={17} className="flex-shrink-0" />
             {!collapsed && <span>{nav.logout}</span>}
           </button>
-        </form>
+        </LogoutForm>
       </div>
     </aside>
   )

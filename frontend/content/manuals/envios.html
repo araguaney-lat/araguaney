@@ -18,15 +18,17 @@
     <section>
       <div class="sect-head">
         <span class="eyebrow">El estado del envío</span>
-        <h2>Abierto, cerrado, despachado</h2>
-        <p class="sect-note">Se llena mientras está <span class="hl">OPEN</span>; se fija al pasar a <span class="hl">CLOSED</span>; y al despacharlo (<span class="hl">SHIPPED</span>) arrastra a sus tarimas y cajas al mismo estado.</p>
+        <h2>De abierto a reconciliado</h2>
+        <p class="sect-note">Se llena mientras está <span class="hl">OPEN</span>; se fija al pasar a <span class="hl">CLOSED</span>; y al despacharlo (<span class="hl">SHIPPED</span>) arrastra a sus tarimas y cajas al mismo estado. Despachar no es el final: <span class="hl">DELIVERED</span> dice que llegó y <span class="hl">RECONCILED</span> que ya se registró qué llegó. Esos dos últimos se explican en el manual de <b>Recepción en destino</b>.</p>
       </div>
       <div class="machine">
-        <p class="desc">Cada transición queda registrada. Despachar es definitivo: congela el contenido completo del envío.</p>
+        <p class="desc">Cada transición queda registrada. Despachar es definitivo: congela el contenido completo del envío, <b>y sigue congelado después</b>. Entregarlo y reconciliarlo no vuelven a tocar las cajas: lo que llegó se guarda aparte, y de esa separación depende poder medir la merma.</p>
         <div class="flow">
           <span class="pill">OPEN</span><span class="arrow">→</span>
           <span class="pill blue">CLOSED</span><span class="arrow">→</span>
-          <span class="pill green">SHIPPED</span>
+          <span class="pill green">SHIPPED</span><span class="arrow">→</span>
+          <span class="pill green">DELIVERED</span><span class="arrow">→</span>
+          <span class="pill green">RECONCILED</span>
         </div>
       </div>
     </section>

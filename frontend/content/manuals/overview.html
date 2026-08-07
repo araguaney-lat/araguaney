@@ -90,7 +90,9 @@
         <div class="flow">
           <span class="pill">OPEN</span><span class="arrow">→</span>
           <span class="pill blue">CLOSED</span><span class="arrow">→</span>
-          <span class="pill green">SHIPPED</span>
+          <span class="pill green">SHIPPED</span><span class="arrow">→</span>
+          <span class="pill green">DELIVERED</span><span class="arrow">→</span>
+          <span class="pill green">RECONCILED</span>
         </div>
       </div>
 
@@ -100,7 +102,9 @@
         <div class="flow">
           <span class="pill">OPEN</span><span class="arrow">→</span>
           <span class="pill blue">CLOSED</span><span class="arrow">→</span>
-          <span class="pill green">SHIPPED</span>
+          <span class="pill green">SHIPPED</span><span class="arrow">→</span>
+          <span class="pill green">DELIVERED</span><span class="arrow">→</span>
+          <span class="pill green">RECONCILED</span>
         </div>
       </div>
     </section>
@@ -131,8 +135,17 @@
         <div><div class="rname">Admin nacional</div><span class="rkey">national_admin</span></div>
         <ul>
           <li>Ve el agregado nacional de todos los centros.</li>
-          <li>Crea y edita centros, campañas y cualquier usuario.</li>
-          <li>Gestiona solicitudes y consulta la auditoría.</li>
+          <li>Crea y edita centros, campañas, catálogo y cualquier usuario.</li>
+          <li>Resuelve las revisiones por volumen atípico y consulta la auditoría.</li>
+          <li>No tiene centro propio: al capturar, elige a nombre de cuál.</li>
+        </ul>
+      </div>
+      <div class="role">
+        <div><div class="rname">Superadmin</div><span class="rkey">/studio</span></div>
+        <ul>
+          <li>Opera en <b>/studio</b>, no en el panel: es la plataforma, no un centro.</li>
+          <li>Crea administración nacional y reinicia contraseñas de cualquiera.</li>
+          <li>Ve la auditoría general, los rebotes de correo y el gasto de IA.</li>
         </ul>
       </div>
     </section>
@@ -164,7 +177,16 @@
         <div class="mod"><span class="path">/scan</span><div><p>Escanear</p><p>Leer un QR para ubicar una caja o tarima.</p></div></div>
         <div class="mod"><span class="path">/national</span><div><p>Nacional</p><p>Stock agregado de todos los centros (admin).</p></div></div>
         <div class="mod"><span class="path">/transfers</span><div><p>Transferencias</p><p>Mover inventario entre centros.</p></div></div>
+        <div class="mod"><span class="path">/campaigns</span><div><p>Campañas</p><p>Organizar donaciones por causa, con página pública.</p></div></div>
+        <div class="mod"><span class="path">/centers</span><div><p>Centros</p><p>Alta y administración de centros de acopio (admin).</p></div></div>
+        <div class="mod"><span class="path">/reviews</span><div><p>Revisiones</p><p>Resolver escalamientos por volumen atípico.</p></div></div>
+        <div class="mod"><span class="path">/requests</span><div><p>Solicitudes</p><p>Pedir y resolver, con hilo de mensajes.</p></div></div>
+        <div class="mod"><span class="path">/messages</span><div><p>Mensajes</p><p>Conversaciones entre personas usuarias.</p></div></div>
+        <div class="mod"><span class="path">/reports</span><div><p>Reportes</p><p>Resumen por campaña de cuánto se ha reunido.</p></div></div>
+        <div class="mod"><span class="path">/intake/pending</span><div><p>Pendientes</p><p>Lo capturado sin conexión que aún no llega al servidor.</p></div></div>
+        <div class="mod"><span class="path">/ayuda</span><div><p>Ayuda</p><p>Estos manuales, dentro de la aplicación.</p></div></div>
       </div>
+      <p class="sect-note" style="margin-top:10px">La recepción en destino y las incidencias viven dentro de la ficha de cada envío, no en un módulo aparte: son parte de la vida de ese envío.</p>
     </section>
 
     <div class="foot">

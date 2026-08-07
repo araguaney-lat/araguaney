@@ -90,7 +90,9 @@
         <div class="flow">
           <span class="pill">OPEN</span><span class="arrow">→</span>
           <span class="pill blue">CLOSED</span><span class="arrow">→</span>
-          <span class="pill green">SHIPPED</span>
+          <span class="pill green">SHIPPED</span><span class="arrow">→</span>
+          <span class="pill green">DELIVERED</span><span class="arrow">→</span>
+          <span class="pill green">RECONCILED</span>
         </div>
       </div>
 
@@ -100,7 +102,9 @@
         <div class="flow">
           <span class="pill">OPEN</span><span class="arrow">→</span>
           <span class="pill blue">CLOSED</span><span class="arrow">→</span>
-          <span class="pill green">SHIPPED</span>
+          <span class="pill green">SHIPPED</span><span class="arrow">→</span>
+          <span class="pill green">DELIVERED</span><span class="arrow">→</span>
+          <span class="pill green">RECONCILED</span>
         </div>
       </div>
     </section>
@@ -131,8 +135,17 @@
         <div><div class="rname">National admin</div><span class="rkey">national_admin</span></div>
         <ul>
           <li>Sees the national aggregate of all centers.</li>
-          <li>Creates and edits centers, campaigns and any user.</li>
-          <li>Manages requests and reviews the audit log.</li>
+          <li>Creates and edits centers, campaigns, catalogue and any user.</li>
+          <li>Resolves atypical-volume reviews and reads the audit log.</li>
+          <li>Has no home center: when capturing, they pick which one it is for.</li>
+        </ul>
+      </div>
+      <div class="role">
+        <div><div class="rname">Superadmin</div><span class="rkey">/studio</span></div>
+        <ul>
+          <li>Operates in <b>/studio</b>, not the panel: this is the platform, not a center.</li>
+          <li>Creates national admins and resets anyone's password.</li>
+          <li>Reads the platform-wide audit log, email bounces and AI spend.</li>
         </ul>
       </div>
     </section>
@@ -164,7 +177,16 @@
         <div class="mod"><span class="path">/scan</span><div><p>Scan</p><p>Read a QR code to locate a box or pallet.</p></div></div>
         <div class="mod"><span class="path">/national</span><div><p>National</p><p>Aggregate stock of all centers (admin).</p></div></div>
         <div class="mod"><span class="path">/transfers</span><div><p>Transfers</p><p>Move inventory between centers.</p></div></div>
+        <div class="mod"><span class="path">/campaigns</span><div><p>Campaigns</p><p>Organize donations by cause, with a public page.</p></div></div>
+        <div class="mod"><span class="path">/centers</span><div><p>Centers</p><p>Create and manage collection centers (admin).</p></div></div>
+        <div class="mod"><span class="path">/reviews</span><div><p>Reviews</p><p>Resolve escalations for atypical volume.</p></div></div>
+        <div class="mod"><span class="path">/requests</span><div><p>Requests</p><p>Request and resolve, with a message thread.</p></div></div>
+        <div class="mod"><span class="path">/messages</span><div><p>Messages</p><p>Conversations between users.</p></div></div>
+        <div class="mod"><span class="path">/reports</span><div><p>Reports</p><p>Per-campaign summary of how much has been gathered.</p></div></div>
+        <div class="mod"><span class="path">/intake/pending</span><div><p>Pending</p><p>Captured offline and not yet delivered to the server.</p></div></div>
+        <div class="mod"><span class="path">/ayuda</span><div><p>Help</p><p>These manuals, inside the application.</p></div></div>
       </div>
+      <p class="sect-note" style="margin-top:10px">Reception at destination and incidents live inside each shipment's page, not in a separate module: they are part of that shipment's life.</p>
     </section>
 
     <div class="foot">

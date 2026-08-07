@@ -81,3 +81,39 @@ class TestIdentidadEnDocumentos:
             texto = (_TEMPLATES / plantilla).read_text()
             assert "@page" in texto, f"{plantilla} no declara @page"
             assert "landscape" in texto, f"{plantilla} debería ser apaisada: son 10 columnas"
+
+
+class TestPaginacionDelManifiesto:
+    """El manifiesto se imprime y viaja con la carga. Una hoja de más por
+    documento no es un detalle cosmético cuando se imprimen decenas."""
+
+    def test_una_tarima_no_se_declara_indivisible(self):
+        """Regresión: `.pallet-block` llevaba `page-break-inside: avoid`.
+
+        Parecía más prolijo y costaba una hoja casi en blanco en cada
+        manifiesto real. Una tarima de sesenta cajas no cabe debajo del
+        encabezado del envío, así que el bloque entero se empujaba a la hoja
+        siguiente... y se partía igual, porque tampoco cabe en una hoja. Se
+        pagaba una hoja por una indivisibilidad imposible de cumplir.
+        """
+        css = (_TEMPLATES / "manifest.html").read_text(encoding="utf-8")
+        inicio = css.index(".pallet-block")
+        bloque = css[inicio:css.index("}", inicio)]
+        assert "avoid" not in bloque, (
+            "la tarima volvió a declararse indivisible; ver el historial de esta prueba"
+        )
+
+    def test_el_codigo_de_tarima_no_se_separa_de_su_tabla(self):
+        """Lo único que sí tiene que mantenerse junto: una hoja que empieza con
+        filas de cajas y sin el código de la tarima no dice de qué tarima habla."""
+        css = (_TEMPLATES / "manifest.html").read_text(encoding="utf-8")
+        cabecera = css[css.index(".pallet-header"):css.index(".subtotal-keep")]
+        assert "break-after: avoid" in cabecera
+
+    def test_la_tabla_repite_su_encabezado_al_partirse(self):
+        """Una tabla partida sin encabezado son columnas de números sin nombre,
+        que es lo que alguien lee en una aduana."""
+        html = (_TEMPLATES / "manifest.html").read_text(encoding="utf-8")
+        # `thead` es lo que WeasyPrint repite en cada hoja de continuación.
+        assert "<thead>" in html
+        assert html.index("<thead>") < html.index("<tbody>")

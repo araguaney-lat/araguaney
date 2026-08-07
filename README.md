@@ -240,6 +240,10 @@ alembic downgrade -1
   with an owner and a resolution
 - **Shrinkage as a metric** — the mirror of the intake rejection rate: one measures what was not
   accepted on the way in, the other what did not arrive on the way out
+- **Offline capture** — many centres operate in basements with no coverage. Intake is queued on
+  the device (catalogue and box codes downloaded while there is signal) and syncs itself when the
+  network returns. An idempotency key generated before the first attempt means a retry can never
+  duplicate inventory, and nothing is ever discarded silently
 - **Donor pre-registration** — donors register online, get a QR, and the centre does a double
   check on receipt; anonymous donation remains the default
 - **Risk prevention** — irrevocable-transfer terms, an escalation threshold for atypical volume,
@@ -259,6 +263,9 @@ alembic downgrade -1
   spend cap, a per-capability flag, caching and rate limiting
 - Provider-neutral through an OpenAI-compatible layer: OpenAI, DeepSeek, Groq, Together or a
   local Ollama, all through environment variables
+- A **spend panel** in `/studio` showing this month's consumption per capability, the state of
+  each switch, and spend per day — because a runaway loop does not show up on the invoice until
+  the month is over, and the daily view is what separates usage from a loop
 
 **Observability**
 - Every background job that holds a promise alerts when it fails, naming what is left unfulfilled
