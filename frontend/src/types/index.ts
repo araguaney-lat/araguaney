@@ -396,3 +396,31 @@ export interface DonorDraft {
   email: string
   phone: string
 }
+
+// ── Recepción en destino (Fase 22) ──────────────────────────────────────────
+
+export type ReceptionOutcome = "RECEIVED" | "MISSING" | "DAMAGED" | "RETAINED_CUSTOMS"
+
+export interface ReceptionLineOut {
+  box_id: string
+  outcome: ReceptionOutcome
+  note: string | null
+}
+
+export interface ShrinkageOut {
+  total_boxes: number
+  received: number
+  not_received: number
+  shrinkage_pct: number
+}
+
+export interface ReceptionOut {
+  id: string
+  shipment_id: string
+  received_at: string
+  consignee_name: string | null
+  notes: string | null
+  lines: ReceptionLineOut[]
+  pallet_weights: { pallet_id: string; gross_weight_kg: string | number }[]
+  shrinkage: ShrinkageOut
+}

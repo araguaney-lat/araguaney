@@ -133,3 +133,34 @@ export async function markDeliveredAction(shipmentId: string, note?: string, del
     return { error: err instanceof Error ? err.message : "Error al marcar la entrega" }
   }
 }
+
+export async function reconcileReceptionAction(
+  shipmentId: string,
+  payload: {
+    exceptions: { box_id: string; outcome: string; note?: string }[]
+    pallet_weights: { pallet_id: string; gross_weight_kg: string }[]
+    consignee_name?: string
+    notes?: string
+  },
+) {
+  const session = await auth()
+  if (!session?.accessToken) return { error: "No autenticado" }
+
+  try {
+    const data = await apiFetch(`/v1/shipments/${shipmentId}/reception`, {
+      method: "POST",
+      token: session.accessToken,
+      // Solo viajan las excepciones: lo que no va en la lista se da por recibido.
+      body: JSON.stringify({
+        exceptions: payload.exceptions,
+        pallet_weights: payload.pallet_weights,
+        consignee_name: payload.consignee_name?.trim() || undefined,
+        notes: payload.notes?.trim() || undefined,
+      }),
+    })
+    revalidatePath("/dashboard/shipments")
+    return { data }
+  } catch (err: unknown) {
+    return { error: err instanceof Error ? err.message : "Error al registrar la recepción" }
+  }
+}
