@@ -1008,7 +1008,8 @@
       "logout": "Sign out",
       "back_to_dashboard": "Dashboard",
       "superadmin": "Superadmin",
-      "platform_admin": "Platform administration"
+      "platform_admin": "Platform administration",
+      "ai": "AI spend"
     },
     "emails": {
       "title": "Email deliverability",
@@ -1101,7 +1102,37 @@
       "link_audit_label": "Audit",
       "link_audit_desc": "Complete log of all system actions",
       "link_settings_label": "Settings",
-      "link_settings_desc": "Global operational variables of the platform"
+      "link_settings_desc": "Global operational variables of the platform",
+      "link_ai_label": "AI spend",
+      "link_ai_desc": "This month's consumption per capability and the state of each switch"
+    },
+    "ai": {
+      "title": "AI spend",
+      "subtitle": "This month's consumption per capability and the state of each switch. The risk is not the price of one call, it is unchecked volume.",
+      "unavailable": "Consumption could not be read. Try again in a moment.",
+      "no_provider": "No AI provider is configured. Every capability is off regardless of what its flag says.",
+      "exhausted": "The monthly spend cap was reached. Capabilities switched themselves off; operations continue, capturing by hand is slower but not impossible.",
+      "of_budget": "of {budget} this month",
+      "since": "Since {date}",
+      "model": "Model: {model}",
+      "by_capability": "By capability",
+      "col_capability": "Capability",
+      "col_switch": "Switch",
+      "col_calls": "Calls",
+      "col_tokens": "Tokens",
+      "col_cost": "Cost",
+      "switch_on": "On",
+      "switch_off": "Off",
+      "capabilities": {
+        "text_mapping": "Free-text mapping",
+        "label_ocr": "Label OCR",
+        "needs_matching": "Needs matching",
+        "national_summary": "National summary"
+      },
+      "daily": "Daily spend",
+      "daily_note": "A thousand calls spread over a month is usage; a thousand in one afternoon is a loop. The total does not tell those apart.",
+      "daily_empty": "No consumption recorded yet.",
+      "top_centers": "Where the spend came from"
     }
   },
   "footer": {

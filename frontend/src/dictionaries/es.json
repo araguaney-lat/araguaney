@@ -1008,7 +1008,8 @@
       "logout": "Cerrar sesión",
       "back_to_dashboard": "Dashboard",
       "superadmin": "Superadmin",
-      "platform_admin": "Administración de plataforma"
+      "platform_admin": "Administración de plataforma",
+      "ai": "Gasto de IA"
     },
     "emails": {
       "title": "Entregas de email",
@@ -1101,7 +1102,37 @@
       "link_audit_label": "Auditoría",
       "link_audit_desc": "Registro completo de todas las acciones del sistema",
       "link_settings_label": "Configuración",
-      "link_settings_desc": "Variables operativas del sistema"
+      "link_settings_desc": "Variables operativas del sistema",
+      "link_ai_label": "Gasto de IA",
+      "link_ai_desc": "Consumo del mes por capacidad y estado de cada interruptor"
+    },
+    "ai": {
+      "title": "Gasto de IA",
+      "subtitle": "Consumo del mes por capacidad y estado de cada interruptor. El riesgo no es el precio de una llamada, es el volumen sin control.",
+      "unavailable": "No se pudo leer el consumo. Vuelve a intentarlo en un momento.",
+      "no_provider": "No hay proveedor de IA configurado. Todas las capacidades están apagadas aunque su bandera diga lo contrario.",
+      "exhausted": "Se alcanzó el tope de gasto del mes. Las capacidades quedaron apagadas solas; la operación sigue, capturar a mano es más lento pero no imposible.",
+      "of_budget": "de {budget} este mes",
+      "since": "Desde el {date}",
+      "model": "Modelo: {model}",
+      "by_capability": "Por capacidad",
+      "col_capability": "Capacidad",
+      "col_switch": "Interruptor",
+      "col_calls": "Llamadas",
+      "col_tokens": "Tokens",
+      "col_cost": "Costo",
+      "switch_on": "Encendida",
+      "switch_off": "Apagada",
+      "capabilities": {
+        "text_mapping": "Mapeo de texto libre",
+        "label_ocr": "OCR de etiqueta",
+        "needs_matching": "Emparejado de necesidades",
+        "national_summary": "Resumen nacional"
+      },
+      "daily": "Gasto por día",
+      "daily_note": "Mil llamadas repartidas en un mes son uso; mil en una tarde son un bucle. El total no distingue esas dos cosas.",
+      "daily_empty": "Todavía no hay consumo registrado.",
+      "top_centers": "De dónde salió el gasto"
     }
   },
   "footer": {

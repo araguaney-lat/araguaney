@@ -4,8 +4,8 @@
 
 ```mermaid
 pie title Tareas completadas (457 tareas)
-    "Listas" : 434
-    "Pendientes" : 23
+    "Listas" : 435
+    "Pendientes" : 22
 ```
 
 | Fase | Nombre | Listas | Pendientes | Progreso |
@@ -33,12 +33,12 @@ pie title Tareas completadas (457 tareas)
 | 20 | [Prevención de riesgos: responsabilidad y anti-lavado en especie](phase-20-risk-prevention.md) | 6 | 4 | 🟡 60% |
 | 21 | [Logística: pesaje, declaración de mercancías y perfiles de paletizado](phase-21-logistics-weighing.md) | 12 | 0 | ✅ 100% |
 | 22 | [Trazabilidad extendida: avión y destino](phase-22-extended-traceability.md) | 14 | 0 | ✅ 100% |
-| 23 | [IA asistida: captura, catálogo y necesidades](phase-23-ai-assisted-capture.md) | 10 | 1 | 🟡 91% |
+| 23 | [IA asistida: captura, catálogo y necesidades](phase-23-ai-assisted-capture.md) | 11 | 0 | ✅ 100% |
 | 24 | [Observabilidad: que un fallo silencioso deje de serlo](phase-24-observability.md) | 11 | 0 | ✅ 100% |
 | 25 | [Captura sin conexión: cola local y sincronización diferida](phase-25-offline-capture.md) | 14 | 0 | ✅ 100% |
-| **Total** | | **434** | **23** | **🟡 95%** |
+| **Total** | | **435** | **22** | **🟡 95%** |
 
-> **Pendientes (23):**
+> **Pendientes (22):**
 > El grupo A de la Fase 13 (privacidad, lo que aplica hoy) está completo.
 > - Los borradores legales de la Fase 20 están escritos y esperando revisión de abogado:
 >   [`docs/legal/drafts/`](../legal/drafts/README.md). Sus tareas siguen abiertas hasta que esa
@@ -49,11 +49,10 @@ pie title Tareas completadas (457 tareas)
 >   estructurales documentados). Lo que queda son los tres textos legales (tasks 1, 2 y 6), que la
 >   task 7 —revisión de abogado— gatea antes de publicar; los borradores ya están escritos en
 >   [`docs/legal/drafts/`](../legal/drafts/README.md).
-> - **1 de la Fase 23 (IA asistida):** las cuatro capacidades, la evaluación y el aviso de privacidad
->   ya están, todo apagado por defecto. Queda el panel de gasto en `/studio` (task 3). Encender
->   cualquier capacidad en producción exige además completar su conjunto de referencia con capturas
->   reales: el código está listo, la medición no.
->   Diseño en
+> - **Fase 23 (IA asistida) está completa en código, no en producción.** Las cuatro capacidades,
+>   la evaluación, el aviso de privacidad y el panel de gasto ya están, todo apagado por defecto.
+>   Encender cualquier capacidad exige antes completar su conjunto de referencia con capturas
+>   reales y superar su umbral: el código está listo, la medición no. Diseño en
 >   [su spec](../superpowers/specs/2026-07-29-ai-assisted-capture-design.md).
 > - **12 gated por pago o por decisión de negocio:** Fase 4 → 2 (spend caps + alertas, requieren
 >   plan de pago de infra). Fase 13 → 10 (bloque de donativos/pagos: entidad receptora, asesoría

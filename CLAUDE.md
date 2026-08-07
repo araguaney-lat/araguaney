@@ -540,6 +540,12 @@ miró.** Ninguna capacidad decide, rechaza, asigna ni despacha.
 - Toda llamada pasa por `app.services.ai.budget.ensure_available` y registra su
   costo en `ai_usage`. Sin registro no hay tope, y sin tope el riesgo deja de ser
   el precio unitario y pasa a ser el volumen.
+- El panel de `/studio/ai` **solo lee** ese registro. Encender o apagar una
+  capacidad se hace en las variables de entorno: un panel que también pudiera
+  cambiarlo sería una segunda fuente de verdad sobre el mismo interruptor. Y
+  enseña el gasto **por día**, no solo el total: mil llamadas repartidas en un
+  mes son uso, mil en una tarde son un bucle, y el total no distingue esas dos
+  cosas hasta que llega la factura.
 - Una bandera por capacidad, apagadas por defecto. Con todo apagado, la
   aplicación se comporta exactamente como antes de la fase.
 - Ninguna capacidad se enciende en producción sin superar el umbral de su

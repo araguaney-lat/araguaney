@@ -29,6 +29,7 @@ export default async function StudioHubPage() {
   const QUICK_LINKS = [
     { href: "/studio/users", label: t.link_users_label, desc: t.link_users_desc },
     { href: "/studio/transfers", label: t.link_transfers_label, desc: t.link_transfers_desc },
+    { href: "/studio/ai", label: t.link_ai_label, desc: t.link_ai_desc },
     { href: "/studio/audit", label: t.link_audit_label, desc: t.link_audit_desc },
     { href: "/studio/settings", label: t.link_settings_label, desc: t.link_settings_desc },
   ]

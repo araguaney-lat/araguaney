@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date, datetime
 from typing import Any
 from uuid import UUID
 
@@ -90,3 +90,42 @@ class RequestMessageCreate(StrictModel):
 
 class RequestStatusPatch(StrictModel):
     status: str
+
+
+# ── Gasto de IA (Fase 23, task 3) ────────────────────────────────────────────
+
+class AICapabilityUsageOut(StrictORMModel):
+    capability: str
+    # Estado del interruptor, no del uso. Cero llamadas con la capacidad
+    # encendida y cero llamadas con la capacidad apagada piden acciones
+    # opuestas, así que el panel no puede confundirlas.
+    enabled: bool
+    calls: int
+    input_tokens: int
+    output_tokens: int
+    cost_usd: float
+
+
+class AIDailySpendOut(StrictORMModel):
+    day: date
+    cost_usd: float
+    calls: int
+
+
+class AICenterSpendOut(StrictORMModel):
+    center_name: str
+    cost_usd: float
+
+
+class AIUsageReportOut(StrictORMModel):
+    month_start: datetime
+    monthly_budget_usd: float
+    month_spend_usd: float
+    budget_exhausted: bool
+    # Sin proveedor configurado toda capacidad está apagada aunque su bandera
+    # diga que sí.
+    provider_configured: bool
+    model: str
+    capabilities: list[AICapabilityUsageOut]
+    daily: list[AIDailySpendOut]
+    top_centers: list[AICenterSpendOut]
