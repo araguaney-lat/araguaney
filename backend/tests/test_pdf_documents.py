@@ -64,11 +64,20 @@ class TestIdentidadEnDocumentos:
     """El nombre viejo del proyecto llegó a imprimirse en documentos de aduana."""
 
     def test_las_plantillas_no_usan_el_nombre_viejo(self):
+        """Lo que se vigila es que el nombre viejo no vuelva, y que haya alguna
+        atribución.
+
+        La versión anterior exigía además la cadena exacta
+        "Araguaney · Coordinación humanitaria". Eso fijaba una redacción, no un
+        invariante, y falló al corregir esa misma redacción —que decía de más:
+        Araguaney no coordina el envío—. Cómo se redacta el pie lo prueba
+        `TestAtribucionAlPie`.
+        """
         for plantilla in ("manifest.html", "transfer_manifest.html"):
             texto = (_TEMPLATES / plantilla).read_text()
             assert "Acopio — Coordinación" not in texto, plantilla
             assert "Acopio · Coordinación" not in texto, plantilla
-            assert "Araguaney · Coordinación humanitaria" in texto, plantilla
+            assert "Araguaney" in texto or "attribution" in texto, plantilla
 
     def test_la_etiqueta_de_tarima_no_usa_el_dominio_viejo(self):
         """Se mira el PDF impreso, no el fuente.
@@ -197,3 +206,83 @@ class TestEtiquetasBilingues:
 
         assert "Cerrada" in self._texto(generate_pallet_label_pdf(tarima, "es"))
         assert "Closed" in self._texto(generate_pallet_label_pdf(tarima, "en"))
+
+
+class TestAtribucionAlPie:
+    """La marca va al pie, y dice lo que es.
+
+    Dos cosas distintas se prueban aquí. Una es de forma: la atribución existe y
+    es discreta, porque lo importante del documento es la carga y no quién
+    imprimió la hoja. La otra es de fondo, y pesa más: el pie **no puede decir
+    que Araguaney coordina el envío**.
+    """
+
+    def _texto(self, pdf: bytes) -> str:
+        import io
+
+        from pypdf import PdfReader
+
+        return "\n".join((p.extract_text() or "") for p in PdfReader(io.BytesIO(pdf)).pages)
+
+    def test_el_pie_no_presenta_a_araguaney_como_parte_del_envio(self):
+        """Regresión de redacción: el pie decía "Araguaney · Coordinación
+        humanitaria".
+
+        En un documento de aduana eso se puede leer como que Araguaney es parte
+        del envío, y no lo es: el centro lo es. Araguaney es el software que
+        imprimió la hoja, y la diferencia importa justo en la mesa donde alguien
+        revisa quién responde por la carga.
+        """
+        pdf = generate_pallet_label_pdf(PalletLabelData(
+            code="TM-PIE001", center_name="Centro de Prueba", status="CLOSED",
+        ))
+        texto = self._texto(pdf)
+
+        assert "Coordinación humanitaria" not in texto
+        assert "generado con Araguaney" in texto
+
+        for plantilla in ("manifest.html", "transfer_manifest.html"):
+            html = (_TEMPLATES / plantilla).read_text(encoding="utf-8")
+            assert "Coordinación humanitaria" not in html, plantilla
+
+    def test_la_etiqueta_de_tarima_lleva_la_marca(self):
+        pdf = generate_pallet_label_pdf(PalletLabelData(
+            code="TM-PIE002", center_name="Centro de Prueba", status="CLOSED",
+        ))
+        import io
+
+        from pypdf import PdfReader
+
+        # QR y logo: dos imágenes. Solo el QR sería la marca sin poner.
+        recursos = PdfReader(io.BytesIO(pdf)).pages[0]["/Resources"]["/XObject"]
+        assert len(recursos) >= 2
+
+    def test_las_etiquetas_de_caja_no_llevan_marca_a_proposito(self):
+        """Diez etiquetas por hoja A4: cada milímetro es contenido.
+
+        Es el único documento que se pega a una caja física, y el QR ya resuelve
+        a araguaney.lat, así que la atribución está de todos modos. Meter un logo
+        aquí se lo quitaría al código de la caja, que es lo que alguien busca con
+        la vista en un andén.
+        """
+        fuente = (Path(__file__).resolve().parents[1] / "app/utils/pdf_labels.py").read_text()
+
+        assert "LOGO_PATH" not in fuente
+        assert "logo" not in fuente.lower()
+
+    def test_sin_archivo_de_logo_el_documento_sigue_saliendo(self):
+        """Un pie sin logo sigue siendo un documento válido. Quedarse sin
+        manifiesto en el andén por un adorno, no."""
+        from unittest.mock import patch
+
+        from app.utils import branding
+
+        branding.logo_data_uri.cache_clear()
+        with patch.object(branding, "LOGO_PATH", Path("/no/existe/logo.png")):
+            assert branding.logo_data_uri() == ""
+            pdf = generate_pallet_label_pdf(PalletLabelData(
+                code="TM-PIE003", center_name="Centro de Prueba", status="OPEN",
+            ))
+        branding.logo_data_uri.cache_clear()
+
+        assert pdf.startswith(b"%PDF")
