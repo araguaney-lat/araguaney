@@ -3,6 +3,7 @@ import { auth } from "@/auth"
 import { redirect } from "next/navigation"
 import { apiFetch } from "@/lib/api"
 import { getLocale, getDictionary } from "@/lib/i18n"
+import { QueuedCaptureRows } from "@/components/QueuedCaptureRows"
 import type { IntakeOut } from "@/types"
 
 export const revalidate = 30
@@ -37,6 +38,10 @@ export default async function IntakePage() {
           {t.new}
         </Link>
       </div>
+
+      {/* Lo que existe solo en este dispositivo va primero y marcado: si no
+          apareciera, quien capturó sin señal creería que se perdió. */}
+      <QueuedCaptureRows />
 
       {intakes.length === 0 ? (
         <div className="rounded-xl border border-cardB bg-card p-8 text-center text-sm text-mut">

@@ -807,7 +807,12 @@
       "exception_body": "Por el volumen, esta donación no puede quedar anónima. Si la persona no quiso o no pudo identificarse, explica qué pasó: la captura entra igual y la coordinación revisa después.",
       "exception_placeholder": "Qué pasó (ej. la persona dejó las cajas y se fue sin dar datos)",
       "weight_hint": "Pesa la caja ya cerrada y anota lo que marque la báscula.",
-      "weight_reference": "Solo el contenido pesaría ~{kg} kg según el catálogo. La caja siempre pesa más."
+      "weight_reference": "Solo el contenido pesaría ~{kg} kg según el catálogo. La caja siempre pesa más.",
+      "submit_offline": "Guardar sin conexión",
+      "offline_ready": "En este dispositivo: {products} productos del catálogo y {codes} códigos de caja apartados.",
+      "error_offline_no_center": "La captura sin conexión es de quien opera un centro. Conéctate para registrar a nombre de un centro.",
+      "error_offline_storage": "Este navegador no permite guardar capturas en el dispositivo. Conéctate para registrar la donación.",
+      "error_offline_network": "No se pudo contactar al servidor y esta cuenta no tiene un centro propio donde guardar la captura. Inténtalo de nuevo con conexión."
     },
     "campaign_members": {
       "back": "← Campañas",
@@ -950,6 +955,36 @@
       "resolved": "Resueltas",
       "approved": "Aprobada",
       "rejected": "Rechazada"
+    },
+    "offline_queue": {
+      "pending_one": "1 captura pendiente de enviar",
+      "pending_many": "{count} capturas pendientes de enviar",
+      "attention_one": "1 espera revisión",
+      "attention_many": "{count} esperan revisión",
+      "keep_open": "Deja la aplicación abierta hasta que llegue a cero.",
+      "session_expired": "La sesión caducó: vuelve a entrar y se enviarán solas.",
+      "review_link": "Ver pendientes"
+    },
+    "intake_pending": {
+      "title": "Capturas pendientes",
+      "subtitle": "Lo que se capturó sin conexión y todavía no llegó al servidor. Nada se descarta solo.",
+      "ready_catalog": "Productos descargados",
+      "ready_codes": "Códigos apartados",
+      "ready_pending": "Capturas en cola",
+      "sync_now": "Sincronizar ahora",
+      "syncing": "Sincronizando…",
+      "loading": "Cargando…",
+      "empty": "No hay nada pendiente: todo lo capturado está en el servidor.",
+      "empty_cta": "Registrar una donación",
+      "status_pending": "En cola",
+      "status_rejected": "Rechazada por el servidor",
+      "status_needs_review": "Necesita revisión",
+      "attempts": "{n} de {max} intentos",
+      "action_retry": "Reintentar",
+      "action_discard": "Descartar",
+      "discard_confirm": "Se borrará de este dispositivo y no llegará al servidor.",
+      "discard_yes": "Sí, descartar",
+      "discard_no": "Cancelar"
     }
   },
   "studio": {

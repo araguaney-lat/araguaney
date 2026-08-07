@@ -807,7 +807,12 @@
       "exception_body": "Given the volume, this donation cannot stay anonymous. If the person would not or could not identify themselves, explain what happened: the capture still goes through and coordination reviews it afterwards.",
       "exception_placeholder": "What happened (e.g. the person left the boxes and walked away)",
       "weight_hint": "Weigh the box once it is packed and enter what the scale reads.",
-      "weight_reference": "Contents alone would weigh ~{kg} kg per the catalog. The box always weighs more."
+      "weight_reference": "Contents alone would weigh ~{kg} kg per the catalog. The box always weighs more.",
+      "submit_offline": "Save offline",
+      "offline_ready": "On this device: {products} catalogue products and {codes} box codes set aside.",
+      "error_offline_no_center": "Offline capture is for centre staff. Reconnect to register on behalf of a centre.",
+      "error_offline_storage": "This browser will not store captures on the device. Reconnect to register the donation.",
+      "error_offline_network": "The server could not be reached and this account has no home centre to hold the capture. Try again with a connection."
     },
     "campaign_members": {
       "back": "← Campaigns",
@@ -950,6 +955,36 @@
       "resolved": "Resolved",
       "approved": "Approved",
       "rejected": "Rejected"
+    },
+    "offline_queue": {
+      "pending_one": "1 capture waiting to be sent",
+      "pending_many": "{count} captures waiting to be sent",
+      "attention_one": "1 needs review",
+      "attention_many": "{count} need review",
+      "keep_open": "Keep the app open until it reaches zero.",
+      "session_expired": "Your session expired: sign in again and they will send themselves.",
+      "review_link": "View pending"
+    },
+    "intake_pending": {
+      "title": "Pending captures",
+      "subtitle": "Captured offline and not yet delivered to the server. Nothing is discarded on its own.",
+      "ready_catalog": "Products downloaded",
+      "ready_codes": "Codes set aside",
+      "ready_pending": "Captures queued",
+      "sync_now": "Sync now",
+      "syncing": "Syncing…",
+      "loading": "Loading…",
+      "empty": "Nothing pending: everything captured is on the server.",
+      "empty_cta": "Register a donation",
+      "status_pending": "Queued",
+      "status_rejected": "Rejected by the server",
+      "status_needs_review": "Needs review",
+      "attempts": "{n} of {max} attempts",
+      "action_retry": "Retry",
+      "action_discard": "Discard",
+      "discard_confirm": "It will be deleted from this device and will not reach the server.",
+      "discard_yes": "Yes, discard",
+      "discard_no": "Cancel"
     }
   },
   "studio": {

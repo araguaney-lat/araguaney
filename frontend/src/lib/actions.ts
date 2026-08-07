@@ -315,6 +315,9 @@ export interface BoxDraft {
   expiry_date?: string
   weight_kg?: number
   gtin?: string
+  // Código apartado de antemano, para una caja capturada sin conexión: la
+  // etiqueta ya se imprimió con ese número antes de que existiera la caja.
+  code?: string
 }
 
 export interface DonorPayload {
@@ -340,6 +343,9 @@ export interface CreateIntakePayload {
   // Por qué una captura de volumen atípico queda sin identificar. Abre una
   // revisión para la coordinación; no la resuelve quien captura.
   anonymous_exception_reason?: string
+  // Llave de idempotencia de una captura que pasó por la cola sin conexión. Se
+  // genera antes del primer intento y no cambia: reintentar no duplica nada.
+  capture_id?: string
 }
 
 export async function createIntakeAction(payload: CreateIntakePayload) {

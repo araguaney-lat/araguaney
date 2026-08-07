@@ -55,11 +55,11 @@
 
 | # | Tarea | Descripción | Complejidad | Estado |
 |---|-------|-------------|-------------|--------|
-| 6 | Catálogo en IndexedDB | Cachear los `ProductType` visibles al iniciar sesión y refrescarlos con conexión. Sin catálogo local no hay captura offline posible. | 🟠 Media | ⬜ |
-| 7 | Cola de capturas | IndexedDB (no `localStorage`: 5 MB y síncrono). El `capture_id` se genera **antes** del primer intento y se conserva en la cola: todo reintento lleva el mismo. | 🔴 Alta | ⬜ |
-| 8 | Sincronización | Background Sync donde exista; `online` + apertura de la app donde no. **Verificar el soporte actual antes de implementar**, no asumirlo. Tras N fallos, la captura pasa a revisión humana en vez de reintentar para siempre. | 🔴 Alta | ⬜ |
-| 9 | La cola es visible | Contador permanente ("3 capturas pendientes"), marca por captura en la lista de recepciones, y aviso al cerrar la app con cola pendiente. Una cola invisible es peor que no tenerla. | 🟠 Media | ⬜ |
-| 10 | Rechazos con destino | Una captura que el servidor rechaza por regla de negocio (p. ej. caducidad corta que el cliente no pudo validar) queda **visible para revisión**, nunca descartada. | 🟠 Media | ⬜ |
+| 6 | Catálogo en IndexedDB | Cachear los `ProductType` visibles al iniciar sesión y refrescarlos con conexión. Sin catálogo local no hay captura offline posible. | 🟠 Media | ✅ Done |
+| 7 | Cola de capturas | IndexedDB (no `localStorage`: 5 MB y síncrono). El `capture_id` se genera **antes** del primer intento y se conserva en la cola: todo reintento lleva el mismo. | 🔴 Alta | ✅ Done |
+| 8 | Sincronización | Verificado el soporte antes de implementar: **ningún Safari implementa Background Sync**, ni Firefox. Como el camino en primer plano hace falta igualmente, añadir la API significaría duplicar la cola dentro del service worker para adelantar un envío que ocurre igual al abrir la aplicación. Se sincroniza al abrir, al volver la conexión, al volver a primer plano y cada pocos minutos con la pestaña visible. Tras N fallos la captura pasa a revisión humana. | 🔴 Alta | ✅ Done |
+| 9 | La cola es visible | Contador permanente ("3 capturas pendientes"), marca por captura en la lista de recepciones, y aviso al cerrar la app con cola pendiente. Una cola invisible es peor que no tenerla. | 🟠 Media | ✅ Done |
+| 10 | Rechazos con destino | Una captura que el servidor rechaza por regla de negocio (p. ej. caducidad corta que el cliente no pudo validar) queda **visible para revisión**, nunca descartada. | 🟠 Media | ✅ Done |
 
 ### Cierre
 
