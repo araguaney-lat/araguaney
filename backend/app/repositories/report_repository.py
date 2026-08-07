@@ -9,6 +9,7 @@ from app.models.campaign import Campaign
 from app.models.center import Center
 from app.models.intake import Intake
 from app.models.product_type import ProductType
+from app.models.reception import ReceptionLine, ShipmentReception
 from app.models.shipment import Shipment
 from app.models.user_campaign import UserCampaign
 
@@ -48,6 +49,45 @@ class ReportRepository:
             )
         ).scalar_one_or_none()
         return row is not None
+
+    def shrinkage(self, campaign_id: UUID, center_id: UUID | None) -> dict:
+        """Merma de la campaña: cuántas cajas recibidas no llegaron bien.
+
+        Es el espejo del % de rechazo en intake. Una mide lo que no se aceptó al
+        entrar; esta, lo que no llegó al salir.
+
+        **Sin filtro de fechas, a diferencia del resto del reporte.** Un envío
+        se recibe semanas después de despacharse, y acotar la merma a la misma
+        ventana que las capturas dejaría fuera justo los envíos que ya
+        completaron su viaje.
+
+        Solo cuentan los envíos con recepción registrada: uno que nadie
+        reconcilió todavía no tiene merma de cero, tiene merma desconocida, y
+        promediarlo como cero mentiría hacia abajo.
+        """
+        stmt = (
+            select(ReceptionLine.outcome, func.count(ReceptionLine.id).label("cnt"))
+            .join(ShipmentReception, ReceptionLine.reception_id == ShipmentReception.id)
+            .join(Shipment, ShipmentReception.shipment_id == Shipment.id)
+            .where(Shipment.campaign_id == campaign_id)
+        )
+        if center_id is not None:
+            stmt = stmt.where(Shipment.center_id == center_id)
+
+        rows = self.db.execute(stmt.group_by(ReceptionLine.outcome)).all()
+        counts = {r.outcome: r.cnt for r in rows}
+        total = sum(counts.values())
+        recibidas = counts.get("RECEIVED", 0)
+        faltantes = total - recibidas
+
+        return {
+            "reconciled_boxes": total,
+            "received": recibidas,
+            "missing": counts.get("MISSING", 0),
+            "damaged": counts.get("DAMAGED", 0),
+            "retained": counts.get("RETAINED_CUSTOMS", 0),
+            "shrinkage_pct": round(faltantes / total * 100, 2) if total else 0.0,
+        }
 
     def summary(self, campaign_id: UUID, center_id: UUID | None, start: date, end: date) -> dict:
         # Box counts by status

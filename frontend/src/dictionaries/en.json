@@ -536,7 +536,9 @@
       "col_boxes": "Boxes",
       "col_units": "Units",
       "country_boxes": "boxes",
-      "tooltip_boxes": "{count} boxes"
+      "tooltip_boxes": "{count} boxes",
+      "kpi_shrinkage": "Shrinkage at destination",
+      "shrinkage_sub": "{missing} missing · {damaged} damaged · {retained} retained"
     },
     "scan": {
       "title": "Scan QR",

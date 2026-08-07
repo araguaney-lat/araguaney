@@ -49,7 +49,7 @@
 | 8 | UI: recepción en destino | Checklist de cajas pre-llenado como recibido (solo se marca la merma), pesos por tarima opcionales, confirmación → `RECONCILED`. Resumen de merma del envío. | 🔴 Alta | ✅ Done |
 | 9 | UI: incidencias | Apartado en el detalle del envío + listado global para `national_admin` (filtro por estado). Crear manual y resolver con nota. Entrada en sidebar de administración. | 🟠 Media | ✅ Done |
 | 10 | Ficha pública refleja entrega | `/b/[code]` y `/p/[code]` muestran "Entregada en destino" cuando el envío está `DELIVERED`/`RECONCILED` (dato del envío; la caja no se muta). Cache con TTL corto o purga al cambiar estado. | 🟠 Media | ✅ Done |
-| 11 | Merma en reportes | % de cajas no recibidas por envío y por campaña en el dashboard de reportes; se registra como métrica de éxito en `CLAUDE.md`. | 🟠 Media | ⬜ |
+| 11 | Merma en reportes | % de cajas no recibidas por envío y por campaña en el dashboard de reportes; se registra como métrica de éxito en `CLAUDE.md`. | 🟠 Media | ✅ Done |
 | 12 | Manual de recepción | Guía en `/dashboard/ayuda` para `national_admin`: qué pedir al consignatario (acta, pesos, fotos por fuera del sistema), cómo registrar merma e incidencias. ES/EN. | 🟢 Baja | ⬜ |
 | 13 | Tests | Máquina extendida + hitos, congelamiento intacto, auto-incidencias (línea y peso), aislamiento tenant, merma en reportes, transiciones inválidas. | 🔴 Alta | ⬜ |
 | 14 | `CLAUDE.md` + roadmap | Actualizar la sección de máquinas de estado (el envío ya no muere en `SHIPPED`) y los totales. | 🟢 Baja | ⬜ |

@@ -36,6 +36,18 @@ interface Summary {
   rejection_rate: number
 }
 
+/** Merma de la campaña. Se consulta sin rango de fechas: un envío se recibe
+ *  semanas después de despacharse, y la ventana del resto del reporte lo
+ *  dejaría fuera justo cuando ya terminó su viaje. */
+interface Shrinkage {
+  reconciled_boxes: number
+  received: number
+  missing: number
+  damaged: number
+  retained: number
+  shrinkage_pct: number
+}
+
 interface ActivityPoint {
   date: string
   total: number
@@ -138,6 +150,7 @@ export default function ReportsDashboard({ campaigns, defaultCampaignId, centerR
   const [customEnd, setCustomEnd] = useState("")
 
   const [summary, setSummary] = useState<Summary | null>(null)
+  const [shrinkage, setShrinkage] = useState<Shrinkage | null>(null)
   const [activity, setActivity] = useState<ActivityPoint[]>([])
   const [byCategory, setByCategory] = useState<CategoryBreakdown[]>([])
   const [byCenter, setByCenter] = useState<CenterBreakdown[]>([])
@@ -157,20 +170,23 @@ export default function ReportsDashboard({ campaigns, defaultCampaignId, centerR
     const base = `/api/reports/${campaignId}`
 
     try {
-      const [sumRes, actRes, catRes, cenRes, cntRes] = await Promise.all([
+      const [sumRes, actRes, catRes, cenRes, cntRes, shrRes] = await Promise.all([
         fetch(`${base}/summary${qs}`),
         fetch(`${base}/activity${qs}`),
         fetch(`${base}/by-category${qs}`),
         fetch(`${base}/by-center${qs}`),
         fetch(`${base}/countries${qs}`),
+        // Sin `qs` a propósito: la merma no se acota al rango.
+        fetch(`${base}/shrinkage`),
       ])
 
-      const [sumData, actData, catData, cenData, cntData] = await Promise.all([
+      const [sumData, actData, catData, cenData, cntData, shrData] = await Promise.all([
         sumRes.ok ? sumRes.json() : null,
         actRes.ok ? actRes.json() : [],
         catRes.ok ? catRes.json() : [],
         cenRes.ok ? cenRes.json() : [],
         cntRes.ok ? cntRes.json() : [],
+        shrRes.ok ? shrRes.json() : null,
       ])
 
       if (sumData) setSummary(sumData)
@@ -178,6 +194,7 @@ export default function ReportsDashboard({ campaigns, defaultCampaignId, centerR
       setByCategory(catData)
       setByCenter(cenData)
       setCountries(cntData)
+      setShrinkage(shrData)
     } catch {
       // silently fail — show empty state
     } finally {
@@ -291,6 +308,20 @@ export default function ReportsDashboard({ campaigns, defaultCampaignId, centerR
           <KpiCard label={t.kpi_rejected} value={summary.rejected_boxes}
             sub={t.rejection_rate_sub.replace("{rate}", String(summary.rejection_rate))}
             accent="text-[var(--dRejT)]" />
+          {/* Espejo del rechazo en intake: uno mide lo que no se aceptó al
+              entrar, este lo que no llegó al salir. Solo se muestra cuando hay
+              envíos recibidos: sin base, 0% mentiría hacia abajo. */}
+          {shrinkage && shrinkage.reconciled_boxes > 0 && (
+            <KpiCard
+              label={t.kpi_shrinkage}
+              value={`${shrinkage.shrinkage_pct}%`}
+              accent={shrinkage.shrinkage_pct > 0 ? "text-[var(--dRejT)]" : undefined}
+              sub={t.shrinkage_sub
+                .replace("{missing}", String(shrinkage.missing))
+                .replace("{damaged}", String(shrinkage.damaged))
+                .replace("{retained}", String(shrinkage.retained))}
+            />
+          )}
           <KpiCard label={t.kpi_units} value={summary.total_units} />
           <KpiCard label={t.kpi_intakes} value={summary.total_intakes} />
           <KpiCard label={t.kpi_shipments} value={summary.total_shipments} />
