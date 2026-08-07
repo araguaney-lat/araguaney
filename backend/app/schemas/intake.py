@@ -42,6 +42,10 @@ class IntakeCreate(StrictModel):
     # Only honored for national_admin (no home center) — coordinator/volunteer
     # always use their own center_id, this field is ignored for them.
     center_id: StrictUUID | None = None
+    # Llave de idempotencia de la captura offline (Fase 25). La genera el cliente
+    # antes del primer intento y la conserva en su cola: reintentar con la misma
+    # devuelve el intake que ya se creó en vez de duplicar inventario.
+    capture_id: StrictUUID | None = None
 
 
 class BoxOut(StrictORMModel):

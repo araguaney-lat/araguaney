@@ -2,6 +2,8 @@ import secrets
 from datetime import date, timezone
 from uuid import UUID
 
+from sqlalchemy.exc import IntegrityError
+
 from app.models.box import Box
 from app.models.events import BoxEvent
 from app.models.intake import Intake
@@ -28,6 +30,15 @@ def _box_code() -> str:
 class IntakeService(BaseService):
 
     def create(self, data: IntakeCreate, center_id: UUID, user_id: UUID) -> IntakeOut:
+        # Idempotencia primero (Fase 25). Una captura offline reintenta con la
+        # misma llave, y una respuesta perdida no puede convertirse en inventario
+        # duplicado: cajas que nadie audita, que inflan el stock nacional y que
+        # llegan a un manifiesto ante una aduana.
+        if data.capture_id is not None:
+            existente = IntakeRepository(self.db).find_by_capture_id(data.capture_id, center_id)
+            if existente is not None:
+                return self._to_out(existente)
+
         if not data.boxes:
             raise api_error("NO_BOXES", "At least one box is required")
 
@@ -118,6 +129,29 @@ class IntakeService(BaseService):
             # mostrador solo abriría la puerta a un segundo donante duplicado.
             donor = donation.donor
 
+        try:
+            return self._write(
+                data, center_id, user_id, campaign_id, donor, donation,
+                product_types, capture_date, intake_repo, pt_repo,
+                unusual_volume, exception_reason,
+            )
+        except IntegrityError:
+            # Dos reintentos concurrentes de la misma captura. El unique de la
+            # base es lo que los ordena; una comprobación previa sola tiene una
+            # carrera justo aquí. Quien pierde devuelve lo que ganó el otro: su
+            # captura sí quedó registrada, solo que la escribió el otro hilo.
+            self.db.rollback()
+            ganador = IntakeRepository(self.db).find_by_capture_id(data.capture_id, center_id)
+            if ganador is None:
+                raise
+            return self._to_out(ganador)
+
+    def _write(
+        self, data, center_id, user_id, campaign_id, donor, donation,
+        product_types, capture_date, intake_repo, pt_repo,
+        unusual_volume, exception_reason,
+    ) -> IntakeOut:
+        """La escritura propiamente dicha, aislada para poder reintentarla."""
         intake = intake_repo.save_intake(Intake(
             center_id=center_id,
             campaign_id=campaign_id,
@@ -130,6 +164,7 @@ class IntakeService(BaseService):
             ),
             donante_libre=data.donante_libre,
             notes=data.notes,
+            capture_id=data.capture_id,
         ))
 
         saved_boxes: list[Box] = []
@@ -199,10 +234,25 @@ class IntakeService(BaseService):
         for box in saved_boxes:
             self.db.refresh(box)
 
+        return self._to_out(intake, saved_boxes, donor)
+
+    def _to_out(self, intake: Intake, boxes: list[Box] | None = None, donor=None) -> IntakeOut:
+        """Respuesta del intake.
+
+        Los tres caminos de `create` la comparten: la captura nueva, la que ya
+        existía por su `capture_id` y la que perdió una carrera concurrente.
+        Quien reintenta debe recibir exactamente lo mismo que recibió el
+        original, o el cliente creerá que su cola quedó a medias.
+        """
+        if boxes is None:
+            boxes = IntakeRepository(self.db).boxes_for_intake(intake.id)
+        if donor is None and intake.donor_id is not None:
+            donor = DonorRepository(self.db).find_by_id(intake.donor_id)
+
         return IntakeOut(
             id=intake.id,
             center_id=intake.center_id,
-            campaign_id=campaign_id,
+            campaign_id=intake.campaign_id,
             donante_libre=intake.donante_libre,
             donor=DonorOut.model_validate(donor) if donor else None,
             notes=intake.notes,
@@ -221,7 +271,7 @@ class IntakeService(BaseService):
                     reject_reason=b.reject_reason,
                     created_at=b.created_at,
                 )
-                for b in saved_boxes
+                for b in boxes
             ],
         )
 

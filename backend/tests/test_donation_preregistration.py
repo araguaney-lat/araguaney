@@ -576,6 +576,7 @@ def test_el_intake_hereda_al_donante_del_pre_registro():
     data.boxes = [_box_draft()]
     data.donor = None               # el mostrador no recaptura al donante
     data.donation_id = uuid4()
+    data.capture_id = None      # captura en línea, sin llave de idempotencia
     data.donante_libre = None
     data.notes = None
 
@@ -603,6 +604,7 @@ def test_un_pre_registro_de_otro_centro_no_contamina_el_intake():
     data.boxes = [_box_draft()]
     data.donor = None
     data.donation_id = uuid4()
+    data.capture_id = None      # captura en línea, sin llave de idempotencia
     data.donante_libre = None
     data.notes = None
 

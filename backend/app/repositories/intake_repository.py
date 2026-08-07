@@ -40,6 +40,15 @@ class IntakeRepository(TenantRepository[Intake]):
         self.db.flush()  # populate box.id — callers build a BoxEvent referencing it right after
         return box
 
+    def find_by_capture_id(self, capture_id, center_id) -> Intake | None:
+        """Busca por la llave de idempotencia del cliente (Fase 25).
+
+        Acotado por centro como todo lo demás: una llave que alguien adivine no
+        puede devolver la captura de otro centro.
+        """
+        stmt = self.scoped(select(Intake).where(Intake.capture_id == capture_id), center_id)
+        return self.db.execute(stmt).scalars().first()
+
     def commit(self) -> None:
         self.db.commit()
 

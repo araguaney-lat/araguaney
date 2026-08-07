@@ -85,6 +85,9 @@ def _intake_data(donor=None, boxes=1, weight=None):
     data.notes = None
     data.donor_terms_accepted = True
     data.anonymous_exception_reason = None
+    # Captura en línea: sin llave de idempotencia (Fase 25). Un MagicMock
+    # devolvería un valor truthy y dispararía la búsqueda de duplicados.
+    data.capture_id = None
     data.boxes = []
     for _ in range(boxes):
         bd = MagicMock()

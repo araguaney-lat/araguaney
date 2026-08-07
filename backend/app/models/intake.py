@@ -18,5 +18,10 @@ class Intake(Base):
     # Versión de los Términos de Donación que aceptó el donante identificado
     # (Fase 20). Nula en captura anónima: no hay a quién atribuirla.
     donor_terms_version = Column(String, nullable=True)
+    # Llave de idempotencia que genera el cliente antes del primer intento y
+    # conserva en su cola offline (Fase 25). Un reintento con la misma llave
+    # devuelve el intake existente en vez de duplicar inventario. Nula en las
+    # capturas en línea, que no la necesitan.
+    capture_id = Column(UUID(as_uuid=True), nullable=True, unique=True)
 
     created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
