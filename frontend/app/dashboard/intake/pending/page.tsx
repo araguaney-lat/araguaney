@@ -109,6 +109,14 @@ export default function PendingCapturesPage() {
         >
           {queue?.syncing ? t.syncing : t.sync_now}
         </button>
+        {/* La etiqueta se pega en el andén, sobre una caja que se acaba de
+            cerrar. Si no sale ahora no sale nunca. */}
+        <Link
+          href="/dashboard/intake/pending/labels"
+          className="rounded-lg border border-cardB px-4 py-2 text-sm font-medium text-tx hover:bg-card2"
+        >
+          {t.print_labels}
+        </Link>
         {queue?.needsLogin && <span className="text-xs text-dRejT">{tq.session_expired}</span>}
       </div>
 
@@ -154,6 +162,17 @@ export default function PendingCapturesPage() {
                     {capture.last_error}
                   </p>
                 )}
+
+                <div className="mt-3 flex flex-wrap items-center gap-3">
+                  {capture.payload.boxes.some((b) => b.code) && (
+                    <Link
+                      href={`/dashboard/intake/pending/labels?capture=${capture.capture_id}`}
+                      className="text-xs text-fnt hover:text-tx"
+                    >
+                      {t.print_labels_one}
+                    </Link>
+                  )}
+                </div>
 
                 {capture.status !== "PENDING" && (
                   <div className="mt-3 flex flex-wrap items-center gap-3">

@@ -68,7 +68,7 @@ export function BottomNav({
     <>
       {/* Fixed bottom tab bar */}
       <nav
-        className="fixed bottom-0 inset-x-0 z-40 flex md:hidden items-stretch justify-around border-t border-sideB bg-side"
+        className="fixed bottom-0 inset-x-0 z-40 flex md:hidden print:hidden items-stretch justify-around border-t border-sideB bg-side"
         style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
       >
         {primaryItems.map((item) => {

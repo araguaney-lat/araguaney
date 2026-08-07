@@ -84,6 +84,14 @@ export const MANUAL_GROUPS: readonly ManualGroup[] = [
         },
       },
       {
+        slug: "sin-conexion",
+        title: { es: "Sin conexión", en: "Offline" },
+        blurb: {
+          es: "Capturar en un sótano: qué se puede hacer sin señal, qué no, y el paso que más importa al salir.",
+          en: "Capturing in a basement: what works without signal, what does not, and the step that matters most on the way out.",
+        },
+      },
+      {
         slug: "recepcion-en-destino",
         title: { es: "Recepción en destino", en: "Reception at destination" },
         blurb: {

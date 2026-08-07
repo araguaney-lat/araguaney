@@ -4,8 +4,8 @@
 
 ```mermaid
 pie title Tareas completadas (457 tareas)
-    "Listas" : 430
-    "Pendientes" : 27
+    "Listas" : 434
+    "Pendientes" : 23
 ```
 
 | Fase | Nombre | Listas | Pendientes | Progreso |
@@ -35,10 +35,10 @@ pie title Tareas completadas (457 tareas)
 | 22 | [Trazabilidad extendida: avión y destino](phase-22-extended-traceability.md) | 14 | 0 | ✅ 100% |
 | 23 | [IA asistida: captura, catálogo y necesidades](phase-23-ai-assisted-capture.md) | 10 | 1 | 🟡 91% |
 | 24 | [Observabilidad: que un fallo silencioso deje de serlo](phase-24-observability.md) | 11 | 0 | ✅ 100% |
-| 25 | [Captura sin conexión: cola local y sincronización diferida](phase-25-offline-capture.md) | 10 | 4 | 🟡 71% |
-| **Total** | | **430** | **27** | **🟡 94%** |
+| 25 | [Captura sin conexión: cola local y sincronización diferida](phase-25-offline-capture.md) | 14 | 0 | ✅ 100% |
+| **Total** | | **434** | **23** | **🟡 95%** |
 
-> **Pendientes (27):**
+> **Pendientes (23):**
 > El grupo A de la Fase 13 (privacidad, lo que aplica hoy) está completo.
 > - Los borradores legales de la Fase 20 están escritos y esperando revisión de abogado:
 >   [`docs/legal/drafts/`](../legal/drafts/README.md). Sus tareas siguen abiertas hasta que esa
@@ -49,12 +49,6 @@ pie title Tareas completadas (457 tareas)
 >   estructurales documentados). Lo que queda son los tres textos legales (tasks 1, 2 y 6), que la
 >   task 7 —revisión de abogado— gatea antes de publicar; los borradores ya están escritos en
 >   [`docs/legal/drafts/`](../legal/drafts/README.md).
-> - **4 de la Fase 25 (captura sin conexión):** el circuito funciona de punta a punta: catálogo y
->   códigos en el dispositivo, cola con llave de idempotencia, sincronización al recuperar señal y
->   una pantalla donde nada se descarta solo. Queda el cierre — etiqueta dibujada en el cliente,
->   manual, pruebas de cierre y documentación. Ser nativo solo resolvería la persistencia: lo demás
->   es de dominio y se hereda. Diseño en
->   [su spec](../superpowers/specs/2026-08-07-offline-capture-design.md).
 > - **1 de la Fase 23 (IA asistida):** las cuatro capacidades, la evaluación y el aviso de privacidad
 >   ya están, todo apagado por defecto. Queda el panel de gasto en `/studio` (task 3). Encender
 >   cualquier capacidad en producción exige además completar su conjunto de referencia con capturas

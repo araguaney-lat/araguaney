@@ -552,7 +552,7 @@ export default function NewIntakePage() {
     // intento, así que reintentarla no puede duplicar inventario.
     const encolar = async (): Promise<boolean> => {
       try {
-        const { withoutCodes } = await queueCapture({
+        const { withoutCodes, capture_id } = await queueCapture({
           payload,
           userId: session?.userId ?? "",
           centerId: session?.centerId ?? "",
@@ -566,7 +566,14 @@ export default function NewIntakePage() {
           },
         })
         await queue?.refresh()
-        router.push(withoutCodes ? "/dashboard/intake/pending" : "/dashboard/intake")
+        // Se va derecho a la hoja de etiquetas: la caja está cerrada y en el
+        // andén, y esa etiqueta o se pega ahora o no se pega nunca. Sin códigos
+        // no hay hoja que imprimir, así que se va a la lista de pendientes.
+        router.push(
+          withoutCodes
+            ? "/dashboard/intake/pending"
+            : `/dashboard/intake/pending/labels?capture=${capture_id}`
+        )
         return true
       } catch {
         // El almacenamiento local puede no existir: navegación privada, o un

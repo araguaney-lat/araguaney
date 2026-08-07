@@ -1,0 +1,173 @@
+<div class="doc"><div class="wrap">
+
+  <span class="eyebrow">Módulo · Sin conexión</span>
+  <h1>Capturar en un sótano</h1>
+  <p class="lede">Muchos centros de acopio operan en sótanos y bodegas donde no hay cobertura. Araguaney guarda la captura en el teléfono y la envía sola cuando vuelve la señal.</p>
+  <p class="crumbs">Panel › Recepción › <b>Pendientes</b> · /dashboard/intake/pending</p>
+
+  <div class="intro-card" style="margin-top:34px">
+    <p><b>Qué hace.</b> Registrar donaciones sin cobertura, con su etiqueta impresa en el momento, y enviarlas al servidor en cuanto haya señal.</p>
+    <p><b>Cómo funciona.</b> La captura se guarda en el dispositivo con un identificador propio. Ese identificador no cambia, así que reintentar el envío nunca duplica el inventario aunque la respuesta se haya perdido a mitad de camino.</p>
+    <p><b>Qué no hace.</b> No sella cajas, no arma tarimas y no cierra envíos sin conexión: esas operaciones dependen del estado de cajas que puede estar cambiando en otro dispositivo.</p>
+  </div>
+
+  <section>
+    <div class="sect-head">
+      <h2>Antes de bajar</h2>
+      <p class="sect-note">Con señal es el único momento en que se puede preparar. Son treinta segundos.</p>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="n">1</div>
+        <div>
+          <h3>Abre la aplicación con cobertura</h3>
+          <p>Al abrirla, descarga el catálogo de productos de tus campañas y aparta un bloque de códigos de caja.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="n">2</div>
+        <div>
+          <h3>Comprueba que hay con qué trabajar</h3>
+          <p>En <code>Recepción › Pendientes</code> verás cuántos productos tienes descargados y cuántos códigos apartados. Si los códigos están bajos, se reponen solos al abrir la aplicación con señal.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="n">3</div>
+        <div>
+          <h3>Baja con la aplicación abierta</h3>
+          <p>No la cierres. Si la cierras y el sótano no tiene señal, la aplicación no podrá volver a cargarse.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head">
+      <h2>Qué puedes hacer sin señal</h2>
+      <p class="sect-note">Todo lo que solo depende de lo que tienes delante.</p>
+    </div>
+    <div class="grid two">
+      <div class="card">
+        <h3>Registrar una recepción</h3>
+        <p>Campaña, donante, notas y todas las cajas que haga falta, igual que con conexión.</p>
+      </div>
+      <div class="card">
+        <h3>Elegir productos del catálogo</h3>
+        <p>La búsqueda usa el catálogo que descargaste, con las mismas campañas que verías en línea.</p>
+      </div>
+      <div class="card">
+        <h3>Leer códigos de barras conocidos</h3>
+        <p>Si el código ya estaba asociado a un producto, se resuelve en el dispositivo. Si no, eliges el producto a mano.</p>
+      </div>
+      <div class="card">
+        <h3>Imprimir la etiqueta</h3>
+        <p>El QR se dibuja en el teléfono con el código apartado de antemano y apunta a la misma ficha pública que apuntará después.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head">
+      <h2>Qué no puedes hacer sin señal</h2>
+      <p class="sect-note">No es una limitación técnica pendiente de arreglar: son operaciones que dependen del estado de otras cajas.</p>
+    </div>
+    <div class="grid two">
+      <div class="card">
+        <h3>Sellar cajas, armar tarimas, cerrar envíos</h3>
+        <p>Una caja puede haber entrado a una tarima desde otro dispositivo. Decidirlo a ciegas produciría dos verdades sobre la misma caja.</p>
+      </div>
+      <div class="card">
+        <h3>Consultar un código de barras nuevo</h3>
+        <p>La consulta a la base mundial de productos necesita internet. Elige el producto a mano y el catálogo aprende esa asociación al sincronizar.</p>
+      </div>
+      <div class="card">
+        <h3>Panel nacional, reportes, transferencias</h3>
+        <p>Son lecturas del servidor. Lo que muestren sin conexión estaría desactualizado y no hay forma de saber cuánto.</p>
+      </div>
+      <div class="card">
+        <h3>Editar una captura ya guardada</h3>
+        <p>Se captura o no se captura. Si algo salió mal, la captura queda visible en Pendientes para descartarla y volver a hacerla.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head">
+      <h2>El paso que más importa</h2>
+    </div>
+    <div class="intro-card">
+      <p><b>Al salir del sótano, abre la aplicación y espera a que el contador llegue a cero.</b></p>
+      <p>El contador de capturas pendientes vive en el marco del panel y se ve desde cualquier pantalla. Mientras no marque cero, esas capturas existen solo en ese teléfono.</p>
+      <p>Si cierras la aplicación con capturas pendientes, el navegador te avisa. No lo ignores: nadie más puede enviarlas por ti, ni desde otro dispositivo ni desde otra cuenta.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head">
+      <h2>Si algo no llega</h2>
+      <p class="sect-note">Nada se descarta solo. Todo termina a la vista de una persona.</p>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="n">1</div>
+        <div>
+          <h3>El servidor rechazó la captura</h3>
+          <p>Por una regla que el dispositivo no podía comprobar: una caducidad demasiado corta, un producto controlado, una campaña que ya cerró. Aparece en Pendientes con el motivo exacto. Reintentarla daría lo mismo, así que espera a que alguien la corrija o la descarte.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="n">2</div>
+        <div>
+          <h3>Falló varias veces seguidas</h3>
+          <p>Tras varios intentos deja de reintentar sola y pasa a revisión. Reintentar para siempre gastaría batería y datos escondiendo el problema detrás de un contador que nunca baja.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="n">3</div>
+        <div>
+          <h3>Tu sesión caducó mientras esperaba</h3>
+          <p>La cola no se toca: vuelve a entrar y se envía sola. Las capturas no se pierden por caducar la sesión.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head">
+      <h2>Límites que conviene conocer</h2>
+    </div>
+    <div class="grid two">
+      <div class="card">
+        <h3>Un dispositivo, una persona</h3>
+        <p>La cola solo envía las capturas de quien las hizo. Si prestas el teléfono, las capturas de la otra persona esperan a que esa persona entre.</p>
+      </div>
+      <div class="card">
+        <h3>Recargar en el sótano</h3>
+        <p>La aplicación se carga de la copia guardada por el navegador. Una pantalla que nunca visitaste con señal puede no abrirse.</p>
+      </div>
+      <div class="card">
+        <h3>Si se acaban los códigos</h3>
+        <p>La captura se guarda igual —perderla sería mucho peor— pero sin etiqueta imprimible. Sus etiquetas salen del PDF del servidor al volver la señal.</p>
+      </div>
+      <div class="card">
+        <h3>Navegación privada</h3>
+        <p>Algunos navegadores no dejan guardar nada en el dispositivo. La aplicación lo dice en vez de fingir que guardó.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head">
+      <h2>Permisos</h2>
+    </div>
+    <div class="perm">
+      <p>La captura sin conexión es de quien opera un centro (<code>volunteer</code>, <code>coordinator</code>). Un <code>national_admin</code> no tiene centro propio y por tanto no tiene bloque de códigos del que sacar etiquetas: registra a nombre de un centro con conexión.</p>
+    </div>
+  </section>
+
+  <div class="foot">
+    <span>Araguaney · Manual del módulo Sin conexión</span>
+    <span>Relacionado: Recepción · Cajas · Escanear</span>
+  </div>
+
+</div></div>

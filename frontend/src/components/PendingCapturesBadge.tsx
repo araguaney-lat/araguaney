@@ -25,7 +25,7 @@ export function PendingCapturesBadge() {
   if (pending === 0 && needsAttention === 0) return null
 
   return (
-    <div className="mb-4 flex flex-wrap items-center gap-3 rounded-xl border border-dDraftB bg-dDraftB px-4 py-3 text-sm text-dDraftT">
+    <div className="mb-4 flex flex-wrap items-center gap-3 rounded-xl border border-dDraftB bg-dDraftB px-4 py-3 text-sm text-dDraftT print:hidden">
       <span className="flex items-center gap-2">
         <span className={`h-2 w-2 rounded-full bg-dDraftT ${syncing ? "animate-pulse" : ""}`} />
         {pending > 0 && (

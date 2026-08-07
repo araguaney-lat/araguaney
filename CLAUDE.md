@@ -565,6 +565,68 @@ miró.** Ninguna capacidad decide, rechaza, asigna ni despacha.
 - Auth: `auth()` en Server Components, `useSession` en Client Components.
 - `apiFetch` centralizado — sin `fetch` crudo en componentes.
 - i18n: español por default.
+- Tests: `npm test` (vitest). Lo que toca IndexedDB se prueba contra una real
+  (`fake-indexeddb`), no contra un doble: la mitad de los errores de esa API
+  están en el manejo de transacciones, y un doble no los reproduce.
+
+### Captura sin conexión (Fase 25)
+
+Muchos centros operan en sótanos sin cobertura. **Lo único que escribe sin
+conexión es la captura de una donación**, y esa frontera no es una limitación
+pendiente de levantar: es la regla.
+
+Se puede escribir sin señal lo que **solo depende de lo que hay delante**. Una
+recepción es eso: alguien trae unas cajas y se anota qué son. Sellar una caja,
+armar una tarima o cerrar un envío dependen del estado de cajas que puede estar
+cambiando en otro dispositivo, y decidirlo a ciegas produciría dos verdades
+sobre la misma caja. Nada de eso se encola.
+
+Cuatro invariantes sostienen el resto:
+
+1. **La llave de idempotencia se genera antes del primer intento** y no cambia
+   nunca (`intakes.capture_id`, único). Reintentar es el caso normal cuando
+   alguien sale de un sótano, no la excepción. **Encolar sin esto sería peor que
+   no encolar:** convertiría "se perdió una captura" —que se nota y se vuelve a
+   capturar— en "hay inventario fantasma", que no se nota y acaba en un
+   manifiesto delante de una aduana.
+2. **El catálogo local conserva la visibilidad por campaña del servidor.** Un
+   producto elegible en el sótano tiene que ser uno que el servidor va a
+   aceptar. Reimplementar esa regla a mano en el cliente se desincroniza de la
+   del servidor al primer cambio.
+3. **La cola es por usuario.** Un dispositivo se comparte. Enviar la captura de
+   alguien con la sesión de la siguiente persona la atribuiría a otro operador
+   y, entre centros distintos, a otro centro.
+4. **Nada se descarta solo.** Un rechazo de negocio deja de reintentarse —daría
+   la misma respuesta— y espera en `/dashboard/intake/pending` con el motivo del
+   servidor. Descartar es la única forma de que una captura desaparezca y es
+   siempre una decisión explícita de una persona.
+
+**El código de caja se aparta con señal para gastarlo sin ella**
+(`box_code_reservations`). Sin código no hay etiqueta imprimible, y en un centro
+con prisa nadie vuelve a abrir una tarima para etiquetar una caja que ya está
+dentro. Dos consecuencias que parecen detalles y no lo son:
+
+- La reserva se reclama **antes** de crear la caja, para que el error de dominio
+  (`CODE_ALREADY_USED`) gane al `unique` de `boxes.code`. Un cliente offline
+  necesita esa distinción: con ella cierra la captura encolada, sin ella la
+  reintenta para siempre.
+- Una captura rechazada **no** devuelve sus códigos al bloque. El servidor nunca
+  los marcó usados, pero la etiqueta con ese número ya está pegada a una caja
+  física; devolverlos pondría el mismo número en una segunda caja.
+
+**No se usa Background Sync.** Se verificó antes de implementar, no después:
+ningún Safari la implementa —ni macOS, ni iOS, ni iPadOS— y Firefox tampoco. Como
+el camino en primer plano hace falta igualmente, añadirla significaría duplicar
+la cola dentro del service worker para adelantar un envío que ocurre igual al
+abrir la aplicación. La instrucción a quien opera es la misma con o sin la API:
+**al salir del sótano, abrir la aplicación y esperar a que el contador llegue a
+cero.** El razonamiento vive en `src/lib/offline/sync.ts` para que nadie tenga
+que redescubrirlo.
+
+Al tocar esta capa: el estado vive en `frontend/src/lib/offline/`, la cola se
+prueba contra una IndexedDB real (`vitest` + `fake-indexeddb`), y **con conexión
+permanente la aplicación tiene que comportarse exactamente como antes de la
+fase** — hay una prueba que lo fija.
 
 ### Errores al cliente
 
