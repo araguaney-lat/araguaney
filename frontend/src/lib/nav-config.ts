@@ -19,6 +19,7 @@ import {
   Inbox,
   Gift,
   ShieldAlert,
+  TriangleAlert,
 } from "lucide-react"
 
 export type IconComponent = React.ComponentType<{ size?: number; className?: string }>
@@ -49,6 +50,7 @@ export type DashboardNav = {
   users: string
   center_applications: string
   reviews: string
+  incidents: string
   audit: string
   team: string
   ayuda: string
@@ -118,6 +120,7 @@ export const ADMIN_ITEMS: AdminNavItem[] = [
   { href: "/dashboard/centers", labelKey: "centers", roles: ["national_admin"], icon: Building2 },
   { href: "/dashboard/admin/users", labelKey: "users", roles: ["national_admin"], icon: UserCog },
   { href: "/dashboard/admin/center-applications", labelKey: "center_applications", roles: ["national_admin"], icon: Inbox },
+  { href: "/dashboard/admin/incidents", labelKey: "incidents", roles: ["national_admin"], icon: TriangleAlert },
   { href: "/dashboard/admin/audit", labelKey: "audit", roles: ["national_admin"], icon: ScrollText },
 ]
 
