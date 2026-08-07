@@ -4,8 +4,8 @@
 
 ```mermaid
 pie title Tareas completadas (457 tareas)
-    "Listas" : 423
-    "Pendientes" : 34
+    "Listas" : 425
+    "Pendientes" : 32
 ```
 
 | Fase | Nombre | Listas | Pendientes | Progreso |
@@ -35,10 +35,10 @@ pie title Tareas completadas (457 tareas)
 | 22 | [Trazabilidad extendida: avión y destino](phase-22-extended-traceability.md) | 14 | 0 | ✅ 100% |
 | 23 | [IA asistida: captura, catálogo y necesidades](phase-23-ai-assisted-capture.md) | 10 | 1 | 🟡 91% |
 | 24 | [Observabilidad: que un fallo silencioso deje de serlo](phase-24-observability.md) | 11 | 0 | ✅ 100% |
-| 25 | [Captura sin conexión: cola local y sincronización diferida](phase-25-offline-capture.md) | 3 | 11 | 🟡 21% |
-| **Total** | | **423** | **34** | **🟡 93%** |
+| 25 | [Captura sin conexión: cola local y sincronización diferida](phase-25-offline-capture.md) | 5 | 9 | 🟡 36% |
+| **Total** | | **425** | **32** | **🟡 93%** |
 
-> **Pendientes (34):**
+> **Pendientes (32):**
 > El grupo A de la Fase 13 (privacidad, lo que aplica hoy) está completo.
 > - Los borradores legales de la Fase 20 están escritos y esperando revisión de abogado:
 >   [`docs/legal/drafts/`](../legal/drafts/README.md). Sus tareas siguen abiertas hasta que esa
@@ -49,9 +49,9 @@ pie title Tareas completadas (457 tareas)
 >   estructurales documentados). Lo que queda son los tres textos legales (tasks 1, 2 y 6), que la
 >   task 7 —revisión de abogado— gatea antes de publicar; los borradores ya están escritos en
 >   [`docs/legal/drafts/`](../legal/drafts/README.md).
-> - **11 de la Fase 25 (captura sin conexión):** la idempotencia ya está —una captura reintentada
->   no duplica inventario— y con ella el esquema de códigos pre-asignados. Falta reservarlos,
->   consumirlos y la cola en el cliente. Ser nativo solo resolvería la persistencia: lo demás es
+> - **9 de la Fase 25 (captura sin conexión):** el backend está completo: una captura reintentada no
+>   duplica inventario y los códigos se reservan con señal para gastarlos sin ella. Falta la cola en
+>   el cliente (IndexedDB, sincronización y su visibilidad). Ser nativo solo resolvería la persistencia: lo demás es
 >   de dominio y se hereda. Diseño en
 >   [su spec](../superpowers/specs/2026-08-07-offline-capture-design.md).
 > - **1 de la Fase 23 (IA asistida):** las cuatro capacidades, la evaluación y el aviso de privacidad

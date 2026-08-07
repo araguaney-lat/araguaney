@@ -525,6 +525,7 @@ def _box_draft():
     bd.quantity = 1
     bd.unit = "cajas"
     bd.batch = None
+    bd.code = None      # sin código pre-asignado (Fase 25)
     bd.expiry_date = None
     bd.weight_kg = None
     bd.gtin = None

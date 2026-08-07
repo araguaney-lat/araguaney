@@ -18,6 +18,9 @@ class BoxDraft(StrictModel):
     # Código de barras leído durante la captura. No se guarda en la caja: sirve
     # para que el catálogo aprenda qué GTIN corresponde a este tipo de producto.
     gtin: str | None = None
+    # Código pre-asignado que el cliente consumió sin conexión (Fase 25). Sin
+    # él, el servidor genera uno como siempre.
+    code: str | None = None
 
 
 class IntakeCreate(StrictModel):

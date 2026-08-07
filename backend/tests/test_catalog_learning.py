@@ -27,6 +27,7 @@ def _box_draft(gtin=None):
     bd.quantity = 10
     bd.unit = "latas"
     bd.batch = "L001"
+    bd.code = None      # sin código pre-asignado (Fase 25)
     bd.expiry_date = None
     bd.weight_kg = None
     bd.gtin = gtin

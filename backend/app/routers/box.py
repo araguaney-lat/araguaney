@@ -14,6 +14,8 @@ from app.repositories.export_job_repository import ExportJobRepository
 from app.schemas.box import BoxOut, BoxPublicOut
 from app.schemas.export_job import ExportJobOut
 from app.schemas.qr_ficha import QrEventOut
+from app.schemas.box import BoxCodeBlockOut, BoxCodeReserveIn
+from app.services import box_code_service
 from app.services.box_service import BoxService
 from app.repositories.audit_repository import AuditRepository
 from app.utils.cloudflare import get_client_ip
@@ -119,6 +121,46 @@ def box_qr_authenticated(
     base_url = settings.frontend_url.split(",")[0].strip().rstrip("/")
     png = box_qr_png(box.code, base_url)
     return Response(content=png, media_type="image/png")
+
+
+# ── Códigos pre-asignados para captura sin conexión (Fase 25) ────────────────
+
+@router.post("/v1/boxes/codes/reserve", response_model=BoxCodeBlockOut, status_code=201)
+@limiter.limit("10/hour")
+def reserve_box_codes(
+    request: Request,
+    data: BoxCodeReserveIn,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_center_role),
+):
+    """Aparta un bloque de códigos para capturar sin conexión.
+
+    Se pide **con** señal, para consumirlo sin ella. El límite por hora es
+    holgado para reponer antes de una jornada y estrecho para que un cliente en
+    bucle no aparte miles de números.
+    """
+    center_id = resolve_write_center_id(current_user, data.center_id)
+    codigos = box_code_service.reserve(db, center_id, current_user.id, data.count)
+    AuditRepository(db).log("BOX_CODES_RESERVED", "box",
+        user_id=current_user.id, entity_id=str(center_id), ip=get_client_ip(request))
+    db.commit()
+    return BoxCodeBlockOut(codes=codigos, available=box_code_service.available(db, center_id))
+
+
+@router.get("/v1/boxes/codes/available", response_model=BoxCodeBlockOut)
+@limiter.limit("60/minute")
+def available_box_codes(
+    request: Request,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_center_role),
+    scope: UUID | None = Depends(tenant_scope),
+):
+    """Cuántos códigos sin usar quedan. El cliente lo consulta para reponer."""
+    center_id = scope or current_user.center_id
+    if center_id is None:
+        # Un national_admin no captura: no tiene centro cuyo bloque contar.
+        return BoxCodeBlockOut(codes=[], available=0)
+    return BoxCodeBlockOut(codes=[], available=box_code_service.available(db, center_id))
 
 
 @router.post("/v1/boxes/labels/pdf", response_model=ExportJobOut, status_code=202)
