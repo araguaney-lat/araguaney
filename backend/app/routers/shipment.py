@@ -22,6 +22,15 @@ from app.schemas.shipment import (
     ShipmentDetailOut,
     ShipmentOut,
 )
+from app.repositories.reception_repository import ReceptionRepository
+from app.schemas.reception import (
+    ReceptionCreate,
+    ReceptionLineOut,
+    ReceptionOut,
+    ReceptionPalletWeightOut,
+    ShrinkageOut,
+)
+from app.services.reception_service import ReceptionService
 from app.services.shipment_service import ShipmentService
 from app.repositories.audit_repository import AuditRepository
 from app.utils.cloudflare import get_client_ip
@@ -183,6 +192,60 @@ def mark_delivered(
         user_id=current_user.id, entity_id=str(shipment_id), ip=get_client_ip(request))
     db.commit()
     return shipment
+
+
+@router.post("/{shipment_id}/reception", response_model=ReceptionOut, status_code=201)
+@limiter.limit("10/minute")
+def reconcile_reception(
+    request: Request,
+    shipment_id: UUID,
+    data: ReceptionCreate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_national_admin),
+    scope: UUID | None = Depends(tenant_scope),
+):
+    """Registra qué llegó, caja por caja, y deja el envío en RECONCILED."""
+    service = ReceptionService(db)
+    reception = service.reconcile(
+        shipment_id, center_id=scope, user_id=current_user.id,
+        exceptions={e.box_id: {"outcome": e.outcome, "note": e.note} for e in data.exceptions},
+        pallet_weights={w.pallet_id: w.gross_weight_kg for w in data.pallet_weights},
+        consignee_name=data.consignee_name, notes=data.notes,
+    )
+    AuditRepository(db).log("SHIPMENT_RECONCILED", "shipment",
+        user_id=current_user.id, entity_id=str(shipment_id), ip=get_client_ip(request))
+    db.commit()
+    return _reception_out(db, reception)
+
+
+@router.get("/{shipment_id}/reception", response_model=ReceptionOut)
+@limiter.limit("60/minute")
+def get_reception(
+    request: Request,
+    shipment_id: UUID,
+    db: Session = Depends(get_db),
+    _: User = Depends(require_coordinator),
+    scope: UUID | None = Depends(tenant_scope),
+):
+    """Lectura para el centro emisor también: le importa qué llegó de lo suyo."""
+    return _reception_out(db, ReceptionService(db).get(shipment_id, center_id=scope))
+
+
+def _reception_out(db: Session, reception) -> ReceptionOut:
+    repo = ReceptionRepository(db)
+    lines = repo.find_lines(reception.id)
+    return ReceptionOut(
+        id=reception.id,
+        shipment_id=reception.shipment_id,
+        received_at=reception.received_at,
+        consignee_name=reception.consignee_name,
+        notes=reception.notes,
+        lines=[ReceptionLineOut.model_validate(line) for line in lines],
+        pallet_weights=[
+            ReceptionPalletWeightOut.model_validate(w) for w in repo.find_weights(reception.id)
+        ],
+        shrinkage=ShrinkageOut(**ReceptionService.shrinkage(lines)),
+    )
 
 
 @router.post("/{shipment_id}/manifest.pdf", response_model=ExportJobOut, status_code=202)

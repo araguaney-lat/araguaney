@@ -100,3 +100,45 @@ class TestShipments:
         assert res.status_code == 200
         codes = {s["reference"] for s in res.json()}
         assert {"EN-AAAAA1", "EN-BBBBB1"} <= codes
+
+
+class TestDestinationTraceability:
+    """Trazabilidad después del despacho (Fase 22).
+
+    Ni las recepciones ni las incidencias llevan `center_id` propio: heredan el
+    del envío por join. Estos tests prueban esa herencia desde la posición del
+    atacante, que es la única que importa.
+    """
+
+    def test_cannot_add_milestone_to_foreign_shipment(self, client, world):
+        res = client.post(
+            f"/v1/shipments/{world.a['shipment'].id}/milestones",
+            json={"milestone": "LOADED_AIRCRAFT"},
+            headers=world.token(world.coordinator_b),
+        )
+        assert res.status_code in (403, 404)
+
+    def test_cannot_mark_foreign_shipment_delivered(self, client, world):
+        res = client.post(
+            f"/v1/shipments/{world.a['shipment'].id}/delivered",
+            json={},
+            headers=world.token(world.coordinator_b),
+        )
+        assert res.status_code in (403, 404)
+        world.db.refresh(world.a["shipment"])
+        assert world.a["shipment"].status != "DELIVERED"
+
+    def test_cannot_reconcile_foreign_shipment(self, client, world):
+        res = client.post(
+            f"/v1/shipments/{world.a['shipment'].id}/reception",
+            json={"exceptions": []},
+            headers=world.token(world.coordinator_b),
+        )
+        assert res.status_code in (403, 404)
+
+    def test_cannot_read_foreign_reception(self, client, world):
+        res = client.get(
+            f"/v1/shipments/{world.a['shipment'].id}/reception",
+            headers=world.token(world.coordinator_b),
+        )
+        assert res.status_code == 404
