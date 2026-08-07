@@ -16,12 +16,14 @@ from app.repositories.user_campaign_repository import UserCampaignRepository
 from app.repositories.user_repository import UserRepository
 from app.schemas.product_type import ProductTypeOut
 from app.schemas.studio import (
+    AIUsageReportOut,
     AuditListOut,
     AuditLogOut,
     StudioUserCreate,
     StudioUserPatch,
 )
 from app.schemas.user_domain import UserOut, CENTER_ROLES
+from app.services.ai.usage_report import build_report
 from app.services.auth_service import AuthService
 from app.utils.audit import fire_audit
 from app.utils.cloudflare import get_client_ip
@@ -204,6 +206,26 @@ def list_audit(
         offset=offset,
     )
     return AuditListOut(items=items, total=total, limit=limit, offset=offset)
+
+
+# ── Gasto de IA (Fase 23, task 3) ────────────────────────────────────────────
+
+@router.get("/ai-usage", response_model=AIUsageReportOut)
+@limiter.limit("30/minute")
+def ai_usage_report(
+    request: Request,
+    db: Session = Depends(get_db),
+    _: User = Depends(get_current_superadmin),
+):
+    """Cuánto lleva gastado la IA este mes, por capacidad y por día.
+
+    Solo lee. Encender o apagar una capacidad se hace en las variables de
+    entorno: un panel que también pudiera cambiarlo sería una segunda fuente de
+    verdad sobre el mismo interruptor.
+
+    Es de `superadmin` porque el gasto es de la plataforma, no de un centro.
+    """
+    return AIUsageReportOut(**build_report(db))
 
 
 # ── Product type promotion ─────────────────────────────────────────────────────

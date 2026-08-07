@@ -74,13 +74,33 @@ def test_every_capability_module_is_covered_by_this_test():
     el descuido no se notaría: los tests seguirían en verde."""
     import pathlib
 
+    # Módulos del paquete que **no** son capacidades: no llaman al proveedor, así
+    # que no hay nada que vigilar en ellos. La lista se enumera a mano y no se
+    # deduce, para que agregar una quinta capacidad de verdad rompa este test en
+    # vez de colarse por una regla genérica.
+    NO_SON_CAPACIDADES = {
+        "__init__",
+        "provider",      # el adaptador
+        "budget",        # los guardarraíles
+        "evaluation",    # el conjunto de referencia
+        "usage_report",  # lectura del gasto para el panel de /studio
+    }
+
     modulos = {
         p.stem for p in pathlib.Path(national_summary.__file__).parent.glob("*.py")
-        if p.stem not in {"__init__", "provider", "budget", "evaluation"}
+        if p.stem not in NO_SON_CAPACIDADES
     }
     vigilados = {m.__name__.rsplit(".", 1)[-1] for m in CAPABILITIES}
 
     assert modulos == vigilados, f"Capacidades sin vigilar: {modulos - vigilados}"
+
+    # La clasificación se comprueba, no se promete: sin esto, silenciar el
+    # test bastaría con meter una capacidad de verdad en la lista de exentos.
+    for stem in NO_SON_CAPACIDADES - {"__init__", "provider"}:
+        fuente = (pathlib.Path(national_summary.__file__).parent / f"{stem}.py").read_text()
+        assert "get_provider" not in fuente, (
+            f"'{stem}' llama al proveedor: es una capacidad y tiene que vigilarse"
+        )
 
 
 @pytest.mark.parametrize("modulo", CAPABILITIES, ids=lambda m: m.__name__.rsplit(".", 1)[-1])

@@ -10,6 +10,7 @@ import {
   Users,
   ScrollText,
   Settings,
+  Sparkles,
   LogOut,
   Inbox,
   MailWarning,
@@ -29,6 +30,7 @@ const NAV_ITEMS: StudioNavItem[] = [
   { href: "/studio/users", labelKey: "users", icon: Users },
   { href: "/studio/center-applications", labelKey: "center_applications", icon: Inbox },
   { href: "/studio/emails", labelKey: "emails", icon: MailWarning },
+  { href: "/studio/ai", labelKey: "ai", icon: Sparkles },
   { href: "/studio/audit", labelKey: "audit", icon: ScrollText },
   { href: "/studio/settings", labelKey: "settings", icon: Settings },
 ]
@@ -38,6 +40,7 @@ export type StudioNav = {
   users: string
   center_applications: string
   emails: string
+  ai: string
   audit: string
   settings: string
   logout: string
