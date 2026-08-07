@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
 
+import { CatalogSuggestions } from "@/components/CatalogSuggestions"
 import { apiFetch } from "@/lib/api"
 import { useDict } from "@/context/DictionaryContext"
 
@@ -140,6 +141,13 @@ export default function ReceiveDonationPage({
                 {item.quantity} {item.unit}
                 {item.added_by === "center" && ` · ${t.added_by_center}`}
               </p>
+              {/* Solo para renglones que el donante escribió como texto: si ya
+                  trae producto de catálogo, no hay nada que sugerir. */}
+              {!recibida && item.free_text && !item.product_type_id && (
+                <div className="mt-1">
+                  <CatalogSuggestions donationCode={donation.code} text={item.free_text} />
+                </div>
+              )}
             </div>
             {!recibida && (
               <div className="flex gap-1">
