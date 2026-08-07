@@ -47,8 +47,8 @@
 
 | # | Tarea | Descripción | Complejidad | Estado |
 |---|-------|-------------|-------------|--------|
-| 1 | Adaptador de proveedor | Interfaz delgada (`clasificar_texto`, `extraer_de_imagen`, `resumir`) sobre la capa OpenAI-compatible existente. Modelo y `base_url` por entorno; sin amarre a un proveedor. Doble para pruebas. | 🟠 Media | ⬜ |
-| 2 | Guardarraíles de gasto | `AI_MONTHLY_BUDGET_USD` con registro de gasto por llamada e interruptor automático al alcanzarlo; rate limiting por usuario y centro sobre `slowapi`; caché de resultados en Redis (`app.utils.cache`); bandera por capacidad. **Ninguna capacidad se invoca desde un endpoint público.** | 🔴 Alta | ⬜ |
+| 1 | Adaptador de proveedor | Interfaz delgada (`clasificar_texto`, `extraer_de_imagen`, `resumir`) sobre la capa OpenAI-compatible existente. Modelo y `base_url` por entorno; sin amarre a un proveedor. Doble para pruebas. | 🟠 Media | ✅ Done |
+| 2 | Guardarraíles de gasto | `AI_MONTHLY_BUDGET_USD` con registro de gasto por llamada e interruptor automático al alcanzarlo; rate limiting por usuario y centro sobre `slowapi`; caché de resultados en Redis (`app.utils.cache`); bandera por capacidad. **Ninguna capacidad se invoca desde un endpoint público.** | 🔴 Alta | ✅ Done |
 | 3 | Panel de gasto | Consumo del mes por capacidad, visible para `superadmin` en `/studio`, con el estado del interruptor. | 🟢 Baja | ⬜ |
 
 ### Capacidades

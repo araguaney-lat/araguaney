@@ -35,7 +35,7 @@ cryptography>=42.0.8
 cloudinary==1.45.0
 
 # AI / OpenAI-compatible providers (OpenAI, DeepSeek, Groq, etc.)
-# openai==1.55.0
+openai==1.55.0
 
 # Langfuse — LLM observability (traces, evals, prompts)
 # langfuse==2.26.0
