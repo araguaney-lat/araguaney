@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { useSession } from "next-auth/react"
 import { apiFetch } from "@/lib/api"
 import type { Campaign, Center, ShipmentOut, ShipmentDetailOut, ShipmentStatus, PalletOut, EventOut } from "@/types"
+import { ShipmentMilestones } from "@/components/ShipmentMilestones"
 import { StatusTimeline } from "@/components/StatusTimeline"
 import {
   createShipmentAction,
@@ -18,6 +19,10 @@ const STATUS_COLORS: Record<ShipmentStatus, string> = {
   OPEN: "bg-dDraftB text-dDraftT",
   CLOSED: "bg-dSealB text-dSealT",
   SHIPPED: "bg-dShipB text-dShipT",
+  // Los dos estados de destino (Fase 22) comparten la paleta de "sellado":
+  // son buenas noticias, a diferencia de un rechazo.
+  DELIVERED: "bg-dSealB text-dSealT",
+  RECONCILED: "bg-dSealB text-dSealT",
 }
 
 export default function ShipmentsPage() {
@@ -282,7 +287,7 @@ export default function ShipmentsPage() {
       )}
 
       <div className="flex gap-2">
-        {(["", "OPEN", "CLOSED", "SHIPPED"] as const).map((s) => (
+        {(["", "OPEN", "CLOSED", "SHIPPED", "DELIVERED", "RECONCILED"] as const).map((s) => (
           <button key={s} onClick={() => setFilter(s)}
             className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${filter === s ? "bg-[var(--gold)] text-[#3B2A00] border-[var(--gold)]" : "bg-card text-mut border-cardB hover:border-sec"}`}>
             {s === "" ? t.filter_all : t.status[s as ShipmentStatus]}
@@ -429,6 +434,16 @@ export default function ShipmentsPage() {
                 <p className="text-xs font-semibold text-fnt mb-3">{dict.dashboard.common.history}</p>
                 <StatusTimeline events={shipmentEvents} />
               </div>
+            )}
+
+            {/* Hitos y llegada: solo national_admin, que es quien captura con el
+                reporte del consignatario. El coordinador los ve en el timeline. */}
+            {isNationalAdmin && activeShipment && (
+              <ShipmentMilestones
+                shipmentId={activeShipment.id}
+                status={activeShipment.status}
+                onDone={() => { fetchShipmentDetail(activeShipment.id); fetchShipments() }}
+              />
             )}
           </div>
         )}

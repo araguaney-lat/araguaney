@@ -123,7 +123,7 @@ export interface Center {
 
 export type BoxStatus = "DRAFT" | "SEALED" | "SHIPPED" | "REJECTED"
 export type PalletStatus = "OPEN" | "CLOSED" | "SHIPPED"
-export type ShipmentStatus = "OPEN" | "CLOSED" | "SHIPPED"
+export type ShipmentStatus = "OPEN" | "CLOSED" | "SHIPPED" | "DELIVERED" | "RECONCILED"
 
 export interface ProductType {
   id: string
@@ -171,9 +171,21 @@ export interface IntakeOut {
 export interface EventOut {
   from_status: string | null
   to_status: string
+  milestone?: string | null
   note: string | null
   ts: string
 }
+
+// Los siete hitos que el backend acepta (Fase 22).
+export const SHIPMENT_MILESTONES = [
+  "DEPARTED_WAREHOUSE",
+  "ARRIVED_AIRPORT",
+  "LOADED_AIRCRAFT",
+  "DEPARTED_FLIGHT",
+  "ARRIVED_DESTINATION",
+  "CUSTOMS_CLEARED",
+  "DELIVERED_CONSIGNEE",
+] as const
 
 export interface BoxPublicOut {
   code: string
@@ -225,6 +237,8 @@ export interface ShipmentOut {
   notes: string | null
   closed_at: string | null
   shipped_at: string | null
+  delivered_at?: string | null
+  reconciled_at?: string | null
   created_at: string
 }
 
