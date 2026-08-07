@@ -11,7 +11,7 @@ Ninguna de estas rutas invoca IA ni encola trabajo caro: lo único que sale de
 aquí son correos, ya acotados por el límite de tasa.
 """
 
-from fastapi import APIRouter, BackgroundTasks, Depends, Request, Response
+from fastapi import APIRouter, BackgroundTasks, Depends, Request, Response, Query
 from pydantic import EmailStr, Field
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -33,6 +33,8 @@ from app.schemas.donation import (
 )
 from app.schemas._base import StrictModel, StrictUUID
 from app.services.donation_photo_service import DonationPhotoService
+from app.schemas.product_type import ProductTypeOut
+from app.services.ai import text_mapping
 from app.services.donation_service import DonationService
 from app.utils.rate_limit import limiter
 
@@ -309,6 +311,27 @@ def center_photo_url(
     """El centro ve las fotos al preparar el doble check."""
     response.headers["Cache-Control"] = _NO_CACHE
     return {"url": DonationPhotoService(db).center_url(code, photo_id)}
+
+
+@router.get("/donations/{code}/suggestions", response_model=list[ProductTypeOut])
+@limiter.limit("30/minute")
+def suggest_catalog_matches(
+    request: Request,
+    code: str,
+    text: str = Query(min_length=1, max_length=500),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_center_role),
+    scope=Depends(tenant_scope),
+):
+    """Hasta tres productos sugeridos para un renglón de texto libre del donante.
+
+    Autenticada y con rate limit, como toda la IA de la fase. Devuelve lista
+    vacía si la capacidad está apagada, sin presupuesto o el proveedor no
+    responde: la captura manual nunca depende de que la IA esté disponible.
+    """
+    return text_mapping.suggest(
+        db, text, user_id=current_user.id, center_id=current_user.center_id
+    )
 
 
 @router.post("/donations/{code}/receive", response_model=DonationOut)
