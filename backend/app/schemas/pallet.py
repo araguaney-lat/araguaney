@@ -54,6 +54,8 @@ class PalletPublicOut(StrictModel):
     center_name: str
     box_count: int
     closed_at: datetime | None
+    delivered: bool = False
+    delivered_at: datetime | None = None
 
 
 class PalletCloseIn(StrictModel):

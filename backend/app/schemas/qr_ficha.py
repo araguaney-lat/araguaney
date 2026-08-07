@@ -39,6 +39,9 @@ class QrBoxFicha(StrictModel):
     sealed_at: datetime | None
     created_at: datetime
     # History
+    # Dato del envío, no de la pieza: lo despachado sigue congelado (Fase 22).
+    delivered: bool = False
+    delivered_at: datetime | None = None
     events: list[QrEventOut]
 
 
@@ -60,4 +63,7 @@ class QrPalletFicha(StrictModel):
     closed_at: datetime | None
     created_at: datetime
     boxes: list[QrPalletBoxRow]
+    # Dato del envío, no de la pieza: lo despachado sigue congelado (Fase 22).
+    delivered: bool = False
+    delivered_at: datetime | None = None
     events: list[QrEventOut]

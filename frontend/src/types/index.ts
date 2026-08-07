@@ -196,6 +196,9 @@ export interface BoxPublicOut {
   unit: string
   expiry_date: string | null
   sealed_at: string | null
+  // Dato del envío, no de la caja: lo despachado sigue congelado (Fase 22).
+  delivered?: boolean
+  delivered_at?: string | null
 }
 
 export interface PalletOut {
