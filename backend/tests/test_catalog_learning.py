@@ -42,6 +42,9 @@ def _service_with(boxes):
     data.donante_libre = None
     data.donor = None            # intake anonimo: la norma del dominio
     data.notes = None
+    # Captura en línea: sin llave de idempotencia (Fase 25). Un MagicMock
+    # devolvería truthy y dispararía la búsqueda de duplicados.
+    data.capture_id = None
     return svc, data, db
 
 

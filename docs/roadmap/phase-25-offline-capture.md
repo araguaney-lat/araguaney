@@ -40,9 +40,9 @@
 
 | # | Tarea | Descripción | Complejidad | Estado |
 |---|-------|-------------|-------------|--------|
-| 1 | Migración: `capture_id` y códigos reservados | `intakes.capture_id` UUID **unique nullable** (nullable porque las capturas en línea de hoy no lo tienen); tabla `box_code_reservations` (code unique, center_id, reserved_by, used_at, box_id). Reversible. | 🟠 Media | ⬜ |
-| 2 | `IntakeService`: idempotencia | Si llega un `capture_id` ya registrado, **devolver el intake existente** con `200` en vez de crear otro. La unicidad la sostiene la base, no una comprobación previa: dos peticiones concurrentes tienen una carrera en medio. | 🔴 Alta | ⬜ |
-| 3 | Tests de idempotencia | Mismo `capture_id` dos veces → un intake, cero cajas nuevas. Caso concurrente. La restricción existe en la base. | 🔴 Alta | ⬜ |
+| 1 | Migración: `capture_id` y códigos reservados | `intakes.capture_id` UUID **unique nullable** (nullable porque las capturas en línea de hoy no lo tienen); tabla `box_code_reservations` (code unique, center_id, reserved_by, used_at, box_id). Reversible. | 🟠 Media | ✅ Done |
+| 2 | `IntakeService`: idempotencia | Si llega un `capture_id` ya registrado, **devolver el intake existente** con `200` en vez de crear otro. La unicidad la sostiene la base, no una comprobación previa: dos peticiones concurrentes tienen una carrera en medio. | 🔴 Alta | ✅ Done |
+| 3 | Tests de idempotencia | Mismo `capture_id` dos veces → un intake, cero cajas nuevas. Caso concurrente. La restricción existe en la base. | 🔴 Alta | ✅ Done |
 
 ### Códigos pre-asignados
 

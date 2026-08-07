@@ -4,8 +4,8 @@
 
 ```mermaid
 pie title Tareas completadas (457 tareas)
-    "Listas" : 420
-    "Pendientes" : 37
+    "Listas" : 423
+    "Pendientes" : 34
 ```
 
 | Fase | Nombre | Listas | Pendientes | Progreso |
@@ -35,10 +35,10 @@ pie title Tareas completadas (457 tareas)
 | 22 | [Trazabilidad extendida: avión y destino](phase-22-extended-traceability.md) | 14 | 0 | ✅ 100% |
 | 23 | [IA asistida: captura, catálogo y necesidades](phase-23-ai-assisted-capture.md) | 10 | 1 | 🟡 91% |
 | 24 | [Observabilidad: que un fallo silencioso deje de serlo](phase-24-observability.md) | 11 | 0 | ✅ 100% |
-| 25 | [Captura sin conexión: cola local y sincronización diferida](phase-25-offline-capture.md) | 0 | 14 | ⬜ 0% |
-| **Total** | | **420** | **37** | **🟡 92%** |
+| 25 | [Captura sin conexión: cola local y sincronización diferida](phase-25-offline-capture.md) | 3 | 11 | 🟡 21% |
+| **Total** | | **423** | **34** | **🟡 93%** |
 
-> **Pendientes (37):**
+> **Pendientes (34):**
 > El grupo A de la Fase 13 (privacidad, lo que aplica hoy) está completo.
 > - Los borradores legales de la Fase 20 están escritos y esperando revisión de abogado:
 >   [`docs/legal/drafts/`](../legal/drafts/README.md). Sus tareas siguen abiertas hasta que esa
@@ -49,10 +49,10 @@ pie title Tareas completadas (457 tareas)
 >   estructurales documentados). Lo que queda son los tres textos legales (tasks 1, 2 y 6), que la
 >   task 7 —revisión de abogado— gatea antes de publicar; los borradores ya están escritos en
 >   [`docs/legal/drafts/`](../legal/drafts/README.md).
-> - **14 de la Fase 25 (captura sin conexión):** muchos centros operan en sótanos sin cobertura; hoy
->   la app abre sin conexión pero no guarda. Encolar la captura y sincronizarla al volver la red,
->   sin duplicar inventario al reintentar. De los tres problemas, ser nativo solo resolvería la
->   persistencia: la idempotencia y los códigos de caja son de dominio y se heredan. Diseño en
+> - **11 de la Fase 25 (captura sin conexión):** la idempotencia ya está —una captura reintentada
+>   no duplica inventario— y con ella el esquema de códigos pre-asignados. Falta reservarlos,
+>   consumirlos y la cola en el cliente. Ser nativo solo resolvería la persistencia: lo demás es
+>   de dominio y se hereda. Diseño en
 >   [su spec](../superpowers/specs/2026-08-07-offline-capture-design.md).
 > - **1 de la Fase 23 (IA asistida):** las cuatro capacidades, la evaluación y el aviso de privacidad
 >   ya están, todo apagado por defecto. Queda el panel de gasto en `/studio` (task 3). Encender
