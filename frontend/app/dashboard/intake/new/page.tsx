@@ -10,6 +10,9 @@ import { createIntakeAction, type BoxDraft, type DonorPayload } from "@/lib/acti
 import { DonorForm } from "@/components/DonorForm"
 import { useOnlineStatus } from "@/components/ConnectivityBanner"
 import { useDict } from "@/context/DictionaryContext"
+import { useOfflineQueue } from "@/context/OfflineQueueContext"
+import { queueCapture } from "@/lib/offline/capture"
+import { searchLocalCatalog, lookupLocalGtin } from "@/lib/offline/catalog-cache"
 
 // @zxing/browser is only needed when the camera scanner actually opens —
 // keep it out of the initial bundle for this high-traffic intake flow.
@@ -80,7 +83,13 @@ function useProductSearch(campaignId: string) {
         const params = new URLSearchParams({ q })
         if (campaignId) params.set("campaign_id", campaignId)
         const res = await fetch(`/api/catalog/search?${params}`)
-        if (res.ok) setResults(await res.json())
+        if (res.ok) { setResults(await res.json()); return }
+        setResults(await searchLocalCatalog(q, campaignId))
+      } catch {
+        // Sin red se busca en el catálogo que se descargó con señal. Misma
+        // visibilidad por campaña que la búsqueda del servidor, para que lo
+        // que se puede elegir aquí sea lo que allá se va a aceptar.
+        setResults(await searchLocalCatalog(q, campaignId))
       } finally {
         setLoading(false)
       }
@@ -102,6 +111,12 @@ function useProductSearch(campaignId: string) {
         return { product: data.product_type, offlineBlocked: false, notFound: false }
       }
       return { product: null, offlineBlocked: false, notFound: true }
+    } catch {
+      // Sin red no hay consulta a Open Food Facts, pero el catálogo local sí
+      // trae los códigos que ya estaban asociados a un producto. Si no está,
+      // se elige el producto a mano: no es un bloqueo, es una búsqueda menos.
+      const local = await lookupLocalGtin(gtin)
+      return { product: local, offlineBlocked: false, notFound: local === null }
     } finally {
       setLoading(false)
     }
@@ -380,6 +395,7 @@ export default function NewIntakePage() {
   const { data: session } = useSession()
   const isNationalAdmin = session?.centerRole === "national_admin"
   const token = session?.accessToken ?? ""
+  const queue = useOfflineQueue()
 
   const [rows, setRows] = useState<BoxRow[]>([newRow()])
   const [campaignId, setCampaignId] = useState("")
@@ -519,8 +535,7 @@ export default function NewIntakePage() {
       gtin: row.scannedGtin || undefined,
     }))
 
-    setSubmitting(true)
-    const result = await createIntakeAction({
+    const payload = {
       campaign_id: campaignId,
       donor: registrarDonante ? donorPayload() : undefined,
       donante_libre: donante.trim() || undefined,
@@ -530,16 +545,66 @@ export default function NewIntakePage() {
       donation_id: donation?.id,
       donor_terms_accepted: registrarDonante && donorTerms,
       anonymous_exception_reason: needsException ? exceptionReason.trim() || undefined : undefined,
-    })
-    setSubmitting(false)
+    }
 
-    if (result.error) {
-      setError(result.error)
-      // El backend pide identificar al donante por el volumen. Si no se puede,
-      // la salida es la excepción con motivo, que abre una revisión.
-      if (result.code === "DONOR_REQUIRED_FOR_VOLUME") setNeedsException(true)
-    } else {
-      router.push("/dashboard/intake")
+    // La captura se guarda en el dispositivo y se va sola cuando vuelva la
+    // señal. El identificador de idempotencia se genera aquí, antes del primer
+    // intento, así que reintentarla no puede duplicar inventario.
+    const encolar = async (): Promise<boolean> => {
+      try {
+        const { withoutCodes } = await queueCapture({
+          payload,
+          userId: session?.userId ?? "",
+          centerId: session?.centerId ?? "",
+          summary: {
+            campaign_name: campaigns.find((c) => c.id === campaignId)?.name ?? "",
+            boxes: rows.map((r) => ({
+              product_name: r.product_type?.display_name ?? "",
+              quantity: parseInt(r.quantity, 10),
+              unit: r.unit.trim(),
+            })),
+          },
+        })
+        await queue?.refresh()
+        router.push(withoutCodes ? "/dashboard/intake/pending" : "/dashboard/intake")
+        return true
+      } catch {
+        // El almacenamiento local puede no existir: navegación privada, o un
+        // navegador que lo niega. Se dice, porque callarlo dejaría a alguien
+        // capturando sin red creyendo que se está guardando algo.
+        setError(t.error_offline_storage)
+        return false
+      }
+    }
+
+    // Sin centro propio no hay bloque de códigos al que pedirle etiquetas: la
+    // captura sin conexión es de quien opera un centro.
+    if (!online && !session?.centerId) { setError(t.error_offline_no_center); return }
+
+    setSubmitting(true)
+    try {
+      if (!online) {
+        await encolar()
+        return
+      }
+
+      const result = await createIntakeAction(payload)
+      if (result.error) {
+        setError(result.error)
+        // El backend pide identificar al donante por el volumen. Si no se puede,
+        // la salida es la excepción con motivo, que abre una revisión.
+        if (result.code === "DONOR_REQUIRED_FOR_VOLUME") setNeedsException(true)
+      } else {
+        router.push("/dashboard/intake")
+      }
+    } catch {
+      // El servidor no llegó a responder: la señal se cayó entre el botón y la
+      // respuesta. Se encola en vez de mostrar un error, que es el momento
+      // exacto en el que hoy se perdía una captura.
+      if (session?.centerId) await encolar()
+      else setError(t.error_offline_network)
+    } finally {
+      setSubmitting(false)
     }
   }
 
@@ -565,6 +630,16 @@ export default function NewIntakePage() {
           <span className={`h-2 w-2 rounded-full ${online ? "bg-[var(--dSealT)]" : "bg-[var(--dDraftT)]"}`} />
           {online ? t.online_status : t.offline_status}
         </div>
+        {/* Sin señal, lo único que importa es si hay con qué capturar: el
+            catálogo descargado y los códigos apartados. Se dice aquí porque el
+            único momento de arreglarlo es antes de bajar, con conexión. */}
+        {!online && queue && (
+          <p className="mt-1 text-xs text-mut">
+            {t.offline_ready
+              .replace("{products}", String(queue.catalogSize))
+              .replace("{codes}", String(queue.codesLeft))}
+          </p>
+        )}
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-5">
@@ -698,7 +773,7 @@ export default function NewIntakePage() {
             disabled={submitting || rows.some((r) => r.offlineBlocked)}
             className="flex-1 rounded-lg bg-[var(--gold)] py-3 text-sm font-medium text-[#3B2A00] hover:opacity-90 disabled:opacity-60"
           >
-            {submitting ? t.submitting : t.submit}
+            {submitting ? t.submitting : online ? t.submit : t.submit_offline}
           </button>
           <button
             type="button"

@@ -6,6 +6,8 @@ import { CenterSelector } from "@/components/CenterSelector"
 import { BottomNav } from "@/components/BottomNav"
 import { DictionaryProvider } from "@/context/DictionaryContext"
 import { ThemeProvider } from "@/context/ThemeContext"
+import { OfflineQueueProvider } from "@/context/OfflineQueueContext"
+import { PendingCapturesBadge } from "@/components/PendingCapturesBadge"
 import { getLocale, getDictionary } from "@/lib/i18n"
 import { getTheme } from "@/lib/theme"
 import type { CenterRole } from "@/types"
@@ -55,6 +57,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
     <SessionProvider session={session}>
       <DictionaryProvider dict={dict}>
         <ThemeProvider theme={theme}>
+         {/* La cola envuelve todo el panel: el contador tiene que seguir a la
+             vista después de capturar, desde cualquier pantalla. */}
+         <OfflineQueueProvider>
           <div data-theme={theme} className="flex h-screen overflow-hidden bg-app text-tx">
             <div className="hidden h-full flex-col md:flex">
               {centerRole === "national_admin" && (
@@ -72,7 +77,10 @@ export default async function DashboardLayout({ children }: { children: React.Re
                 theme={theme}
               />
             </div>
-            <main className="flex-1 overflow-y-auto p-6 pb-24 md:pb-6">{children}</main>
+            <main className="flex-1 overflow-y-auto p-6 pb-24 md:pb-6">
+              <PendingCapturesBadge />
+              {children}
+            </main>
             <BottomNav
               centerRole={centerRole}
               centerSelectorToken={centerRole === "national_admin" ? session.accessToken : null}
@@ -85,6 +93,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
               theme={theme}
             />
           </div>
+         </OfflineQueueProvider>
         </ThemeProvider>
       </DictionaryProvider>
     </SessionProvider>
