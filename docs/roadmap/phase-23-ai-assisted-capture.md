@@ -56,7 +56,7 @@
 | # | Tarea | Descripción | Complejidad | Estado |
 |---|-------|-------------|-------------|--------|
 | 4 | Mapeo de texto libre → catálogo | En la recepción (Fase 18, autenticada): cada renglón de texto libre llega con 3 sugerencias por confianza; el coordinador elige, busca o crea. La elección alimenta el catálogo que aprende (Fase 19). | 🔴 Alta | ✅ Done |
-| 5 | OCR de etiqueta de medicamento | Foto → `inn_name`, `form`, `strength`, `batch`, `expiry_date` pre-llenados, editables y marcados como sugeridos hasta confirmarse. La caducidad pasa por la validación de 365 días existente. | 🔴 Alta | ⬜ |
+| 5 | OCR de etiqueta de medicamento | Foto → `inn_name`, `form`, `strength`, `batch`, `expiry_date` pre-llenados, editables y marcados como sugeridos hasta confirmarse. La caducidad pasa por la validación de 365 días existente. | 🔴 Alta | ✅ Done |
 | 6 | Necesidades ↔ stock | La solicitud muestra qué centros tienen inventario compatible y en qué cantidad. Scoped por tenant: un centro no descubre el stock de otro salvo `national_admin`. | 🟠 Media | ⬜ |
 | 7 | Resumen del agregado nacional | Párrafo generado sobre las cifras que el panel ya calcula, para prensa y donantes institucionales. Sin datos personales en el prompt. | 🟢 Baja | ⬜ |
 

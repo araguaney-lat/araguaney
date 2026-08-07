@@ -34,7 +34,7 @@ from app.schemas.donation import (
 from app.schemas._base import StrictModel, StrictUUID
 from app.services.donation_photo_service import DonationPhotoService
 from app.schemas.product_type import ProductTypeOut
-from app.services.ai import text_mapping
+from app.services.ai import label_ocr, text_mapping
 from app.services.donation_service import DonationService
 from app.utils.rate_limit import limiter
 
@@ -332,6 +332,35 @@ def suggest_catalog_matches(
     return text_mapping.suggest(
         db, text, user_id=current_user.id, center_id=current_user.center_id
     )
+
+
+@router.post("/donations/{code}/photos/{photo_id}/read-label", response_model=dict)
+@limiter.limit("20/minute")
+def read_label(
+    request: Request,
+    code: str,
+    photo_id: StrictUUID,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_center_role),
+    scope=Depends(tenant_scope),
+):
+    """Lee la etiqueta de una foto y devuelve los campos que logró leer.
+
+    Los campos llegan como **sugerencia**: quien captura los confirma o los
+    corrige antes de que la caja se selle. La caducidad sigue pasando por la
+    validación de vida útil, así que una lectura optimista no puede colar una
+    caja que debía rechazarse.
+
+    Diccionario vacío si la capacidad está apagada, sin presupuesto o el
+    proveedor no responde: se teclea como siempre.
+    """
+    url = DonationPhotoService(db).center_url(code, photo_id)
+    campos = label_ocr.extract(
+        db, url, user_id=current_user.id, center_id=current_user.center_id
+    )
+    # `suggested` es explícito para que ningún cliente confunda esto con datos
+    # confirmados: nada llega a SEALED sin que una persona lo haya mirado.
+    return {"suggested": campos}
 
 
 @router.post("/donations/{code}/receive", response_model=DonationOut)

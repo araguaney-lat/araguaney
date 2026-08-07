@@ -4,8 +4,8 @@
 
 ```mermaid
 pie title Tareas completadas (443 tareas)
-    "Listas" : 414
-    "Pendientes" : 29
+    "Listas" : 415
+    "Pendientes" : 28
 ```
 
 | Fase | Nombre | Listas | Pendientes | Progreso |
@@ -33,11 +33,11 @@ pie title Tareas completadas (443 tareas)
 | 20 | [Prevención de riesgos: responsabilidad y anti-lavado en especie](phase-20-risk-prevention.md) | 6 | 4 | 🟡 60% |
 | 21 | [Logística: pesaje, declaración de mercancías y perfiles de paletizado](phase-21-logistics-weighing.md) | 12 | 0 | ✅ 100% |
 | 22 | [Trazabilidad extendida: avión y destino](phase-22-extended-traceability.md) | 14 | 0 | ✅ 100% |
-| 23 | [IA asistida: captura, catálogo y necesidades](phase-23-ai-assisted-capture.md) | 4 | 7 | 🟡 36% |
+| 23 | [IA asistida: captura, catálogo y necesidades](phase-23-ai-assisted-capture.md) | 5 | 6 | 🟡 45% |
 | 24 | [Observabilidad: que un fallo silencioso deje de serlo](phase-24-observability.md) | 11 | 0 | ✅ 100% |
-| **Total** | | **414** | **29** | **🟡 93%** |
+| **Total** | | **415** | **28** | **🟡 94%** |
 
-> **Pendientes (29):**
+> **Pendientes (28):**
 > El grupo A de la Fase 13 (privacidad, lo que aplica hoy) está completo.
 > - Los borradores legales de la Fase 20 están escritos y esperando revisión de abogado:
 >   [`docs/legal/drafts/`](../legal/drafts/README.md). Sus tareas siguen abiertas hasta que esa
@@ -48,8 +48,9 @@ pie title Tareas completadas (443 tareas)
 >   estructurales documentados). Lo que queda son los tres textos legales (tasks 1, 2 y 6), que la
 >   task 7 —revisión de abogado— gatea antes de publicar; los borradores ya están escritos en
 >   [`docs/legal/drafts/`](../legal/drafts/README.md).
-> - **7 de la Fase 23 (IA asistida):** cimientos, evaluación y el mapeo de texto libre ya están, con
->   todo apagado por defecto; faltan OCR de etiqueta, emparejamiento, resumen nacional y lo legal.
+> - **6 de la Fase 23 (IA asistida):** cimientos, evaluación y las dos capacidades de mayor retorno
+>   (mapeo de texto y OCR de etiqueta) ya están, apagadas por defecto; faltan emparejamiento de
+>   necesidades, resumen nacional, el panel de gasto y lo legal.
 >   Diseño en
 >   [su spec](../superpowers/specs/2026-07-29-ai-assisted-capture-design.md).
 > - **12 gated por pago o por decisión de negocio:** Fase 4 → 2 (spend caps + alertas, requieren
