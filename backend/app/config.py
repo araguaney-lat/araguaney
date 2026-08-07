@@ -109,12 +109,23 @@ class Settings(BaseSettings):
     cloudinary_api_key: str = ""
     cloudinary_api_secret: str = ""
 
-    # ── AI / OpenAI-compatible (optional — LLM features) ─────────────────────
-    # pip install openai==1.55.0
-    # Works with OpenAI, DeepSeek, Groq, Together AI, etc. via base_url
-    # ai_api_key: str = ""
-    # ai_base_url: str = "https://api.openai.com/v1"   # override for other providers
-    # ai_model: str = "gpt-4o-mini"
+    # ── IA asistida (Fase 23) ────────────────────────────────────────────────
+    # Capa OpenAI-compatible: OpenAI, DeepSeek, Groq, Together u Ollama local
+    # entran cambiando `ai_base_url`. Sin `ai_api_key` la IA queda apagada y la
+    # aplicación se comporta exactamente como antes de esta fase.
+    ai_api_key: str = ""
+    ai_base_url: str = "https://api.openai.com/v1"
+    ai_model: str = "gpt-4o-mini"
+    # Tope de gasto mensual. Al alcanzarlo, las capacidades se apagan solas y la
+    # operación sigue: el riesgo de esta fase no es el precio unitario, es el
+    # volumen sin control.
+    ai_monthly_budget_usd: float = 20.0
+    # Bandera por capacidad: encender una no enciende las demás. Ninguna se
+    # invoca desde un endpoint público.
+    ai_enable_text_mapping: bool = False
+    ai_enable_label_ocr: bool = False
+    ai_enable_needs_matching: bool = False
+    ai_enable_national_summary: bool = False
 
     # ── Langfuse (optional — LLM observability) ───────────────────────────────
     # pip install langfuse==2.26.0
