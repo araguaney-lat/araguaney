@@ -1,6 +1,9 @@
-# Security Layers — FastAPI + Next.js Boilerplate
+# Security Layers — Araguaney
 
-This document tracks every security layer implemented in this stack. Use it as a checklist when starting a new project from this template.
+This document tracks every security layer implemented in this stack. The first
+half is inherited from the `fastapi-nextjs-boilerplate` template and reads as a
+checklist for any project built on it; the sections from *Controles
+estructurales del dominio* onward are specific to Araguaney.
 
 ---
 
@@ -251,6 +254,33 @@ abre una revisión que resuelve la coordinación, nunca quien la capturó. El
 alcance de este control termina ahí: es escalamiento y registro, no verificación
 documental de identidad ni screening de sanciones, que serían desproporcionados
 para una plataforma que no maneja dinero (FATF R.8 pide proporcionalidad).
+
+---
+
+## La cola de captura sin conexión (Fase 25)
+
+La cola vive en el **dispositivo**, en IndexedDB, y eso mueve tres cosas de
+lugar. Se documentan aquí porque un dispositivo prestado es un vector que no
+existe cuando todo el estado está en el servidor.
+
+**La cola es por usuario y se filtra al enviar.** Un teléfono se comparte entre
+turnos. Sin ese filtro, la captura de una persona se enviaría con la sesión de
+la siguiente que entre, y quedaría atribuida a otro operador y —entre centros
+distintos— a otro centro. El filtro está en `dueCaptures` y tiene prueba propia.
+
+**Los códigos de caja apartados son por centro.** Un bloque reservado por el
+centro A no lo puede consumir el centro B, y un código de otro centro se rechaza
+con **el mismo mensaje** que uno inexistente: si el error fuera distinto, un
+centro podría mapear el bloque de otro probando códigos.
+
+**La cola no se cifra, y es una decisión, no un olvido.** Lo que guarda es
+inventario —producto, cantidad, lote, caducidad—, no datos de beneficiarios. El
+donante identificado es opcional y no es obligatorio para capturar. Si algún día
+la cola tuviera que llevar PII obligatoria, esta decisión se revisa: está escrita
+como no-objetivo en `docs/roadmap/phase-25-offline-capture.md`.
+
+Al cerrar sesión se borran catálogo y códigos, **nunca capturas pendientes**:
+eso sería perder trabajo de alguien.
 
 ---
 

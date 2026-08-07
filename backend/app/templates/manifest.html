@@ -31,8 +31,18 @@
   th { background: #e5e7eb; padding: 2mm 2.5mm; text-align: left; font-size: 7pt; font-weight: bold; border: 0.3pt solid #ccc; }
   td { padding: 1.5mm 2.5mm; border: 0.3pt solid #ddd; vertical-align: top; }
   tr:nth-child(even) td { background: #f9fafb; }
-  .pallet-block { margin-top: 6mm; page-break-inside: avoid; }
-  .pallet-header { display: flex; justify-content: space-between; align-items: baseline; }
+  /* Una tarima fluye y se parte donde toque. `page-break-inside: avoid` aqui
+     parecia mas prolijo y costaba una hoja casi en blanco en cada manifiesto
+     real: una tarima de sesenta cajas no cabe debajo del encabezado, asi que
+     se empujaba entera a la hoja siguiente... y se partia igual, porque
+     tampoco cabe en una hoja. El `thead` se repite solo en cada hoja de
+     continuacion, que es lo que hace legible una tabla partida. */
+  .pallet-block { margin-top: 6mm; }
+  /* Lo unico que no puede partirse: el codigo de la tarima separado de su
+     primera fila deja una hoja que no dice de que tarima habla. */
+  .pallet-header { display: flex; justify-content: space-between; align-items: baseline; break-after: avoid; }
+  .subtotal-keep { break-before: avoid; }
+  .totals, .legend { break-inside: avoid; }
   .pallet-code { font-size: 11pt; font-weight: bold; font-family: monospace; }
   .pallet-meta { font-size: 7.5pt; color: #555; }
   .subtotal { margin-top: 1mm; font-size: 7.5pt; color: #555; text-align: right; }
@@ -125,7 +135,7 @@
         {% endfor %}
       </tbody>
     </table>
-    <div class="subtotal">
+    <div class="subtotal subtotal-keep">
       Subtotal tarima: {{ pallet.boxes | map(attribute='quantity') | sum }} unid.
       {% if pallet.boxes_weight_kg %} · {{ '%.3f'|format(pallet.boxes_weight_kg|float) }} kg en cajas{% endif %}
       {% if pallet.gross_weight_kg %}

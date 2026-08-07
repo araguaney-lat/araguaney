@@ -18,15 +18,17 @@
     <section>
       <div class="sect-head">
         <span class="eyebrow">The shipment status</span>
-        <h2>Open, closed, dispatched</h2>
-        <p class="sect-note">It is filled while <span class="hl">OPEN</span>; it is fixed when it moves to <span class="hl">CLOSED</span>; and when dispatched (<span class="hl">SHIPPED</span>) it drags its pallets and boxes into the same status.</p>
+        <h2>From open to reconciled</h2>
+        <p class="sect-note">It is filled while <span class="hl">OPEN</span>; it is fixed when it moves to <span class="hl">CLOSED</span>; and when dispatched (<span class="hl">SHIPPED</span>) it drags its pallets and boxes into the same status. Dispatching is not the end: <span class="hl">DELIVERED</span> says it arrived and <span class="hl">RECONCILED</span> says what arrived has been recorded. Both are covered in the <b>Reception at destination</b> manual.</p>
       </div>
       <div class="machine">
-        <p class="desc">Every transition is recorded. Dispatching is final: it freezes the entire content of the shipment.</p>
+        <p class="desc">Every transition is recorded. Dispatching is final: it freezes the entire content of the shipment, <b>and it stays frozen afterwards</b>. Delivering and reconciling never touch the boxes again: what arrived is stored separately, and measuring shrinkage depends on that separation.</p>
         <div class="flow">
           <span class="pill">OPEN</span><span class="arrow">→</span>
           <span class="pill blue">CLOSED</span><span class="arrow">→</span>
-          <span class="pill green">SHIPPED</span>
+          <span class="pill green">SHIPPED</span><span class="arrow">→</span>
+          <span class="pill green">DELIVERED</span><span class="arrow">→</span>
+          <span class="pill green">RECONCILED</span>
         </div>
       </div>
     </section>

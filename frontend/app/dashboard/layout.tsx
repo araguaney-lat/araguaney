@@ -55,7 +55,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   return (
     <SessionProvider session={session}>
-      <DictionaryProvider dict={dict}>
+      <DictionaryProvider dict={dict} locale={locale}>
         <ThemeProvider theme={theme}>
          {/* La cola envuelve todo el panel: el contador tiene que seguir a la
              vista después de capturar, desde cualquier pantalla. */}

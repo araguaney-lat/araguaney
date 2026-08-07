@@ -41,7 +41,7 @@ export default async function StudioLayout({ children }: { children: React.React
   const userEmail = me?.email ?? null
 
   return (
-    <DictionaryProvider dict={dict}>
+    <DictionaryProvider dict={dict} locale={locale}>
       <div className="flex h-screen overflow-hidden bg-zinc-50">
         <StudioSidebar
           userName={userName}

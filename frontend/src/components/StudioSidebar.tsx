@@ -4,7 +4,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useEffect, useState } from "react"
-import { logoutAction } from "@/lib/actions"
+import { LogoutForm } from "@/components/LogoutForm"
 import {
   BarChart2,
   Users,
@@ -185,7 +185,7 @@ export function StudioSidebar({ userName, userEmail, nav, locale }: StudioSideba
           </div>
         )}
 
-        <form action={logoutAction}>
+        <LogoutForm>
           <button
             type="submit"
             title={collapsed ? nav.logout : undefined}
@@ -194,7 +194,7 @@ export function StudioSidebar({ userName, userEmail, nav, locale }: StudioSideba
             <LogOut size={17} className="flex-shrink-0" />
             {!collapsed && <span>{nav.logout}</span>}
           </button>
-        </form>
+        </LogoutForm>
       </div>
     </aside>
   )

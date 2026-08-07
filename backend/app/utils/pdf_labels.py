@@ -14,6 +14,7 @@ from reportlab.lib.units import mm
 from reportlab.pdfgen import canvas
 from reportlab.lib.utils import ImageReader
 
+from app.utils.label_strings import date_format_for, strings_for
 from app.utils.qr import box_qr_png
 
 
@@ -43,7 +44,8 @@ def _label_dims() -> tuple[float, float]:
     return usable_w / _COLS, usable_h / _ROWS
 
 
-def _draw_label(c: canvas.Canvas, label: LabelData, x: float, y: float, w: float, h: float) -> None:
+def _draw_label(c: canvas.Canvas, label: LabelData, x: float, y: float, w: float, h: float,
+                t: dict[str, str], date_fmt: str) -> None:
     pad = 3 * mm
     qr_size = h - 2 * pad
 
@@ -71,20 +73,27 @@ def _draw_label(c: canvas.Canvas, label: LabelData, x: float, y: float, w: float
 
     name = label.display_name[:38] + "…" if len(label.display_name) > 38 else label.display_name
     c.drawString(tx, ty - 16, name)
-    c.drawString(tx, ty - 24, f"Cant: {label.quantity} {label.unit}")
+    c.drawString(tx, ty - 24, f"{t['quantity']}: {label.quantity} {label.unit}")
 
     if label.batch:
-        c.drawString(tx, ty - 32, f"Lote: {label.batch}")
+        c.drawString(tx, ty - 32, f"{t['batch']}: {label.batch}")
     if label.expiry_date:
-        c.drawString(tx, ty - 40, f"Cad: {label.expiry_date.strftime('%d/%m/%Y')}")
+        c.drawString(tx, ty - 40, f"{t['expiry']}: {label.expiry_date.strftime(date_fmt)}")
 
     c.setFont("Helvetica", 5)
     c.setFillColor(colors.HexColor("#71717a"))
     c.drawString(tx, y + pad + 2, label.center_name[:40])
 
 
-def generate_labels_pdf(labels: list[LabelData]) -> bytes:
-    """Return PDF bytes with all labels laid out on A4 pages (10 per page)."""
+def generate_labels_pdf(labels: list[LabelData], lang: str | None = None) -> bytes:
+    """Return PDF bytes with all labels laid out on A4 pages (10 per page).
+
+    `lang` sigue el idioma que eligió quien imprime, igual que el resto del
+    panel. Solo traduce las palabras del formulario: el producto, el lote y el
+    centro salen como se capturaron.
+    """
+    t = strings_for(lang)
+    date_fmt = date_format_for(lang)
     buf = io.BytesIO()
     c = canvas.Canvas(buf, pagesize=A4)
     label_w, label_h = _label_dims()
@@ -102,7 +111,7 @@ def generate_labels_pdf(labels: list[LabelData]) -> bytes:
         # ReportLab y=0 is bottom; we draw top-down
         y = _PAGE_H - _MARGIN_V - (row + 1) * label_h
 
-        _draw_label(c, label, x, y, label_w, label_h)
+        _draw_label(c, label, x, y, label_w, label_h, t, date_fmt)
 
     c.save()
     return buf.getvalue()

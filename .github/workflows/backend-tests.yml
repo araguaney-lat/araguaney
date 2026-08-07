@@ -23,6 +23,8 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
-          pip install pytest pytest-asyncio httpx
+          # pypdf: solo para pruebas. Las etiquetas se verifican leyendo el
+          # texto del PDF generado, no el fuente que lo escribe.
+          pip install pytest pytest-asyncio httpx pypdf
       - name: Run test suite (unit + tenant isolation)
         run: python -m pytest -q

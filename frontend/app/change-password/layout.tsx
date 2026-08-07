@@ -13,7 +13,7 @@ export default async function ChangePasswordLayout({ children }: { children: Rea
   const dict = await getDictionary(locale)
   return (
     <LocaleProvider locale={locale}>
-      <DictionaryProvider dict={dict}>{children}</DictionaryProvider>
+      <DictionaryProvider dict={dict} locale={locale}>{children}</DictionaryProvider>
     </LocaleProvider>
   )
 }

@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react"
 import { BrowserQRCodeSvgWriter } from "@zxing/library"
 import type { QueuedCapture } from "@/lib/offline/types"
+import { useDict, useLocale } from "@/context/DictionaryContext"
 
 /* Etiquetas de cajas capturadas sin conexión (Fase 25, task 11).
  *
@@ -54,6 +55,11 @@ function Label({
 }) {
   // Misma URL que codifica el servidor en `box_qr_png`.
   const svg = useQrSvg(`${origin}/b/${code}`)
+  // Las mismas palabras que imprime el servidor en su PDF, en el mismo idioma:
+  // la misma caja no puede salir con dos etiquetas distintas según quién la
+  // imprimió.
+  const t = useDict().dashboard.intake_labels
+  const locale = useLocale()
 
   return (
     <div className="flex gap-3 break-inside-avoid rounded border border-cardB p-3">
@@ -66,10 +72,14 @@ function Label({
         <p className="font-mono font-semibold text-tx">{code}</p>
         <p className="mt-1 truncate text-tx">{productName}</p>
         <p className="text-mut">
-          {quantity} {unit}
+          {t.field_quantity}: {quantity} {unit}
         </p>
-        {batch && <p className="text-mut">Lote: {batch}</p>}
-        {expiry && <p className="text-mut">Cad: {expiry}</p>}
+        {batch && <p className="text-mut">{t.field_batch}: {batch}</p>}
+        {expiry && (
+          <p className="text-mut">
+            {t.field_expiry}: {new Date(`${expiry}T00:00:00`).toLocaleDateString(locale)}
+          </p>
+        )}
         {/* El nombre del centro no viaja en la sesión, así que aquí va la
             campaña. El QR ya identifica la caja sin ambigüedad; esto es solo
             para leer de lejos en el andén. */}

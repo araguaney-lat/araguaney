@@ -30,6 +30,14 @@ export const MANUAL_GROUPS: readonly ManualGroup[] = [
           en: "The full flow, the concepts, the statuses, and the map of the panel's modules.",
         },
       },
+      {
+        slug: "mi-rol",
+        title: { es: "Qué te toca según tu rol", en: "What is yours to do" },
+        blurb: {
+          es: "Tu día normal en orden, y qué no puedes hacer aunque veas el botón.",
+          en: "Your normal day in order, and what you cannot do even when you can see the button.",
+        },
+      },
     ],
   },
   {

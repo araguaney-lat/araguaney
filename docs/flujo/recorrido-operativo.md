@@ -21,6 +21,7 @@ y por qué.
 | **Coordinador** | Su centro | Todo lo del voluntario, más tarimas, envíos, manifiestos y el equipo de su centro |
 | **Administración nacional** | Todos los centros | Crea centros, campañas y catálogo; ve el agregado nacional; resuelve revisiones |
 | **Donante** | Sin cuenta | Puede registrar su donación en línea antes de llevarla, o llegar sin registrar |
+| **Superadmin** | La plataforma, en `/studio` | Crea administración nacional, ve la auditoría general y el gasto de IA. No opera un centro |
 
 ---
 
@@ -148,6 +149,32 @@ detener la fila no recupera nada, y lo que sí sirve es que quede el rastro.
 Esos casos aparecen en **Revisiones**, donde la administración nacional los
 aprueba o los rechaza.
 
+### Si el centro está en un sótano
+
+Muchos centros operan bajo tierra o en bodegas sin cobertura. La recepción
+—**y solo la recepción**— funciona sin conexión: se guarda en el teléfono y se
+va sola cuando vuelve la señal.
+
+Lo que hay que hacer es una cosa, y hay que hacerla arriba, con señal: **abrir
+la aplicación antes de bajar.** Al abrirla descarga el catálogo y aparta un
+bloque de códigos de caja, que es lo que permite imprimir la etiqueta en el
+momento. Sin ese paso, abajo no hay con qué trabajar.
+
+Y una al salir: **volver a abrir la aplicación y esperar a que el contador de
+pendientes llegue a cero.** Mientras no marque cero, esas capturas existen solo
+en ese teléfono. Si se cierra la aplicación con capturas en cola, el navegador
+avisa.
+
+Sellar, armar tarimas y cerrar envíos **no** funcionan sin conexión, y no es una
+limitación pendiente de arreglar: dependen del estado de cajas que puede estar
+cambiando en otro dispositivo. Decidir a ciegas produciría dos verdades sobre la
+misma caja.
+
+Si el servidor rechaza una captura al sincronizar —una caducidad corta, un
+producto controlado—, no se descarta: queda en **Recepción → Pendientes** con el
+motivo, esperando a que una persona la corrija o la descarte. El manual completo
+está en *Ayuda → Sin conexión*.
+
 ### Lo que el sistema rechaza solo
 
 Al guardar, cada caja queda en uno de dos estados: **borrador** (lista para
@@ -217,7 +244,8 @@ En **Envíos**.
    avisa, pero no bloquea: quien está en el andén ve la tarima y el sistema no.
 3. Cerrar el envío (no se puede cerrar vacío).
 4. **Despachar.** Este es el punto de no retorno: al despachar se congela todo,
-   tarimas y cajas incluidas. Ya no se edita nada.
+   tarimas y cajas incluidas. Ya no se edita nada, **y sigue así después**:
+   entregarlo y reconciliarlo tampoco vuelven a tocar las cajas (ver la Parte 6).
 5. Descargar los documentos:
    - **Manifiesto** (PDF y Excel): el packing list, caja por caja.
    - **Declaración de mercancías** (Excel y JSON): lo que hay, cuánto pesa,
@@ -231,7 +259,54 @@ o el contador del centro.
 
 ---
 
-## Parte 6 · Movimientos entre centros
+## Parte 6 · El viaje y lo que llegó
+
+Despachar no es el final. Un envío sigue vivo hasta que alguien registra qué
+llegó de verdad.
+
+### Los hitos del camino
+
+En la ficha del envío se pueden ir anotando los sucesos del viaje: salió del
+almacén, llegó al aeropuerto, quedó retenido en aduana, salió a reparto. Son
+**hitos**: dejan constancia de que algo pasó sin inventar estados intermedios.
+Por eso la máquina de estados no crece con cada aeropuerto ni con cada trámite.
+
+La fecha la pone quien registra el hito, no el sistema. El reporte del
+consignatario suele llegar tarde y describir algo de ayer; el campo de fecha
+existe para que el hito quede cuando ocurrió y no cuando alguien se enteró.
+
+### Registrar la recepción en destino
+
+Cuando el envío llega, se marca **entregado** y se captura, caja por caja, qué
+llegó: bien, faltante, dañado o retenido. Al terminar, el envío queda
+**reconciliado**.
+
+Aquí hay una decisión de diseño que conviene entender, porque a primera vista
+parece un error:
+
+> **Registrar la recepción no toca el inventario despachado.** Las cajas siguen
+> diciendo lo que se envió. Lo que llegó vive aparte.
+
+Enviado y recibido son dos hechos distintos, y el sistema guarda los dos. Si al
+recibir se corrigieran las cajas hacia atrás, la diferencia desaparecería, y esa
+diferencia es justamente lo que hay que poder medir: la **merma**.
+
+### Incidencias
+
+Lo que salió mal —un faltante, un daño, una retención en aduana, una diferencia
+de peso— se abre como incidencia, acotada a la tarima o a la caja cuando se sabe
+cuál. Cada una tiene su estado y se cierra con una nota de resolución.
+
+### La merma
+
+Es el espejo del porcentaje de rechazo en la recepción: uno mide lo que no se
+aceptó al entrar, la merma mide lo que no llegó al salir. Se calcula **solo
+sobre envíos reconciliados**. Un envío que nadie ha recibido todavía no tiene
+merma de cero: tiene merma desconocida, que no es lo mismo.
+
+---
+
+## Parte 7 · Movimientos entre centros
 
 En **Transferencias**. Sirve cuando un centro le pasa cajas a otro (porque el
 otro tiene el envío armado, o porque hay que consolidar).
@@ -243,7 +318,7 @@ transferencia tiene su propio manifiesto.
 
 ---
 
-## Parte 7 · Ver el resultado
+## Parte 8 · Ver el resultado
 
 ### Reportes de campaña
 
@@ -284,5 +359,6 @@ el donante hasta el envío.
 ## El camino completo, en una línea
 
 Centros y catálogo listos → campaña abierta con su gente inscrita → el donante
-registra en línea (o no) → recepción, que crea las cajas → sellado y etiqueta →
-tarima cerrada y pesada → envío despachado con manifiesto → reporte.
+registra en línea (o no) → recepción, que crea las cajas (con o sin conexión) →
+sellado y etiqueta → tarima cerrada y pesada → envío despachado con manifiesto →
+hitos del viaje → recepción en destino y reconciliación → reporte y merma.

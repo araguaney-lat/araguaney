@@ -5,7 +5,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useEffect, useRef, useState } from "react"
 import { Menu, X, LogOut } from "lucide-react"
-import { logoutAction } from "@/lib/actions"
+import { LogoutForm } from "@/components/LogoutForm"
 import { LanguageSwitcher } from "@/components/LanguageSwitcher"
 import { ThemeToggle } from "@/components/ThemeToggle"
 import { CenterSelector } from "@/components/CenterSelector"
@@ -207,7 +207,7 @@ export function BottomNav({
             </Link>
           )}
 
-          <form action={logoutAction}>
+          <LogoutForm>
             <button
               type="submit"
               className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm text-tx hover:bg-card2"
@@ -215,7 +215,7 @@ export function BottomNav({
               <LogOut size={17} className="flex-shrink-0" />
               <span>{nav.logout}</span>
             </button>
-          </form>
+          </LogoutForm>
         </div>
       </div>
     </>
