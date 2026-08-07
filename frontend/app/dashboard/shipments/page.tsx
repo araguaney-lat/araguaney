@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react"
 import { apiFetch } from "@/lib/api"
 import type { Campaign, Center, ShipmentOut, ShipmentDetailOut, ShipmentStatus, PalletOut, EventOut } from "@/types"
 import { ShipmentMilestones } from "@/components/ShipmentMilestones"
+import { ShipmentReception } from "@/components/ShipmentReception"
 import { StatusTimeline } from "@/components/StatusTimeline"
 import {
   createShipmentAction,
@@ -438,6 +439,16 @@ export default function ShipmentsPage() {
 
             {/* Hitos y llegada: solo national_admin, que es quien captura con el
                 reporte del consignatario. El coordinador los ve en el timeline. */}
+            {activeShipment && (
+              <ShipmentReception
+                shipmentId={activeShipment.id}
+                status={activeShipment.status}
+                pallets={activeShipment.pallets}
+                isNationalAdmin={isNationalAdmin}
+                onDone={() => { fetchShipmentDetail(activeShipment.id); fetchShipments() }}
+              />
+            )}
+
             {isNationalAdmin && activeShipment && (
               <ShipmentMilestones
                 shipmentId={activeShipment.id}
