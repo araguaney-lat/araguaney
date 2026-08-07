@@ -1,0 +1,102 @@
+<div class="doc">
+  <div class="wrap">
+
+    <header>
+      <span class="eyebrow">Módulo · Recepción en destino</span>
+      <h1>Registrar qué llegó de verdad</h1>
+      <p class="lede">La trazabilidad no termina cuando el envío sale. Aquí se anota dónde va, cuándo llegó y qué se recibió caja por caja, con la merma y las incidencias que hayan aparecido en el camino.</p>
+      <p class="crumbs">Panel &rsaquo; <b>Envíos</b> &rsaquo; Detalle del envío &nbsp;·&nbsp; /dashboard/shipments</p>
+    </header>
+
+    <section>
+      <div class="intro-card">
+        <p><b>Quién registra.</b> La coordinación nacional, con el reporte de quien recibe en destino. El consignatario no tiene cuenta en el sistema: crear usuarios para una zona de desastre resolvería el problema equivocado.</p>
+        <p><b>Qué ve el centro emisor.</b> Los coordinadores del centro que despachó ven todo el recorrido y la recepción de su carga, y pueden levantar incidencias, aunque no registran la llegada.</p>
+      </div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <span class="eyebrow">El estado del envío</span>
+        <h2>Ya no muere en despachado</h2>
+        <p class="sect-note">Dos estados nuevos después de <span class="hl">SHIPPED</span>: uno dice que llegó, el otro que ya se registró qué llegó.</p>
+      </div>
+      <div class="machine">
+        <p class="desc">Entregado y reconciliado son cosas distintas. Un envío puede llevar días entregado sin que nadie haya contado las cajas todavía.</p>
+        <div class="flow">
+          <span class="pill">OPEN</span><span class="arrow">→</span>
+          <span class="pill blue">CLOSED</span><span class="arrow">→</span>
+          <span class="pill green">SHIPPED</span><span class="arrow">→</span>
+          <span class="pill green">DELIVERED</span><span class="arrow">→</span>
+          <span class="pill green">RECONCILED</span>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <span class="eyebrow">En el camino</span>
+        <h2>Hitos: dónde va la carga</h2>
+        <p class="sect-note">Un hito deja constancia de un suceso sin cambiar el estado del envío.</p>
+      </div>
+      <p>Se registran siete: salida del depósito, llegada al aeropuerto, carga al avión, despegue, llegada a destino, liberación en aduana y entrega al consignatario. Aparecen en la línea de tiempo del envío, intercalados con los cambios de estado y dibujados distinto, para que se lea de un vistazo qué fue un cambio y qué fue un avance.</p>
+      <div class="callout">
+        <p><b>La fecha la pones tú, no el sistema.</b> El reporte del consignatario llega tarde y casi siempre describe algo de ayer. El campo de fecha existe para que el hito quede cuando ocurrió y no cuando te enteraste.</p>
+      </div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <span class="eyebrow">Qué pedirle al consignatario</span>
+        <h2>Antes de registrar la recepción</h2>
+      </div>
+      <div class="steps">
+        <div class="step"><span class="n">1</span><div>
+          <p><b>Un acta o mensaje con lo que llegó.</b> Basta el canal que la conectividad permita: correo, WhatsApp, una foto del papel firmado. Lo que importa es que alguien del otro lado declare qué recibió.</p>
+        </div></div>
+        <div class="step"><span class="n">2</span><div>
+          <p><b>Los códigos de las cajas con novedad.</b> Solo las que faltaron, llegaron dañadas o quedaron retenidas. Las que llegaron bien no hay que listarlas.</p>
+        </div></div>
+        <div class="step"><span class="n">3</span><div>
+          <p><b>El peso de cada tarima, si hay báscula.</b> Es opcional. Cuando lo hay, el sistema lo compara con el peso de salida y abre incidencia si la diferencia pasa el margen.</p>
+        </div></div>
+        <div class="step"><span class="n">4</span><div>
+          <p><b>Fotos, si las hay.</b> No se suben al sistema: guárdalas donde tu operación las tenga a mano y menciónalas en la nota. Sirven para sostener un reclamo, no para vivir en el inventario.</p>
+        </div></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <span class="eyebrow">El registro</span>
+        <h2>Solo se marca lo que salió mal</h2>
+        <p class="sect-note">El checklist llega pre-llenado como recibido. La merma es la minoría.</p>
+      </div>
+      <p>Al abrir la recepción aparecen todas las cajas del envío, agrupadas por tarima y ya marcadas como recibidas. Cambia solo las que tengan novedad, con su motivo: <b>faltante</b>, <b>dañada</b> o <b>retenida en aduana</b>. Cada una abre su incidencia automáticamente.</p>
+      <p>Si un envío llegó completo, confirmar es un solo clic sin importar si son tres cajas o trescientas. Un formulario que obligue a confirmar caja por caja lo que sí llegó se llena mal justo cuando el envío es grande.</p>
+      <div class="callout warn">
+        <p><b>Se registra una sola vez.</b> No hay forma de reabrir una recepción. Si después aparece algo que no se anotó, se levanta una incidencia con la corrección: el acta original queda como quedó, porque ya viajó a un reporte y a una métrica.</p>
+      </div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <span class="eyebrow">Lo que no cambia</span>
+        <h2>Las cajas despachadas quedan intactas</h2>
+      </div>
+      <p>Registrar la recepción no modifica ninguna caja ni ninguna tarima: siguen en <span class="hl">SHIPPED</span>, exactamente como salieron. Enviado y recibido son dos hechos distintos y el sistema guarda los dos.</p>
+      <p>Esa separación es lo que hace medible la merma. Si la recepción reescribiera el inventario, la diferencia entre lo que salió y lo que llegó dejaría de existir en el momento mismo de registrarla.</p>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <span class="eyebrow">Después</span>
+        <h2>Incidencias y merma</h2>
+      </div>
+      <p>Cada faltante, daño, retención o diferencia de peso queda como <b>incidencia</b> con estado abierto. Se resuelven desde el detalle del envío o desde <b>Incidencias</b> en el menú de administración, y cerrar una exige escribir cómo se resolvió: sin esa nota, "resuelta" no significa nada seis meses después.</p>
+      <p>La <b>merma</b> de la campaña aparece en Reportes: el porcentaje de cajas que no llegaron bien, con su desglose. Solo cuenta envíos con recepción registrada, porque un envío que nadie recibió todavía no tiene merma de cero, tiene merma desconocida.</p>
+      <p>Y la ficha pública de cada caja y tarima pasa a decir <b>"Entregada en destino"</b>, así que quien escanee el QR ve que llegó sin necesidad de entrar al panel.</p>
+    </section>
+
+  </div>
+</div>

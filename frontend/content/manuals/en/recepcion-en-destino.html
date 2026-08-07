@@ -1,0 +1,102 @@
+<div class="doc">
+  <div class="wrap">
+
+    <header>
+      <span class="eyebrow">Module · Reception at destination</span>
+      <h1>Recording what actually arrived</h1>
+      <p class="lede">Traceability does not end when the shipment leaves. This is where you record where it is, when it landed, and what was received box by box, along with the shrinkage and any incidents that came up along the way.</p>
+      <p class="crumbs">Panel &rsaquo; <b>Shipments</b> &rsaquo; Shipment detail &nbsp;·&nbsp; /dashboard/shipments</p>
+    </header>
+
+    <section>
+      <div class="intro-card">
+        <p><b>Who records it.</b> National coordination, working from the report of whoever received the cargo. The consignee has no account in the system: creating users for a disaster zone would solve the wrong problem.</p>
+        <p><b>What the sending centre sees.</b> Coordinators of the dispatching centre see the whole journey and the reception of their cargo, and can raise incidents, though they do not record the arrival.</p>
+      </div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <span class="eyebrow">Shipment status</span>
+        <h2>It no longer dies at dispatched</h2>
+        <p class="sect-note">Two new states after <span class="hl">SHIPPED</span>: one says it arrived, the other that what arrived has been recorded.</p>
+      </div>
+      <div class="machine">
+        <p class="desc">Delivered and reconciled are different things. A shipment can sit delivered for days before anyone counts the boxes.</p>
+        <div class="flow">
+          <span class="pill">OPEN</span><span class="arrow">→</span>
+          <span class="pill blue">CLOSED</span><span class="arrow">→</span>
+          <span class="pill green">SHIPPED</span><span class="arrow">→</span>
+          <span class="pill green">DELIVERED</span><span class="arrow">→</span>
+          <span class="pill green">RECONCILED</span>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <span class="eyebrow">Along the way</span>
+        <h2>Milestones: where the cargo is</h2>
+        <p class="sect-note">A milestone records an event without changing the shipment's status.</p>
+      </div>
+      <p>Seven are available: left the warehouse, arrived at the airport, loaded onto the aircraft, departed, arrived at destination, cleared customs, and delivered to the consignee. They appear on the shipment timeline, interleaved with status changes and drawn differently, so a glance tells you what was a change and what was progress.</p>
+      <div class="callout">
+        <p><b>You set the date, not the system.</b> The consignee's report arrives late and almost always describes yesterday. The date field exists so the milestone lands when it happened, not when you heard about it.</p>
+      </div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <span class="eyebrow">What to ask the consignee for</span>
+        <h2>Before recording the reception</h2>
+      </div>
+      <div class="steps">
+        <div class="step"><span class="n">1</span><div>
+          <p><b>A record or message stating what arrived.</b> Whatever channel connectivity allows: email, WhatsApp, a photo of the signed paper. What matters is that someone on the other side declares what they received.</p>
+        </div></div>
+        <div class="step"><span class="n">2</span><div>
+          <p><b>The codes of the boxes with issues.</b> Only the ones missing, damaged or retained. The ones that arrived fine do not need listing.</p>
+        </div></div>
+        <div class="step"><span class="n">3</span><div>
+          <p><b>The weight of each pallet, if there is a scale.</b> Optional. When present, the system compares it against the dispatch weight and opens an incident if the difference exceeds the margin.</p>
+        </div></div>
+        <div class="step"><span class="n">4</span><div>
+          <p><b>Photos, if any.</b> They are not uploaded to the system: keep them wherever your operation can reach them and mention them in the note. They exist to support a claim, not to live inside the inventory.</p>
+        </div></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <span class="eyebrow">The record</span>
+        <h2>Only mark what went wrong</h2>
+        <p class="sect-note">The checklist arrives pre-filled as received. Shrinkage is the minority.</p>
+      </div>
+      <p>Opening the reception shows every box in the shipment, grouped by pallet and already marked as received. Change only those with an issue and give the reason: <b>missing</b>, <b>damaged</b> or <b>retained in customs</b>. Each one opens its incident automatically.</p>
+      <p>If a shipment arrived complete, confirming is a single click whether it holds three boxes or three hundred. A form that demands box-by-box confirmation of what did arrive gets filled carelessly, precisely when the shipment is large.</p>
+      <div class="callout warn">
+        <p><b>It is recorded once.</b> There is no way to reopen a reception. If something surfaces later, raise an incident with the correction: the original record stays as it was, because it already reached a report and a metric.</p>
+      </div>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <span class="eyebrow">What does not change</span>
+        <h2>Dispatched boxes stay untouched</h2>
+      </div>
+      <p>Recording the reception modifies no box and no pallet: they remain at <span class="hl">SHIPPED</span>, exactly as they left. Sent and received are two separate facts and the system keeps both.</p>
+      <p>That separation is what makes shrinkage measurable. If reception rewrote the inventory, the difference between what left and what arrived would stop existing the very moment it was recorded.</p>
+    </section>
+
+    <section>
+      <div class="sect-head">
+        <span class="eyebrow">Afterwards</span>
+        <h2>Incidents and shrinkage</h2>
+      </div>
+      <p>Every missing box, damage, retention or weight difference becomes an <b>incident</b> in the open state. They are resolved from the shipment detail or from <b>Incidents</b> in the administration menu, and closing one requires writing how it was resolved: without that note, "resolved" means nothing six months later.</p>
+      <p>The campaign's <b>shrinkage</b> appears in Reports: the percentage of boxes that did not arrive well, with its breakdown. It counts only shipments with a recorded reception, because a shipment nobody has received does not have zero shrinkage, it has unknown shrinkage.</p>
+      <p>And the public ficha of every box and pallet starts saying <b>"Delivered at destination"</b>, so whoever scans the QR sees that it arrived without opening the panel.</p>
+    </section>
+
+  </div>
+</div>
