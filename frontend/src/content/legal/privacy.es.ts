@@ -6,9 +6,9 @@ import type { LegalDoc } from "./types"
 
 export const privacyEs: LegalDoc = {
   title: "Aviso de Privacidad",
-  version: "1.2",
-  updatedISO: "2026-07-30",
-  updatedLabel: "30 de julio de 2026",
+  version: "1.3",
+  updatedISO: "2026-08-07",
+  updatedLabel: "7 de agosto de 2026",
   versionLabel: "Versión",
   updatedPrefix: "Última actualización:",
   intro:
@@ -113,9 +113,13 @@ export const privacyEs: LegalDoc = {
               ["Cloudinary", "Almacenamiento de fotografías de perfil (solo si subes una)", "Imagen de perfil"],
               ["Google (opcional)", "Inicio de sesión (OAuth) y analítica solo en páginas públicas de difusión — nunca dentro del panel", "Datos de autenticación / métricas anónimas de navegación pública"],
               ["Sentry (opcional)", "Registro de errores para diagnóstico técnico", "Contexto técnico del error, posible dirección IP"],
+              ["Proveedor de IA (opcional)", "Asistencia en la captura: interpretar el texto de una donación y leer los datos impresos en una etiqueta de medicamento", "El texto del renglón o la fotografía de la etiqueta"],
             ],
           },
         },
+        "La asistencia por inteligencia artificial está apagada de forma predeterminada y se activa por decisión de quien opera la plataforma. Cuando está activa, el texto de un renglón de donación o la fotografía de una etiqueta se envían a un proveedor externo para interpretarlos. Ese envío ocurre únicamente desde el panel, con sesión iniciada, y nunca desde una página pública: lo que escribes al pre-registrar una donación se guarda tal cual y no se envía a ningún proveedor de IA.",
+        "Una fotografía de etiqueta puede contener datos personales de forma incidental (por ejemplo, si aparece una receta o un nombre en el encuadre). Te pedimos encuadrar solo la caja del producto. El proveedor procesa la imagen para responder y no la utiliza para entrenar sus modelos; el resultado se conserva en caché por un plazo breve y se elimina junto con la donación conforme a los plazos de esta sección.",
+        "El proveedor concreto y su país dependen de la configuración de cada despliegue, y puede ser un servicio ubicado en Estados Unidos o un modelo ejecutado localmente sin transferencia alguna. Si esta funcionalidad está activa en el despliegue que usas, puedes solicitar el detalle del proveedor vigente en el correo de contacto de este aviso.",
         "Las consultas a catálogos de referencia (OMS, UNSPSC, IFRC/ICRC, IOM, GS1, COFEPRIS, RxNorm, Open Food Facts) se realizan únicamente con datos de producto (p. ej. un código de barras) y no incluyen datos personales.",
         "No realizamos transferencias de tus datos personales a terceros distintos de estos encargados, salvo requerimiento de autoridad competente conforme a la ley.",
       ],

@@ -17,6 +17,8 @@ from app.schemas.studio import (
     RequestMessageOut,
     RequestStatusPatch,
 )
+from app.dependencies import tenant_scope
+from app.services.ai import needs_matching
 from app.utils.cloudflare import get_client_ip
 from app.utils.errors import api_error
 from app.utils.rate_limit import limiter
@@ -121,6 +123,30 @@ def add_message(
             background_tasks.add_task(_send_email)
 
     return msg
+
+
+@router.get("/{request_id}/matches", response_model=list[dict])
+@limiter.limit("30/minute")
+def match_request_with_stock(
+    request: Request,
+    request_id: UUID,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+    scope=Depends(tenant_scope),
+):
+    """Qué categorías pide esta solicitud y qué stock hay de cada una.
+
+    El stock sale de la base y viene acotado por centro: un coordinador no
+    descubre por aquí el inventario de otro. Lista vacía si la IA no está.
+    """
+    solicitud = RequestRepository(db).find_by_id(request_id)
+    if solicitud is None:
+        raise api_error("NOT_FOUND", "Solicitud no encontrada", status_code=404)
+
+    return needs_matching.match(
+        db, f"{solicitud.title}. {solicitud.description}",
+        user_id=current_user.id, center_id=scope,
+    )
 
 
 @router.patch("/{request_id}/status", response_model=RequestOut)

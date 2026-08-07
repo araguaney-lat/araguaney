@@ -528,6 +528,13 @@ miró.** Ninguna capacidad decide, rechaza, asigna ni despacha.
   aplicación se comporta exactamente como antes de la fase.
 - Ninguna capacidad se enciende en producción sin superar el umbral de su
   conjunto de evaluación, fijado **antes** de medir.
+- **El modelo interpreta lenguaje; los números salen de la base.** El stock que
+  se empareja con una solicitud y las cifras que se resumen para prensa vienen
+  de un `GROUP BY`, no del modelo. Un número inventado sobre inventario
+  humanitario es creíble, falso y difícil de desmentir una vez publicado.
+- Activar una capacidad que envía datos a un tercero exige que el aviso de
+  privacidad lo declare (proveedor, finalidad, categoría de dato). Ver la
+  sección de transferencias.
 
 ### Seguridad del código
 

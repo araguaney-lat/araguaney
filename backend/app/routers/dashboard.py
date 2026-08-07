@@ -11,7 +11,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.dependencies import require_center_role, tenant_scope
+from app.dependencies import require_center_role, tenant_scope, require_national_admin
 from app.models.campaign import Campaign
 from app.models.center import Center
 from app.models.events import BoxEvent, PalletEvent
@@ -29,6 +29,7 @@ from app.schemas.aggregate import (
     WeightDashboardOut,
 )
 from app.schemas.qr_ficha import QrBoxFicha, QrEventOut, QrPalletBoxRow, QrPalletFicha
+from app.services.ai import national_summary as national_summary_service
 from app.utils import cache, delivery_status
 from app.utils.errors import api_error
 from app.utils.rate_limit import limiter
@@ -74,6 +75,21 @@ def national_dashboard(
 
 
 # ── Weight metrics ────────────────────────────────────────────────────────────
+
+@router.get("/dashboard/national/summary", response_model=dict)
+@limiter.limit("10/minute")
+def national_summary(
+    request: Request,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_national_admin),
+):
+    """Párrafo redactado sobre las cifras que este panel ya calcula.
+
+    `null` si la capacidad está apagada o no hay inventario que resumir: el
+    panel muestra sus cifras igual, que es como se ve hoy.
+    """
+    return {"summary": national_summary_service.summarize(db, user_id=current_user.id)}
+
 
 @router.get("/dashboard/weight", response_model=WeightDashboardOut)
 @limiter.limit("60/minute")
