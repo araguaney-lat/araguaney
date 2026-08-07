@@ -4,8 +4,8 @@
 
 ```mermaid
 pie title Tareas completadas (443 tareas)
-    "Listas" : 412
-    "Pendientes" : 31
+    "Listas" : 413
+    "Pendientes" : 30
 ```
 
 | Fase | Nombre | Listas | Pendientes | Progreso |
@@ -33,11 +33,11 @@ pie title Tareas completadas (443 tareas)
 | 20 | [Prevención de riesgos: responsabilidad y anti-lavado en especie](phase-20-risk-prevention.md) | 6 | 4 | 🟡 60% |
 | 21 | [Logística: pesaje, declaración de mercancías y perfiles de paletizado](phase-21-logistics-weighing.md) | 12 | 0 | ✅ 100% |
 | 22 | [Trazabilidad extendida: avión y destino](phase-22-extended-traceability.md) | 14 | 0 | ✅ 100% |
-| 23 | [IA asistida: captura, catálogo y necesidades](phase-23-ai-assisted-capture.md) | 2 | 9 | 🟡 18% |
+| 23 | [IA asistida: captura, catálogo y necesidades](phase-23-ai-assisted-capture.md) | 3 | 8 | 🟡 27% |
 | 24 | [Observabilidad: que un fallo silencioso deje de serlo](phase-24-observability.md) | 11 | 0 | ✅ 100% |
-| **Total** | | **412** | **31** | **🟡 93%** |
+| **Total** | | **413** | **30** | **🟡 93%** |
 
-> **Pendientes (31):**
+> **Pendientes (30):**
 > El grupo A de la Fase 13 (privacidad, lo que aplica hoy) está completo.
 > - Los borradores legales de la Fase 20 están escritos y esperando revisión de abogado:
 >   [`docs/legal/drafts/`](../legal/drafts/README.md). Sus tareas siguen abiertas hasta que esa
@@ -48,8 +48,8 @@ pie title Tareas completadas (443 tareas)
 >   estructurales documentados). Lo que queda son los tres textos legales (tasks 1, 2 y 6), que la
 >   task 7 —revisión de abogado— gatea antes de publicar; los borradores ya están escritos en
 >   [`docs/legal/drafts/`](../legal/drafts/README.md).
-> - **9 de la Fase 23 (IA asistida):** el adaptador neutral de proveedor y los guardarraíles de gasto
->   ya están, con todo apagado por defecto; faltan las cuatro capacidades, su evaluación y lo legal.
+> - **8 de la Fase 23 (IA asistida):** el adaptador, los guardarraíles y el arnés de evaluación con sus
+>   umbrales ya están, con todo apagado por defecto; faltan las cuatro capacidades y lo legal.
 >   Diseño en
 >   [su spec](../superpowers/specs/2026-07-29-ai-assisted-capture-design.md).
 > - **12 gated por pago o por decisión de negocio:** Fase 4 → 2 (spend caps + alertas, requieren

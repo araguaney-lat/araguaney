@@ -64,7 +64,7 @@
 
 | # | Tarea | Descripción | Complejidad | Estado |
 |---|-------|-------------|-------------|--------|
-| 8 | Conjunto de referencia y umbrales | ~100 casos por capacidad con datos reales; métricas declaradas (top-1 y top-3 para mapeo, exactitud por campo para OCR); umbral de encendido fijado **antes** de ver resultados. Sirve además para comparar modelos por costo y calidad. | 🔴 Alta | ⬜ |
+| 8 | Conjunto de referencia y umbrales | ~100 casos por capacidad con datos reales; métricas declaradas (top-1 y top-3 para mapeo, exactitud por campo para OCR); umbral de encendido fijado **antes** de ver resultados. Sirve además para comparar modelos por costo y calidad. | 🔴 Alta | ✅ Done |
 | 9 | Tests | Adaptador con doble (sin red en pruebas), bandera apagada = comportamiento de hoy, tope alcanzado = apagado sin romper la operación, caché no re-cobra, aislamiento tenant del emparejamiento, evaluación en CI con proveedor simulado. | 🔴 Alta | ⬜ |
 | 10 | Legal y privacidad | Aviso de privacidad: transferencia de datos a proveedor externo (categoría, finalidad, proveedor, país) y datos personales incidentales en fotos; retención según Fase 13. Prompts sin PII. Documentar Ollama local como salida si la revisión legal desaconseja el envío a terceros. | 🟠 Media | ⬜ |
 | 11 | Roadmap + `CLAUDE.md` | Registrar el principio rector y la regla de "ningún endpoint público invoca IA"; actualizar totales. | 🟢 Baja | ⬜ |

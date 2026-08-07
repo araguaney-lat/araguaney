@@ -1,0 +1,35 @@
+{
+  "_comment": "Cada caso apunta a una foto de etiqueta y declara los campos que deberían leerse. Las imágenes NO viven en el repositorio: pueden contener datos personales incidentales y son pesadas. `image_ref` es la clave en el almacenamiento de evaluación de cada quien.",
+  "cases": [
+    {
+      "image_ref": "eval/labels/paracetamol-500-caja.jpg",
+      "expected": {
+        "inn_name": "Paracetamol",
+        "form": "Tableta",
+        "strength": "500 mg",
+        "batch": "L2291",
+        "expiry_date": "2028-03-31"
+      }
+    },
+    {
+      "image_ref": "eval/labels/ibuprofeno-400-blister.jpg",
+      "expected": {
+        "inn_name": "Ibuprofeno",
+        "form": "Tableta",
+        "strength": "400 mg",
+        "batch": "IB4402",
+        "expiry_date": "2027-11-30"
+      }
+    },
+    {
+      "image_ref": "eval/labels/amoxicilina-suspension.jpg",
+      "expected": {
+        "inn_name": "Amoxicilina",
+        "form": "Suspensión oral",
+        "strength": "250 mg/5 mL",
+        "batch": "AM7781",
+        "expiry_date": "2027-06-30"
+      }
+    }
+  ]
+}
