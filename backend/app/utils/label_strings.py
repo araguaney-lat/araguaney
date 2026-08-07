@@ -32,7 +32,7 @@ LABEL_STRINGS: dict[str, dict[str, str]] = {
         "status_OPEN": "Abierta",
         "status_CLOSED": "Cerrada",
         "status_SHIPPED": "Enviada",
-        "footer": "Araguaney · Coordinación humanitaria · araguaney.lat",
+        "footer": "Documento generado con Araguaney · araguaney.lat",
     },
     "en": {
         "quantity": "Qty",
@@ -46,7 +46,7 @@ LABEL_STRINGS: dict[str, dict[str, str]] = {
         "status_OPEN": "Open",
         "status_CLOSED": "Closed",
         "status_SHIPPED": "Shipped",
-        "footer": "Araguaney · Humanitarian coordination · araguaney.lat",
+        "footer": "Document generated with Araguaney · araguaney.lat",
     },
 }
 

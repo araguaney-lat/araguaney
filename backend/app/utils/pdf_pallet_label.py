@@ -9,6 +9,7 @@ from datetime import datetime
 
 import qrcode
 from app.legal import CUSTOMS_LEGEND_EN, CUSTOMS_LEGEND_ES
+from app.utils.branding import LOGO_PATH
 from app.utils.label_strings import date_format_for, strings_for
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.utils import ImageReader
@@ -120,8 +121,17 @@ def generate_pallet_label_pdf(pallet: PalletLabelData, lang: str | None = None) 
     c.setFont("Helvetica-Oblique", 6)
     c.drawCentredString(w / 2, 20.5 * mm, CUSTOMS_LEGEND_EN)
 
+    # Atribución al pie: el logo del tamaño de la letra, y el par centrado como
+    # una sola unidad para que no quede el texto corrido a un lado.
     c.setFont("Helvetica", 7)
-    c.drawCentredString(w / 2, 15 * mm, t["footer"])
+    texto = t["footer"]
+    marca = 4 * mm
+    ancho_texto = c.stringWidth(texto, "Helvetica", 7)
+    x = (w - (marca + 1.5 * mm + ancho_texto)) / 2
+    if LOGO_PATH.exists():
+        c.drawImage(ImageReader(str(LOGO_PATH)), x, 14 * mm, marca, marca, mask="auto")
+        x += marca + 1.5 * mm
+    c.drawString(x, 15 * mm, texto)
 
     c.save()
     return buf.getvalue()
