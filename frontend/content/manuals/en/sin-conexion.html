@@ -1,0 +1,173 @@
+<div class="doc"><div class="wrap">
+
+  <span class="eyebrow">Module · Offline</span>
+  <h1>Capturing in a basement</h1>
+  <p class="lede">Many collection centres operate in basements and warehouses with no coverage. Araguaney stores the capture on the phone and sends it by itself once the signal returns.</p>
+  <p class="crumbs">Panel › Intake › <b>Pending</b> · /dashboard/intake/pending</p>
+
+  <div class="intro-card" style="margin-top:34px">
+    <p><b>What it does.</b> Registers donations with no coverage, with the label printed on the spot, and delivers them to the server as soon as there is signal.</p>
+    <p><b>How it works.</b> The capture is stored on the device with an identifier of its own. That identifier never changes, so retrying the delivery can never duplicate inventory even if the answer was lost halfway.</p>
+    <p><b>What it does not do.</b> It does not seal boxes, build pallets or close shipments offline: those depend on the state of boxes that may be changing on another device.</p>
+  </div>
+
+  <section>
+    <div class="sect-head">
+      <h2>Before going down</h2>
+      <p class="sect-note">With signal is the only moment you can prepare. It takes thirty seconds.</p>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="n">1</div>
+        <div>
+          <h3>Open the app with coverage</h3>
+          <p>On opening, it downloads the product catalogue for your campaigns and sets aside a block of box codes.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="n">2</div>
+        <div>
+          <h3>Check there is something to work with</h3>
+          <p>In <code>Intake › Pending</code> you will see how many products are downloaded and how many codes are set aside. If codes run low, they are topped up automatically whenever you open the app with signal.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="n">3</div>
+        <div>
+          <h3>Go down with the app open</h3>
+          <p>Do not close it. If you close it and the basement has no signal, the app will not be able to load again.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head">
+      <h2>What you can do without signal</h2>
+      <p class="sect-note">Everything that depends only on what is in front of you.</p>
+    </div>
+    <div class="grid two">
+      <div class="card">
+        <h3>Register an intake</h3>
+        <p>Campaign, donor, notes and as many boxes as needed, exactly as with a connection.</p>
+      </div>
+      <div class="card">
+        <h3>Pick products from the catalogue</h3>
+        <p>The search uses the catalogue you downloaded, with the same campaign visibility you would see online.</p>
+      </div>
+      <div class="card">
+        <h3>Scan known barcodes</h3>
+        <p>If the code was already associated with a product, it resolves on the device. If not, you pick the product by hand.</p>
+      </div>
+      <div class="card">
+        <h3>Print the label</h3>
+        <p>The QR is drawn on the phone with the code set aside in advance, and points to the same public page it will point to afterwards.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head">
+      <h2>What you cannot do without signal</h2>
+      <p class="sect-note">This is not a technical gap waiting to be fixed: these operations depend on the state of other boxes.</p>
+    </div>
+    <div class="grid two">
+      <div class="card">
+        <h3>Seal boxes, build pallets, close shipments</h3>
+        <p>A box may have entered a pallet from another device. Deciding blind would produce two truths about the same box.</p>
+      </div>
+      <div class="card">
+        <h3>Look up a new barcode</h3>
+        <p>The query to the global product database needs the internet. Pick the product by hand and the catalogue learns that association on sync.</p>
+      </div>
+      <div class="card">
+        <h3>National dashboard, reports, transfers</h3>
+        <p>These are reads from the server. Whatever they showed offline would be out of date with no way to know by how much.</p>
+      </div>
+      <div class="card">
+        <h3>Edit a capture already saved</h3>
+        <p>It is captured or it is not. If something went wrong, the capture stays visible in Pending so you can discard it and do it again.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head">
+      <h2>The step that matters most</h2>
+    </div>
+    <div class="intro-card">
+      <p><b>On leaving the basement, open the app and wait for the counter to reach zero.</b></p>
+      <p>The pending-captures counter lives in the panel frame and is visible from any screen. Until it reads zero, those captures exist only on that phone.</p>
+      <p>If you close the app with captures pending, the browser warns you. Do not ignore it: nobody else can send them for you, from another device or another account.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head">
+      <h2>If something does not arrive</h2>
+      <p class="sect-note">Nothing is discarded on its own. Everything ends up in front of a person.</p>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="n">1</div>
+        <div>
+          <h3>The server rejected the capture</h3>
+          <p>Because of a rule the device could not check: a shelf life that is too short, a controlled product, a campaign that already closed. It appears in Pending with the exact reason. Retrying would give the same answer, so it waits for someone to correct or discard it.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="n">2</div>
+        <div>
+          <h3>It failed several times in a row</h3>
+          <p>After a few attempts it stops retrying by itself and goes to review. Retrying forever would burn battery and data while hiding the problem behind a counter that never drops.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="n">3</div>
+        <div>
+          <h3>Your session expired while it waited</h3>
+          <p>The queue is left untouched: sign in again and it sends itself. Captures are not lost because a session expired.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head">
+      <h2>Limits worth knowing</h2>
+    </div>
+    <div class="grid two">
+      <div class="card">
+        <h3>One device, one person</h3>
+        <p>The queue only sends the captures of whoever made them. If you lend the phone, the other person's captures wait until that person signs in.</p>
+      </div>
+      <div class="card">
+        <h3>Reloading in the basement</h3>
+        <p>The app loads from the copy the browser stored. A screen you never visited with signal may not open.</p>
+      </div>
+      <div class="card">
+        <h3>If codes run out</h3>
+        <p>The capture is saved anyway — losing it would be far worse — but with no printable label. Its labels come from the server PDF once the signal returns.</p>
+      </div>
+      <div class="card">
+        <h3>Private browsing</h3>
+        <p>Some browsers refuse to store anything on the device. The app says so rather than pretending it saved.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sect-head">
+      <h2>Permissions</h2>
+    </div>
+    <div class="perm">
+      <p>Offline capture is for centre staff (<code>volunteer</code>, <code>coordinator</code>). A <code>national_admin</code> has no home centre and therefore no code block to draw labels from: they register on behalf of a centre with a connection.</p>
+    </div>
+  </section>
+
+  <div class="foot">
+    <span>Araguaney · Offline module manual</span>
+    <span>Related: Intake · Boxes · Scan</span>
+  </div>
+
+</div></div>

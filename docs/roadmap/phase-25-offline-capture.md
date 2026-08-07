@@ -65,10 +65,10 @@
 
 | # | Tarea | Descripción | Complejidad | Estado |
 |---|-------|-------------|-------------|--------|
-| 11 | Etiqueta offline | El QR se dibuja en el cliente con el código pre-asignado; el PDF en lote sigue siendo del servidor. | 🟠 Media | ⬜ |
-| 12 | Manual y límites | Guía en `/dashboard/ayuda`: qué se puede capturar sin señal, qué no, y el paso que más importa — al salir del sótano, abrir la app y esperar a que el contador llegue a cero. ES/EN. | 🟢 Baja | ⬜ |
-| 13 | Tests de cierre | Aislamiento entre centros de los códigos reservados; una captura offline rechazada no se pierde; con conexión permanente el comportamiento es idéntico al de hoy. | 🔴 Alta | ⬜ |
-| 14 | `CLAUDE.md` + roadmap | Registrar qué escribe offline y por qué solo la captura; totales. | 🟢 Baja | ⬜ |
+| 11 | Etiqueta offline | El QR se dibuja en el cliente con el código pre-asignado; el PDF en lote sigue siendo del servidor. | 🟠 Media | ✅ Done |
+| 12 | Manual y límites | Guía en `/dashboard/ayuda`: qué se puede capturar sin señal, qué no, y el paso que más importa — al salir del sótano, abrir la app y esperar a que el contador llegue a cero. ES/EN. | 🟢 Baja | ✅ Done |
+| 13 | Tests de cierre | Aislamiento entre centros de los códigos reservados; una captura offline rechazada no se pierde; con conexión permanente el comportamiento es idéntico al de hoy. | 🔴 Alta | ✅ Done |
+| 14 | `CLAUDE.md` + roadmap | Registrar qué escribe offline y por qué solo la captura; totales. | 🟢 Baja | ✅ Done |
 
 ---
 

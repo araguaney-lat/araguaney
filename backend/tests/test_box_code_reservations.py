@@ -189,6 +189,49 @@ def test_capturing_without_a_code_still_works(db, mundo):
 
 # ── Idempotencia y códigos, juntos ───────────────────────────────────────────
 
+def test_a_failed_capture_leaves_every_code_unused(db, mundo):
+    """La primera caja reclama su código y la segunda tumba la captura.
+
+    Sin la reversión, ese primer código quedaría gastado sin ninguna caja que lo
+    lleve: un número menos en el bloque y una etiqueta impresa que ya no vale
+    para nada. Se hace el `rollback` a mano porque es lo que hace `get_db` al
+    cerrar la sesión después de un error.
+    """
+    bueno = box_code_service.reserve(db, CENTER, USER, count=1)[0]
+    caja = BoxDraft(product_type_id=mundo["product"].id, quantity=10, unit="lata",
+                    expiry_date=date.today() + timedelta(days=400))
+    captura = IntakeCreate(
+        campaign_id=mundo["campaign"].id,
+        boxes=[caja.model_copy(update={"code": bueno}),
+               caja.model_copy(update={"code": "BX-NOEXISTE"})],
+    )
+
+    with pytest.raises(HTTPException) as exc:
+        IntakeService(db).create(captura, CENTER, USER)
+    db.rollback()
+
+    assert exc.value.detail["code"] == "CODE_NOT_RESERVED"
+    assert db.query(BoxCodeReservation).filter_by(code=bueno).one().used_at is None
+    assert box_code_service.available(db, CENTER) == 1
+
+
+def test_a_coordinator_reserves_only_for_their_own_center():
+    """Aunque mande el centro de otro en el cuerpo de la petición.
+
+    El endpoint de reserva pasa por `resolve_write_center_id`, que ignora lo que
+    venga en el cuerpo para todo el que no sea national_admin. Es lo que impide
+    que un centro aparte números del bloque de otro.
+    """
+    from types import SimpleNamespace
+
+    from app.dependencies import resolve_write_center_id
+
+    coordinador = SimpleNamespace(center_role="coordinator", center_id=CENTER)
+
+    assert resolve_write_center_id(coordinador, OTHER_CENTER) == CENTER
+    assert resolve_write_center_id(coordinador, None) == CENTER
+
+
 def test_a_retried_capture_does_not_consume_a_second_code(db, mundo):
     """El caso real de la fase: el sótano, la respuesta perdida, el reintento.
 

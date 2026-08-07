@@ -61,7 +61,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
              vista después de capturar, desde cualquier pantalla. */}
          <OfflineQueueProvider>
           <div data-theme={theme} className="flex h-screen overflow-hidden bg-app text-tx">
-            <div className="hidden h-full flex-col md:flex">
+            <div className="hidden h-full flex-col md:flex print:hidden">
               {centerRole === "national_admin" && (
                 <CenterSelector token={session.accessToken} />
               )}
@@ -77,7 +77,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
                 theme={theme}
               />
             </div>
-            <main className="flex-1 overflow-y-auto p-6 pb-24 md:pb-6">
+            <main className="flex-1 overflow-y-auto p-6 pb-24 md:pb-6 print:overflow-visible print:p-0">
               <PendingCapturesBadge />
               {children}
             </main>

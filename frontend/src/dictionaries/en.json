@@ -984,7 +984,17 @@
       "action_discard": "Discard",
       "discard_confirm": "It will be deleted from this device and will not reach the server.",
       "discard_yes": "Yes, discard",
-      "discard_no": "Cancel"
+      "discard_no": "Cancel",
+      "print_labels": "Print labels",
+      "print_labels_one": "Print its labels"
+    },
+    "intake_labels": {
+      "title": "Offline labels",
+      "subtitle": "The QR is drawn on this device with the code set aside in advance. It points to the same public page it will point to once the box exists on the server.",
+      "print": "Print",
+      "back": "Back to pending",
+      "empty": "No captures queued.",
+      "empty_no_codes": "These captures were saved without codes because the block ran out. Their labels come from the server PDF once the signal returns."
     }
   },
   "studio": {

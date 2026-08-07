@@ -984,7 +984,17 @@
       "action_discard": "Descartar",
       "discard_confirm": "Se borrará de este dispositivo y no llegará al servidor.",
       "discard_yes": "Sí, descartar",
-      "discard_no": "Cancelar"
+      "discard_no": "Cancelar",
+      "print_labels": "Imprimir etiquetas",
+      "print_labels_one": "Imprimir sus etiquetas"
+    },
+    "intake_labels": {
+      "title": "Etiquetas sin conexión",
+      "subtitle": "El QR se dibuja en este dispositivo con el código que se apartó de antemano. Apunta a la misma ficha pública que apuntará cuando la caja exista en el servidor.",
+      "print": "Imprimir",
+      "back": "Volver a pendientes",
+      "empty": "No hay capturas en cola.",
+      "empty_no_codes": "Estas capturas se guardaron sin códigos porque el bloque se agotó. Sus etiquetas salen del PDF del servidor cuando vuelva la señal."
     }
   },
   "studio": {

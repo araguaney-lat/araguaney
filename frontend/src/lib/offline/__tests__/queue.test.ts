@@ -235,6 +235,20 @@ describe("sincronizar", () => {
   })
 })
 
+describe("con conexión permanente", () => {
+  it("no se hace ninguna petición si no hay nada encolado", async () => {
+    // La promesa de la fase incluye que quien nunca pierde señal no note nada:
+    // ni una petición de más, ni un estado nuevo que mantener.
+    const peticiones = vi.fn()
+    vi.stubGlobal("fetch", peticiones)
+
+    const outcome = await syncQueue("token", USER)
+
+    expect(peticiones).not.toHaveBeenCalled()
+    expect(outcome).toEqual({ synced: 0, rejected: 0, retry: 0, needsLogin: false })
+  })
+})
+
 describe("descartar", () => {
   it("es la única forma de que una captura desaparezca, y libera sus códigos", async () => {
     await seedCodes(1)
