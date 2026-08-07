@@ -13,7 +13,7 @@ export default async function LoginLayout({ children }: { children: React.ReactN
   const dict = await getDictionary(locale)
   return (
     <LocaleProvider locale={locale}>
-      <DictionaryProvider dict={dict}>{children}</DictionaryProvider>
+      <DictionaryProvider dict={dict} locale={locale}>{children}</DictionaryProvider>
     </LocaleProvider>
   )
 }

@@ -994,7 +994,10 @@
       "print": "Print",
       "back": "Back to pending",
       "empty": "No captures queued.",
-      "empty_no_codes": "These captures were saved without codes because the block ran out. Their labels come from the server PDF once the signal returns."
+      "empty_no_codes": "These captures were saved without codes because the block ran out. Their labels come from the server PDF once the signal returns.",
+      "field_quantity": "Qty",
+      "field_batch": "Batch",
+      "field_expiry": "Exp"
     }
   },
   "studio": {

@@ -93,7 +93,8 @@ def generate_shipment_manifest_xlsx(db: Session, shipment_id: str) -> tuple[byte
     return generate_manifest_xlsx(manifest_data), content_type, f"packing-list-ifrc-{ref}.xlsx"
 
 
-def generate_box_labels_pdf(db: Session, center_id: str | None, status: str) -> tuple[bytes, str, str]:
+def generate_box_labels_pdf(db: Session, center_id: str | None, status: str,
+                            lang: str | None = None) -> tuple[bytes, str, str]:
     from app.repositories.box_repository import BoxRepository
     from app.repositories.center_repository import CenterRepository
     from app.repositories.product_type_repository import ProductTypeRepository
@@ -132,10 +133,10 @@ def generate_box_labels_pdf(db: Session, center_id: str | None, status: str) -> 
             base_url=base_url,
         ))
 
-    return generate_labels_pdf(labels), "application/pdf", f"etiquetas-{status.lower()}.pdf"
+    return generate_labels_pdf(labels, lang), "application/pdf", f"etiquetas-{status.lower()}.pdf"
 
 
-def generate_pallet_label_pdf(db: Session, pallet_id: str) -> tuple[bytes, str, str]:
+def generate_pallet_label_pdf(db: Session, pallet_id: str, lang: str | None = None) -> tuple[bytes, str, str]:
     from app.repositories.center_repository import CenterRepository
     from app.services.pallet_service import PalletService
     from app.config import settings
@@ -154,7 +155,7 @@ def generate_pallet_label_pdf(db: Session, pallet_id: str) -> tuple[bytes, str, 
         base_url=base_url,
     )
     filename = f"tarima-{detail.code}.pdf"
-    return _generate_pallet_label_pdf(label), "application/pdf", filename
+    return _generate_pallet_label_pdf(label, lang), "application/pdf", filename
 
 
 def generate_transfer_manifest_pdf(db: Session, transfer_id: str) -> tuple[bytes, str, str]:
@@ -330,8 +331,10 @@ def generate_shipment_declaration_xlsx(db: Session, shipment_id: str) -> tuple[b
 _GENERATORS: dict[str, Callable[[Session, dict], tuple[bytes, str, str]]] = {
     "SHIPMENT_MANIFEST_PDF": lambda db, p: generate_shipment_manifest_pdf(db, p["shipment_id"]),
     "SHIPMENT_MANIFEST_XLSX": lambda db, p: generate_shipment_manifest_xlsx(db, p["shipment_id"]),
-    "BOX_LABELS_PDF": lambda db, p: generate_box_labels_pdf(db, p["center_id"], p["status"]),
-    "PALLET_LABEL_PDF": lambda db, p: generate_pallet_label_pdf(db, p["pallet_id"]),
+    # `lang` con `.get`: los trabajos encolados antes de esta versión no lo
+    # traen, y un export en curso no puede romperse por un despliegue.
+    "BOX_LABELS_PDF": lambda db, p: generate_box_labels_pdf(db, p["center_id"], p["status"], p.get("lang")),
+    "PALLET_LABEL_PDF": lambda db, p: generate_pallet_label_pdf(db, p["pallet_id"], p.get("lang")),
     "TRANSFER_MANIFEST_PDF": lambda db, p: generate_transfer_manifest_pdf(db, p["transfer_id"]),
     "REPORT_EXPORT_CSV": lambda db, p: generate_report_export_csv(
         db, p["campaign_id"], p["center_id"], p["start"], p["end"]

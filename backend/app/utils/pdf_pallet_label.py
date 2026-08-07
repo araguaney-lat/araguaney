@@ -9,6 +9,7 @@ from datetime import datetime
 
 import qrcode
 from app.legal import CUSTOMS_LEGEND_EN, CUSTOMS_LEGEND_ES
+from app.utils.label_strings import date_format_for, strings_for
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.utils import ImageReader
 from reportlab.lib.units import mm
@@ -44,7 +45,8 @@ def fit_box_codes(codes: list[str], y_start: float) -> tuple[list[str], int]:
     return visible, len(codes) - len(visible)
 
 
-def generate_pallet_label_pdf(pallet: PalletLabelData) -> bytes:
+def generate_pallet_label_pdf(pallet: PalletLabelData, lang: str | None = None) -> bytes:
+    t = strings_for(lang)
     buf = io.BytesIO()
     c = canvas.Canvas(buf, pagesize=A4)
     w, h = A4
@@ -73,23 +75,24 @@ def generate_pallet_label_pdf(pallet: PalletLabelData) -> bytes:
     c.setFont("Helvetica", 11)
     c.drawCentredString(w / 2, qr_y - 19 * mm, pallet.center_name)
 
-    status_label = {"OPEN": "Abierta", "CLOSED": "Cerrada", "SHIPPED": "Enviada"}.get(pallet.status, pallet.status)
-    c.drawCentredString(w / 2, qr_y - 25 * mm, f"Estado: {status_label}")
+    status_label = t.get(f"status_{pallet.status}", pallet.status)
+    c.drawCentredString(w / 2, qr_y - 25 * mm, f"{t['status']}: {status_label}")
 
     box_count = len(pallet.box_codes)
     c.setFont("Helvetica-Bold", 12)
-    c.drawCentredString(w / 2, qr_y - 33 * mm, f"{box_count} caja{'s' if box_count != 1 else ''}")
+    c.drawCentredString(w / 2, qr_y - 33 * mm,
+                        f"{box_count} {t['boxes_one'] if box_count == 1 else t['boxes_many']}")
 
     if pallet.closed_at:
         c.setFont("Helvetica", 9)
-        date_str = pallet.closed_at.strftime("%d/%m/%Y %H:%M")
-        c.drawCentredString(w / 2, qr_y - 39 * mm, f"Cerrada: {date_str}")
+        date_str = pallet.closed_at.strftime(f"{date_format_for(lang)} %H:%M")
+        c.drawCentredString(w / 2, qr_y - 39 * mm, f"{t['closed']}: {date_str}")
 
     # Box codes list
     if pallet.box_codes:
         y_start = qr_y - 50 * mm
         c.setFont("Helvetica-Bold", 9)
-        c.drawString(25 * mm, y_start, "Cajas en esta tarima:")
+        c.drawString(25 * mm, y_start, t["boxes_in_pallet"])
         c.setFont("Helvetica", 8)
         y = y_start - 5 * mm
         col_w = (w - 50 * mm) / 3
@@ -118,7 +121,7 @@ def generate_pallet_label_pdf(pallet: PalletLabelData) -> bytes:
     c.drawCentredString(w / 2, 20.5 * mm, CUSTOMS_LEGEND_EN)
 
     c.setFont("Helvetica", 7)
-    c.drawCentredString(w / 2, 15 * mm, "Araguaney · Coordinación humanitaria · araguaney.lat")
+    c.drawCentredString(w / 2, 15 * mm, t["footer"])
 
     c.save()
     return buf.getvalue()

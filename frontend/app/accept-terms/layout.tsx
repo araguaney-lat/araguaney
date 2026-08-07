@@ -13,7 +13,7 @@ export default async function AcceptTermsLayout({ children }: { children: React.
   const dict = await getDictionary(locale)
   return (
     <LocaleProvider locale={locale}>
-      <DictionaryProvider dict={dict}>{children}</DictionaryProvider>
+      <DictionaryProvider dict={dict} locale={locale}>{children}</DictionaryProvider>
     </LocaleProvider>
   )
 }

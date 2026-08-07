@@ -123,6 +123,19 @@ def box_qr_authenticated(
     return Response(content=png, media_type="image/png")
 
 
+
+def _print_lang(request: Request) -> str:
+    """Idioma de la etiqueta, tomado del panel de quien la imprime.
+
+    El panel manda `?lang=`; si no viene, se lee `Accept-Language`. Cualquier
+    cosa que no sea `en` cae en español, que es el idioma por defecto del
+    producto. Nunca levanta: una etiqueta en el idioma equivocado se lee igual,
+    pero un 400 deja a alguien sin etiquetas en pleno andén.
+    """
+    pedido = request.query_params.get("lang") or request.headers.get("accept-language", "")
+    return "en" if pedido.lower().startswith("en") else "es"
+
+
 # ── Códigos pre-asignados para captura sin conexión (Fase 25) ────────────────
 
 @router.post("/v1/boxes/codes/reserve", response_model=BoxCodeBlockOut, status_code=201)
@@ -180,7 +193,8 @@ def download_labels_pdf(
 
     job = ExportJobRepository(db).create(
         kind="BOX_LABELS_PDF",
-        params={"center_id": str(scope) if scope else None, "status": status},
+        params={"center_id": str(scope) if scope else None, "status": status,
+                "lang": _print_lang(request)},
         requested_by=current_user.id,
         center_id=scope,
     )

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react"
 import Link from "next/link"
-import { useDict } from "@/context/DictionaryContext"
+import { useDict, useLocale } from "@/context/DictionaryContext"
 import { useOfflineQueue } from "@/context/OfflineQueueContext"
 import {
   discardCapture,
@@ -22,10 +22,11 @@ import type { QueuedCapture } from "@/lib/offline/types"
  * decida. Descartar es la única forma de que algo capturado se borre, y es
  * siempre una decisión explícita. */
 
-function formatDate(ms: number): string {
-  // Sin locale explícito: el del dispositivo, que es el del turno de quien
-  // está mirando la pantalla.
-  return new Date(ms).toLocaleString(undefined, {
+function formatDate(ms: number, locale: string): string {
+  // El idioma del panel, no el del dispositivo: quien eligió inglés en la
+  // aplicación no espera fechas en el formato de la configuración regional del
+  // teléfono prestado que está usando.
+  return new Date(ms).toLocaleString(locale, {
     day: "2-digit",
     month: "short",
     hour: "2-digit",
@@ -38,6 +39,7 @@ export default function PendingCapturesPage() {
   const t = dict.dashboard.intake_pending
   const tq = dict.dashboard.offline_queue
   const queue = useOfflineQueue()
+  const locale = useLocale()
 
   const [captures, setCaptures] = useState<QueuedCapture[]>([])
   const [confirming, setConfirming] = useState<string | null>(null)
@@ -139,7 +141,7 @@ export default function PendingCapturesPage() {
                   <div>
                     <p className="text-sm font-medium text-tx">{capture.summary.campaign_name}</p>
                     <p className="text-xs text-mut">
-                      {formatDate(capture.created_at)}
+                      {formatDate(capture.created_at, locale)}
                       {" · "}
                       {t.attempts.replace("{n}", String(capture.attempts)).replace("{max}", String(MAX_ATTEMPTS))}
                     </p>

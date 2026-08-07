@@ -18,6 +18,7 @@ from app.services.pallet_service import PalletService
 from app.repositories.audit_repository import AuditRepository
 from app.utils.cloudflare import get_client_ip
 from app.utils.qr import pallet_qr_png
+from app.routers.box import _print_lang
 from app.utils.rate_limit import limiter
 
 router = APIRouter(tags=["pallets"])
@@ -170,7 +171,7 @@ def pallet_label_pdf(
 
     job = ExportJobRepository(db).create(
         kind="PALLET_LABEL_PDF",
-        params={"pallet_id": str(pallet_id)},
+        params={"pallet_id": str(pallet_id), "lang": _print_lang(request)},
         requested_by=current_user.id,
         center_id=scope,
     )

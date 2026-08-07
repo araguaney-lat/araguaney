@@ -994,7 +994,10 @@
       "print": "Imprimir",
       "back": "Volver a pendientes",
       "empty": "No hay capturas en cola.",
-      "empty_no_codes": "Estas capturas se guardaron sin códigos porque el bloque se agotó. Sus etiquetas salen del PDF del servidor cuando vuelva la señal."
+      "empty_no_codes": "Estas capturas se guardaron sin códigos porque el bloque se agotó. Sus etiquetas salen del PDF del servidor cuando vuelva la señal.",
+      "field_quantity": "Cant",
+      "field_batch": "Lote",
+      "field_expiry": "Cad"
     }
   },
   "studio": {
