@@ -83,6 +83,14 @@ export const MANUAL_GROUPS: readonly ManualGroup[] = [
           en: "Consolidate pallets and generate the manifest.",
         },
       },
+      {
+        slug: "recepcion-en-destino",
+        title: { es: "Recepción en destino", en: "Reception at destination" },
+        blurb: {
+          es: "Hitos del viaje, registrar qué llegó, merma e incidencias.",
+          en: "Journey milestones, recording what arrived, shrinkage and incidents.",
+        },
+      },
     ],
   },
   {

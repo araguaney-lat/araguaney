@@ -250,6 +250,8 @@ Centro (tenant)
     Box (caja HOMOGÉNEA, QR propio) ──► ProductType (SKU: categoría + atributos)
   Pallet (tarima, MIXTA, QR propio) ──► agrupa Boxes
   Shipment (envío) ──► agrupa Pallets ──► genera manifiesto
+    ShipmentReception ──► ReceptionLine (una por caja: qué llegó de verdad)
+    Incident ──► lo que salió mal, con estado y resolución
 ```
 
 | Entidad | Esencia | Notas |
@@ -263,7 +265,9 @@ Centro (tenant)
 | `Box` | Caja homogénea | 1 product_type + 1 batch + 1 expiry (garantizado por esquema). `code` → QR |
 | `Pallet` | Tarima de transporte | Mixta; agrupa cajas selladas. `code` → QR |
 | `Shipment` | Envío | Agrupa tarimas; genera manifiesto |
-| `BoxEvent`/`PalletEvent`/`ShipmentEvent` | Auditoría | from_status → to_status + user + ts |
+| `BoxEvent`/`PalletEvent`/`ShipmentEvent` | Auditoría | from_status → to_status + user + ts; en el de envío, `milestone` marca los hitos |
+| `ShipmentReception` + `ReceptionLine` | Qué llegó (Fase 22) | Una por envío; una línea por caja. No muta el inventario despachado |
+| `Incident` | Faltante, daño, retención o diferencia de peso | Cuelga del envío; acota a tarima o caja cuando se sabe. `OPEN → RESOLVED` con nota |
 | `RiskReview` | Escalamiento (Fase 20) | Captura de volumen atípico pendiente de que la coordinación la apruebe o rechace |
 
 Categorías (`ProductType.category`): `MEDICINE | MEDICAL_SUPPLY | FOOD | WATER | HYGIENE | TOOL | RESCUE_GEAR | OTHER`.
@@ -285,7 +289,17 @@ tiene un solo `batch` y una sola `expiry_date`. Si llega mezcla → se divide en
 **Máquinas de estado** (todo cambio escribe un `*_event`):
 - `Box`: `DRAFT → SEALED → SHIPPED` (+ `REJECTED` desde `DRAFT`). Solo cajas `SEALED` entran a tarima.
 - `Pallet`: `OPEN → CLOSED → SHIPPED`. Solo cajas `SEALED` entran; solo tarimas `CLOSED` entran a envío.
-- `Shipment`: `OPEN → CLOSED → SHIPPED`. Al `SHIPPED` se congela todo.
+- `Shipment`: `OPEN → CLOSED → SHIPPED → DELIVERED → RECONCILED`. Al `SHIPPED` se
+  congela todo, **y sigue congelado después**: `DELIVERED` dice que llegó y
+  `RECONCILED` que ya se registró qué llegó, pero ninguno toca las cajas ni las
+  tarimas. Lo que ocurrió en destino vive en las tablas de recepción, nunca como
+  mutación retroactiva del inventario despachado. Enviado y recibido son dos
+  hechos y el sistema guarda ambos; de esa separación depende poder medir la
+  merma (Fase 22).
+- **Hitos logísticos** (`shipment_events.milestone`): un hito es un evento con
+  `from_status = to_status`. Registra que algo pasó en el camino sin inventar
+  estados intermedios, así que la máquina no crece con cada aeropuerto ni cada
+  trámite.
 
 **El peso de verdad vive en la tarima** (Fase 21). El peso se mide dos veces, con
 báscula las dos, y hay una referencia que no se mide:
