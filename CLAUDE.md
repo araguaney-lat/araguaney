@@ -509,6 +509,26 @@ canal ruidoso se arregla leyéndolo y uno mudo no se nota hasta que es tarde).
 > la Fase 24 esa verificación destapó un SDK que no cargaba, una subida de source
 > maps rota un mes atrás y eventos frenados antes de salir del navegador.
 
+### IA asistida (Fase 23)
+
+**La IA pre-llena, la persona confirma. Nada se sella con un dato que nadie
+miró.** Ninguna capacidad decide, rechaza, asigna ni despacha.
+
+- **Ningún endpoint público invoca IA.** No es una convención: `ensure_available`
+  exige un `user_id`, así que una ruta anónima no puede llegar a la IA ni por
+  descuido. Lo público es cacheable, anónimo y barato de golpear, y un costo por
+  petición ahí es un ataque de bajo presupuesto contra el presupuesto de una
+  organización humanitaria.
+- El texto libre del donante en `/donar` **se guarda tal cual, sin llamar a
+  nadie**. El mapeo a catálogo ocurre después, en el panel, con sesión.
+- Toda llamada pasa por `app.services.ai.budget.ensure_available` y registra su
+  costo en `ai_usage`. Sin registro no hay tope, y sin tope el riesgo deja de ser
+  el precio unitario y pasa a ser el volumen.
+- Una bandera por capacidad, apagadas por defecto. Con todo apagado, la
+  aplicación se comporta exactamente como antes de la fase.
+- Ninguna capacidad se enciende en producción sin superar el umbral de su
+  conjunto de evaluación, fijado **antes** de medir.
+
 ### Seguridad del código
 
 - Columnas sensibles en DB: `encrypt_value` / `decrypt_value` de `app.utils.crypto`.

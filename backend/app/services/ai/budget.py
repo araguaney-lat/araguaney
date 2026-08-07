@@ -4,15 +4,22 @@ El riesgo de esta fase no es el precio unitario —una sugerencia cuesta
 centésimas de centavo— sino el volumen sin control: un bucle mal escrito, un
 cliente que reintenta, una foto que se procesa mil veces.
 
-Cuatro frenos, en orden de dureza:
+Cinco frenos, en orden de dureza:
 
-1. **Bandera por capacidad.** Encender el mapeo no enciende el OCR.
-2. **Tope mensual.** Al alcanzarlo, las capacidades se apagan solas. La
+1. **Sesión obligatoria.** `ensure_available` exige un `user_id`: sin usuario
+   autenticado no hay IA, y una ruta anónima no tiene ninguno que pasar. La
+   regla "ningún endpoint público invoca IA" deja de depender de que alguien la
+   recuerde.
+2. **Bandera por capacidad.** Encender el mapeo no enciende el OCR.
+3. **Tope mensual.** Al alcanzarlo, las capacidades se apagan solas. La
    operación sigue: capturar a mano es más lento, no imposible.
-3. **Caché.** La misma pregunta no se cobra dos veces.
-4. **Ningún endpoint público invoca IA.** No es configuración, es una regla de
-   la fase: lo público es cacheable y anónimo, y ahí un costo por petición se
-   convierte en un ataque barato.
+4. **Caché.** La misma pregunta no se cobra dos veces, ni siquiera entre centros.
+5. **Rate limit por usuario y centro** en cada endpoint que las exponga, sobre
+   `slowapi`, como el resto de la API.
+
+Lo público es cacheable, anónimo y barato de golpear. Un costo por petición ahí
+no es un gasto: es un ataque de bajo presupuesto contra el presupuesto de una
+organización humanitaria.
 """
 
 from __future__ import annotations
@@ -81,8 +88,22 @@ def budget_exhausted(db: Session) -> bool:
     return month_spend_usd(db) >= tope
 
 
-def ensure_available(db: Session, capability: str) -> None:
-    """Puerta única. Todo camino a la IA pasa por aquí."""
+def ensure_available(db: Session, capability: str, user_id: UUID | None) -> None:
+    """Puerta única. Todo camino a la IA pasa por aquí.
+
+    `user_id` es obligatorio y esa es la mitad más importante de esta función.
+    La regla de la fase —ninguna capacidad se invoca desde un endpoint público—
+    deja de ser una nota en un documento y pasa a ser algo que el código impide:
+    una ruta anónima no tiene usuario que pasar, así que no puede llegar hasta
+    aquí ni por descuido.
+
+    Importa porque lo público es cacheable, anónimo y barato de golpear. Un costo
+    por petición ahí no es un gasto, es un ataque de bajo presupuesto contra el
+    presupuesto de una organización humanitaria.
+    """
+    if user_id is None:
+        logger.warning("Se intentó usar '%s' sin usuario autenticado", capability)
+        raise AIDisabled("Las capacidades de IA requieren un usuario autenticado")
     if not capability_enabled(capability):
         raise AIDisabled(f"La capacidad '{capability}' está apagada")
     if budget_exhausted(db):

@@ -126,7 +126,7 @@ def test_the_gate_opens_while_there_is_budget(db):
     with patch.object(budget.settings, "ai_api_key", "sk-de-prueba"), \
          patch.object(budget.settings, "ai_enable_text_mapping", True), \
          patch.object(budget.settings, "ai_monthly_budget_usd", 20.0):
-        budget.ensure_available(db, "text_mapping")  # no levanta
+        budget.ensure_available(db, "text_mapping", user_id=uuid4())  # no levanta
 
 
 def test_reaching_the_cap_turns_the_capability_off(db):
@@ -137,7 +137,7 @@ def test_reaching_the_cap_turns_the_capability_off(db):
          patch.object(budget.settings, "ai_enable_text_mapping", True), \
          patch.object(budget.settings, "ai_monthly_budget_usd", 1.0):
         with pytest.raises(AIDisabled):
-            budget.ensure_available(db, "text_mapping")
+            budget.ensure_available(db, "text_mapping", user_id=uuid4())
 
 
 def test_a_zero_cap_reads_as_off(db):
@@ -185,3 +185,35 @@ def test_without_redis_the_cache_is_a_miss_and_not_a_crash():
     with patch("app.utils.cache.get_redis_client", return_value=None):
         budget.store("ai:text_mapping:loquesea", {"a": 1})
         assert budget.cached("ai:text_mapping:loquesea") is None
+
+
+# ── Sesión obligatoria ───────────────────────────────────────────────────────
+
+def test_without_an_authenticated_user_there_is_no_ai(db):
+    """La regla "ningún endpoint público invoca IA", vuelta mecanismo.
+
+    Una ruta anónima no tiene usuario que pasar, así que no puede llegar a la
+    IA ni por descuido de quien la escriba dentro de seis meses. Sin esto, la
+    regla dependería de que alguien la recuerde.
+    """
+    with patch.object(budget.settings, "ai_api_key", "sk-de-prueba"), \
+         patch.object(budget.settings, "ai_enable_text_mapping", True), \
+         patch.object(budget.settings, "ai_monthly_budget_usd", 20.0):
+        with pytest.raises(AIDisabled) as exc:
+            budget.ensure_available(db, "text_mapping", user_id=None)
+
+    assert "autenticado" in str(exc.value)
+
+
+def test_the_session_check_comes_before_the_others(db):
+    """Un anónimo no debe poder distinguir si la capacidad existe o está apagada.
+
+    Comprobar primero la sesión evita que la respuesta filtre configuración a
+    quien no debería estar preguntando.
+    """
+    with patch.object(budget.settings, "ai_api_key", ""), \
+         patch.object(budget.settings, "ai_enable_text_mapping", False):
+        with pytest.raises(AIDisabled) as exc:
+            budget.ensure_available(db, "text_mapping", user_id=None)
+
+    assert "autenticado" in str(exc.value)
