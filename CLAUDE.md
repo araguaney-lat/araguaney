@@ -90,8 +90,10 @@ La REGLA #2 aplica igual al texto del PR: nada de credenciales, parámetros de
 controles ni recetas de evasión.
 
 **Alcance.** Esta regla cubre el título y el cuerpo del PR. Los mensajes de
-commit van en inglés y sin traducción: son para quien lee `git log`, no
-documentación de producto (sección 10).
+commit y la documentación del repositorio (`README`, `CONTRIBUTING`, `SECURITY`,
+`AGENTS`) van en inglés y sin traducción: son para quien lee `git log` o llega de
+fuera, no documentación de producto. La tabla de la sección 10 dice qué archivo
+cae de cada lado.
 
 ---
 
@@ -408,10 +410,24 @@ nombres de archivo. Sin excepciones nuevas.
 documentación, textos de error al usuario y contenido de alertas. El proyecto
 opera en español y una alerta la lee alguien de guardia a las tres de la mañana.
 
-**La prosa dirigida a quien contribuye va en inglés.** Mensajes de commit y
-texto de los PR: se leen desde fuera del proyecto, quedan indexados y son lo
-primero que encuentra quien evalúa si adoptar el software. Para los PR, además,
-se acompañan de su versión en español (REGLA #3).
+**La prosa dirigida a quien contribuye va en inglés.** Mensajes de commit,
+texto de los PR y la **documentación del repositorio** (`README.md`,
+`CONTRIBUTING.md`, `SECURITY.md`, `AGENTS.md`): se leen desde fuera del proyecto,
+quedan indexados y son lo primero que encuentra quien evalúa si adoptar el
+software. Para los PR, además, se acompañan de su versión en español (REGLA #3).
+
+**Dónde cae cada archivo**, porque la frontera no es obvia:
+
+| Archivo | Idioma | Por qué |
+|---|---|---|
+| `README`, `CONTRIBUTING`, `SECURITY`, `AGENTS` | Inglés | Los lee quien evalúa o contribuye desde fuera |
+| `CODE_OF_CONDUCT` | Bilingüe | Estándar internacional que la comunidad local también debe poder leer |
+| **Este archivo** y `docs/roadmap/` | Español | Es el razonamiento de dominio que los comentarios del código citan casi literalmente. Traducirlo partiría en dos idiomas una misma cadena de decisiones |
+| `docs/observability.md`, `docs/flujo/`, manuales del panel | Español | Los lee quien opera un centro o está de guardia |
+
+El criterio no es "documentación va en inglés", sino **a quién se dirige cada
+texto**. Un runbook que alguien abre a las tres de la mañana en un centro de
+acopio mexicano no gana nada traducido.
 
 ```python
 # CORRECTO

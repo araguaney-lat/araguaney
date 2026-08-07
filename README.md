@@ -1,23 +1,25 @@
 # Araguaney
 
-> **El estándar común para coordinar centros de acopio y logística de ayuda humanitaria.**
-> App web multi-centro y gratuita: registra donaciones **en especie** por ítem, las empaca en
-> **cajas homogéneas** con QR, las consolida en **tarimas** y **envíos** con manifiesto
-> exportable, y agrega el stock de todos los centros en un **panel nacional** en tiempo real.
-> Sin datos de beneficiarios y con la donación anónima como norma: del donante solo se guarda lo que decide dar,
-> con plazo de conservación declarado y purga automática.
+> **A common standard for coordinating collection centres and humanitarian aid logistics.**
+> A free, multi-centre web application: it records **in-kind** donations item by item, packs them
+> into **homogeneous boxes** with QR codes, consolidates those into **pallets** and **shipments**
+> with an exportable manifest, tracks what actually arrived at the destination, and aggregates
+> every centre's stock into a real-time **national dashboard**.
+> No beneficiary data, and anonymous donation as the norm: of the donor, only what they choose to
+> give is stored, with a declared retention period and automatic purging.
 
-**El flujo:** `Intake` (recepción) → `Box` (caja homogénea + QR) → `Pallet` (tarima) → `Shipment`
-(envío + manifiesto) → panel nacional agregado.
+**The flow:** `Intake` → `Box` (homogeneous + QR) → `Pallet` → `Shipment` (with manifest) →
+reception at the destination → national aggregate dashboard.
 
-**Público + multi-idioma:** además del panel operativo, sirve un **sitio público bilingüe (ES/EN)**
-optimizado para SEO/AEO — pilares, guías, glosario, "qué falta" (`/necesidades`), landings por
-escenario, FAQ y changelog. Agnóstico de país; funciona para cualquier emergencia (sismos,
-inundaciones, incendios, crisis migratorias).
+**Public and multilingual:** beyond the operational panel, it serves a **bilingual public site
+(ES/EN)** tuned for SEO/AEO — pillars, guides, a glossary, "what is needed" (`/necesidades`),
+scenario landings, an FAQ hub and a changelog. Country-agnostic; it works for any emergency
+(earthquakes, floods, fires, migration crises).
 
-> Deriva del boilerplate `fastapi-nextjs-boilerplate`. El **qué/por qué** del producto y sus reglas
-> viven en [`CLAUDE.md`](CLAUDE.md); el **roadmap por fases** en [`docs/roadmap/`](docs/roadmap/);
-> el mantenimiento de SEO/AEO en [`docs/seo-maintenance.md`](docs/seo-maintenance.md).
+> Derived from the `fastapi-nextjs-boilerplate`. The product's **what and why**, along with its
+> rules, live in [`CLAUDE.md`](CLAUDE.md); the **phase roadmap** in
+> [`docs/roadmap/`](docs/roadmap/); SEO/AEO maintenance in
+> [`docs/seo-maintenance.md`](docs/seo-maintenance.md).
 
 ## Tech Stack
 
@@ -39,31 +41,42 @@ inundaciones, incendios, crisis migratorias).
 
 ## Domain model
 
-Multi-tenant "pool / row-level": **un solo deploy, una sola DB, `center_id` discrimina por centro**
-(hace trivial la agregación nacional). Todo acceso a datos pasa por el scoping de tenant.
+Multi-tenant "pool / row-level": **one deploy, one database, `center_id` discriminates by
+centre** — which is what makes national aggregation a single `GROUP BY`. Every data access goes
+through tenant scoping.
 
-| Entidad | Esencia |
+| Entity | Essence |
 |---|---|
-| `Center` | El tenant (centro de acopio) |
-| `ProductType` | El SKU — categoría + atributos (p. ej. `strength`) |
-| `Intake` | Recepción de una donación (donante opcional; anónimo por default) |
-| `Box` | Caja **homogénea**: 1 `product_type` + 1 lote + 1 caducidad · QR propio |
-| `Pallet` | Tarima (mixta) que agrupa cajas selladas · QR propio |
-| `Shipment` | Envío que agrupa tarimas · genera el manifiesto/packing list |
-| `Campaign` | Campaña/evento (slug público en `/eventos/{slug}`) |
-| `Transfer` | Transferencia de inventario entre centros |
+| `Center` | The tenant (collection centre) |
+| `ProductType` | The SKU — category + attributes (e.g. `strength`) |
+| `Intake` | Receipt of a donation (donor optional; anonymous by default) |
+| `Box` | **Homogeneous** box: 1 `product_type` + 1 batch + 1 expiry · own QR |
+| `Pallet` | Pallet (mixed) grouping sealed boxes · own QR |
+| `Shipment` | Shipment grouping pallets · produces the manifest / packing list |
+| `ShipmentReception` + `ReceptionLine` | What actually arrived, box by box |
+| `Incident` | Missing, damaged, retained or a weight difference · `OPEN → RESOLVED` |
+| `Campaign` | Campaign/event (public slug at `/eventos/{slug}`) |
+| `Transfer` | Inventory transfer between centres |
 
-Máquinas de estado con auditoría (`*_event`): `Box` DRAFT→SEALED→SHIPPED (+REJECTED),
-`Pallet` OPEN→CLOSED→SHIPPED, `Shipment` OPEN→CLOSED→SHIPPED.
+State machines with an audit trail (`*_event`): `Box` DRAFT→SEALED→SHIPPED (+REJECTED),
+`Pallet` OPEN→CLOSED→SHIPPED, `Shipment` OPEN→CLOSED→SHIPPED→DELIVERED→RECONCILED.
+
+**Dispatched inventory stays frozen.** `DELIVERED` says it arrived and `RECONCILED` says what
+arrived has been recorded, but neither touches a box or a pallet. Sent and received are two
+distinct facts and the system keeps both — that separation is what makes shrinkage measurable at
+all. Logistics milestones (`shipment_events.milestone`) are events where `from_status =
+to_status`: they record that something happened along the way without inventing intermediate
+states.
 
 ## Roles
 
-- **`users.role`** (del boilerplate) gobierna las secciones: `user` → `/dashboard`,
-  `superadmin` → `/studio`, y las rutas públicas sin login.
-- **`center_role`** controla qué ve cada usuario dentro de `/dashboard`:
-  - `volunteer` — intake, cajas, etiquetas (su centro)
-  - `coordinator` — + tarimas, envíos, manifiestos, gestión de su centro
-  - `national_admin` — agregado nacional, centros/campañas, usuarios, auditoría (`center_id = NULL`)
+- **`users.role`** governs which section you reach: `user` → `/dashboard`, `superadmin` →
+  `/studio`, plus the public routes that need no login.
+- **`center_role`** controls what each user sees inside `/dashboard`:
+  - `volunteer` — intake, boxes, labels (their own centre)
+  - `coordinator` — the above plus pallets, shipments, manifests, and managing their centre
+  - `national_admin` — national aggregate, centres/campaigns, users, incidents, audit
+    (`center_id = NULL`)
 
 ## Project Structure
 
@@ -93,23 +106,23 @@ Máquinas de estado con auditoría (`*_event`): `Box` DRAFT→SEALED→SHIPPED (
 ├── frontend/
 │   ├── app/                  # Next.js App Router — [lang]/ (público ES/EN i18n),
 │   │                         #   dashboard/, studio/, sitemap.ts, robots.ts, manifest.ts
-│   ├── public/               # Estáticos + llms.txt / llms-full.txt + key IndexNow
+│   ├── public/               # Static assets + llms.txt / llms-full.txt + IndexNow key
 │   └── src/
 │       ├── components/       # Shared UI components
 │       ├── lib/              # actions.ts, api.ts, routes.ts (i18n), seo.ts,
 │       │                     #   structured-data.ts, scenarios.ts, changelog.ts, …
-│       ├── content/          # Copy legal (privacy/terms) por idioma
+│       ├── content/          # Legal copy (privacy/terms) per language
 │       ├── dictionaries/     # i18n (es.json / en.json)
 │       └── types/            # Shared TypeScript interfaces
 ├── .github/
 │   ├── dependabot.yml        # Grouped weekly dep updates (npm + pip + actions)
 │   └── workflows/
-│       └── security-scan.yml # npm/pip audit — bloquea solo si el PR cambia deps
+│       └── security-scan.yml # npm/pip audit — blocks only if the PR changes deps
 ├── docs/
-│   ├── roadmap/              # Roadmap por fases (fuente de verdad del avance)
-│   ├── integrations/         # Guías portables (p. ej. Resend deliverability)
-│   ├── seo-maintenance.md    # Runbook de mantenimiento SEO/AEO
-│   └── optional-layers.md    # Capas opcionales del boilerplate
+│   ├── roadmap/              # Phase roadmap (source of truth for progress)
+│   ├── integrations/         # Portable guides (e.g. Resend deliverability)
+│   ├── seo-maintenance.md    # SEO/AEO maintenance runbook
+│   └── optional-layers.md    # Optional boilerplate layers
 ├── docker-compose.yml        # Local dev: db + redis + backend + worker + frontend
 └── .env.example              # All env vars documented
 ```
@@ -215,31 +228,59 @@ alembic downgrade -1
 
 ## What's included
 
-**Dominio (Araguaney)**
-- Intake de donaciones por ítem con validación en recepción (caducidad, reglas OMS de
-  medicamentos, bloqueo de controlados) — rechazo en el momento del registro
-- Caja **homogénea** garantizada por esquema (1 producto + 1 lote + 1 caducidad) con QR + etiqueta
-- Tarimas y envíos con **manifiesto / packing list exportable** (PDF/XLSX, encolado en ARQ)
-- **Panel nacional agregado** — stock de todos los centros en tiempo real (un `GROUP BY`)
-- **Transferencias** entre centros · **mensajería** entre usuarios · **reportes** de campaña
-- **Auto-registro de centros** con aprobación (invitación por email, cambio de contraseña forzado)
-- **Deliverability de emails** — webhook de Resend (bounces/quejas) + panel de reenvío
-- Catálogos de referencia (WHO/OMS, IFRC/ICRC, IOM, UNSPSC, GS1) para clasificar el inventario
+**Domain (Araguaney)**
+- Item-by-item donation intake with validation at receipt (expiry, WHO medicine donation rules,
+  controlled substances blocked) — rejection happens at the moment of capture
+- **Homogeneous box** guaranteed by the schema (1 product + 1 batch + 1 expiry) with QR + label
+- Pallets and shipments with an **exportable manifest / packing list** (PDF/XLSX, queued in ARQ)
+- **Weighing at two levels** (box and pallet) and a **goods declaration** with country-agnostic
+  field names; HS codes, never a single country's tax regime
+- **Extended traceability to the destination** — logistics milestones, arrival, reconciled
+  reception box by box, and incidents (missing, damage, customs retention, weight difference)
+  with an owner and a resolution
+- **Shrinkage as a metric** — the mirror of the intake rejection rate: one measures what was not
+  accepted on the way in, the other what did not arrive on the way out
+- **Donor pre-registration** — donors register online, get a QR, and the centre does a double
+  check on receipt; anonymous donation remains the default
+- **Risk prevention** — irrevocable-transfer terms, an escalation threshold for atypical volume,
+  a customs legend, and a red-flags guide for coordinators
+- **National aggregate dashboard** — every centre's stock in real time (one `GROUP BY`)
+- **Transfers** between centres · **messaging** between users · campaign **reports**
+- **Centre self-registration** with approval (email invitation, forced password change)
+- **Email deliverability** — Resend webhook (bounces/complaints) + resend panel
+- Reference catalogues (WHO, IFRC/ICRC, IOM, UNSPSC, GS1, RxNorm, COFEPRIS) to classify inventory
+
+**AI-assisted capture (off by default)**
+- Free-text donation lines mapped to catalogue products, medicine label OCR, needs-to-stock
+  matching, and a written summary of the national aggregate
+- **The AI pre-fills, a person confirms.** Nothing is sealed with a value nobody looked at, and no
+  capability decides, rejects, assigns or dispatches
+- **No public endpoint invokes AI**, enforced in code rather than by convention, plus a monthly
+  spend cap, a per-capability flag, caching and rate limiting
+- Provider-neutral through an OpenAI-compatible layer: OpenAI, DeepSeek, Groq, Together or a
+  local Ollama, all through environment variables
+
+**Observability**
+- Every background job that holds a promise alerts when it fails, naming what is left unfulfilled
+  rather than which exception was raised
+- A cron heartbeat, because a cron that never runs does not fail and therefore never alerts, plus
+  `GET /health/jobs` for an external monitor — a watchdog cannot detect its own death
+- An alert noise budget that groups by problem identity, so a channel stays worth reading
 
 **Public site & SEO/AEO**
-- Sitio público **bilingüe (ES/EN)** con locale por URL (ES sin prefijo, EN con `/en/...`,
-  slugs traducidos vía `src/lib/routes.ts`) + `hreflang`/canonical
-- Pilares, guías, glosario, `/necesidades` ("qué falta"), landings por **escenario**
-  (`/escenarios/[scenario]`) y por **categoría**, hub `/preguntas-frecuentes`, changelog
-  `/novedades`, `/nosotros`, landing de México (COFEPRIS/SAT)
-- `sitemap.ts` + `robots.ts` (declara crawlers de IA) + `llms.txt` / `llms-full.txt`
-- Structured data (schema.org): `Organization` (con `sameAs`/founder), `SoftwareApplication`,
-  `Article`/`HowTo`/`FAQPage`/`BreadcrumbList`/`Event`, `speakable` — en `src/lib/structured-data.ts`
-- **IndexNow** on-publish: al crear una campaña pública, el backend pinguea Bing (grounding de
-  ChatGPT/Copilot) — ver `app/utils/indexnow.py`
-- Señales de frescura (`dateModified` + fecha visible en guías) y bylines E-E-A-T
-- Host canónico único (`www`), Google Search Console + Bing Webmaster verificados
-- Mantenimiento recurrente: [`docs/seo-maintenance.md`](docs/seo-maintenance.md)
+- **Bilingual public site (ES/EN)** with locale by URL (ES unprefixed, EN under `/en/...`,
+  translated slugs via `src/lib/routes.ts`) + `hreflang`/canonical
+- Pillars, guides, glossary, `/necesidades` ("what is needed"), **scenario** landings
+  (`/escenarios/[scenario]`) and **category** landings, `/preguntas-frecuentes` hub, `/novedades`
+  changelog, `/nosotros`, and a Mexico landing (COFEPRIS/SAT)
+- `sitemap.ts` + `robots.ts` (declares AI crawlers) + `llms.txt` / `llms-full.txt`
+- Structured data (schema.org): `Organization` (with `sameAs`/founder), `SoftwareApplication`,
+  `Article`/`HowTo`/`FAQPage`/`BreadcrumbList`/`Event`, `speakable` — in `src/lib/structured-data.ts`
+- **IndexNow** on publish: creating a public campaign pings Bing from the backend (grounding for
+  ChatGPT/Copilot) — see `app/utils/indexnow.py`
+- Freshness signals (`dateModified` plus a visible date on guides) and E-E-A-T bylines
+- A single canonical host (`www`), with Google Search Console and Bing Webmaster verified
+- Recurring maintenance: [`docs/seo-maintenance.md`](docs/seo-maintenance.md)
 
 **Auth**
 - JWT auth with token denylist (logout revocation)
@@ -376,34 +417,43 @@ def get_me_v2(current_user = Depends(get_current_user)):
 
 Unversioned routes (Stripe webhooks, health check) bypass the registry entirely.
 
-## Objetivos de Desarrollo Sostenible
+## Sustainable Development Goals
 
-Araguaney contribuye al **ODS 11.5** (reducir de forma significativa las
-pérdidas causadas por desastres) mejorando la trazabilidad y la eficiencia de
-la logística de ayuda humanitaria en especie, y al **ODS 17.16-17.17**
-(alianzas para lograr los objetivos) al dar a centros de acopio independientes
-un estándar común de coordinación y un panel agregado compartido.
+Araguaney contributes to **SDG 11.5** (significantly reduce losses caused by
+disasters) by improving the traceability and efficiency of in-kind humanitarian
+logistics, and to **SDG 17.16–17.17** (partnerships for the goals) by giving
+independent collection centres a common coordination standard and a shared
+aggregate dashboard.
 
-## Licencia y marca
+## Licence and trademark
 
-El código de Araguaney es **software libre bajo [AGPL-3.0](LICENSE)**: puedes
-usarlo, estudiarlo, modificarlo y desplegar tu propia instancia. Si operas una
-versión modificada como servicio, la AGPL te obliga a publicar tus cambios.
+Araguaney's code is **free software under [AGPL-3.0](LICENSE)**: you may use it,
+study it, modify it and deploy your own instance. If you run a modified version
+as a service, the AGPL requires you to publish your changes.
 
-El uso de la plataforma en [araguaney.lat](https://www.araguaney.lat) es
-**gratuito** para centros de acopio y coordinaciones humanitarias: sin
-licencias, sin límite de cajas y sin costo por uso.
+Using the platform at [araguaney.lat](https://www.araguaney.lat) is **free** for
+collection centres and humanitarian coordinators: no licences, no box limits and
+no usage fees.
 
-**Titularidad.** Araguaney es un proyecto de **Antony Delgado Casanova**,
-titular del copyright del código, del nombre "Araguaney" y del dominio
-araguaney.lat. No existe una entidad jurídica asociada al proyecto.
+**Ownership.** Araguaney is a project by **Antony Delgado Casanova**, who holds
+copyright over the code, the name "Araguaney" and the araguaney.lat domain. No
+legal entity is associated with the project.
 
-**La marca no se licencia con el código.** El nombre "Araguaney", el logo y el
-dominio araguaney.lat identifican la instancia oficial y su red de centros.
-Un fork debe operar bajo otro nombre y dominio, sin presentarse como la
-instancia oficial — especialmente durante una emergencia, cuando la confusión
-cuesta más.
+**The trademark is not licensed with the code.** The name "Araguaney", the logo
+and the araguaney.lat domain identify the official instance and its network of
+centres. A fork must operate under a different name and domain, without
+presenting itself as the official instance — especially during an emergency,
+when confusion costs the most.
 
-Para reportar vulnerabilidades: [SECURITY.md](SECURITY.md). Para contribuir:
-[CONTRIBUTING.md](CONTRIBUTING.md). Normas de convivencia:
-[CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
+To report vulnerabilities: [SECURITY.md](SECURITY.md). To contribute:
+[CONTRIBUTING.md](CONTRIBUTING.md). Community standards:
+[CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md). Conventions and domain rules:
+[CLAUDE.md](CLAUDE.md).
+
+## ¿Prefieres español?
+
+El producto opera en español: la interfaz, los manuales del panel
+(`/dashboard/ayuda`), los mensajes de error y los comentarios del código están en
+ese idioma. Esta documentación de repositorio está en inglés porque se dirige a
+quien evalúa o contribuye al proyecto desde fuera, que es el mismo criterio que
+sigue el texto de los pull requests.
