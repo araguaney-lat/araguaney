@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 from uuid import UUID
 
 from app.arq_pool import enqueue
-from app.models.events import BoxEvent, PalletEvent, ShipmentEvent
+from app.models.events import SHIPMENT_MILESTONES, BoxEvent, PalletEvent, ShipmentEvent
 from app.models.shipment import Shipment
 from app.repositories.donation_repository import DonationRepository
 from app.repositories.pallet_repository import PalletRepository
@@ -14,6 +14,11 @@ from app.services.base import BaseService
 from app.utils.errors import api_error
 from app.utils.weight import height_warning
 from app.utils.weight import boxes_weight as _boxes_weight, net_weight, weight_discrepancy
+
+
+# Estados en los que el envío ya salió del centro y admite hitos. Un hito sobre
+# un envío que aún se está armando describiría algo que no ocurrió.
+_POST_DISPATCH = ("SHIPPED", "DELIVERED", "RECONCILED")
 
 
 class ShipmentService(BaseService):
@@ -152,6 +157,73 @@ class ShipmentService(BaseService):
         self, center_id: UUID | None, status: str | None = None, limit: int = 200, offset: int = 0
     ) -> list[Shipment]:
         return ShipmentRepository(self.db).list_all(center_id, status=status, limit=limit, offset=offset)
+
+    # ── Después de despachar (Fase 22) ────────────────────────────────────────
+
+    def add_milestone(
+        self, shipment_id: UUID, center_id: UUID | None, user_id: UUID,
+        milestone: str, note: str | None = None, occurred_at: datetime | None = None,
+    ) -> Shipment:
+        """Anota un hito logístico sin mover el estado.
+
+        Un hito es un evento con `from_status = to_status`: registra que algo
+        pasó sin inventar estados intermedios. Si cada paso del camino fuera un
+        estado, la máquina crecería con cada aeropuerto.
+        """
+        if milestone not in SHIPMENT_MILESTONES:
+            raise api_error("INVALID_MILESTONE", f"Unknown milestone '{milestone}'", field="milestone")
+
+        repo = ShipmentRepository(self.db)
+        shipment = repo.find_by_id(shipment_id, center_id)
+        if not shipment:
+            raise api_error("SHIPMENT_NOT_FOUND", "Shipment not found", status_code=404)
+        if shipment.status not in _POST_DISPATCH:
+            raise api_error(
+                "INVALID_STATUS",
+                f"Shipment is '{shipment.status}'; milestones only apply once it has been shipped",
+                status_code=400,
+            )
+
+        evento = ShipmentEvent(
+            shipment_id=shipment.id,
+            user_id=user_id,
+            from_status=shipment.status,
+            to_status=shipment.status,
+            milestone=milestone,
+            note=note,
+        )
+        # La fecha del hito la pone quien lo registra: el reporte del
+        # consignatario llega tarde y con frecuencia describe algo de ayer.
+        if occurred_at is not None:
+            evento.ts = occurred_at
+        self.db.add(evento)
+        repo.commit()
+        return shipment
+
+    def mark_delivered(
+        self, shipment_id: UUID, center_id: UUID | None, user_id: UUID,
+        note: str | None = None, delivered_at: datetime | None = None,
+    ) -> Shipment:
+        """SHIPPED → DELIVERED. Llegó; qué llegó se registra en la recepción."""
+        repo = ShipmentRepository(self.db)
+        shipment = repo.find_by_id(shipment_id, center_id)
+        if not shipment:
+            raise api_error("SHIPMENT_NOT_FOUND", "Shipment not found", status_code=404)
+        if shipment.status != "SHIPPED":
+            raise api_error(
+                "INVALID_TRANSITION",
+                f"Shipment is '{shipment.status}'; only SHIPPED shipments can be marked delivered",
+                status_code=400,
+            )
+
+        shipment.status = "DELIVERED"
+        shipment.delivered_at = delivered_at or datetime.now(tz=timezone.utc)
+        self.db.add(ShipmentEvent(
+            shipment_id=shipment.id, user_id=user_id,
+            from_status="SHIPPED", to_status="DELIVERED", note=note,
+        ))
+        repo.commit()
+        return shipment
 
     def _build_detail(self, shipment: Shipment) -> ShipmentDetailOut:
         s_repo = ShipmentRepository(self.db)

@@ -34,6 +34,8 @@ from app.models import pallet  # noqa: F401
 from app.models import product_gtin  # noqa: F401
 from app.models import product_type  # noqa: F401
 from app.models import request  # noqa: F401
+from app.models import incident  # noqa: F401
+from app.models import reception  # noqa: F401
 from app.models import shipment  # noqa: F401
 from app.models import token_denylist  # noqa: F401
 from app.models import transfer  # noqa: F401

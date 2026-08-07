@@ -4,8 +4,8 @@
 
 ```mermaid
 pie title Tareas completadas (443 tareas)
-    "Listas" : 396
-    "Pendientes" : 47
+    "Listas" : 399
+    "Pendientes" : 44
 ```
 
 | Fase | Nombre | Listas | Pendientes | Progreso |
@@ -32,12 +32,12 @@ pie title Tareas completadas (443 tareas)
 | 19 | [Identidad estructurada del donante en el intake](phase-19-structured-donor-identity.md) | 9 | 0 | ✅ 100% |
 | 20 | [Prevención de riesgos: responsabilidad y anti-lavado en especie](phase-20-risk-prevention.md) | 6 | 4 | 🟡 60% |
 | 21 | [Logística: pesaje, declaración de mercancías y perfiles de paletizado](phase-21-logistics-weighing.md) | 12 | 0 | ✅ 100% |
-| 22 | [Trazabilidad extendida: avión y destino](phase-22-extended-traceability.md) | 0 | 14 | ⬜ 0% |
+| 22 | [Trazabilidad extendida: avión y destino](phase-22-extended-traceability.md) | 3 | 11 | 🟡 21% |
 | 23 | [IA asistida: captura, catálogo y necesidades](phase-23-ai-assisted-capture.md) | 0 | 11 | ⬜ 0% |
 | 24 | [Observabilidad: que un fallo silencioso deje de serlo](phase-24-observability.md) | 11 | 0 | ✅ 100% |
-| **Total** | | **396** | **47** | **🟡 89%** |
+| **Total** | | **399** | **44** | **🟡 90%** |
 
-> **Pendientes (47):**
+> **Pendientes (44):**
 > El grupo A de la Fase 13 (privacidad, lo que aplica hoy) está completo.
 > - Los borradores legales de la Fase 20 están escritos y esperando revisión de abogado:
 >   [`docs/legal/drafts/`](../legal/drafts/README.md). Sus tareas siguen abiertas hasta que esa
@@ -48,8 +48,8 @@ pie title Tareas completadas (443 tareas)
 >   estructurales documentados). Lo que queda son los tres textos legales (tasks 1, 2 y 6), que la
 >   task 7 —revisión de abogado— gatea antes de publicar; los borradores ya están escritos en
 >   [`docs/legal/drafts/`](../legal/drafts/README.md).
-> - **14 de la Fase 22 (trazabilidad extendida):** hitos logísticos, recepción en destino con
->   merma e incidencias; diseño en
+> - **11 de la Fase 22 (trazabilidad extendida):** el esquema, los repositorios y los hitos con la
+>   llegada ya están; falta recepción en destino con merma, incidencias y su UI. Diseño en
 >   [su spec](../superpowers/specs/2026-07-29-extended-traceability-design.md).
 > - **11 de la Fase 23 (IA asistida):** mapeo de texto libre, OCR de etiqueta, emparejamiento de
 >   necesidades y resumen nacional, con guardarraíles de gasto; diseño en

@@ -30,6 +30,8 @@ class ShipmentOut(StrictORMModel):
     notes: str | None
     closed_at: datetime | None
     shipped_at: datetime | None
+    delivered_at: datetime | None = None
+    reconciled_at: datetime | None = None
     created_at: datetime
     height_profile: str | None = None
 
@@ -45,8 +47,24 @@ class ShipmentDetailOut(StrictModel):
     notes: str | None
     closed_at: datetime | None
     shipped_at: datetime | None
+    delivered_at: datetime | None = None
+    reconciled_at: datetime | None = None
     created_at: datetime
     height_profile: str | None = None
     # Tarimas que no caben en el perfil declarado. Aviso, no bloqueo.
     height_warnings: list[str] = []
     pallets: list[PalletDetailOut]
+
+
+class MilestoneIn(StrictModel):
+    """Hito logístico. `occurred_at` es opcional porque el reporte del
+    consignatario suele llegar tarde y describir algo de ayer."""
+
+    milestone: str
+    note: str | None = None
+    occurred_at: datetime | None = None
+
+
+class DeliveredIn(StrictModel):
+    note: str | None = None
+    delivered_at: datetime | None = None
