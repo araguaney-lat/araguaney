@@ -16,6 +16,7 @@ from app.repositories.product_type_repository import ProductTypeRepository
 from app.repositories.user_campaign_repository import UserCampaignRepository
 from app.schemas.donor import DonorOut
 from app.schemas.intake import BoxDraft, IntakeCreate, IntakeOut, BoxOut
+from app.services import box_code_service
 from app.services.base import BaseService
 from app.services.validation_service import validate_box
 from app.utils.gtin import normalize as normalize_gtin, validate as validate_gtin
@@ -173,8 +174,15 @@ class IntakeService(BaseService):
             reject_reason = validate_box(bd, pt, capture_date)
             status = "REJECTED" if reject_reason else "DRAFT"
 
+            # Se reclama antes de crear la caja: así el error de dominio gana al
+            # unique de `boxes.code` y el cliente sabe qué pasó.
+            reserva = box_code_service.claim(self.db, bd.code, center_id) if bd.code else None
+
             box = Box(
-                code=_box_code(),
+                # Un código pre-asignado llega de una captura offline: la
+                # etiqueta ya se imprimió con él, así que la caja tiene que
+                # nacer con ese número y no con uno nuevo.
+                code=bd.code or _box_code(),
                 center_id=center_id,
                 product_type_id=bd.product_type_id,
                 intake_id=intake.id,
@@ -188,6 +196,9 @@ class IntakeService(BaseService):
             )
             intake_repo.save_box(box)
             saved_boxes.append(box)
+
+            if reserva is not None:
+                reserva.box_id = box.id
 
             # El catálogo aprende: el código leído queda ligado al producto que
             # la persona eligió. Un GTIN mal formado se ignora en silencio, no

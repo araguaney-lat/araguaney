@@ -95,6 +95,7 @@ def _intake_data(donor=None, boxes=1, weight=None):
         bd.quantity = 1
         bd.unit = "cajas"
         bd.batch = None
+        bd.code = None      # sin código pre-asignado (Fase 25)
         bd.expiry_date = None
         bd.weight_kg = weight
         bd.gtin = None

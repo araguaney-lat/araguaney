@@ -48,8 +48,8 @@
 
 | # | Tarea | Descripción | Complejidad | Estado |
 |---|-------|-------------|-------------|--------|
-| 4 | Reserva de bloques | `POST /v1/boxes/codes/reserve` devuelve N códigos para el centro del usuario. Rate-limited. Un bloque sin usar no es inventario y no aparece en ningún reporte. | 🟠 Media | ⬜ |
-| 5 | Consumir un código reservado | El intake acepta un `code` pre-asignado por caja; se marca `used_at` y se liga al `box_id`. Consumirlo dos veces falla. Un código de A no lo consume B. | 🟠 Media | ⬜ |
+| 4 | Reserva de bloques | `POST /v1/boxes/codes/reserve` devuelve N códigos para el centro del usuario. Rate-limited. Un bloque sin usar no es inventario y no aparece en ningún reporte. | 🟠 Media | ✅ Done |
+| 5 | Consumir un código reservado | El intake acepta un `code` pre-asignado por caja; se marca `used_at` y se liga al `box_id`. Consumirlo dos veces falla. Un código de A no lo consume B. | 🟠 Media | ✅ Done |
 
 ### Cola en el cliente
 

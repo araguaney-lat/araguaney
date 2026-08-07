@@ -2,7 +2,9 @@ from datetime import date, datetime
 from decimal import Decimal
 from uuid import UUID
 
-from app.schemas._base import StrictModel, StrictORMModel
+from pydantic import Field
+
+from app.schemas._base import StrictModel, StrictORMModel, StrictUUID
 
 
 class BoxSealRequest(StrictModel):
@@ -40,3 +42,16 @@ class BoxPublicOut(StrictORMModel):
     # Dato del envío, no de la caja: lo despachado sigue congelado (Fase 22).
     delivered: bool = False
     delivered_at: datetime | None = None
+
+
+class BoxCodeReserveIn(StrictModel):
+    """Petición de un bloque de códigos pre-asignados (Fase 25)."""
+
+    count: int = Field(ge=1, le=200)
+    # Solo lo honra un national_admin, igual que en el intake.
+    center_id: StrictUUID | None = None
+
+
+class BoxCodeBlockOut(StrictModel):
+    codes: list[str]
+    available: int
