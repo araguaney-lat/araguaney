@@ -424,3 +424,18 @@ export interface ReceptionOut {
   pallet_weights: { pallet_id: string; gross_weight_kg: string | number }[]
   shrinkage: ShrinkageOut
 }
+
+export type IncidentType = "WEIGHT_DIFF" | "MISSING_BOX" | "DAMAGE" | "CUSTOMS_RETENTION" | "OTHER"
+
+export interface IncidentOut {
+  id: string
+  shipment_id: string
+  pallet_id: string | null
+  box_id: string | null
+  type: IncidentType
+  description: string
+  status: "OPEN" | "RESOLVED"
+  resolution_note: string | null
+  resolved_at: string | null
+  created_at: string
+}

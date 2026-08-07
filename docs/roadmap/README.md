@@ -4,8 +4,8 @@
 
 ```mermaid
 pie title Tareas completadas (443 tareas)
-    "Listas" : 403
-    "Pendientes" : 40
+    "Listas" : 405
+    "Pendientes" : 38
 ```
 
 | Fase | Nombre | Listas | Pendientes | Progreso |
@@ -32,12 +32,12 @@ pie title Tareas completadas (443 tareas)
 | 19 | [Identidad estructurada del donante en el intake](phase-19-structured-donor-identity.md) | 9 | 0 | ✅ 100% |
 | 20 | [Prevención de riesgos: responsabilidad y anti-lavado en especie](phase-20-risk-prevention.md) | 6 | 4 | 🟡 60% |
 | 21 | [Logística: pesaje, declaración de mercancías y perfiles de paletizado](phase-21-logistics-weighing.md) | 12 | 0 | ✅ 100% |
-| 22 | [Trazabilidad extendida: avión y destino](phase-22-extended-traceability.md) | 7 | 7 | 🟡 50% |
+| 22 | [Trazabilidad extendida: avión y destino](phase-22-extended-traceability.md) | 9 | 5 | 🟡 64% |
 | 23 | [IA asistida: captura, catálogo y necesidades](phase-23-ai-assisted-capture.md) | 0 | 11 | ⬜ 0% |
 | 24 | [Observabilidad: que un fallo silencioso deje de serlo](phase-24-observability.md) | 11 | 0 | ✅ 100% |
-| **Total** | | **403** | **40** | **🟡 91%** |
+| **Total** | | **405** | **38** | **🟡 91%** |
 
-> **Pendientes (40):**
+> **Pendientes (38):**
 > El grupo A de la Fase 13 (privacidad, lo que aplica hoy) está completo.
 > - Los borradores legales de la Fase 20 están escritos y esperando revisión de abogado:
 >   [`docs/legal/drafts/`](../legal/drafts/README.md). Sus tareas siguen abiertas hasta que esa
@@ -48,9 +48,9 @@ pie title Tareas completadas (443 tareas)
 >   estructurales documentados). Lo que queda son los tres textos legales (tasks 1, 2 y 6), que la
 >   task 7 —revisión de abogado— gatea antes de publicar; los borradores ya están escritos en
 >   [`docs/legal/drafts/`](../legal/drafts/README.md).
-> - **7 de la Fase 22 (trazabilidad extendida):** hitos, llegada, timeline y la recepción completa con
->   su checklist ya están; falta la gestión de incidencias, la ficha pública, los reportes y el
->   manual. Diseño en
+> - **5 de la Fase 22 (trazabilidad extendida):** hitos, llegada, timeline, recepción con su checklist
+>   e incidencias con su bandeja ya están; falta la ficha pública, los reportes, el manual y los tests
+>   de cierre. Diseño en
 >   [su spec](../superpowers/specs/2026-07-29-extended-traceability-design.md).
 > - **11 de la Fase 23 (IA asistida):** mapeo de texto libre, OCR de etiqueta, emparejamiento de
 >   necesidades y resumen nacional, con guardarraíles de gasto; diseño en

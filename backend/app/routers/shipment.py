@@ -23,6 +23,7 @@ from app.schemas.shipment import (
     ShipmentOut,
 )
 from app.repositories.reception_repository import ReceptionRepository
+from app.schemas.incident import IncidentCreate, IncidentOut
 from app.schemas.reception import (
     ReceptionCreate,
     ReceptionLineOut,
@@ -30,6 +31,7 @@ from app.schemas.reception import (
     ReceptionPalletWeightOut,
     ShrinkageOut,
 )
+from app.services.incident_service import IncidentService
 from app.services.reception_service import ReceptionService
 from app.services.shipment_service import ShipmentService
 from app.repositories.audit_repository import AuditRepository
@@ -246,6 +248,40 @@ def _reception_out(db: Session, reception) -> ReceptionOut:
         ],
         shrinkage=ShrinkageOut(**ReceptionService.shrinkage(lines)),
     )
+
+
+@router.post("/{shipment_id}/incidents", response_model=IncidentOut, status_code=201)
+@limiter.limit("30/minute")
+def create_incident(
+    request: Request,
+    shipment_id: UUID,
+    data: IncidentCreate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_coordinator),
+    scope: UUID | None = Depends(tenant_scope),
+):
+    """El centro emisor también levanta incidencias: es quien nota lo que falta."""
+    incident = IncidentService(db).create(
+        shipment_id, center_id=scope, user_id=current_user.id,
+        type=data.type, description=data.description,
+        pallet_id=data.pallet_id, box_id=data.box_id,
+    )
+    AuditRepository(db).log("INCIDENT_CREATED", "incident",
+        user_id=current_user.id, entity_id=str(incident.id), ip=get_client_ip(request))
+    db.commit()
+    return incident
+
+
+@router.get("/{shipment_id}/incidents", response_model=list[IncidentOut])
+@limiter.limit("60/minute")
+def list_shipment_incidents(
+    request: Request,
+    shipment_id: UUID,
+    db: Session = Depends(get_db),
+    _: User = Depends(require_coordinator),
+    scope: UUID | None = Depends(tenant_scope),
+):
+    return IncidentService(db).list_for_shipment(shipment_id, center_id=scope)
 
 
 @router.post("/{shipment_id}/manifest.pdf", response_model=ExportJobOut, status_code=202)

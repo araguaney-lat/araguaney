@@ -129,7 +129,8 @@
       "admin_section": "Administración",
       "ops_section": "Operaciones",
       "menu": "Menú",
-      "reviews": "Revisiones"
+      "reviews": "Revisiones",
+      "incidents": "Incidencias"
     },
     "role": {
       "national_admin": "Admin Nacional",
