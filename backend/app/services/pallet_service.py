@@ -10,6 +10,7 @@ from app.repositories.pallet_repository import PalletRepository
 from app.schemas.box import BoxOut
 from app.schemas.pallet import PalletCreate, PalletDetailOut, PalletPublicOut
 from app.services.base import BaseService
+from app.utils import delivery_status
 from app.utils.errors import api_error
 from app.utils.weight import validate_weighing
 from app.utils.weight import boxes_weight as _boxes_weight, net_weight, weight_discrepancy
@@ -121,12 +122,15 @@ class PalletService(BaseService):
             raise api_error("PALLET_NOT_FOUND", "Pallet not found", status_code=404)
         boxes = PalletRepository(self.db).find_boxes(pallet.id)
         center = CenterRepository(self.db).find_by_id(pallet.center_id) if pallet.center_id else None
+        entrega = delivery_status.for_pallet(self.db, pallet.id)
         return PalletPublicOut(
             code=pallet.code,
             status=pallet.status,
             center_name=center.name if center else "Araguaney",
             box_count=len(boxes),
             closed_at=pallet.closed_at,
+            delivered=entrega.delivered,
+            delivered_at=entrega.delivered_at,
         )
 
     def _build_detail(self, pallet: Pallet) -> PalletDetailOut:

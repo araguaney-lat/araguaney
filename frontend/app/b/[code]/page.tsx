@@ -17,6 +17,7 @@ const LABELS: Record<Loc, {
   quantity: string
   expiry: string
   sealed: string
+  delivered: string
   footer: string
   verifying: string
   confirmHuman: string
@@ -32,6 +33,7 @@ const LABELS: Record<Loc, {
     quantity: "Cantidad",
     expiry: "Caducidad",
     sealed: "Sellada",
+    delivered: "Entregada en destino",
     footer: "Araguaney · Coordinación humanitaria · araguaney.lat",
     verifying: "Verificando acceso…",
     confirmHuman: "Confirma que eres humano para ver la ficha",
@@ -47,6 +49,7 @@ const LABELS: Record<Loc, {
     quantity: "Quantity",
     expiry: "Expiry",
     sealed: "Sealed",
+    delivered: "Delivered at destination",
     footer: "Araguaney · Humanitarian coordination · araguaney.lat",
     verifying: "Verifying access…",
     confirmHuman: "Confirm you're human to see the details",
@@ -137,6 +140,13 @@ export default function BoxPublicFichaPage() {
                 {L.statuses[box.status] ?? box.status}
               </span>
             </div>
+
+            {/* La caja sigue congelada en SHIPPED: esto viene de su envío. */}
+            {box.delivered && (
+              <p className="rounded-lg bg-emerald-50 px-3 py-2 text-sm font-medium text-emerald-800">
+                ✓ {L.delivered}
+              </p>
+            )}
 
             <div>
               <p className="text-sm font-semibold text-zinc-800">{box.display_name}</p>

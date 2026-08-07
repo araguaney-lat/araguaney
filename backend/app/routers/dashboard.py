@@ -29,7 +29,7 @@ from app.schemas.aggregate import (
     WeightDashboardOut,
 )
 from app.schemas.qr_ficha import QrBoxFicha, QrEventOut, QrPalletBoxRow, QrPalletFicha
-from app.utils import cache
+from app.utils import cache, delivery_status
 from app.utils.errors import api_error
 from app.utils.rate_limit import limiter
 
@@ -142,6 +142,7 @@ def qr_ficha(
             ).scalars()
         )
 
+        entrega = delivery_status.for_box(db, box.id)
         ficha = QrBoxFicha(
             code=box.code,
             status=box.status,
@@ -159,7 +160,10 @@ def qr_ficha(
             campaign_name=campaign.name if campaign else None,
             sealed_at=box.sealed_at,
             created_at=box.created_at,
-            events=[QrEventOut(from_status=e.from_status, to_status=e.to_status, note=e.note, ts=e.ts) for e in events],
+            events=[QrEventOut(from_status=e.from_status, to_status=e.to_status,
+                               milestone=e.milestone, note=e.note, ts=e.ts) for e in events],
+            delivered=entrega.delivered,
+            delivered_at=entrega.delivered_at,
         )
         serialized = ficha.model_dump_json()
         cache.set(cache_key, serialized, ttl=_QR_TTL)
@@ -197,6 +201,7 @@ def qr_ficha(
             if b.weight_kg is not None:
                 total_weight = (total_weight or Decimal(0)) + b.weight_kg
 
+        entrega = delivery_status.for_pallet(db, pallet.id)
         ficha = QrPalletFicha(
             code=pallet.code,
             status=pallet.status,
@@ -215,7 +220,10 @@ def qr_ficha(
                 )
                 for b, pt in box_rows
             ],
-            events=[QrEventOut(from_status=e.from_status, to_status=e.to_status, note=e.note, ts=e.ts) for e in events],
+            events=[QrEventOut(from_status=e.from_status, to_status=e.to_status,
+                               milestone=e.milestone, note=e.note, ts=e.ts) for e in events],
+            delivered=entrega.delivered,
+            delivered_at=entrega.delivered_at,
         )
         serialized = ficha.model_dump_json()
         cache.set(cache_key, serialized, ttl=_QR_TTL)

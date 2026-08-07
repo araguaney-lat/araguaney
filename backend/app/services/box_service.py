@@ -8,6 +8,7 @@ from app.repositories.box_repository import BoxRepository
 from app.repositories.product_type_repository import ProductTypeRepository
 from app.schemas.box import BoxOut, BoxPublicOut
 from app.services.base import BaseService
+from app.utils import delivery_status
 from app.utils.errors import api_error
 
 
@@ -70,6 +71,7 @@ class BoxService(BaseService):
         if not box:
             raise api_error("BOX_NOT_FOUND", "Box not found", status_code=404)
         pt: ProductType | None = ProductTypeRepository(self.db).find_by_id(box.product_type_id)
+        entrega = delivery_status.for_box(self.db, box.id)
         return BoxPublicOut(
             code=box.code,
             status=box.status,
@@ -79,4 +81,6 @@ class BoxService(BaseService):
             unit=box.unit,
             expiry_date=box.expiry_date,
             sealed_at=box.sealed_at,
+            delivered=entrega.delivered,
+            delivered_at=entrega.delivered_at,
         )

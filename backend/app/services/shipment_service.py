@@ -223,7 +223,27 @@ class ShipmentService(BaseService):
             from_status="SHIPPED", to_status="DELIVERED", note=note,
         ))
         repo.commit()
+        # La ficha pública de cada caja y tarima pasa a decir "entregada".
+        self._purge_qr_cache(shipment_id)
         return shipment
+
+    def _purge_qr_cache(self, shipment_id: UUID) -> None:
+        """Invalida la ficha pública de cada pieza del envío.
+
+        El TTL del edge acota cuánto puede tardar el dato en aparecer; esto lo
+        quita de en medio en el origen. Sin Redis no hace nada, y no pasa nada:
+        el TTL sigue siendo el techo.
+        """
+        from app.utils import cache
+
+        repo = ShipmentRepository(self.db)
+        pallet_repo = PalletRepository(self.db)
+        pallets = repo.find_pallets(shipment_id)
+        boxes_by_pallet = pallet_repo.find_boxes_for_pallets([p.id for p in pallets])
+        for pallet in pallets:
+            cache.delete(f"qr:{pallet.code}")
+            for box in boxes_by_pallet[pallet.id]:
+                cache.delete(f"qr:{box.code}")
 
     def _build_detail(self, shipment: Shipment) -> ShipmentDetailOut:
         s_repo = ShipmentRepository(self.db)

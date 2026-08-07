@@ -36,6 +36,8 @@ interface QrLabels {
   center: string
   campaign: string
   sealed: string
+  delivered: string
+  deliveredOn: string
   summary: string
   boxesRow: string
   totalWeight: string
@@ -57,6 +59,7 @@ const LABELS: Record<Loc, QrLabels> = {
     batchExpiry: "Lote y caducidad", batch: "Lote", expiry: "Caducidad",
     quantityWeight: "Cantidad y peso", quantity: "Cantidad", weight: "Peso",
     origin: "Origen", center: "Centro", campaign: "Campaña", sealed: "Sellada",
+    delivered: "Entregada en destino", deliveredOn: "Entregada el",
     summary: "Resumen", boxesRow: "Cajas", totalWeight: "Peso total", closed: "Cerrada",
     contents: (n) => `Contenido (${n} cajas)`,
     history: "Historial", pallet: "Tarima", notFound: "Ficha no encontrada",
@@ -70,6 +73,7 @@ const LABELS: Record<Loc, QrLabels> = {
     batchExpiry: "Batch & expiry", batch: "Batch", expiry: "Expiry",
     quantityWeight: "Quantity & weight", quantity: "Quantity", weight: "Weight",
     origin: "Origin", center: "Center", campaign: "Campaign", sealed: "Sealed",
+    delivered: "Delivered at destination", deliveredOn: "Delivered on",
     summary: "Summary", boxesRow: "Boxes", totalWeight: "Total weight", closed: "Closed",
     contents: (n) => `Contents (${n} boxes)`,
     history: "History", pallet: "Pallet", notFound: "Ficha not found",
@@ -119,6 +123,8 @@ interface BoxFicha {
   sealed_at: string | null
   created_at: string
   events: QrEvent[]
+  delivered?: boolean
+  delivered_at?: string | null
 }
 
 interface PalletBoxRow {
@@ -140,6 +146,8 @@ interface PalletFicha {
   created_at: string
   boxes: PalletBoxRow[]
   events: QrEvent[]
+  delivered?: boolean
+  delivered_at?: string | null
 }
 
 type Ficha = BoxFicha | PalletFicha
@@ -213,6 +221,21 @@ export default async function QrFichaPage({
               {statusLabel}
             </span>
           </div>
+
+          {/* La pieza sigue congelada en SHIPPED; esto es un dato de su envío.
+              Va arriba porque es la pregunta que trae quien escanea el QR. */}
+          {ficha.delivered && (
+            <p className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-sm font-medium text-emerald-800">
+              ✓ {L.delivered}
+              {ficha.delivered_at && (
+                <span className="font-normal text-emerald-700">
+                  · {L.deliveredOn} {new Date(ficha.delivered_at).toLocaleDateString(L.dateLocale, {
+                    day: "numeric", month: "short", year: "numeric",
+                  })}
+                </span>
+              )}
+            </p>
+          )}
         </div>
 
         {ficha.kind === "box" && <BoxSection ficha={ficha} L={L} />}

@@ -24,6 +24,12 @@ router = APIRouter(tags=["pallets"])
 
 _PUBLIC_CACHE = "public, max-age=300, s-maxage=3600, stale-while-revalidate=86400"
 
+# La ficha se cachea mucho menos que su QR. El PNG no cambia nunca: el código es
+# el mismo hasta que la tarima deje de existir. La ficha, en cambio, pasa de "no
+# ha llegado" a "entregada en destino" (Fase 22), y una hora de retraso en ese
+# dato convierte la respuesta en una mentira para quien escanea en el andén.
+_FICHA_CACHE = "public, max-age=60, s-maxage=300, stale-while-revalidate=600"
+
 
 # ── Public endpoints (cacheable) ──────────────────────────────────────────────
 
@@ -38,7 +44,7 @@ def pallet_public_ficha(
     return Response(
         content=result.model_dump_json(),
         media_type="application/json",
-        headers={"Cache-Control": _PUBLIC_CACHE},
+        headers={"Cache-Control": _FICHA_CACHE},
     )
 
 

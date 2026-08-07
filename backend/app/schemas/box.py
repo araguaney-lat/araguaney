@@ -37,3 +37,6 @@ class BoxPublicOut(StrictORMModel):
     unit: str
     expiry_date: date | None
     sealed_at: datetime | None
+    # Dato del envío, no de la caja: lo despachado sigue congelado (Fase 22).
+    delivered: bool = False
+    delivered_at: datetime | None = None
