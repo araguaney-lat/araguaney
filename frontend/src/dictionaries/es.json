@@ -282,7 +282,9 @@
       "status": {
         "OPEN": "Abierto",
         "CLOSED": "Cerrado",
-        "SHIPPED": "Despachado"
+        "SHIPPED": "Despachado",
+        "DELIVERED": "Entregado",
+        "RECONCILED": "Recepción registrada"
       },
       "field_height_profile": "Perfil de altura",
       "height_profile_none": "— Sin declarar —",

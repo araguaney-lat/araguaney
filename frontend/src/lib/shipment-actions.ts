@@ -86,3 +86,50 @@ export async function shipShipmentAction(shipmentId: string) {
   }
 }
 
+
+// ── Después de despachar (Fase 22) ──────────────────────────────────────────
+
+export async function addMilestoneAction(
+  shipmentId: string,
+  milestone: string,
+  note?: string,
+  occurredAt?: string,
+) {
+  const session = await auth()
+  if (!session?.accessToken) return { error: "No autenticado" }
+
+  try {
+    const data = await apiFetch(`/v1/shipments/${shipmentId}/milestones`, {
+      method: "POST",
+      token: session.accessToken,
+      // Sin fecha, el backend usa la de ahora. Se manda cuando quien registra
+      // sabe que el hecho ocurrió antes, que es el caso habitual.
+      body: JSON.stringify({
+        milestone,
+        note: note?.trim() || undefined,
+        occurred_at: occurredAt || undefined,
+      }),
+    })
+    revalidatePath("/dashboard/shipments")
+    return { data }
+  } catch (err: unknown) {
+    return { error: err instanceof Error ? err.message : "Error al registrar el hito" }
+  }
+}
+
+export async function markDeliveredAction(shipmentId: string, note?: string, deliveredAt?: string) {
+  const session = await auth()
+  if (!session?.accessToken) return { error: "No autenticado" }
+
+  try {
+    const data = await apiFetch(`/v1/shipments/${shipmentId}/delivered`, {
+      method: "POST",
+      token: session.accessToken,
+      body: JSON.stringify({ note: note?.trim() || undefined, delivered_at: deliveredAt || undefined }),
+    })
+    revalidatePath("/dashboard/shipments")
+    return { data }
+  } catch (err: unknown) {
+    return { error: err instanceof Error ? err.message : "Error al marcar la entrega" }
+  }
+}
