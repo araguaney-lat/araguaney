@@ -12,9 +12,19 @@ leer como que Araguaney es parte del envío. No lo es: el centro lo es. Araguane
 es el software que imprimió la hoja, y la diferencia importa justo en la mesa
 donde alguien revisa quién responde por la carga.
 
-El logo se lee del disco y no de una URL: el documento lo arma un trabajo de
-fondo, y un pie de página no puede depender de que el worker tenga salida a
-internet en ese instante.
+**El logo se lee del disco y no de la URL de Cloudinary**, aunque Cloudinary sea
+la fuente de verdad de la marca. La copia local se resuelve al desplegar, con
+`scripts/refresh_logo_asset.py`, y no al imprimir. Tres razones, en orden de
+gravedad:
+
+1. **Un documento reimpreso tiene que verse como el que viajó con la carga.**
+   Leyendo la URL en vivo, cambiar la imagen reescribiría en silencio el aspecto
+   de todos los documentos pasados, incluido el manifiesto que alguien vuelve a
+   imprimir para un envío de hace seis meses.
+2. **El documento lo arma un trabajo de fondo.** Un adorno no puede meter una
+   dependencia de red en la ruta que produce el manifiesto.
+3. **Peso.** El original son 1024x1024 y ~1.7 MB; para 4 mm de pie sobran 128 px
+   y ~19 KB.
 """
 
 from __future__ import annotations
