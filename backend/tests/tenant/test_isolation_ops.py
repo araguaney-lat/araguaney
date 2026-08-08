@@ -64,6 +64,23 @@ class TestRequests:
         )
         assert res.status_code in (403, 404)
 
+    def test_cannot_match_stock_against_foreign_request(self, client, world):
+        # El emparejamiento con IA se cobra: sin este corte, B gastaría
+        # presupuesto sobre el texto de una solicitud de A. La denegación
+        # ocurre antes de invocar a la IA, así que no depende de que esté activa.
+        res = client.get(
+            f"/v1/requests/{world.request_a.id}/matches",
+            headers=world.token(world.coordinator_b),
+        )
+        assert res.status_code in (403, 404)
+
+    def test_owner_can_match_stock_against_own_request(self, client, world):
+        res = client.get(
+            f"/v1/requests/{world.request_a.id}/matches",
+            headers=world.token(world.coordinator_a),
+        )
+        assert res.status_code == 200
+
 
 class TestTransfers:
     def test_list_excludes_unrelated_transfers(self, client, world):
