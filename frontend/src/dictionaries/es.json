@@ -195,7 +195,7 @@
     },
     "intake": {
       "title": "Recepciones (Intake)",
-      "new": "+ Nueva recepción",
+      "new": "Nueva recepción",
       "anonymous": "Donante anónimo",
       "empty": "No hay recepciones registradas. Crea la primera.",
       "new_page_title": "Nueva recepción",
@@ -253,7 +253,7 @@
     },
     "shipments": {
       "title": "Envíos",
-      "new": "+ Nuevo envío",
+      "new": "Nuevo envío",
       "empty": "No hay envíos.",
       "filter_all": "Todos",
       "close": "Cerrar",
@@ -332,7 +332,7 @@
     },
     "transfers": {
       "title": "Transferencias",
-      "new": "+ Nueva transferencia",
+      "new": "Nueva transferencia",
       "empty": "No hay transferencias.",
       "tab_outgoing": "Enviando",
       "tab_incoming": "Recibiendo",
@@ -368,7 +368,7 @@
     "requests": {
       "title": "Mis solicitudes",
       "subtitle": "Comunicación con el equipo nacional",
-      "new": "+ Nueva solicitud",
+      "new": "Nueva solicitud",
       "cancel": "Cancelar",
       "empty": "No tienes solicitudes. Crea una para comunicarte con el equipo nacional.",
       "form_title": "Nueva solicitud",
@@ -423,7 +423,7 @@
     },
     "campaigns": {
       "title": "Campañas",
-      "new": "+ Nueva campaña",
+      "new": "Nueva campaña",
       "empty": "No hay campañas activas.",
       "field_name": "Nombre",
       "field_destination": "País destino",
@@ -459,7 +459,7 @@
     },
     "centers": {
       "title": "Centros",
-      "new": "+ Nuevo centro",
+      "new": "Nuevo centro",
       "empty": "No hay centros registrados.",
       "field_name": "Nombre",
       "field_country": "País",
@@ -684,7 +684,7 @@
       "count_one": "1 usuario",
       "count_other": "{count} usuarios",
       "filter_all_roles": "Todos los roles",
-      "new_btn": "+ Nuevo usuario",
+      "new_btn": "Nuevo usuario",
       "form_title": "Nuevo usuario",
       "field_username": "Username *",
       "field_center_id": "Centro ID (UUID)",
@@ -819,7 +819,7 @@
       "fallback_name": "Campaña",
       "members_count_one": "1 miembro",
       "members_count_other": "{count} miembros",
-      "add_btn": "+ Agregar miembro",
+      "add_btn": "Agregar miembro",
       "cancel": "Cancelar",
       "general_notice": "Los usuarios se asignan automáticamente a <strong>Donaciones Generales</strong> al ser creados. No es posible removerlos de esta campaña.",
       "add_panel_title": "Agregar miembro",
@@ -848,7 +848,7 @@
     "catalog": {
       "title": "Catálogo de productos",
       "subtitle": "Tipos de producto — globales y de campaña.",
-      "new": "+ Nuevo tipo",
+      "new": "Nuevo tipo",
       "filter_all_categories": "Todas las categorías",
       "filter_all": "Todos",
       "filter_global": "Globales",

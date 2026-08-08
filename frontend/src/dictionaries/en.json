@@ -195,7 +195,7 @@
     },
     "intake": {
       "title": "Intake",
-      "new": "+ New intake",
+      "new": "New intake",
       "anonymous": "Anonymous donor",
       "empty": "No intakes recorded. Create the first one.",
       "new_page_title": "New intake",
@@ -253,7 +253,7 @@
     },
     "shipments": {
       "title": "Shipments",
-      "new": "+ New shipment",
+      "new": "New shipment",
       "empty": "No shipments.",
       "filter_all": "All",
       "close": "Close",
@@ -332,7 +332,7 @@
     },
     "transfers": {
       "title": "Transfers",
-      "new": "+ New transfer",
+      "new": "New transfer",
       "empty": "No transfers.",
       "tab_outgoing": "Outgoing",
       "tab_incoming": "Incoming",
@@ -368,7 +368,7 @@
     "requests": {
       "title": "My requests",
       "subtitle": "Communication with the national team",
-      "new": "+ New request",
+      "new": "New request",
       "cancel": "Cancel",
       "empty": "No requests. Create one to communicate with the national team.",
       "form_title": "New request",
@@ -423,7 +423,7 @@
     },
     "campaigns": {
       "title": "Campaigns",
-      "new": "+ New campaign",
+      "new": "New campaign",
       "empty": "No active campaigns.",
       "field_name": "Name",
       "field_destination": "Destination country",
@@ -459,7 +459,7 @@
     },
     "centers": {
       "title": "Centers",
-      "new": "+ New center",
+      "new": "New center",
       "empty": "No centers registered.",
       "field_name": "Name",
       "field_country": "Country",
@@ -684,7 +684,7 @@
       "count_one": "1 user",
       "count_other": "{count} users",
       "filter_all_roles": "All roles",
-      "new_btn": "+ New user",
+      "new_btn": "New user",
       "form_title": "New user",
       "field_username": "Username *",
       "field_center_id": "Center ID (UUID)",
@@ -819,7 +819,7 @@
       "fallback_name": "Campaign",
       "members_count_one": "1 member",
       "members_count_other": "{count} members",
-      "add_btn": "+ Add member",
+      "add_btn": "Add member",
       "cancel": "Cancel",
       "general_notice": "Users are automatically assigned to <strong>General Donations</strong> when created. They cannot be removed from this campaign.",
       "add_panel_title": "Add member",
@@ -848,7 +848,7 @@
     "catalog": {
       "title": "Product catalog",
       "subtitle": "Product types — global and campaign-scoped.",
-      "new": "+ New type",
+      "new": "New type",
       "filter_all_categories": "All categories",
       "filter_all": "All",
       "filter_global": "Global",
