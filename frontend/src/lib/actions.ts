@@ -70,7 +70,11 @@ export async function totpChallengeAction(partial_token: string, code: string) {
 
   const data = await res.json()
   try {
-    await signIn("credentials", { accessToken: data.access_token, redirectTo: "/dashboard" })
+    await signIn("credentials", {
+      accessToken: data.access_token,
+      refreshToken: data.refresh_token,
+      redirectTo: "/dashboard",
+    })
   } catch (error) {
     if (error instanceof AuthError) return { error: t.errors.login_session_error }
     throw error
@@ -143,13 +147,9 @@ export async function resetPasswordAction(_: unknown, formData: FormData) {
 }
 
 export async function logoutAction() {
-  const session = await auth()
-  if (session?.accessToken) {
-    await fetch(`${API_URL}/v1/auth/logout`, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${session.accessToken}` },
-    }).catch(() => {})
-  }
+  // La revocación del refresh (y del access) en el backend ocurre en el evento
+  // signOut de NextAuth, que tiene el refresh token de la cookie cifrada sin
+  // exponerlo aquí. Esta acción solo cierra la sesión local.
   await signOut({ redirectTo: "/login" })
 }
 

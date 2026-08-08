@@ -1,3 +1,4 @@
+import hashlib
 import logging
 import secrets
 import uuid
@@ -10,8 +11,10 @@ from sqlalchemy.orm import Session
 
 from app.arq_pool import enqueue
 from app.config import settings
+from app.models.refresh_token import RefreshToken
 from app.models.token_denylist import TokenDenylist
 from app.models.user import User
+from app.repositories.refresh_token_repository import RefreshTokenRepository
 from app.repositories.token_denylist_repository import TokenDenylistRepository
 from app.repositories.user_repository import UserRepository
 from app.schemas.auth import UserCreate
@@ -44,6 +47,117 @@ class AuthService(BaseService):
         if center_role:
             payload["center_role"] = center_role
         return jwt.encode(payload, settings.secret_key, algorithm=settings.algorithm)
+
+    # ── Refresh tokens ──────────────────────────────────────────────────────────
+
+    @staticmethod
+    def _hash_refresh_token(raw: str) -> str:
+        """SHA-256 del token en claro. Solo el hash toca la base."""
+        return hashlib.sha256(raw.encode()).hexdigest()
+
+    def _create_refresh_token(self, user_id: uuid.UUID, family_id: uuid.UUID | None = None) -> str:
+        """Crea un refresh token y devuelve el valor en claro (nunca se guarda).
+
+        `family_id` None inicia una familia nueva (un login); pasarla continúa la
+        cadena existente al rotar.
+        """
+        raw = secrets.token_urlsafe(48)
+        row = RefreshToken(
+            user_id=user_id,
+            token_hash=self._hash_refresh_token(raw),
+            family_id=family_id or uuid.uuid4(),
+            expires_at=datetime.now(timezone.utc) + timedelta(days=settings.refresh_token_expire_days),
+        )
+        RefreshTokenRepository(self.db).save(row)
+        return raw
+
+    def _issue_session(self, user: User) -> dict:
+        """Respuesta de sesión completa: access corto + refresh de larga vida.
+
+        Único punto donde se arma; login, el paso de 2FA y el cambio forzado de
+        contraseña la comparten para no divergir.
+        """
+        access = self.create_access_token(
+            str(user.id),
+            center_id=str(user.center_id) if user.center_id else None,
+            center_role=user.center_role,
+        )
+        refresh = self._create_refresh_token(user.id)
+        return {
+            "access_token": access,
+            "refresh_token": refresh,
+            "token_type": "bearer",
+            "role": user.role,
+            "center_role": user.center_role,
+            "center_id": str(user.center_id) if user.center_id else None,
+            "must_change_password": bool(user.must_change_password),
+            "must_accept_terms": user.must_accept_terms,
+        }
+
+    def _is_benign_reuse(self, repo: RefreshTokenRepository, row: RefreshToken) -> bool:
+        """True si reusar este token revocado es un doble disparo del cliente.
+
+        Benigno si fue reemplazado hace muy poco (ventana de gracia) y su
+        reemplazo sigue vigente: dos renovaciones que salieron casi a la vez. Un
+        reuso más tarde, o cuando la cadena ya avanzó (el reemplazo también fue
+        revocado), es sospechoso y no entra por aquí.
+        """
+        if row.replaced_by is None:
+            return False
+        replacement = repo.find_by_id(row.replaced_by)
+        if replacement is None or replacement.revoked or replacement.created_at is None:
+            return False
+        leeway = timedelta(seconds=settings.refresh_reuse_leeway_seconds)
+        return datetime.now(timezone.utc) - replacement.created_at.replace(tzinfo=timezone.utc) <= leeway
+
+    def refresh(self, raw_token: str) -> dict:
+        """Rota un refresh token: emite uno nuevo y revoca el presentado.
+
+        Detección de reuso: si el token presentado ya estaba revocado, alguien
+        reusó un eslabón viejo de la cadena —señal de robo— y se revoca la
+        familia entera. Un token vencido o inexistente es un 401 normal.
+        """
+        repo = RefreshTokenRepository(self.db)
+        row = repo.find_by_hash(self._hash_refresh_token(raw_token))
+        if row is None:
+            raise api_error("INVALID_REFRESH_TOKEN", "Invalid refresh token", status_code=401)
+
+        if row.revoked:
+            if not self._is_benign_reuse(repo, row):
+                # Reuso real de un token viejo: corta la sesión completa.
+                repo.revoke_family(row.family_id)
+                raise api_error("REFRESH_TOKEN_REUSED", "Refresh token reuse detected", status_code=401)
+            # Doble disparo concurrente del cliente dentro de la ventana de
+            # gracia: no es robo. Se sigue y se emite una rotación nueva.
+
+        if row.expires_at.replace(tzinfo=timezone.utc) < datetime.now(timezone.utc):
+            raise api_error("REFRESH_TOKEN_EXPIRED", "Refresh token expired", status_code=401)
+
+        user = UserRepository(self.db).find_by_id(row.user_id)
+        if user is None or not user.is_active:
+            raise api_error("INVALID_REFRESH_TOKEN", "Invalid refresh token", status_code=401)
+
+        # Rota dentro de la misma familia y encadena la sustitución.
+        new_raw = self._create_refresh_token(user.id, family_id=row.family_id)
+        new_row = repo.find_by_hash(self._hash_refresh_token(new_raw))
+        row.revoked = True
+        row.replaced_by = new_row.id if new_row else None
+        self.db.commit()
+
+        access = self.create_access_token(
+            str(user.id),
+            center_id=str(user.center_id) if user.center_id else None,
+            center_role=user.center_role,
+        )
+        return {"access_token": access, "refresh_token": new_raw, "token_type": "bearer"}
+
+    def revoke_refresh_token(self, raw_token: str) -> None:
+        """Revoca la familia de un refresh token (cierre de sesión). Silencioso
+        si el token no existe: cerrar sesión no debe filtrar si era válido."""
+        repo = RefreshTokenRepository(self.db)
+        row = repo.find_by_hash(self._hash_refresh_token(raw_token))
+        if row is not None:
+            repo.revoke_family(row.family_id)
 
     @staticmethod
     def hash_password(password: str) -> str:
@@ -132,20 +246,7 @@ class AuthService(BaseService):
             partial = self._create_partial_token(str(user.id))
             return {"requires_totp": True, "partial_token": partial}
 
-        token = self.create_access_token(
-            str(user.id),
-            center_id=str(user.center_id) if user.center_id else None,
-            center_role=user.center_role,
-        )
-        return {
-            "access_token": token,
-            "token_type": "bearer",
-            "role": user.role,
-            "center_role": user.center_role,
-            "center_id": str(user.center_id) if user.center_id else None,
-            "must_change_password": bool(user.must_change_password),
-            "must_accept_terms": user.must_accept_terms,
-        }
+        return self._issue_session(user)
 
     @staticmethod
     def _create_partial_token(user_id: str) -> str:
@@ -154,7 +255,11 @@ class AuthService(BaseService):
         payload = {"sub": user_id, "exp": expire, "scope": "totp_pending", "jti": jti}
         return jwt.encode(payload, settings.secret_key, algorithm=settings.algorithm)
 
-    def logout(self, token: str) -> None:
+    def logout(self, token: str, refresh_token: str | None = None) -> None:
+        # Revoca el refresh (su familia) para que un token filtrado no siga vivo
+        # tras cerrar sesión; el access se invalida por su jti abajo.
+        if refresh_token:
+            self.revoke_refresh_token(refresh_token)
         try:
             payload = jwt.decode(token, settings.secret_key, algorithms=[settings.algorithm])
             jti: str | None = payload.get("jti")
@@ -218,20 +323,7 @@ class AuthService(BaseService):
         user.must_change_password = False
         self.db.commit()
 
-        token = self.create_access_token(
-            str(user.id),
-            center_id=str(user.center_id) if user.center_id else None,
-            center_role=user.center_role,
-        )
-        return {
-            "access_token": token,
-            "token_type": "bearer",
-            "role": user.role,
-            "center_role": user.center_role,
-            "center_id": str(user.center_id) if user.center_id else None,
-            "must_change_password": False,
-            "must_accept_terms": user.must_accept_terms,
-        }
+        return self._issue_session(user)
 
     def accept_terms(self, user: User, version: str) -> dict:
         from app.legal import CURRENT_TERMS_VERSION
@@ -376,17 +468,4 @@ class AuthService(BaseService):
             denylist_repo.save(TokenDenylist(jti=jti, expires_at=expires_at))
             self.db.flush()
 
-        token = self.create_access_token(
-            str(user.id),
-            center_id=str(user.center_id) if user.center_id else None,
-            center_role=user.center_role,
-        )
-        return {
-            "access_token": token,
-            "token_type": "bearer",
-            "role": user.role,
-            "center_role": user.center_role,
-            "center_id": str(user.center_id) if user.center_id else None,
-            "must_change_password": bool(user.must_change_password),
-            "must_accept_terms": user.must_accept_terms,
-        }
+        return self._issue_session(user)

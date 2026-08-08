@@ -64,13 +64,10 @@ function handleI18n(req: NextRequest): NextResponse | null {
 
 const runAuth = auth((req) => {
   const session = req.auth
-  // A NextAuth session can outlive the backend access token (24h, no refresh
-  // token). Treat an expired-token session as logged-out so the user is bounced
-  // to /login instead of sitting on a broken dashboard with a 401'd token.
-  const isExpired =
-    !!session &&
-    (session.error === "AccessTokenExpired" ||
-      (!!session.accessTokenExpires && Date.now() >= session.accessTokenExpires))
+  // El access token se renueva solo con el refresh (callback jwt). La sesión se
+  // trata como cerrada únicamente cuando el refresh falla —terminó de verdad—,
+  // para botar a /login en vez de dejar un panel con un token muerto.
+  const isExpired = !!session && session.error === "RefreshAccessTokenError"
   const isLoggedIn = !!session && !isExpired
   const centerRole = session?.centerRole ?? null
   const platformRole = session?.platformRole ?? null

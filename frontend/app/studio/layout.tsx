@@ -23,12 +23,9 @@ async function fetchMe(token: string): Promise<{ full_name?: string | null; user
 export default async function StudioLayout({ children }: { children: React.ReactNode }) {
   const session = await auth()
   if (!session) redirect("/login")
-  // Backend token expired (24h, no refresh) → bounce with a "session expired" notice.
-  if (
-    session.error === "AccessTokenExpired" ||
-    // eslint-disable-next-line react-hooks/purity -- Server Component async; Date.now() se evalúa por petición y la regla de pureza del compilador no aplica aquí
-    (session.accessTokenExpires && Date.now() >= session.accessTokenExpires)
-  ) {
+  // El access token vence rápido y NextAuth lo renueva solo con el refresh. Solo
+  // si el refresh falla (la sesión terminó de verdad) se rebota con el aviso.
+  if (session.error === "RefreshAccessTokenError") {
     redirect("/login?expired=1")
   }
   if (session.mustChangePassword) redirect("/change-password")

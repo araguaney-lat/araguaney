@@ -12,6 +12,8 @@ from app.schemas.auth import (
     ChangePasswordRequest,
     DeleteAccountRequest,
     ForgotPasswordRequest,
+    LogoutRequest,
+    RefreshRequest,
     ResendRequest,
     ResetPasswordRequest,
     Token,
@@ -57,14 +59,30 @@ def login(
     return result
 
 
+@router.post("/refresh", response_model=Token)
+@limiter.limit("30/minute")
+def refresh(
+    request: Request,
+    data: RefreshRequest,
+    db: Session = Depends(get_db),
+):
+    """Renueva el access token a partir de un refresh válido, rotándolo.
+
+    Anónimo por diseño: el access ya venció y el refresh es la única credencial.
+    Se limita por IP (no hay sesión que keyear) y el propio token detecta reuso.
+    """
+    return AuthService(db).refresh(data.refresh_token)
+
+
 @router.post("/logout", status_code=status.HTTP_204_NO_CONTENT)
 @limiter.limit("10/minute")
 def logout(
     request: Request,
+    data: LogoutRequest | None = None,
     token: str = Depends(_oauth2_scheme),
     db: Session = Depends(get_db),
 ) -> None:
-    AuthService(db).logout(token)
+    AuthService(db).logout(token, refresh_token=data.refresh_token if data else None)
 
 
 @router.get("/verify-email")
