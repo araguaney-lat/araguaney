@@ -1,7 +1,7 @@
 from datetime import date, datetime, timezone
 from uuid import UUID
 
-from sqlalchemy import cast, Date, func, select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.models.box import Box
@@ -170,7 +170,11 @@ class ReportRepository:
 
     def activity(self, campaign_id: UUID, center_id: UUID | None, start: date, end: date) -> list[dict]:
         """Daily box creation counts grouped by status."""
-        day_col = cast(Box.created_at, Date).label("day")
+        # `func.date` en vez de `cast(..., Date)`: el cast da la fecha en Postgres
+        # pero en SQLite aplica afinidad numérica y devuelve solo el año, así que
+        # la prueba (que corre en SQLite) no vigilaba esta consulta. `func.date`
+        # trunca a 'YYYY-MM-DD' en ambos motores.
+        day_col = func.date(Box.created_at).label("day")
         stmt = (
             select(day_col, Box.status, func.count(Box.id).label("cnt"))
             .join(Intake, Box.intake_id == Intake.id)
