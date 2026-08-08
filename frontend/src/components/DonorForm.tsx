@@ -32,6 +32,7 @@ export function DonorForm({ value, onChange }: Props) {
   useEffect(() => {
     const q = value.email.trim()
     if (q.length < 2 || !token) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- carga o suscripción de datos intencional al montar o al cambiar de filtro; migrar a una capa de datos (SWR/react-query) se rastrea aparte
       setMatches([])
       return
     }
@@ -45,7 +46,7 @@ export function DonorForm({ value, onChange }: Props) {
     return () => clearTimeout(timer)
   }, [value.email, token])
 
-  const useMatch = (d: Donor) => {
+  const applyMatch = (d: Donor) => {
     onChange({
       donor_type: d.donor_type,
       first_name: d.first_name,
@@ -117,7 +118,7 @@ export function DonorForm({ value, onChange }: Props) {
               <li key={d.id}>
                 <button
                   type="button"
-                  onClick={() => useMatch(d)}
+                  onClick={() => applyMatch(d)}
                   className="w-full rounded px-2 py-1 text-left text-xs text-tx hover:bg-card2"
                 >
                   <span className="font-medium">

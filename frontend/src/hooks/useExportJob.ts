@@ -58,5 +58,14 @@ export function useExportJob() {
     })()
   }, [stop])
 
-  return { phase, error, start, isBusy: phase === "generating" }
+  // Limpia el error y vuelve a inactivo. Antes cada pantalla espejaba
+  // `error` a un useState propio solo para poder cerrar el aviso; con esto el
+  // aviso se deriva del hook y se cierra reseteándolo, sin estado duplicado.
+  const reset = useCallback(() => {
+    stop()
+    setPhase("idle")
+    setError(null)
+  }, [stop])
+
+  return { phase, error, start, reset, isBusy: phase === "generating" }
 }

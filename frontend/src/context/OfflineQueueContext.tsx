@@ -110,6 +110,7 @@ export function OfflineQueueProvider({ children }: { children: React.ReactNode }
 
   // Contadores al vuelo: los cambia esta pestaña o cualquier otra.
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- carga o suscripción de datos intencional al montar o al cambiar de filtro; migrar a una capa de datos (SWR/react-query) se rastrea aparte
     void refresh()
     return subscribeToQueue(() => void refresh())
   }, [refresh])
@@ -119,6 +120,7 @@ export function OfflineQueueProvider({ children }: { children: React.ReactNode }
   useEffect(() => {
     if (!token || !userId) return
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- carga o suscripción de datos intencional al montar o al cambiar de filtro; migrar a una capa de datos (SWR/react-query) se rastrea aparte
     void prepare()
     void syncNow()
 
@@ -146,6 +148,7 @@ export function OfflineQueueProvider({ children }: { children: React.ReactNode }
   // Cerrar la pestaña con capturas dentro es la forma más fácil de perder
   // trabajo sin enterarse: el aviso del navegador es lo único que lo frena.
   const pendingRef = useRef(0)
+  // eslint-disable-next-line react-hooks/refs -- ref al último valor: actualizarla en el render es intencional para no rehacer la suscripción a media ráfaga
   pendingRef.current = pending
   useEffect(() => {
     const warn = (e: BeforeUnloadEvent) => {

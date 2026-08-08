@@ -156,7 +156,6 @@ export default function ReportsDashboard({ campaigns, defaultCampaignId, centerR
   const [byCenter, setByCenter] = useState<CenterBreakdown[]>([])
   const [countries, setCountries] = useState<CountryPoint[]>([])
   const [loading, setLoading] = useState(false)
-  const [exportError, setExportError] = useState<string | null>(null)
   const csvExport = useExportJob()
 
   const isNational = centerRole === "national_admin"
@@ -202,15 +201,12 @@ export default function ReportsDashboard({ campaigns, defaultCampaignId, centerR
     }
   }, [campaignId, start, end])
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- carga inicial de datos al montar/cambiar de campaña; el patrón escalable (SWR/react-query) se rastrea aparte.
   useEffect(() => { fetchAll() }, [fetchAll])
-
-  useEffect(() => {
-    if (csvExport.error) setExportError(csvExport.error)
-  }, [csvExport.error])
 
   function handleExport() {
     if (!campaignId) return
-    setExportError(null)
+    csvExport.reset()
     csvExport.start(`/v1/reports/campaign/${campaignId}/export.csv?start=${start}&end=${end}`)
   }
 
@@ -288,10 +284,10 @@ export default function ReportsDashboard({ campaigns, defaultCampaignId, centerR
         </button>
       </div>
 
-      {exportError && (
+      {csvExport.error && (
         <div className="rounded-lg bg-dRejB px-3 py-2 text-xs text-dRejT flex items-center justify-between">
-          <span>{exportError}</span>
-          <button className="ml-2 underline" onClick={() => setExportError(null)}>{dict.dashboard.common.close}</button>
+          <span>{csvExport.error}</span>
+          <button className="ml-2 underline" onClick={() => csvExport.reset()}>{dict.dashboard.common.close}</button>
         </div>
       )}
 

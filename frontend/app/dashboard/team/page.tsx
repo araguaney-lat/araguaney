@@ -90,7 +90,7 @@ export default function TeamPage() {
     }
   }
 
-  useEffect(() => { load() }, [activeCenterId, token]) // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { load() }, [activeCenterId, token]) // eslint-disable-line react-hooks/exhaustive-deps, react-hooks/set-state-in-effect -- carga o suscripción de datos intencional al montar o al cambiar de filtro; migrar a una capa de datos (SWR/react-query) se rastrea aparte
 
   const field = (k: keyof typeof EMPTY_FORM) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setForm((f) => ({ ...f, [k]: e.target.value }))

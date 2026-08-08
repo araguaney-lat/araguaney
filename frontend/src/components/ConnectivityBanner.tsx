@@ -1,21 +1,31 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useSyncExternalStore } from "react"
+
+// Suscripción al estado de red con la API que React recomienda para fuentes
+// externas: `useSyncExternalStore` lee `navigator.onLine` sin el parpadeo de
+// un `useState` + `useEffect` (que en el primer render muestra un valor y lo
+// corrige en el effect) y sin arriesgar una fuga de listener. El snapshot de
+// servidor asume "con conexión": en SSR no hay `navigator` y es el default sano.
+function subscribe(onChange: () => void): () => void {
+  window.addEventListener("online", onChange)
+  window.addEventListener("offline", onChange)
+  return () => {
+    window.removeEventListener("online", onChange)
+    window.removeEventListener("offline", onChange)
+  }
+}
+
+export function useOnlineStatus(): boolean {
+  return useSyncExternalStore(
+    subscribe,
+    () => navigator.onLine,
+    () => true,
+  )
+}
 
 export function ConnectivityBanner() {
-  const [online, setOnline] = useState(true)
-
-  useEffect(() => {
-    setOnline(navigator.onLine)
-    const up = () => setOnline(true)
-    const down = () => setOnline(false)
-    window.addEventListener("online", up)
-    window.addEventListener("offline", down)
-    return () => {
-      window.removeEventListener("online", up)
-      window.removeEventListener("offline", down)
-    }
-  }, [])
+  const online = useOnlineStatus()
 
   if (online) {
     return (
@@ -32,22 +42,4 @@ export function ConnectivityBanner() {
       Sin conexión — solo puedes usar productos del catálogo existente
     </div>
   )
-}
-
-export function useOnlineStatus(): boolean {
-  const [online, setOnline] = useState(true)
-
-  useEffect(() => {
-    setOnline(navigator.onLine)
-    const up = () => setOnline(true)
-    const down = () => setOnline(false)
-    window.addEventListener("online", up)
-    window.addEventListener("offline", down)
-    return () => {
-      window.removeEventListener("online", up)
-      window.removeEventListener("offline", down)
-    }
-  }, [])
-
-  return online
 }

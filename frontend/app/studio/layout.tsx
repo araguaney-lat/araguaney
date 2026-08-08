@@ -26,6 +26,7 @@ export default async function StudioLayout({ children }: { children: React.React
   // Backend token expired (24h, no refresh) → bounce with a "session expired" notice.
   if (
     session.error === "AccessTokenExpired" ||
+    // eslint-disable-next-line react-hooks/purity -- Server Component async; Date.now() se evalúa por petición y la regla de pureza del compilador no aplica aquí
     (session.accessTokenExpires && Date.now() >= session.accessTokenExpires)
   ) {
     redirect("/login?expired=1")

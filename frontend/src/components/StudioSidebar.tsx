@@ -3,7 +3,7 @@
 import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { useEffect, useState } from "react"
+import { useCollapsiblePanel } from "@/hooks/useCollapsiblePanel"
 import { LogoutForm } from "@/components/LogoutForm"
 import {
   BarChart2,
@@ -42,26 +42,12 @@ interface StudioSidebarProps {
 
 export function StudioSidebar({ userName, userEmail, nav, locale }: StudioSidebarProps) {
   const pathname = usePathname()
-  const [collapsed, setCollapsed] = useState(false)
-  const [mounted, setMounted] = useState(false)
-  useEffect(() => {
-    const stored = localStorage.getItem(STORAGE_KEY)
-    if (stored === "true") setCollapsed(true)
-    setMounted(true)
-  }, [])
+  const [collapsed, toggle] = useCollapsiblePanel(STORAGE_KEY)
 
   // En móvil esta barra no se renderiza: ahí manda `StudioBottomNav`.
   const cerrada = collapsed
 
-  function toggle() {
-    setCollapsed((c) => {
-      const next = !c
-      localStorage.setItem(STORAGE_KEY, String(next))
-      return next
-    })
-  }
-
-  const width = !mounted ? "w-56" : cerrada ? "w-14" : "w-56"
+  const width = cerrada ? "w-14" : "w-56"
 
   return (
     <aside

@@ -28,6 +28,7 @@ export default function TwoFactorPage() {
       router.replace("/login")
       return
     }
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- effect con efecto de navegador; el setState es parte de ese flujo, no un derivado del render
     setPartialToken(token)
   }, [router])
 

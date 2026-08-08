@@ -23,6 +23,7 @@ export default function StudioTransfersPage() {
   const [statusFilter, setStatusFilter] = useState("")
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- carga o suscripción de datos intencional al montar o al cambiar de filtro; migrar a una capa de datos (SWR/react-query) se rastrea aparte
     setLoading(true)
     const params = new URLSearchParams()
     if (statusFilter) params.set("status", statusFilter)

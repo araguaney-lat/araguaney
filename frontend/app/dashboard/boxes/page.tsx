@@ -42,11 +42,7 @@ export default function BoxesPage() {
     }
   }
 
-  useEffect(() => { fetchBoxes() }, [filter]) // eslint-disable-line react-hooks/exhaustive-deps
-
-  useEffect(() => {
-    if (labelsExport.error) setError(labelsExport.error)
-  }, [labelsExport.error])
+  useEffect(() => { fetchBoxes() }, [filter]) // eslint-disable-line react-hooks/exhaustive-deps, react-hooks/set-state-in-effect -- carga o suscripción de datos intencional al montar o al cambiar de filtro; migrar a una capa de datos (SWR/react-query) se rastrea aparte
 
   const handleSeal = async (boxId: string) => {
     setSealing(boxId)
@@ -80,6 +76,9 @@ export default function BoxesPage() {
   }
 
   const draftCount = boxes.filter((b) => b.status === "DRAFT").length
+  // El error del export se muestra derivándolo en el render, no espejándolo a
+  // un useState con un effect: una fuente menos de la que salga desincronizado.
+  const shownError = error ?? labelsExport.error
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -112,9 +111,9 @@ export default function BoxesPage() {
         </div>
       )}
 
-      {error && (
+      {shownError && (
         <div className="mb-4 rounded-lg bg-dRejB px-4 py-2 text-sm text-dRejT">
-          {error}
+          {shownError}
         </div>
       )}
 

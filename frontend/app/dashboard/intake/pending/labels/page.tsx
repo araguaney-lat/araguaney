@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react"
 import Link from "next/link"
 import { useDict } from "@/context/DictionaryContext"
+import { useUrlSearchParam } from "@/hooks/useUrlSearchParam"
 import { OfflineLabelSheet } from "@/components/OfflineLabelSheet"
 import { listCaptures, subscribeToQueue } from "@/lib/offline/queue"
 import type { QueuedCapture } from "@/lib/offline/types"
@@ -19,17 +20,14 @@ export default function OfflineLabelsPage() {
   const t = dict.dashboard.intake_labels
 
   const [captures, setCaptures] = useState<QueuedCapture[]>([])
-  const [only, setOnly] = useState<string | null>(null)
-
-  useEffect(() => {
-    setOnly(new URLSearchParams(window.location.search).get("capture"))
-  }, [])
+  const only = useUrlSearchParam("capture")
 
   const load = useCallback(async () => {
     setCaptures(await listCaptures())
   }, [])
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- carga o suscripción de datos intencional al montar o al cambiar de filtro; migrar a una capa de datos (SWR/react-query) se rastrea aparte
     void load()
     return subscribeToQueue(() => void load())
   }, [load])

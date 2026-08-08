@@ -28,7 +28,7 @@ export default function IncidentsPage() {
     setLoading(false)
   }, [filter])
 
-  useEffect(() => { cargar() }, [cargar])
+  useEffect(() => { cargar() }, [cargar]) // eslint-disable-line react-hooks/set-state-in-effect -- carga o suscripción de datos intencional al montar o al cambiar de filtro; migrar a una capa de datos (SWR/react-query) se rastrea aparte
 
   const resolver = async (id: string) => {
     setBusy(id)

@@ -99,15 +99,10 @@ export default function ShipmentsPage() {
     if (res.ok) setClosedPallets(await res.json())
   }
 
-  useEffect(() => { fetchShipments() }, [filter]) // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { fetchShipments() }, [filter]) // eslint-disable-line react-hooks/exhaustive-deps, react-hooks/set-state-in-effect -- carga o suscripción de datos intencional al montar o al cambiar de filtro; migrar a una capa de datos (SWR/react-query) se rastrea aparte
 
-  useEffect(() => {
-    if (manifestExport.error) setError(manifestExport.error)
-  }, [manifestExport.error])
-
-  useEffect(() => {
-    if (declarationExport.error) setError(declarationExport.error)
-  }, [declarationExport.error])
+  // Error de los exports derivado en el render, no espejado a estado con effects.
+  const shownError = error ?? manifestExport.error ?? declarationExport.error
 
   useEffect(() => {
     fetch("/api/campaigns?active_only=true")
@@ -200,10 +195,10 @@ export default function ShipmentsPage() {
         />
       </div>
 
-      {error && (
+      {shownError && (
         <div className="rounded-lg bg-dRejB p-3 text-sm text-dRejT">
-          {error}
-          <button className="ml-2 underline" onClick={() => setError(null)}>{dict.dashboard.common.close}</button>
+          {shownError}
+          <button className="ml-2 underline" onClick={() => { setError(null); manifestExport.reset(); declarationExport.reset() }}>{dict.dashboard.common.close}</button>
         </div>
       )}
 
