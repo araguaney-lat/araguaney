@@ -130,11 +130,16 @@ function useProductSearch(campaignId: string) {
 function BoxRowInput({
   row,
   campaignId,
+  autoFocusBarcode,
   onChange,
   onRemove,
 }: {
   row: BoxRow
   campaignId: string
+  /** La última fila arranca con el cursor en su código de barras. El ciclo en
+   *  el andén es agregar caja → disparar la pistola → agregar caja, y obligar a
+   *  tocar la pantalla en medio lo convierte en tres gestos. */
+  autoFocusBarcode: boolean
   onChange: (updated: BoxRow) => void
   onRemove: () => void
 }) {
@@ -205,6 +210,7 @@ function BoxRowInput({
           <input
             type="text"
             inputMode="numeric"
+            autoFocus={autoFocusBarcode}
             value={barcodeInput}
             placeholder={t.barcode_placeholder}
             className="flex-1 rounded-lg border border-inpB bg-inp px-3 py-2 text-sm text-tx focus:outline-none focus:ring-2 focus:ring-[var(--gold)]"
@@ -736,11 +742,12 @@ export default function NewIntakePage() {
           <h2 className="text-sm font-medium text-tx">
             {t.boxes_header.replace("{count}", String(rows.length))}
           </h2>
-          {rows.map((row) => (
+          {rows.map((row, i) => (
             <BoxRowInput
               key={row.key}
               row={row}
               campaignId={campaignId}
+              autoFocusBarcode={i === rows.length - 1 && rows.length > 1}
               onChange={updateRow(row.key)}
               onRemove={() => removeRow(row.key)}
             />
