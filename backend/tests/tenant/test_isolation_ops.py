@@ -43,6 +43,41 @@ class TestReports:
         names = {row["center_name"] for row in res.json()}
         assert "Centro A" not in names
 
+    # Rango que bracketea el "ahora" con holgura: el created_at de las cajas lo
+    # pone SQLite con CURRENT_TIMESTAMP (UTC), que cerca de medianoche cae en un
+    # día distinto al date.today() local. Un rango de ±1 día lo cubre y hace la
+    # prueba determinista, sin depender de la hora a la que corra.
+    def _wide_range(self) -> str:
+        from datetime import date, timedelta
+        today = date.today()
+        return f"?start={today - timedelta(days=1)}&end={today + timedelta(days=1)}"
+
+    def test_activity_buckets_by_real_day_for_own_center(self, client, world):
+        # Antes, activity() agrupaba con cast(created_at, Date), que en SQLite (el
+        # motor de las pruebas) devolvía el año como entero: la ruta funcionaba en
+        # Postgres pero quedaba sin vigilancia. Además nada ejercitaba /activity.
+        res = client.get(
+            f"/v1/reports/campaign/{world.campaign.id}/activity{self._wide_range()}",
+            headers=world.token(world.coordinator_a),
+        )
+        assert res.status_code == 200
+        points = res.json()
+        assert points, "debe haber al menos un día con actividad"
+        # Seeds de center_a: una caja SEALED y una DRAFT en la campaña.
+        assert sum(p["sealed"] for p in points) == 1
+        assert sum(p["draft"] for p in points) == 1
+        # La clave del día es una fecha 'YYYY-MM-DD', no un año suelto.
+        assert all(len(p["date"]) == 10 and p["date"].count("-") == 2 for p in points)
+
+    def test_activity_excludes_the_other_center(self, client, world):
+        res = client.get(
+            f"/v1/reports/campaign/{world.campaign.id}/activity{self._wide_range()}",
+            headers=world.token(world.coordinator_b),
+        )
+        assert res.status_code == 200
+        # coordinator_b ve solo lo suyo: una SEALED, nunca las dos de la campaña.
+        assert sum(p["sealed"] for p in res.json()) == 1
+
 
 class TestRequests:
     def test_list_excludes_foreign_requests(self, client, world):
