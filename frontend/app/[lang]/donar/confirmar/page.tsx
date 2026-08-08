@@ -48,27 +48,32 @@ export default async function ConfirmDonationPage({
         locale={lang}
         localeLinks={{ es: localizedPath("donar/confirmar", "es"), en: localizedPath("donar/confirmar", "en") }}
       />
-      <main className="mx-auto max-w-lg px-4 py-16 text-center">
-        {!token ? (
-          <>
-            <h1 className="font-serif text-2xl font-bold text-zinc-900">{t.failTitle}</h1>
-            <p className="mt-3 text-sm text-zinc-600">{t.missing}</p>
-          </>
-        ) : result?.ok ? (
-          <>
-            <h1 className="font-serif text-2xl font-bold text-zinc-900">{t.okTitle}</h1>
-            <p className="mt-3 text-sm text-zinc-600">{t.okBody}</p>
-            <div className="mt-6 inline-block rounded-xl border border-zinc-200 bg-zinc-50 px-6 py-4">
-              <p className="text-xs text-zinc-500">{t.codeLabel}</p>
-              <p className="font-mono text-2xl font-bold tracking-wide text-zinc-900">{result.code}</p>
-            </div>
-          </>
-        ) : (
-          <>
-            <h1 className="font-serif text-2xl font-bold text-zinc-900">{t.failTitle}</h1>
-            <p className="mt-3 text-sm text-zinc-600">{result?.error}</p>
-          </>
-        )}
+      {/* flex-1 + centrado: el <body> del layout raíz es min-h-full flex-col, así
+          que un main que crece empuja el footer al fondo aunque el contenido sea
+          corto (antes quedaba a media pantalla). */}
+      <main className="flex flex-1 flex-col items-center justify-center px-4 py-16 text-center">
+        <div className="w-full max-w-lg">
+          {!token ? (
+            <>
+              <h1 className="font-serif text-2xl font-bold text-zinc-900">{t.failTitle}</h1>
+              <p className="mt-3 text-sm text-zinc-600">{t.missing}</p>
+            </>
+          ) : result?.ok ? (
+            <>
+              <h1 className="font-serif text-2xl font-bold text-zinc-900">{t.okTitle}</h1>
+              <p className="mt-3 text-sm text-zinc-600">{t.okBody}</p>
+              <div className="mt-6 inline-block rounded-xl border border-zinc-200 bg-zinc-50 px-6 py-4">
+                <p className="text-xs text-zinc-500">{t.codeLabel}</p>
+                <p className="font-mono text-2xl font-bold tracking-wide text-zinc-900">{result.code}</p>
+              </div>
+            </>
+          ) : (
+            <>
+              <h1 className="font-serif text-2xl font-bold text-zinc-900">{t.failTitle}</h1>
+              <p className="mt-3 text-sm text-zinc-600">{result?.error}</p>
+            </>
+          )}
+        </div>
       </main>
       <HomeFooter dict={dict.footer} locale={lang} />
     </>

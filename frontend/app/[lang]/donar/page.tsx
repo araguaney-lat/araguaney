@@ -87,7 +87,9 @@ export default async function DonatePage({
 }) {
   const { lang } = await params
   const dict = await getDictionary(lang)
-  const sitekey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? ""
+  // .trim() contra un salto de línea al final del valor de la env (artefacto de
+  // pegado común): Turnstile rechaza el sitekey con espacios y el widget no carga.
+  const sitekey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY?.trim() ?? ""
 
   return (
     <>
