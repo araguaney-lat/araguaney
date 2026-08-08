@@ -1,8 +1,10 @@
 "use client"
 
-import { useCallback, useEffect, useState } from "react"
+import { useState } from "react"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
 
 import { createIncidentAction, resolveIncidentAction } from "@/lib/incident-actions"
+import { apiGet } from "@/lib/query"
 import type { IncidentOut, IncidentType, PalletDetailOut } from "@/types"
 
 export const INCIDENT_TYPE_LABELS: Record<IncidentType, string> = {
@@ -28,7 +30,7 @@ interface Props {
  * significa nada seis meses después.
  */
 export function ShipmentIncidents({ shipmentId, pallets, isNationalAdmin, status }: Props) {
-  const [incidents, setIncidents] = useState<IncidentOut[]>([])
+  const qc = useQueryClient()
   const [type, setType] = useState<IncidentType>("OTHER")
   const [description, setDescription] = useState("")
   const [target, setTarget] = useState("")
@@ -36,12 +38,13 @@ export function ShipmentIncidents({ shipmentId, pallets, isNationalAdmin, status
   const [busy, setBusy] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
 
-  const cargar = useCallback(async () => {
-    const res = await fetch(`/api/shipments/${shipmentId}/incidents`)
-    if (res.ok) setIncidents(await res.json())
-  }, [shipmentId])
-
-  useEffect(() => { cargar() }, [cargar, status]) // eslint-disable-line react-hooks/set-state-in-effect -- carga o suscripción de datos intencional al montar o al cambiar de filtro; migrar a una capa de datos (SWR/react-query) se rastrea aparte
+  // `status` en la clave: al cambiar el estado del envío se relee la lista.
+  const incidentsQuery = useQuery({
+    queryKey: ["shipment-incidents", shipmentId, status],
+    queryFn: () => apiGet<IncidentOut[]>(`/api/shipments/${shipmentId}/incidents`),
+  })
+  const incidents = incidentsQuery.data ?? []
+  const cargar = () => qc.invalidateQueries({ queryKey: ["shipment-incidents", shipmentId] })
 
   const crear = async () => {
     if (!description.trim()) return setError("Describe qué pasó")

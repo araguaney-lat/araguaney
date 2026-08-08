@@ -2,8 +2,10 @@
 
 import { useState, useEffect, useRef } from "react"
 import { useSession } from "next-auth/react"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
 import type { ThreadOut, ThreadDetailOut, AttachmentOut, Campaign } from "@/types"
 import { createThreadAction, addReplyAction, markReadAction } from "@/lib/message-actions"
+import { apiGet } from "@/lib/query"
 import { Paperclip, Send, X, FileText, ImageIcon, Download } from "lucide-react"
 import { useDict } from "@/context/DictionaryContext"
 
@@ -51,11 +53,9 @@ export default function MessagesPage() {
   const { data: session } = useSession()
   const myUserId = session?.user?.id ?? null
 
+  const qc = useQueryClient()
   const [tab, setTab] = useState<"PRIVATE" | "PUBLIC">("PRIVATE")
-  const [threads, setThreads] = useState<ThreadOut[]>([])
   const [activeThread, setActiveThread] = useState<ThreadDetailOut | null>(null)
-  const [campaigns, setCampaigns] = useState<Campaign[]>([])
-  const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [actionLoading, setActionLoading] = useState(false)
   const [replyBody, setReplyBody] = useState("")
@@ -66,25 +66,36 @@ export default function MessagesPage() {
   const [newCampaignId, setNewCampaignId] = useState("")
   const [newType, setNewType] = useState<"PRIVATE" | "PUBLIC">("PRIVATE")
   const [newRecipientIds, setNewRecipientIds] = useState<string[]>([])
-  const [campaignMembers, setCampaignMembers] = useState<{ id: string; email: string; full_name?: string | null }[]>([])
 
   const [pendingFiles, setPendingFiles] = useState<File[]>([])
   const fileInputRef = useRef<HTMLInputElement>(null)
   const replyEndRef = useRef<HTMLDivElement>(null)
 
-  const fetchThreads = async () => {
-    setLoading(true)
-    setError(null)
-    try {
-      const res = await fetch(`/api/messages?thread_type=${tab}`)
-      if (!res.ok) throw new Error(dict.dashboard.common.error_unknown)
-      setThreads(await res.json())
-    } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : dict.dashboard.common.error_unknown)
-    } finally {
-      setLoading(false)
-    }
-  }
+  // Hilos (por pestaña), campañas, y miembros de la campaña elegida al componer:
+  // tres queries. Las acciones invalidan la lista de hilos.
+  const threadsQuery = useQuery({
+    queryKey: ["threads", tab],
+    queryFn: () => apiGet<ThreadOut[]>(`/api/messages?thread_type=${tab}`),
+  })
+  const threads = threadsQuery.data ?? []
+  const loading = threadsQuery.isPending
+  const refetchThreads = () => qc.invalidateQueries({ queryKey: ["threads"] })
+
+  const campaignsQuery = useQuery({
+    queryKey: ["campaigns", "all"],
+    queryFn: () => apiGet<Campaign[]>("/api/campaigns"),
+  })
+  const campaigns = campaignsQuery.data ?? []
+
+  const membersQuery = useQuery({
+    queryKey: ["campaign-members", newCampaignId],
+    queryFn: () =>
+      apiGet<{ id: string; email: string; full_name?: string | null }[]>(
+        `/api/campaigns/${newCampaignId}/members`,
+      ),
+    enabled: !!newCampaignId,
+  })
+  const campaignMembers = membersQuery.data ?? []
 
   const fetchDetail = async (id: string) => {
     const res = await fetch(`/api/messages/${id}`)
@@ -96,24 +107,6 @@ export default function MessagesPage() {
       }
     }
   }
-
-  useEffect(() => { fetchThreads() }, [tab]) // eslint-disable-line react-hooks/exhaustive-deps, react-hooks/set-state-in-effect -- carga o suscripción de datos intencional al montar o al cambiar de filtro; migrar a una capa de datos (SWR/react-query) se rastrea aparte
-
-  useEffect(() => {
-    fetch("/api/campaigns")
-      .then((r) => r.ok ? r.json() : [])
-      .then(setCampaigns)
-      .catch(() => setCampaigns([]))
-  }, [])
-
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- carga o suscripción de datos intencional al montar o al cambiar de filtro; migrar a una capa de datos (SWR/react-query) se rastrea aparte
-    if (!newCampaignId) { setCampaignMembers([]); return }
-    fetch(`/api/campaigns/${newCampaignId}/members`)
-      .then((r) => r.ok ? r.json() : [])
-      .then(setCampaignMembers)
-      .catch(() => setCampaignMembers([]))
-  }, [newCampaignId])
 
   useEffect(() => {
     replyEndRef.current?.scrollIntoView({ behavior: "smooth" })
@@ -134,7 +127,7 @@ export default function MessagesPage() {
     else {
       setShowCreate(false)
       setNewTitle(""); setNewBody(""); setNewCampaignId(""); setNewRecipientIds([])
-      await fetchThreads()
+      refetchThreads()
     }
   }
 
@@ -148,7 +141,7 @@ export default function MessagesPage() {
       setReplyBody("")
       setPendingFiles([])
       await fetchDetail(activeThread.id)
-      await fetchThreads()
+      refetchThreads()
     }
   }
 

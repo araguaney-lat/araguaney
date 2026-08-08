@@ -1,6 +1,8 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
+import { apiGet } from "@/lib/query"
 import { useSession } from "next-auth/react"
 import { apiFetch } from "@/lib/api"
 import type { Campaign, Center, ShipmentOut, ShipmentDetailOut, ShipmentStatus, PalletOut, EventOut } from "@/types"
@@ -41,27 +43,23 @@ export default function ShipmentsPage() {
   // national_admin has no home center — they must pick one before creating
   // a shipment. Coordinator never sees this, their own center is used
   // automatically server-side.
-  const [centers, setCenters] = useState<Center[]>([])
+  const qc = useQueryClient()
   const [selectedCenterId, setSelectedCenterId] = useState("")
 
-  useEffect(() => {
-    if (!isNationalAdmin || !token) return
-    apiFetch<Center[]>("/v1/centers", { token })
-      .then((data) => {
-        setCenters(data)
-        if (data.length > 0) setSelectedCenterId((id) => id || data[0].id)
-      })
-      .catch(() => setCenters([]))
-  }, [isNationalAdmin, token])
+  const centersQuery = useQuery({
+    queryKey: ["centers"],
+    queryFn: () => apiFetch<Center[]>("/v1/centers", { token }),
+    enabled: isNationalAdmin && !!token,
+  })
+  const centers = centersQuery.data ?? []
+  // Sin auto-selección por effect: cae al primer centro hasta que se elija otro.
+  const activeCenterId = isNationalAdmin ? selectedCenterId || centers[0]?.id || "" : ""
 
-  const [shipments, setShipments] = useState<ShipmentOut[]>([])
   const [filter, setFilter] = useState<ShipmentStatus | "">("")
-  const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [activeShipment, setActiveShipment] = useState<ShipmentDetailOut | null>(null)
   const [shipmentEvents, setShipmentEvents] = useState<EventOut[]>([])
   const [closedPallets, setClosedPallets] = useState<PalletOut[]>([])
-  const [campaigns, setCampaigns] = useState<Campaign[]>([])
   const [selectedPalletId, setSelectedPalletId] = useState("")
   const [showCreateForm, setShowCreateForm] = useState(false)
   const [newShipment, setNewShipment] = useState({ campaign_id: "", destination: "Venezuela", carrier: "", reference: "", notes: "", height_profile: "" })
@@ -69,20 +67,20 @@ export default function ShipmentsPage() {
   const manifestExport = useExportJob()
   const declarationExport = useExportJob()
 
-  const fetchShipments = async () => {
-    setLoading(true)
-    setError(null)
-    try {
-      const params = filter ? `?status=${filter}` : ""
-      const res = await fetch(`/api/shipments${params}`)
-      if (!res.ok) throw new Error(dict.dashboard.common.error_unknown)
-      setShipments(await res.json())
-    } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : dict.dashboard.common.error_unknown)
-    } finally {
-      setLoading(false)
-    }
-  }
+  // Lista y campañas leídas con React Query; las mutaciones invalidan la lista.
+  const shipmentsQuery = useQuery({
+    queryKey: ["shipments", filter],
+    queryFn: () => apiGet<ShipmentOut[]>(`/api/shipments${filter ? `?status=${filter}` : ""}`),
+  })
+  const shipments = shipmentsQuery.data ?? []
+  const loading = shipmentsQuery.isPending
+  const refetchShipments = () => qc.invalidateQueries({ queryKey: ["shipments"] })
+
+  const campaignsQuery = useQuery({
+    queryKey: ["campaigns", "active"],
+    queryFn: () => apiGet<Campaign[]>("/api/campaigns?active_only=true"),
+  })
+  const campaigns = campaignsQuery.data ?? []
 
   const fetchShipmentDetail = async (id: string) => {
     const [detailRes, eventsRes] = await Promise.all([
@@ -99,26 +97,18 @@ export default function ShipmentsPage() {
     if (res.ok) setClosedPallets(await res.json())
   }
 
-  useEffect(() => { fetchShipments() }, [filter]) // eslint-disable-line react-hooks/exhaustive-deps, react-hooks/set-state-in-effect -- carga o suscripción de datos intencional al montar o al cambiar de filtro; migrar a una capa de datos (SWR/react-query) se rastrea aparte
-
-  // Error de los exports derivado en el render, no espejado a estado con effects.
-  const shownError = error ?? manifestExport.error ?? declarationExport.error
-
-  useEffect(() => {
-    fetch("/api/campaigns?active_only=true")
-      .then((r) => r.ok ? r.json() : [])
-      .then(setCampaigns)
-      .catch(() => setCampaigns([]))
-  }, [])
+  // Error de los exports y de la lista, derivado en el render.
+  const listError = shipmentsQuery.error instanceof Error ? shipmentsQuery.error.message : null
+  const shownError = error ?? listError ?? manifestExport.error ?? declarationExport.error
 
   const handleCreate = async () => {
-    if (isNationalAdmin && !selectedCenterId) { setError(tc.select_center_label); return }
+    if (isNationalAdmin && !activeCenterId) { setError(tc.select_center_label); return }
     setActionLoading("create")
     const result = await createShipmentAction({
       ...newShipment,
       campaign_id: newShipment.campaign_id || undefined,
       height_profile: newShipment.height_profile || undefined,
-      center_id: isNationalAdmin ? selectedCenterId : undefined,
+      center_id: isNationalAdmin ? activeCenterId : undefined,
     })
     setActionLoading(null)
     if (result.error) {
@@ -126,7 +116,7 @@ export default function ShipmentsPage() {
     } else {
       setShowCreateForm(false)
       setNewShipment({ campaign_id: "", destination: "Venezuela", carrier: "", reference: "", notes: "", height_profile: "" })
-      await fetchShipments()
+      refetchShipments()
     }
   }
 
@@ -140,7 +130,7 @@ export default function ShipmentsPage() {
     } else {
       setSelectedPalletId("")
       setActiveShipment(result.data as ShipmentDetailOut)
-      await fetchShipments()
+      refetchShipments()
       await fetchClosedPallets()
     }
   }
@@ -152,7 +142,7 @@ export default function ShipmentsPage() {
     if (result.error) {
       setError(result.error)
     } else {
-      setShipments((prev) => prev.map((s) => s.id === shipmentId ? { ...s, status: "CLOSED" as ShipmentStatus } : s))
+      refetchShipments()
       if (activeShipment?.id === shipmentId) setActiveShipment({ ...activeShipment, status: "CLOSED" })
     }
   }
@@ -164,7 +154,7 @@ export default function ShipmentsPage() {
     if (result.error) {
       setError(result.error)
     } else {
-      setShipments((prev) => prev.map((s) => s.id === shipmentId ? { ...s, status: "SHIPPED" as ShipmentStatus } : s))
+      refetchShipments()
       if (activeShipment?.id === shipmentId) setActiveShipment({ ...activeShipment, status: "SHIPPED" })
     }
   }
@@ -214,7 +204,7 @@ export default function ShipmentsPage() {
                 ) : (
                   <select
                     className="w-full text-sm border border-inpB bg-inp text-tx rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--gold)]"
-                    value={selectedCenterId}
+                    value={activeCenterId}
                     onChange={(e) => setSelectedCenterId(e.target.value)}
                   >
                     {centers.map((c) => (
@@ -276,7 +266,7 @@ export default function ShipmentsPage() {
             </label>
           </div>
           <div className="flex gap-2">
-            <button onClick={handleCreate} disabled={actionLoading === "create" || (isNationalAdmin && !selectedCenterId)}
+            <button onClick={handleCreate} disabled={actionLoading === "create" || (isNationalAdmin && !activeCenterId)}
               className="px-4 py-2 bg-[var(--gold)] text-[#3B2A00] rounded-lg text-sm hover:opacity-90 disabled:opacity-50">
               {actionLoading === "create" ? t.creating : t.create_btn}
             </button>
@@ -452,7 +442,7 @@ export default function ShipmentsPage() {
                 status={activeShipment.status}
                 pallets={activeShipment.pallets}
                 isNationalAdmin={isNationalAdmin}
-                onDone={() => { fetchShipmentDetail(activeShipment.id); fetchShipments() }}
+                onDone={() => { fetchShipmentDetail(activeShipment.id); refetchShipments() }}
               />
             )}
 
@@ -460,7 +450,7 @@ export default function ShipmentsPage() {
               <ShipmentMilestones
                 shipmentId={activeShipment.id}
                 status={activeShipment.status}
-                onDone={() => { fetchShipmentDetail(activeShipment.id); fetchShipments() }}
+                onDone={() => { fetchShipmentDetail(activeShipment.id); refetchShipments() }}
               />
             )}
           </div>

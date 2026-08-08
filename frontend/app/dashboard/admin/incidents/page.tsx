@@ -1,9 +1,11 @@
 "use client"
 
-import { useCallback, useEffect, useState } from "react"
+import { useState } from "react"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 
 import { INCIDENT_TYPE_LABELS } from "@/components/ShipmentIncidents"
 import { resolveIncidentAction } from "@/lib/incident-actions"
+import { apiGet } from "@/lib/query"
 import type { IncidentOut } from "@/types"
 
 /**
@@ -14,30 +16,28 @@ import type { IncidentOut } from "@/types"
  * las abiertas, que es lo único accionable.
  */
 export default function IncidentsPage() {
-  const [incidents, setIncidents] = useState<IncidentOut[]>([])
+  const qc = useQueryClient()
   const [filter, setFilter] = useState<"OPEN" | "RESOLVED" | "">("OPEN")
   const [notes, setNotes] = useState<Record<string, string>>({})
-  const [busy, setBusy] = useState<string | null>(null)
-  const [error, setError] = useState<string | null>(null)
-  const [loading, setLoading] = useState(true)
 
-  const cargar = useCallback(async () => {
-    setLoading(true)
-    const res = await fetch(`/api/incidents${filter ? `?status=${filter}` : ""}`)
-    if (res.ok) setIncidents(await res.json())
-    setLoading(false)
-  }, [filter])
+  const incidentsQuery = useQuery({
+    queryKey: ["incidents", filter],
+    queryFn: () => apiGet<IncidentOut[]>(`/api/incidents${filter ? `?status=${filter}` : ""}`),
+  })
+  const incidents = incidentsQuery.data ?? []
+  const loading = incidentsQuery.isPending
 
-  useEffect(() => { cargar() }, [cargar]) // eslint-disable-line react-hooks/set-state-in-effect -- carga o suscripción de datos intencional al montar o al cambiar de filtro; migrar a una capa de datos (SWR/react-query) se rastrea aparte
+  const resolveMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const result = await resolveIncidentAction(id, notes[id] ?? "")
+      if (result.error) throw new Error(result.error)
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["incidents"] }),
+  })
+  const busy = resolveMutation.isPending ? (resolveMutation.variables ?? null) : null
+  const error = resolveMutation.error instanceof Error ? resolveMutation.error.message : null
 
-  const resolver = async (id: string) => {
-    setBusy(id)
-    setError(null)
-    const result = await resolveIncidentAction(id, notes[id] ?? "")
-    setBusy(null)
-    if (result.error) return setError(result.error)
-    cargar()
-  }
+  const resolver = (id: string) => resolveMutation.mutate(id)
 
   return (
     <div className="space-y-6">

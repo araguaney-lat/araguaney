@@ -1,8 +1,9 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import Image from "next/image"
 import { useSession } from "next-auth/react"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { apiFetch } from "@/lib/api"
 import type { Center, UserOut } from "@/types"
 import { useDict } from "@/context/DictionaryContext"
@@ -49,60 +50,37 @@ export default function TeamPage() {
   // national_admin picks a center from a selector (server-filtered to their
   // own country_code, see GET /v1/centers); coordinator/volunteer only ever
   // have their own single center — no selector needed.
-  const [centers, setCenters] = useState<Center[]>([])
+  const qc = useQueryClient()
   const [selectedCenterId, setSelectedCenterId] = useState<string>("")
-  const activeCenterId = isNationalAdmin ? selectedCenterId : session?.centerId
-
-  const [users, setUsers] = useState<UserOut[]>([])
-  const [loading, setLoading] = useState(true)
   const [showManage, setShowManage] = useState(false)
   const [showForm, setShowForm] = useState(false)
   const [form, setForm] = useState(EMPTY_FORM)
-  const [saving, setSaving] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [reinviting, setReinviting] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
 
-  // national_admin: load the center list once, auto-select the first one.
-  useEffect(() => {
-    if (!isNationalAdmin || !token) return
-    apiFetch<Center[]>("/v1/centers", { token })
-      .then((data) => {
-        setCenters(data)
-        if (data.length > 0) setSelectedCenterId((id) => id || data[0].id)
-      })
-      .catch(() => setCenters([]))
-  }, [isNationalAdmin, token])
+  // national_admin elige de un selector; el resto solo tiene su propio centro.
+  const centersQuery = useQuery({
+    queryKey: ["centers"],
+    queryFn: () => apiFetch<Center[]>("/v1/centers", { token }),
+    enabled: isNationalAdmin && !!token,
+  })
+  const centers = centersQuery.data ?? []
+  // Sin auto-selección por effect: si aún no eligió, cae al primer centro. El
+  // selector se ata a este valor efectivo, no al estado crudo.
+  const activeCenterId = isNationalAdmin
+    ? selectedCenterId || centers[0]?.id || ""
+    : session?.centerId ?? ""
 
-  async function load() {
-    if (!activeCenterId || !token) {
-      setLoading(false)
-      return
-    }
-    setLoading(true)
-    try {
-      const data = await apiFetch<UserOut[]>(`/v1/centers/${activeCenterId}/users`, { token })
-      setUsers(data)
-    } catch {
-      setError(dict.dashboard.common.error_unknown)
-    } finally {
-      setLoading(false)
-    }
-  }
+  const usersQuery = useQuery({
+    queryKey: ["center-users", activeCenterId],
+    queryFn: () => apiFetch<UserOut[]>(`/v1/centers/${activeCenterId}/users`, { token }),
+    enabled: !!activeCenterId && !!token,
+  })
+  const users = usersQuery.data ?? []
+  const loading = usersQuery.isPending
 
-  useEffect(() => { load() }, [activeCenterId, token]) // eslint-disable-line react-hooks/exhaustive-deps, react-hooks/set-state-in-effect -- carga o suscripción de datos intencional al montar o al cambiar de filtro; migrar a una capa de datos (SWR/react-query) se rastrea aparte
-
-  const field = (k: keyof typeof EMPTY_FORM) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
-    setForm((f) => ({ ...f, [k]: e.target.value }))
-
-  async function handleCreate(e: React.FormEvent) {
-    e.preventDefault()
-    if (!activeCenterId) return
-    setSaving(true)
-    setError(null)
-    setSuccess(null)
-    try {
-      const user = await apiFetch<UserOut>(`/v1/centers/${activeCenterId}/users`, {
+  const createMutation = useMutation({
+    mutationFn: () =>
+      apiFetch<UserOut>(`/v1/centers/${activeCenterId}/users`, {
         method: "POST",
         body: JSON.stringify({
           email: form.email.trim(),
@@ -111,34 +89,43 @@ export default function TeamPage() {
           center_role: form.center_role,
         }),
         token,
-      })
-      setUsers((u) => [user, ...u])
+      }),
+    onSuccess: () => {
       setForm(EMPTY_FORM)
       setShowForm(false)
       setSuccess(t.invite_success)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : dict.dashboard.common.error_unknown)
-    } finally {
-      setSaving(false)
-    }
+      qc.invalidateQueries({ queryKey: ["center-users", activeCenterId] })
+    },
+  })
+  const saving = createMutation.isPending
+
+  const reinviteMutation = useMutation({
+    mutationFn: (userId: string) =>
+      apiFetch(`/v1/centers/${activeCenterId}/users/${userId}/reinvite`, { method: "POST", token }),
+    onSuccess: () => setSuccess(t.reinvite_success),
+  })
+  const reinviting = reinviteMutation.isPending ? (reinviteMutation.variables ?? null) : null
+
+  // Error mostrado: el de la carga de miembros o el de la última acción.
+  const error =
+    [usersQuery.error, createMutation.error, reinviteMutation.error].find(
+      (e): e is Error => e instanceof Error,
+    )?.message ?? null
+
+  const field = (k: keyof typeof EMPTY_FORM) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
+    setForm((f) => ({ ...f, [k]: e.target.value }))
+
+  function handleCreate(e: React.FormEvent) {
+    e.preventDefault()
+    if (!activeCenterId) return
+    setSuccess(null)
+    createMutation.mutate()
   }
 
-  async function handleReinvite(userId: string) {
+  function handleReinvite(userId: string) {
     if (!activeCenterId) return
-    setReinviting(userId)
-    setError(null)
     setSuccess(null)
-    try {
-      await apiFetch(`/v1/centers/${activeCenterId}/users/${userId}/reinvite`, {
-        method: "POST",
-        token,
-      })
-      setSuccess(t.reinvite_success)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : dict.dashboard.common.error_unknown)
-    } finally {
-      setReinviting(null)
-    }
+    reinviteMutation.mutate(userId)
   }
 
   const roleBadge = (role: string) => {
@@ -163,7 +150,7 @@ export default function TeamPage() {
         </div>
         {canManage && (
           <PageAction
-            onClick={() => { setShowManage((v) => !v); setShowForm(false); setError(null); setSuccess(null) }}
+            onClick={() => { setShowManage((v) => !v); setShowForm(false); createMutation.reset(); reinviteMutation.reset(); setSuccess(null) }}
             icon={showManage ? X : UserCog}
             label={showManage ? t.cancel : t.manage_team}
           />
@@ -177,7 +164,7 @@ export default function TeamPage() {
             <p className="mt-1 text-sm text-fnt">{t.no_centers}</p>
           ) : (
             <select
-              value={selectedCenterId}
+              value={activeCenterId}
               onChange={(e) => setSelectedCenterId(e.target.value)}
               className="mt-1 w-full rounded-lg border border-cardB px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--gold)]"
             >
@@ -228,7 +215,7 @@ export default function TeamPage() {
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-base font-semibold text-tx">{t.manage_team}</h2>
             <button
-              onClick={() => { setShowForm((v) => !v); setError(null); setSuccess(null) }}
+              onClick={() => { setShowForm((v) => !v); createMutation.reset(); setSuccess(null) }}
               className="rounded-lg bg-[var(--blue)] px-3 py-1.5 text-sm font-medium text-white hover:opacity-90"
             >
               {showForm ? t.cancel : t.invite_btn}

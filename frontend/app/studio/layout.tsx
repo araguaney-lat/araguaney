@@ -3,6 +3,7 @@ import { redirect } from "next/navigation"
 import { StudioSidebar } from "@/components/StudioSidebar"
 import { StudioBottomNav } from "@/components/StudioBottomNav"
 import { DictionaryProvider } from "@/context/DictionaryContext"
+import { QueryProvider } from "@/components/QueryProvider"
 import { getLocale, getDictionary } from "@/lib/i18n"
 
 const API_URL = process.env.API_URL ?? "http://localhost:8000"
@@ -40,6 +41,7 @@ export default async function StudioLayout({ children }: { children: React.React
   const userEmail = me?.email ?? null
 
   return (
+    <QueryProvider>
     <DictionaryProvider dict={dict} locale={locale}>
       <div className="flex h-screen overflow-hidden bg-zinc-50">
         {/* La barra lateral es de escritorio; en móvil manda la de abajo, igual
@@ -61,5 +63,6 @@ export default async function StudioLayout({ children }: { children: React.React
         />
       </div>
     </DictionaryProvider>
+    </QueryProvider>
   )
 }

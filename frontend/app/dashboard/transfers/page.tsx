@@ -1,6 +1,8 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
+import { apiGet } from "@/lib/query"
 import { useSession } from "next-auth/react"
 import type { TransferOut, TransferDetailOut, TransferStatus, Center, BoxOut } from "@/types"
 import { StatusTimeline } from "@/components/StatusTimeline"
@@ -32,12 +34,10 @@ export default function TransfersPage() {
   const myCenter = (session as { centerId?: string | null } | null)?.centerId ?? null
   const myRole = (session as { centerRole?: string | null } | null)?.centerRole ?? null
 
-  const [transfers, setTransfers] = useState<TransferOut[]>([])
+  const qc = useQueryClient()
   const [activeDetail, setActiveDetail] = useState<TransferDetailOut | null>(null)
-  const [centers, setCenters] = useState<Center[]>([])
   const [sealedBoxes, setSealedBoxes] = useState<BoxOut[]>([])
   const [tab, setTab] = useState<"outgoing" | "incoming" | "all">("outgoing")
-  const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [actionLoading, setActionLoading] = useState<string | null>(null)
   const [showCreate, setShowCreate] = useState(false)
@@ -51,39 +51,34 @@ export default function TransfersPage() {
   const [rejectingId, setRejectingId] = useState<string | null>(null)
   const manifestExport = useExportJob()
 
-  const fetchTransfers = async () => {
-    setLoading(true)
-    setError(null)
-    try {
+  // Lista por pestaña y centros, leídos con React Query; las acciones invalidan.
+  const transfersQuery = useQuery({
+    queryKey: ["transfers", tab, myCenter ?? ""],
+    queryFn: () => {
       const params = new URLSearchParams()
       if (tab === "outgoing" && myCenter) params.set("from_center_id", myCenter)
       if (tab === "incoming" && myCenter) params.set("to_center_id", myCenter)
-      const res = await fetch(`/api/transfers?${params}`)
-      if (!res.ok) throw new Error(dict.dashboard.common.error_unknown)
-      setTransfers(await res.json())
-    } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : dict.dashboard.common.error_unknown)
-    } finally {
-      setLoading(false)
-    }
-  }
+      return apiGet<TransferOut[]>(`/api/transfers?${params}`)
+    },
+  })
+  const transfers = transfersQuery.data ?? []
+  const loading = transfersQuery.isPending
+  const refetchTransfers = () => qc.invalidateQueries({ queryKey: ["transfers"] })
+
+  const centersQuery = useQuery({
+    queryKey: ["centers"],
+    queryFn: () => apiGet<Center[]>("/api/centers"),
+  })
+  const centers = centersQuery.data ?? []
 
   const fetchDetail = async (id: string) => {
     const res = await fetch(`/api/transfers/${id}`)
     if (res.ok) setActiveDetail(await res.json())
   }
 
-  useEffect(() => { fetchTransfers() }, [tab]) // eslint-disable-line react-hooks/exhaustive-deps, react-hooks/set-state-in-effect -- carga o suscripción de datos intencional al montar o al cambiar de filtro; migrar a una capa de datos (SWR/react-query) se rastrea aparte
-
-  // Error del export derivado en el render, no espejado a estado con un effect.
-  const shownError = error ?? manifestExport.error
-
-  useEffect(() => {
-    fetch("/api/centers")
-      .then((r) => r.ok ? r.json() : [])
-      .then(setCenters)
-      .catch(() => setCenters([]))
-  }, [])
+  // Error del export y de la lista, derivado en el render.
+  const listError = transfersQuery.error instanceof Error ? transfersQuery.error.message : null
+  const shownError = error ?? listError ?? manifestExport.error
 
   const fetchSealedBoxes = async () => {
     const res = await fetch("/api/boxes?status=SEALED")
@@ -105,7 +100,7 @@ export default function TransfersPage() {
     } else {
       setShowCreate(false)
       setNewTransfer({ from_center_id: myCenter ?? "", to_center_id: "", notes: "", box_ids: [] })
-      await fetchTransfers()
+      refetchTransfers()
     }
   }
 
@@ -123,7 +118,7 @@ export default function TransfersPage() {
     setActionLoading(null)
     if (result.error) setError(result.error)
     else {
-      await fetchTransfers()
+      refetchTransfers()
       if (activeDetail?.id === id) await fetchDetail(id)
     }
   }
@@ -136,7 +131,7 @@ export default function TransfersPage() {
     setRejectReason("")
     if (result.error) setError(result.error)
     else {
-      await fetchTransfers()
+      refetchTransfers()
       if (activeDetail?.id === id) await fetchDetail(id)
     }
   }

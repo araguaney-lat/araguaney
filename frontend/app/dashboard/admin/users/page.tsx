@@ -1,6 +1,7 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { listStudioUsersAction, createStudioUserAction, patchStudioUserAction, reinviteStudioUserAction } from "@/lib/studio-actions"
 import type { UserOut } from "@/types"
 import { useDict } from "@/context/DictionaryContext"
@@ -15,8 +16,7 @@ export default function StudioUsersPage() {
   const dict = useDict()
   const t = dict.dashboard.admin_users
 
-  const [users, setUsers] = useState<UserOut[]>([])
-  const [loading, setLoading] = useState(true)
+  const qc = useQueryClient()
   const [showForm, setShowForm] = useState(false)
   const [form, setForm] = useState(EMPTY_FORM)
   const [saving, setSaving] = useState(false)
@@ -26,14 +26,13 @@ export default function StudioUsersPage() {
   const [filterRole, setFilterRole] = useState("")
   const [reinviting, setReinviting] = useState<string | null>(null)
 
-  async function load() {
-    setLoading(true)
-    const data = await listStudioUsersAction(filterRole ? { center_role: filterRole } : undefined)
-    setUsers(data)
-    setLoading(false)
-  }
-
-  useEffect(() => { load() }, [filterRole]) // eslint-disable-line react-hooks/exhaustive-deps, react-hooks/set-state-in-effect -- carga o suscripción de datos intencional al montar o al cambiar de filtro; migrar a una capa de datos (SWR/react-query) se rastrea aparte
+  const usersQuery = useQuery({
+    queryKey: ["studio-users", filterRole],
+    queryFn: () => listStudioUsersAction(filterRole ? { center_role: filterRole } : undefined),
+  })
+  const users = usersQuery.data ?? []
+  const loading = usersQuery.isPending
+  const refetchUsers = () => qc.invalidateQueries({ queryKey: ["studio-users"] })
 
   const field = (k: keyof typeof EMPTY_FORM) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setForm((f) => ({ ...f, [k]: e.target.value }))
@@ -52,7 +51,7 @@ export default function StudioUsersPage() {
         country_code: form.country_code || undefined,
         password: form.password.trim() || undefined,
       })
-      setUsers((u) => [created, ...u])
+      refetchUsers()
       setForm(EMPTY_FORM)
       setShowForm(false)
     } catch (err) {
@@ -83,7 +82,7 @@ export default function StudioUsersPage() {
         is_active: editForm.is_active,
         country_code: editForm.country_code || undefined,
       })
-      setUsers((u) => u.map((x) => (x.id === updated.id ? updated : x)))
+      refetchUsers()
       setEditingId(null)
     } catch (err) {
       setError(err instanceof Error ? err.message : dict.dashboard.common.error_unknown)

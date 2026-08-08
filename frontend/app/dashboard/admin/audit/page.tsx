@@ -1,6 +1,7 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
+import { useQuery } from "@tanstack/react-query"
 import { listAuditAction } from "@/lib/studio-actions"
 import type { AuditEntry } from "@/lib/studio-actions"
 import { useDict } from "@/context/DictionaryContext"
@@ -15,36 +16,22 @@ export default function StudioAuditPage() {
   const dict = useDict()
   const t = dict.dashboard.admin_audit
 
-  const [items, setItems] = useState<AuditEntry[]>([])
-  const [total, setTotal] = useState(0)
-  const [loading, setLoading] = useState(true)
+  const LIMIT = 50
   const [filterEntity, setFilterEntity] = useState("")
   const [offset, setOffset] = useState(0)
   const [selected, setSelected] = useState<AuditEntry | null>(null)
-  const LIMIT = 50
 
-  async function load(off = 0) {
-    setLoading(true)
-    const result = await listAuditAction({
-      entity_type: filterEntity || undefined,
-      limit: LIMIT,
-      offset: off,
-    })
-    setItems(result.items)
-    setTotal(result.total)
-    setLoading(false)
-  }
+  // offset vive en la queryKey: paginar o filtrar refetchea solo. Al cambiar el
+  // filtro se vuelve a la primera página desde el propio handler del select.
+  const auditQuery = useQuery({
+    queryKey: ["audit", filterEntity, offset],
+    queryFn: () => listAuditAction({ entity_type: filterEntity || undefined, limit: LIMIT, offset }),
+  })
+  const items = auditQuery.data?.items ?? []
+  const total = auditQuery.data?.total ?? 0
+  const loading = auditQuery.isPending
 
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- carga o suscripción de datos intencional al montar o al cambiar de filtro; migrar a una capa de datos (SWR/react-query) se rastrea aparte
-    setOffset(0)
-    load(0)
-  }, [filterEntity]) // eslint-disable-line react-hooks/exhaustive-deps
-
-  function changePage(off: number) {
-    setOffset(off)
-    load(off)
-  }
+  const changePage = (off: number) => setOffset(off)
 
   return (
     <div className="max-w-5xl">
@@ -57,7 +44,7 @@ export default function StudioAuditPage() {
         </div>
         <select
           value={filterEntity}
-          onChange={(e) => setFilterEntity(e.target.value)}
+          onChange={(e) => { setFilterEntity(e.target.value); setOffset(0) }}
           className="rounded-lg border border-cardB px-3 py-1.5 text-sm focus:outline-none"
         >
           <option value="">{t.filter_all}</option>

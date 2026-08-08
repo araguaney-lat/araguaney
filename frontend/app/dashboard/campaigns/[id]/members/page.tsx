@@ -1,10 +1,12 @@
 "use client"
 
-import { useEffect, useState, useCallback } from "react"
+import { useState } from "react"
 import { useParams } from "next/navigation"
 import Link from "next/link"
 import { useSession } from "next-auth/react"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
 import type { CampaignMember, Campaign, Center, UserOut } from "@/types"
+import { apiGet } from "@/lib/query"
 import { useDict } from "@/context/DictionaryContext"
 import { Plus, X } from "lucide-react"
 import { PageAction } from "@/components/PageAction"
@@ -24,16 +26,10 @@ export default function CampaignMembersPage() {
   const isAdmin = session?.centerRole === "national_admin"
   const userCenterId = session?.centerId ?? null
 
-  const [campaign, setCampaign] = useState<Campaign | null>(null)
-  const [members, setMembers] = useState<CampaignMember[]>([])
-  const [loading, setLoading] = useState(true)
+  const qc = useQueryClient()
   const [error, setError] = useState<string | null>(null)
-
   const [addOpen, setAddOpen] = useState(false)
-  const [centers, setCenters] = useState<Center[]>([])
   const [selectedCenterId, setSelectedCenterId] = useState<string>("")
-  const [centerUsers, setCenterUsers] = useState<UserOut[]>([])
-  const [loadingUsers, setLoadingUsers] = useState(false)
   const [selectedUserId, setSelectedUserId] = useState<string>("")
   const [adding, setAdding] = useState(false)
   const [addError, setAddError] = useState<string | null>(null)
@@ -45,50 +41,51 @@ export default function CampaignMembersPage() {
     volunteer: t.role_volunteer,
   }
 
-  const fetchMembers = useCallback(async () => {
-    const [campRes, membRes] = await Promise.all([
-      fetch(`/api/campaigns`).then((r) => r.ok ? r.json() : []),
-      fetch(`/api/campaigns/${id}/members`).then((r) => r.ok ? r.json() : []),
-    ])
-    const camp = (campRes as Campaign[]).find((c: Campaign) => c.id === id) ?? null
-    setCampaign(camp)
-    setMembers(membRes)
-  }, [id])
+  const campaignsQuery = useQuery({
+    queryKey: ["campaigns", "all"],
+    queryFn: () => apiGet<Campaign[]>("/api/campaigns"),
+  })
+  const campaign = campaignsQuery.data?.find((c) => c.id === id) ?? null
 
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- carga o suscripción de datos intencional al montar o al cambiar de filtro; migrar a una capa de datos (SWR/react-query) se rastrea aparte
-    fetchMembers().finally(() => setLoading(false))
-  }, [fetchMembers])
+  const membersQuery = useQuery({
+    queryKey: ["campaign-members", id],
+    queryFn: () => apiGet<CampaignMember[]>(`/api/campaigns/${id}/members`),
+  })
+  const members = membersQuery.data ?? []
+  const loading = campaignsQuery.isPending || membersQuery.isPending
+  const refetchMembers = () => qc.invalidateQueries({ queryKey: ["campaign-members", id] })
 
-  useEffect(() => {
-    if (!addOpen) return
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- carga o suscripción de datos intencional al montar o al cambiar de filtro; migrar a una capa de datos (SWR/react-query) se rastrea aparte
-    setSelectedUserId("")
-    setCenterUsers([])
-    setAddError(null)
+  // El selector de centro solo aparece al abrir el panel y solo para la admin
+  // nacional; el resto usa su propio centro (se fija al abrir).
+  const centersQuery = useQuery({
+    queryKey: ["centers"],
+    queryFn: () => apiGet<Center[]>("/api/centers"),
+    enabled: addOpen && isAdmin,
+  })
+  const centers = centersQuery.data ?? []
 
-    if (isAdmin) {
-      fetch("/api/centers")
-        .then((r) => r.ok ? r.json() : [])
-        .then(setCenters)
-    } else if (userCenterId) {
-      setSelectedCenterId(userCenterId)
-    }
-  }, [addOpen, isAdmin, userCenterId])
+  const centerUsersQuery = useQuery({
+    queryKey: ["center-users", selectedCenterId],
+    queryFn: () => apiGet<UserOut[]>(`/api/centers/${selectedCenterId}/users`),
+    enabled: !!selectedCenterId,
+  })
+  // Quien ya es miembro no vuelve a ofrecerse: se filtra en el render.
+  const memberIds = new Set(members.map((m) => m.id))
+  const centerUsers = (centerUsersQuery.data ?? []).filter((u) => !memberIds.has(u.id))
+  const loadingUsers = centerUsersQuery.isLoading
 
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- carga o suscripción de datos intencional al montar o al cambiar de filtro; migrar a una capa de datos (SWR/react-query) se rastrea aparte
-    if (!selectedCenterId) { setCenterUsers([]); return }
-    setLoadingUsers(true)
-    setSelectedUserId("")
-    fetch(`/api/centers/${selectedCenterId}/users`)
-      .then((r) => r.ok ? r.json() : [])
-      .then((users: UserOut[]) => {
-        const memberIds = new Set(members.map((m) => m.id))
-        setCenterUsers(users.filter((u) => !memberIds.has(u.id)))
-      })
-      .finally(() => setLoadingUsers(false))
-  }, [selectedCenterId, members])
+  // Abrir el panel resetea la selección en el propio handler, no en un effect.
+  const toggleAdd = () => {
+    setAddOpen((v) => {
+      const next = !v
+      if (next) {
+        setSelectedUserId("")
+        setAddError(null)
+        setSelectedCenterId(!isAdmin && userCenterId ? userCenterId : "")
+      }
+      return next
+    })
+  }
 
   async function handleAdd() {
     if (!selectedUserId) return
@@ -105,7 +102,7 @@ export default function CampaignMembersPage() {
         setAddError(data?.detail ?? dict.dashboard.common.error_unknown)
         return
       }
-      await fetchMembers()
+      refetchMembers()
       setAddOpen(false)
       setSelectedCenterId("")
       setSelectedUserId("")
@@ -126,7 +123,7 @@ export default function CampaignMembersPage() {
         setError(data?.detail ?? dict.dashboard.common.error_unknown)
         return
       }
-      setMembers((prev) => prev.filter((m) => m.id !== userId))
+      refetchMembers()
     } catch {
       setError(dict.dashboard.common.error_unknown)
     } finally {
@@ -156,7 +153,7 @@ export default function CampaignMembersPage() {
             <p className="text-sm text-mut mt-0.5">{memberCount}</p>
           </div>
           <PageAction
-            onClick={() => setAddOpen((v) => !v)}
+            onClick={toggleAdd}
             icon={addOpen ? X : Plus}
             label={addOpen ? t.cancel : t.add_btn}
           />
@@ -189,7 +186,7 @@ export default function CampaignMembersPage() {
               <label className="text-xs text-mut">{t.select_center_label}</label>
               <select
                 value={selectedCenterId}
-                onChange={(e) => setSelectedCenterId(e.target.value)}
+                onChange={(e) => { setSelectedCenterId(e.target.value); setSelectedUserId("") }}
                 className="mt-1 w-full rounded-lg border border-cardB px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--gold)]"
               >
                 <option value="">{t.select_center_placeholder}</option>
