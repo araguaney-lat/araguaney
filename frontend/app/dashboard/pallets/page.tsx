@@ -1,10 +1,12 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useCallback } from "react"
 import dynamic from "next/dynamic"
 import { ScanLine } from "lucide-react"
 import { useSession } from "next-auth/react"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { apiFetch } from "@/lib/api"
+import { apiGet } from "@/lib/query"
 import type { Center, PalletOut, PalletDetailOut, PalletStatus, EventOut } from "@/types"
 import { StatusTimeline } from "@/components/StatusTimeline"
 import {
@@ -53,22 +55,19 @@ export default function PalletsPage() {
   // national_admin has no home center — they must pick one before creating
   // a pallet. Coordinator never sees this, their own center is used
   // automatically server-side.
-  const [centers, setCenters] = useState<Center[]>([])
+  const qc = useQueryClient()
   const [selectedCenterId, setSelectedCenterId] = useState("")
 
-  useEffect(() => {
-    if (!isNationalAdmin || !token) return
-    apiFetch<Center[]>("/v1/centers", { token })
-      .then((data) => {
-        setCenters(data)
-        if (data.length > 0) setSelectedCenterId((id) => id || data[0].id)
-      })
-      .catch(() => setCenters([]))
-  }, [isNationalAdmin, token])
+  const centersQuery = useQuery({
+    queryKey: ["centers"],
+    queryFn: () => apiFetch<Center[]>("/v1/centers", { token }),
+    enabled: isNationalAdmin && !!token,
+  })
+  const centers = centersQuery.data ?? []
+  // Sin auto-selección por effect: cae al primer centro hasta que se elija otro.
+  const activeCenterId = isNationalAdmin ? selectedCenterId || centers[0]?.id || "" : ""
 
-  const [pallets, setPallets] = useState<PalletOut[]>([])
   const [filter, setFilter] = useState<PalletStatus | "">("")
-  const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [activePallet, setActivePallet] = useState<PalletDetailOut | null>(null)
   const [palletEvents, setPalletEvents] = useState<EventOut[]>([])
@@ -81,20 +80,14 @@ export default function PalletsPage() {
   const [weighing, setWeighing] = useState({ gross: "", height: "" })
   const labelExport = useExportJob()
 
-  const fetchPallets = async () => {
-    setLoading(true)
-    setError(null)
-    try {
-      const params = filter ? `?status=${filter}` : ""
-      const res = await fetch(`/api/pallets${params}`)
-      if (!res.ok) throw new Error(dict.dashboard.common.error_unknown)
-      setPallets(await res.json())
-    } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : dict.dashboard.common.error_unknown)
-    } finally {
-      setLoading(false)
-    }
-  }
+  // La lista se lee con React Query; las mutaciones la invalidan para releerla.
+  const palletsQuery = useQuery({
+    queryKey: ["pallets", filter],
+    queryFn: () => apiGet<PalletOut[]>(`/api/pallets${filter ? `?status=${filter}` : ""}`),
+  })
+  const pallets = palletsQuery.data ?? []
+  const loading = palletsQuery.isPending
+  const refetchPallets = () => qc.invalidateQueries({ queryKey: ["pallets"] })
 
   const fetchPalletDetail = async (id: string) => {
     const [detailRes, eventsRes] = await Promise.all([
@@ -106,20 +99,19 @@ export default function PalletsPage() {
     else setPalletEvents([])
   }
 
-  useEffect(() => { fetchPallets() }, [filter]) // eslint-disable-line react-hooks/exhaustive-deps, react-hooks/set-state-in-effect -- carga o suscripción de datos intencional al montar o al cambiar de filtro; migrar a una capa de datos (SWR/react-query) se rastrea aparte
-
-  // Error del export derivado en el render, no espejado a estado con un effect.
-  const shownError = error ?? labelExport.error
+  // Error del export derivado en el render, más el de la lista y las acciones.
+  const listError = palletsQuery.error instanceof Error ? palletsQuery.error.message : null
+  const shownError = error ?? listError ?? labelExport.error
 
   const handleCreate = async () => {
-    if (isNationalAdmin && !selectedCenterId) { setError(tc.select_center_label); return }
+    if (isNationalAdmin && !activeCenterId) { setError(tc.select_center_label); return }
     setActionLoading("create")
-    const result = await createPalletAction(undefined, isNationalAdmin ? selectedCenterId : undefined)
+    const result = await createPalletAction(undefined, isNationalAdmin ? activeCenterId : undefined)
     setActionLoading(null)
     if (result.error) {
       setError(result.error)
     } else {
-      await fetchPallets()
+      refetchPallets()
     }
   }
 
@@ -136,7 +128,7 @@ export default function PalletsPage() {
     } else {
       setBoxCodeInput("")
       setActivePallet(result.data as PalletDetailOut)
-      await fetchPallets()
+      refetchPallets()
     }
   }
 
@@ -166,7 +158,7 @@ export default function PalletsPage() {
     if (result.error) {
       setError(result.error)
     } else {
-      setPallets((prev) => prev.map((p) => p.id === palletId ? { ...p, status: "CLOSED" as PalletStatus } : p))
+      refetchPallets()
       if (activePallet?.id === palletId) setActivePallet({ ...activePallet, status: "CLOSED" })
       setClosingId(null)
       setWeighing({ gross: "", height: "" })
@@ -185,7 +177,7 @@ export default function PalletsPage() {
         <div className="flex items-center gap-2">
           {isNationalAdmin && centers.length > 0 && (
             <select
-              value={selectedCenterId}
+              value={activeCenterId}
               onChange={(e) => setSelectedCenterId(e.target.value)}
               className="rounded-lg border border-inpB bg-inp px-3 py-2 text-sm text-tx focus:outline-none focus:ring-2 focus:ring-[var(--gold)]"
             >
@@ -196,7 +188,7 @@ export default function PalletsPage() {
           )}
           <button
             onClick={handleCreate}
-            disabled={actionLoading === "create" || (isNationalAdmin && !selectedCenterId)}
+            disabled={actionLoading === "create" || (isNationalAdmin && !activeCenterId)}
             className="px-4 py-2 bg-[var(--gold)] text-[#3B2A00] rounded-lg text-sm font-medium hover:opacity-90 disabled:opacity-50"
           >
             {actionLoading === "create" ? t.creating : t.new}
