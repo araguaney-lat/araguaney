@@ -1,7 +1,8 @@
 "use client"
 
-import { useCallback, useEffect, useState } from "react"
+import { useState } from "react"
 import { useSession } from "next-auth/react"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 
 import { apiFetch } from "@/lib/api"
 import { useDict } from "@/context/DictionaryContext"
@@ -24,39 +25,34 @@ export default function RiskReviewsPage() {
   const { data: session } = useSession()
   const token = session?.accessToken ?? ""
 
-  const [rows, setRows] = useState<RiskReview[]>([])
-  const [loading, setLoading] = useState(true)
+  const qc = useQueryClient()
   const [notes, setNotes] = useState<Record<string, string>>({})
-  const [busy, setBusy] = useState<string | null>(null)
-  const [error, setError] = useState<string | null>(null)
 
-  const load = useCallback(() => {
-    if (!token) return
-    setLoading(true)
-    apiFetch<RiskReview[]>("/v1/risk-reviews", { token })
-      .then(setRows)
-      .catch(() => setRows([]))
-      .finally(() => setLoading(false))
-  }, [token])
+  // Esta pantalla lee del backend directo con apiFetch + token (no por los route
+  // handlers /api/*, como boxes): las dos son el patrón de fetch del proyecto y
+  // ambas caben en React Query. `enabled` espera a que haya token de sesión.
+  const reviewsQuery = useQuery({
+    queryKey: ["risk-reviews"],
+    queryFn: () => apiFetch<RiskReview[]>("/v1/risk-reviews", { token }),
+    enabled: !!token,
+  })
+  const rows = reviewsQuery.data ?? []
+  const loading = reviewsQuery.isLoading
 
-  useEffect(load, [load]) // eslint-disable-line react-hooks/set-state-in-effect -- carga o suscripción de datos intencional al montar o al cambiar de filtro; migrar a una capa de datos (SWR/react-query) se rastrea aparte
-
-  async function resolve(id: string, resolution: "APPROVED" | "REJECTED") {
-    setBusy(id)
-    setError(null)
-    try {
-      await apiFetch(`/v1/risk-reviews/${id}/resolve`, {
+  const resolveMutation = useMutation({
+    mutationFn: ({ id, resolution }: { id: string; resolution: "APPROVED" | "REJECTED" }) =>
+      apiFetch(`/v1/risk-reviews/${id}/resolve`, {
         method: "POST",
         token,
         body: JSON.stringify({ resolution, note: notes[id]?.trim() || null }),
-      })
-      load()
-    } catch (err) {
-      setError(err instanceof Error ? err.message : tc.error_unknown)
-    } finally {
-      setBusy(null)
-    }
-  }
+      }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["risk-reviews"] }),
+  })
+  const busy = resolveMutation.isPending ? resolveMutation.variables.id : null
+  const error = resolveMutation.error instanceof Error ? resolveMutation.error.message : null
+
+  const resolve = (id: string, resolution: "APPROVED" | "REJECTED") =>
+    resolveMutation.mutate({ id, resolution })
 
   const pending = rows.filter((r) => r.status === "PENDING")
   const resolved = rows.filter((r) => r.status !== "PENDING")

@@ -1,11 +1,13 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import type { BoxOut, BoxStatus, EventOut } from "@/types"
 import { StatusTimeline } from "@/components/StatusTimeline"
 import { sealBoxAction } from "@/lib/box-actions"
 import { useExportJob } from "@/hooks/useExportJob"
 import { useDict } from "@/context/DictionaryContext"
+import { apiGet } from "@/lib/query"
 
 const STATUS_COLORS: Record<BoxStatus, string> = {
   DRAFT: "bg-dDraftB text-dDraftT",
@@ -18,45 +20,36 @@ export default function BoxesPage() {
   const dict = useDict()
   const t = dict.dashboard.boxes
 
-  const [boxes, setBoxes] = useState<BoxOut[]>([])
+  const qc = useQueryClient()
   const [filter, setFilter] = useState<BoxStatus | "">("")
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [sealing, setSealing] = useState<string | null>(null)
   const [expandedBoxId, setExpandedBoxId] = useState<string | null>(null)
   const [boxEvents, setBoxEvents] = useState<Record<string, EventOut[]>>({})
   const labelsExport = useExportJob()
 
-  const fetchBoxes = async () => {
-    setLoading(true)
-    setError(null)
-    try {
-      const params = filter ? `?status=${filter}` : ""
-      const res = await fetch(`/api/boxes${params}`)
-      if (!res.ok) throw new Error(dict.dashboard.common.error_unknown)
-      setBoxes(await res.json())
-    } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : dict.dashboard.common.error_unknown)
-    } finally {
-      setLoading(false)
-    }
-  }
+  // La lista se lee con React Query: cachea, deduplica peticiones en vuelo y
+  // revalida sola. Antes era un useState + useEffect que recargaba a mano en
+  // cada cambio de filtro (y disparaba set-state-in-effect).
+  const boxesQuery = useQuery({
+    queryKey: ["boxes", filter],
+    queryFn: () => apiGet<BoxOut[]>(`/api/boxes${filter ? `?status=${filter}` : ""}`),
+  })
+  const boxes = boxesQuery.data ?? []
+  const loading = boxesQuery.isPending
 
-  useEffect(() => { fetchBoxes() }, [filter]) // eslint-disable-line react-hooks/exhaustive-deps, react-hooks/set-state-in-effect -- carga o suscripción de datos intencional al montar o al cambiar de filtro; migrar a una capa de datos (SWR/react-query) se rastrea aparte
+  // Sellar es una mutación: al terminar, se invalida la lista y se relee del
+  // servidor (fuente de verdad) en vez de parchear el estado local a mano.
+  const sealMutation = useMutation({
+    mutationFn: async (boxId: string) => {
+      const result = await sealBoxAction(boxId)
+      if (result.error) throw new Error(result.error)
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["boxes"] }),
+  })
+  const sealing = sealMutation.isPending ? (sealMutation.variables ?? null) : null
 
-  const handleSeal = async (boxId: string) => {
-    setSealing(boxId)
-    const result = await sealBoxAction(boxId)
-    setSealing(null)
-    if (result.error) {
-      setError(result.error)
-    } else {
-      setBoxes((prev) => prev.map((b) => b.id === boxId ? { ...b, status: "SEALED" as BoxStatus, sealed_at: new Date().toISOString() } : b))
-    }
-  }
+  const handleSeal = (boxId: string) => sealMutation.mutate(boxId)
 
   const handleDownloadPdf = () => {
-    setError(null)
     labelsExport.start(`/v1/boxes/labels/pdf?status=${filter || "DRAFT"}`)
   }
 
@@ -76,9 +69,10 @@ export default function BoxesPage() {
   }
 
   const draftCount = boxes.filter((b) => b.status === "DRAFT").length
-  // El error del export se muestra derivándolo en el render, no espejándolo a
-  // un useState con un effect: una fuente menos de la que salga desincronizado.
-  const shownError = error ?? labelsExport.error
+  // Errores de la lista, del sellado y del export, derivados en el render.
+  const listError = boxesQuery.error instanceof Error ? boxesQuery.error.message : null
+  const sealError = sealMutation.error instanceof Error ? sealMutation.error.message : null
+  const shownError = listError ?? sealError ?? labelsExport.error
 
   return (
     <div className="max-w-4xl mx-auto">

@@ -7,6 +7,7 @@ import { BottomNav } from "@/components/BottomNav"
 import { DictionaryProvider } from "@/context/DictionaryContext"
 import { ThemeProvider } from "@/context/ThemeContext"
 import { OfflineQueueProvider } from "@/context/OfflineQueueContext"
+import { QueryProvider } from "@/components/QueryProvider"
 import { PendingCapturesBadge } from "@/components/PendingCapturesBadge"
 import { getLocale, getDictionary } from "@/lib/i18n"
 import { getTheme } from "@/lib/theme"
@@ -53,6 +54,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   return (
     <SessionProvider session={session}>
+      <QueryProvider>
       <DictionaryProvider dict={dict} locale={locale}>
         <ThemeProvider theme={theme}>
          {/* La cola envuelve todo el panel: el contador tiene que seguir a la
@@ -94,6 +96,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
          </OfflineQueueProvider>
         </ThemeProvider>
       </DictionaryProvider>
+      </QueryProvider>
     </SessionProvider>
   )
 }
