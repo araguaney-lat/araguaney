@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { useMemo, useSyncExternalStore } from "react"
 import { BrowserQRCodeSvgWriter } from "@zxing/library"
 import type { QueuedCapture } from "@/lib/offline/types"
 import { useDict, useLocale } from "@/context/DictionaryContext"
@@ -90,8 +90,13 @@ function Label({
 }
 
 export function OfflineLabelSheet({ captures }: { captures: QueuedCapture[] }) {
-  const [origin, setOrigin] = useState("")
-  useEffect(() => setOrigin(window.location.origin), [])
+  // window.location.origin no cambia sin navegar; se lee con el snapshot y
+  // devuelve "" en el servidor, donde no hay window.
+  const origin = useSyncExternalStore(
+    () => () => {},
+    () => window.location.origin,
+    () => "",
+  )
 
   const labels = captures.flatMap((capture) =>
     capture.payload.boxes

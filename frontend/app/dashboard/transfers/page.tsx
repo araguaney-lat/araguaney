@@ -73,11 +73,10 @@ export default function TransfersPage() {
     if (res.ok) setActiveDetail(await res.json())
   }
 
-  useEffect(() => { fetchTransfers() }, [tab]) // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { fetchTransfers() }, [tab]) // eslint-disable-line react-hooks/exhaustive-deps, react-hooks/set-state-in-effect -- carga o suscripción de datos intencional al montar o al cambiar de filtro; migrar a una capa de datos (SWR/react-query) se rastrea aparte
 
-  useEffect(() => {
-    if (manifestExport.error) setError(manifestExport.error)
-  }, [manifestExport.error])
+  // Error del export derivado en el render, no espejado a estado con un effect.
+  const shownError = error ?? manifestExport.error
 
   useEffect(() => {
     fetch("/api/centers")
@@ -168,10 +167,10 @@ export default function TransfersPage() {
         />
       </div>
 
-      {error && (
+      {shownError && (
         <div className="rounded-lg bg-dRejB border border-dRejB p-3 text-sm text-dRejT">
-          {error}
-          <button className="ml-2 underline" onClick={() => setError(null)}>{dict.dashboard.common.close}</button>
+          {shownError}
+          <button className="ml-2 underline" onClick={() => { setError(null); manifestExport.reset() }}>{dict.dashboard.common.close}</button>
         </div>
       )}
 

@@ -51,6 +51,7 @@ export function CameraScanner({ onResult, onClose, label }: Props) {
     // getUserMedia only exists in a secure context (HTTPS or localhost). Accessing the
     // dev server over a LAN IP leaves it undefined, which would otherwise be a black screen.
     if (!navigator.mediaDevices?.getUserMedia) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- effect con efecto de navegador; el setState es parte de ese flujo, no un derivado del render
       setError("insecure")
       return
     }

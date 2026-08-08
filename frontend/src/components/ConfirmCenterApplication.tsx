@@ -34,6 +34,7 @@ export default function ConfirmCenterApplication({ token, labels: t, homeHref }:
     ran.current = true
 
     if (!token) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- effect con efecto de navegador; el setState es parte de ese flujo, no un derivado del render
       setState("invalid")
       return
     }

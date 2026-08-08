@@ -4,6 +4,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useEffect, useRef, useState } from "react"
+import { useCollapsiblePanel } from "@/hooks/useCollapsiblePanel"
 import { LogoutForm } from "@/components/LogoutForm"
 import type { CenterRole } from "@/types"
 import { LogOut, PanelLeftClose, PanelLeftOpen, Wrench } from "lucide-react"
@@ -37,16 +38,9 @@ interface SidebarProps {
 
 export function Sidebar({ centerRole, platformRole, centerName, nav, roleLabels, userName, userEmail, userAvatarUrl, locale, theme }: SidebarProps) {
   const pathname = usePathname()
-  const [collapsed, setCollapsed] = useState(false)
-  const [mounted, setMounted] = useState(false)
+  const [collapsed, toggle] = useCollapsiblePanel(STORAGE_KEY)
   const [unreadMessages, setUnreadMessages] = useState(0)
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
-
-  useEffect(() => {
-    const stored = localStorage.getItem(STORAGE_KEY)
-    if (stored === "true") setCollapsed(true)
-    setMounted(true)
-  }, [])
 
   useEffect(() => {
     const fetchUnread = () => {
@@ -60,20 +54,11 @@ export function Sidebar({ centerRole, platformRole, centerName, nav, roleLabels,
     return () => { if (intervalRef.current) clearInterval(intervalRef.current) }
   }, [])
 
-  function toggle() {
-    setCollapsed((c) => {
-      const next = !c
-      localStorage.setItem(STORAGE_KEY, String(next))
-      return next
-    })
-  }
-
   const visibleItems = NAV_ITEMS.filter((item) => centerRole && item.roles.includes(centerRole))
   const visibleOpsItems = OPS_ITEMS.filter((item) => centerRole && item.roles.includes(centerRole))
   const visibleAdminItems = ADMIN_ITEMS.filter((item) => centerRole && item.roles.includes(centerRole))
 
-  // Avoid layout shift before hydration
-  const width = !mounted ? "w-56" : collapsed ? "w-14" : "w-56"
+  const width = collapsed ? "w-14" : "w-56"
 
   return (
     <aside

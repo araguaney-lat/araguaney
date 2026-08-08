@@ -39,7 +39,7 @@ export default function RiskReviewsPage() {
       .finally(() => setLoading(false))
   }, [token])
 
-  useEffect(load, [load])
+  useEffect(load, [load]) // eslint-disable-line react-hooks/set-state-in-effect -- carga o suscripción de datos intencional al montar o al cambiar de filtro; migrar a una capa de datos (SWR/react-query) se rastrea aparte
 
   async function resolve(id: string, resolution: "APPROVED" | "REJECTED") {
     setBusy(id)

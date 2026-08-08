@@ -27,5 +27,9 @@ jobs:
       # porque Vercel ya lo ejecuta en cada push (incluye el typecheck del build).
       - name: Typecheck
         run: npm run typecheck
+      # `eslint .` falla solo ante errores; las advertencias (deuda conocida de
+      # las reglas nuevas de React 19, ver eslint.config.mjs) no rompen el build.
+      - name: Lint
+        run: npm run lint
       - name: Run test suite
         run: npm test

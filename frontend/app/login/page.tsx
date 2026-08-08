@@ -1,10 +1,11 @@
 "use client"
 
-import { useActionState, useEffect, useState } from "react"
+import { useActionState, useEffect } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { loginAction } from "@/lib/actions"
+import { useUrlSearchParam } from "@/hooks/useUrlSearchParam"
 import { useDict } from "@/context/DictionaryContext"
 import { useLocale } from "@/context/LocaleContext"
 
@@ -19,14 +20,10 @@ export default function LoginPage() {
   const termsHref = locale === "en" ? "/terms" : "/terminos"
   const privacyHref = locale === "en" ? "/privacy" : "/aviso-de-privacidad"
   const [state, formAction, isPending] = useActionState(loginAction, null)
-  const [sessionExpired, setSessionExpired] = useState(false)
 
-  // Read the ?expired=1 flag the middleware sets when it bounces an expired
-  // session here. Done in an effect (not useSearchParams) to avoid forcing a
-  // Suspense boundary / client-render deopt on this page.
-  useEffect(() => {
-    setSessionExpired(new URLSearchParams(window.location.search).get("expired") === "1")
-  }, [])
+  // Bandera ?expired=1 que el middleware pone al rebotar una sesión vencida.
+  // Se lee sin useSearchParams para no forzar Suspense/deopt en esta página.
+  const sessionExpired = useUrlSearchParam("expired") === "1"
 
   useEffect(() => {
     if (state && "requires_totp" in state && state.requires_totp) {

@@ -106,11 +106,10 @@ export default function PalletsPage() {
     else setPalletEvents([])
   }
 
-  useEffect(() => { fetchPallets() }, [filter]) // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { fetchPallets() }, [filter]) // eslint-disable-line react-hooks/exhaustive-deps, react-hooks/set-state-in-effect -- carga o suscripción de datos intencional al montar o al cambiar de filtro; migrar a una capa de datos (SWR/react-query) se rastrea aparte
 
-  useEffect(() => {
-    if (labelExport.error) setError(labelExport.error)
-  }, [labelExport.error])
+  // Error del export derivado en el render, no espejado a estado con un effect.
+  const shownError = error ?? labelExport.error
 
   const handleCreate = async () => {
     if (isNationalAdmin && !selectedCenterId) { setError(tc.select_center_label); return }
@@ -205,10 +204,10 @@ export default function PalletsPage() {
         </div>
       </div>
 
-      {error && (
+      {shownError && (
         <div className="rounded-lg bg-dRejB p-3 text-sm text-dRejT">
-          {error}
-          <button className="ml-2 underline" onClick={() => setError(null)}>{dict.dashboard.common.close}</button>
+          {shownError}
+          <button className="ml-2 underline" onClick={() => { setError(null); labelExport.reset() }}>{dict.dashboard.common.close}</button>
         </div>
       )}
 

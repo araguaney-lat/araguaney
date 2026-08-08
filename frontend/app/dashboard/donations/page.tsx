@@ -26,6 +26,7 @@ export default function DonationsPage() {
 
   useEffect(() => {
     if (!token) return
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- carga o suscripción de datos intencional al montar o al cambiar de filtro; migrar a una capa de datos (SWR/react-query) se rastrea aparte
     setLoading(true)
     apiFetch<Donation[]>(`/v1/donations?incoming=${tab === "incoming"}`, { token })
       .then(setRows)

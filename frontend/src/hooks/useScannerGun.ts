@@ -49,6 +49,7 @@ export function useScannerGun(onScan: (code: string) => void, enabled = true): v
   // El callback se lee de una ref para no volver a suscribir el listener en
   // cada render: una suscripción que se rehace a media ráfaga pierde teclas.
   const alEscanear = useRef(onScan)
+  // eslint-disable-next-line react-hooks/refs -- ref al último valor: actualizarla en el render es intencional para no rehacer la suscripción a media ráfaga
   alEscanear.current = onScan
 
   useEffect(() => {

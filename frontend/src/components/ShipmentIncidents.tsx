@@ -41,7 +41,7 @@ export function ShipmentIncidents({ shipmentId, pallets, isNationalAdmin, status
     if (res.ok) setIncidents(await res.json())
   }, [shipmentId])
 
-  useEffect(() => { cargar() }, [cargar, status])
+  useEffect(() => { cargar() }, [cargar, status]) // eslint-disable-line react-hooks/set-state-in-effect -- carga o suscripción de datos intencional al montar o al cambiar de filtro; migrar a una capa de datos (SWR/react-query) se rastrea aparte
 
   const crear = async () => {
     if (!description.trim()) return setError("Describe qué pasó")

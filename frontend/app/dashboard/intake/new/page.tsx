@@ -487,12 +487,13 @@ export default function NewIntakePage() {
         if (data.length > 0) setCampaignId((id) => id || data[0].id)
       })
       .catch(() => setCampaigns([]))
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [])
 
   // La sugerencia solo se aplica si quien captura pertenece a esa campaña:
   // seleccionar una que no está en su lista dejaría el select en un valor muerto.
   useEffect(() => {
     if (!suggestedCampaignId) return
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- carga o suscripción de datos intencional al montar o al cambiar de filtro; migrar a una capa de datos (SWR/react-query) se rastrea aparte
     if (campaigns.some((c) => c.id === suggestedCampaignId)) setCampaignId(suggestedCampaignId)
   }, [suggestedCampaignId, campaigns])
 

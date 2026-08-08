@@ -48,6 +48,7 @@ export function ShipmentReception({
   const yaRecibido = status === "RECONCILED"
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- carga o suscripción de datos intencional al montar o al cambiar de filtro; migrar a una capa de datos (SWR/react-query) se rastrea aparte
     if (!yaRecibido) { setLoading(false); return }
     fetch(`/api/shipments/${shipmentId}/reception`)
       .then((r) => (r.ok ? r.json() : null))
