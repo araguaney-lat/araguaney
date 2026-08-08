@@ -24,9 +24,10 @@ from __future__ import annotations
 
 from uuid import UUID
 
-from sqlalchemy import or_
+from sqlalchemy import or_, select
 from sqlalchemy.orm import Session
 
+from app.models.audit_log import AuditLog
 from app.models.user import User
 from app.utils.errors import api_error
 
@@ -92,3 +93,59 @@ def resolve_center_id(actor: User, center_id: UUID | None) -> UUID | None:
             field="center_id",
         )
     return center_id
+
+
+def scope_audit_query(db: Session, stmt, actor: User):
+    """Acota la bitácora a lo que el actor puede ver.
+
+    De los treinta y dos tipos de acción que se registran, veintiséis son
+    operativos —cajas selladas, tarimas cerradas, envíos despachados,
+    transferencias, incidencias— y no hay motivo para escondérselos a quien
+    coordina la operación nacional. Esos pasan enteros.
+
+    Los seis restantes son sobre cuentas (`entity_type == "user"`), y ahí sí
+    hace falta el mismo corte que en el listado de usuarios: **si no puede ver
+    la cuenta, no ve su renglón**. Sin esto, cerrar el listado no habría servido
+    de nada — los mismos nombres aparecerían en otra pantalla, que es donde este
+    tipo de fuga suele quedarse durante años.
+
+    El corte se hace por el sujeto de la entrada (`entity_id`, la cuenta
+    afectada) y no por quién la ejecutó: lo que revela una cuenta de plataforma
+    es aparecer como objeto de la acción.
+
+    **Los identificadores se resuelven en Python y no con un `CAST` en SQL.**
+    La primera versión comparaba `cast(users.id, String)` contra `entity_id`.
+    En Postgres —que es la base de este proyecto— eso funciona: el cast de un
+    `uuid` devuelve la forma con guiones, igual que `str(uuid)`. En la SQLite
+    en memoria de las pruebas, no: ahí el UUID se guarda en hexadecimal sin
+    guiones y el filtro no excluía nada.
+
+    Es decir, no había un fallo en producción; había un control de acceso que
+    **las pruebas no podían verificar**. Y eso es casi igual de malo: dieciocho
+    de los archivos de prueba corren sobre SQLite, así que un filtro con SQL
+    dependiente del dialecto queda sin vigilancia justo donde más hace falta.
+    Se paga una consulta pequeña —las cuentas protegidas son un puñado— a cambio
+    de que la comparación sea la misma en los dos motores y la prueba muerda de
+    verdad.
+    """
+    if is_platform_admin(actor):
+        return stmt
+
+    protegidas = [
+        str(fila)
+        for fila in db.execute(
+            select(User.id).where(
+                or_(User.role != "user", User.center_role == "national_admin")
+            )
+        ).scalars().all()
+    ]
+    if not protegidas:
+        return stmt
+
+    return stmt.where(
+        or_(
+            AuditLog.entity_type != "user",
+            AuditLog.entity_id.is_(None),
+            AuditLog.entity_id.notin_(protegidas),
+        )
+    )

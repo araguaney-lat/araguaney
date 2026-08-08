@@ -115,3 +115,106 @@ def test_the_platform_admin_keeps_every_power():
 def test_no_role_check_when_the_role_is_not_being_changed():
     """Editar solo el nombre no puede fallar por un rol que nadie tocó."""
     ensure_can_assign_role(OPERACION, None)
+
+
+# ── La bitácora ──────────────────────────────────────────────────────────────
+
+class TestAlcanceDeLaBitacora:
+    """Lo operativo entero; de las cuentas, solo las que puede gestionar.
+
+    Sin este corte, cerrar el listado de usuarios no habría servido de nada: los
+    mismos nombres aparecerían en la auditoría, que es donde este tipo de fuga
+    se queda durante años porque nadie la mira.
+    """
+
+    def _db(self):
+        from sqlalchemy import create_engine
+        from sqlalchemy.dialects.postgresql import JSONB
+        from sqlalchemy.ext.compiler import compiles
+        from sqlalchemy.orm import sessionmaker
+        from sqlalchemy.pool import StaticPool
+
+        from app.database import Base
+
+        @compiles(JSONB, "sqlite")
+        def _jsonb(element, compiler, **kw):  # noqa: ANN001, ANN003
+            return "JSON"
+
+        import app.models  # noqa: F401
+
+        engine = create_engine("sqlite://", connect_args={"check_same_thread": False},
+                               poolclass=StaticPool)
+        Base.metadata.create_all(engine)
+        return sessionmaker(bind=engine, expire_on_commit=False)()
+
+    def _sembrar(self, db):
+        """Dos cuentas y dos renglones de bitácora sobre cada una, más uno
+        operativo."""
+        import uuid
+
+        from app.models.audit_log import AuditLog
+        from app.models.user import User as U
+
+        voluntaria = U(id=uuid.uuid4(), email="v@x.mx", username="v",
+                       hashed_password="x", role="user", center_role="volunteer")
+        plataforma = U(id=uuid.uuid4(), email="s@x.mx", username="s",
+                       hashed_password="x", role="superadmin")
+        par = U(id=uuid.uuid4(), email="n@x.mx", username="n",
+                hashed_password="x", role="user", center_role="national_admin")
+        db.add_all([voluntaria, plataforma, par])
+        db.add_all([
+            AuditLog(action="USER_INVITED", entity_type="user", entity_id=str(voluntaria.id)),
+            AuditLog(action="USER_INVITED", entity_type="user", entity_id=str(plataforma.id)),
+            AuditLog(action="USER_UPDATED", entity_type="user", entity_id=str(par.id)),
+            AuditLog(action="BOX_SEALED", entity_type="box", entity_id="BX-0001"),
+        ])
+        db.commit()
+        return voluntaria, plataforma, par
+
+    def _leer(self, db, actor):
+        from app.repositories.audit_repository import AuditRepository
+        from app.services.user_admin_scope import scope_audit_query
+
+        filas, _ = AuditRepository(db).list(
+            limit=50, scope=lambda stmt: scope_audit_query(db, stmt, actor)
+        )
+        return filas
+
+    def test_the_platform_admin_sees_everything(self):
+        db = self._db()
+        self._sembrar(db)
+
+        assert len(self._leer(db, PLATAFORMA)) == 4
+
+    def test_the_operation_keeps_the_whole_operational_log(self):
+        """Es para lo que la usa: quién selló qué, quién despachó cuándo."""
+        db = self._db()
+        self._sembrar(db)
+
+        acciones = [f.action for f in self._leer(db, OPERACION)]
+        assert "BOX_SEALED" in acciones
+
+    def test_the_operation_does_not_see_entries_about_accounts_it_cannot_manage(self):
+        db = self._db()
+        voluntaria, plataforma, par = self._sembrar(db)
+
+        vistos = {f.entity_id for f in self._leer(db, OPERACION)}
+
+        assert str(voluntaria.id) in vistos, "sí gestiona esa cuenta"
+        assert str(plataforma.id) not in vistos, "cuenta de plataforma"
+        assert str(par.id) not in vistos, "cuenta de un par"
+
+    def test_an_entry_without_a_subject_is_not_hidden(self):
+        """`entity_id` nulo no puede colarse en el filtro de `NOT IN` y
+        desaparecer: no nombra a nadie, así que no revela nada."""
+        import uuid
+
+        from app.models.audit_log import AuditLog
+
+        db = self._db()
+        self._sembrar(db)
+        db.add(AuditLog(action="USER_TERMS_ACCEPTED", entity_type="user", entity_id=None))
+        db.commit()
+
+        acciones = [f.action for f in self._leer(db, OPERACION)]
+        assert "USER_TERMS_ACCEPTED" in acciones

@@ -28,6 +28,7 @@ from app.services.user_admin_scope import (
     ensure_can_assign_role,
     ensure_can_manage,
     resolve_center_id,
+    scope_audit_query,
     scope_user_query,
 )
 from app.services.auth_service import AuthService
@@ -209,7 +210,7 @@ def list_audit(
     limit: int = Query(50, ge=1, le=200),
     offset: int = Query(0, ge=0),
     db: Session = Depends(get_db),
-    _: User = Depends(get_current_superadmin),
+    actor: User = Depends(require_user_manager),
 ):
     items, total = AuditRepository(db).list(
         entity_type=entity_type,
@@ -218,6 +219,9 @@ def list_audit(
         to_date=to_date,
         limit=limit,
         offset=offset,
+        # Lo operativo entero; de las entradas sobre cuentas, solo las que esta
+        # persona puede gestionar.
+        scope=lambda stmt: scope_audit_query(db, stmt, actor),
     )
     return AuditListOut(items=items, total=total, limit=limit, offset=offset)
 

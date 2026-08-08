@@ -486,6 +486,27 @@ schemas/    → Pydantic I/O models (extend StrictModel or StrictORMModel from s
 - Timestamps `DateTime(timezone=True)`.
 - Estados como `String` + CHECK constraint (no ENUM nativo de Postgres).
 
+### Las pruebas corren sobre SQLite; producción es Postgres
+
+Dieciocho de los archivos de prueba levantan una SQLite en memoria, porque el
+workflow de CI no arranca un Postgres. La aplicación **nunca** habla con SQLite:
+Railway y `docker-compose` son Postgres 16.
+
+La brecha muerde en el SQL que depende del dialecto, y de una forma incómoda:
+el código puede estar bien en producción y la prueba fallar, o —peor— pasar sin
+comprobar nada. Ya pasó dos veces:
+
+- `cast(uuid, String)` da la forma con guiones en Postgres y hexadecimal sin
+  guiones en SQLite. Un filtro de acceso escrito así funciona en producción y
+  queda **sin vigilancia** en las pruebas (`app/services/user_admin_scope.py`).
+- `date_trunc` no existe en SQLite; por eso el panel de gasto de IA agrupa con
+  `func.date` y normaliza el resultado en Python (`app/services/ai/usage_report.py`).
+
+La regla práctica: **si una consulta sostiene un control de acceso o una cifra
+que alguien va a leer, que no dependa del dialecto.** Resolver en Python lo
+poco que haga falta cuesta una consulta chica y hace que la prueba mida lo
+mismo que corre en producción.
+
 ### Migraciones
 
 - Alembic encadenado: `002` → `001_add_login_lockout`.
