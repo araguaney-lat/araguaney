@@ -212,16 +212,18 @@ El sidebar del `national_admin` en `/dashboard` tiene dos secciones:
 
 ### Rol de plataforma (`superadmin`) — opera en `/studio`
 
-> **Estado real (2026-08-07).** La tabla de abajo es el alcance previsto del rol,
-> no lo que hay construido. En producción, `/studio/users`, `/studio/audit` y
-> `/studio/settings` son marcadores de "Próximamente" (Fase 5, tasks 12, 13 y
-> 16, corregidas en el roadmap). La gestión de usuarios y la auditoría existen
-> hoy en `/dashboard/admin/users` y `/dashboard/admin/audit` para
-> `national_admin`. Lo que funciona en Studio: métricas, solicitudes de centro,
-> rebotes de correo y el panel de gasto de IA.
+> **`/studio/settings` sigue siendo un marcador de "Próximamente":** no hay
+> backend de configuración que enseñar. El resto de la tabla funciona.
 >
-> Se descubrió abriendo las páginas, no leyendo el código: el roadmap las daba
-> por hechas y la documentación las describía como si existieran.
+> **Gestión de usuarios: dos alcances sobre la misma pantalla.** `/studio/users`
+> y `/dashboard/admin/users` son el mismo componente; lo que cada quien ve lo
+> decide el backend, no la URL. Las reglas viven juntas en
+> `app/services/user_admin_scope.py` y están ahí para impedir un ascenso: la
+> administración nacional crea voluntariado y coordinación, siempre a nombre de
+> un centro que elige, y no ve ni toca cuentas de plataforma ni a sus pares.
+> Una cuenta **sin centro** es una administración nacional, así que dejar el
+> centro en blanco es el mismo ascenso por la puerta de atrás y también está
+> cerrado.
 
 | Puede |
 |---|
@@ -483,6 +485,27 @@ schemas/    → Pydantic I/O models (extend StrictModel or StrictORMModel from s
 - PK `UUID(as_uuid=True)` con `default=uuid.uuid4` (no server_default).
 - Timestamps `DateTime(timezone=True)`.
 - Estados como `String` + CHECK constraint (no ENUM nativo de Postgres).
+
+### Las pruebas corren sobre SQLite; producción es Postgres
+
+Dieciocho de los archivos de prueba levantan una SQLite en memoria, porque el
+workflow de CI no arranca un Postgres. La aplicación **nunca** habla con SQLite:
+Railway y `docker-compose` son Postgres 16.
+
+La brecha muerde en el SQL que depende del dialecto, y de una forma incómoda:
+el código puede estar bien en producción y la prueba fallar, o —peor— pasar sin
+comprobar nada. Ya pasó dos veces:
+
+- `cast(uuid, String)` da la forma con guiones en Postgres y hexadecimal sin
+  guiones en SQLite. Un filtro de acceso escrito así funciona en producción y
+  queda **sin vigilancia** en las pruebas (`app/services/user_admin_scope.py`).
+- `date_trunc` no existe en SQLite; por eso el panel de gasto de IA agrupa con
+  `func.date` y normaliza el resultado en Python (`app/services/ai/usage_report.py`).
+
+La regla práctica: **si una consulta sostiene un control de acceso o una cifra
+que alguien va a leer, que no dependa del dialecto.** Resolver en Python lo
+poco que haga falta cuesta una consulta chica y hace que la prueba mida lo
+mismo que corre en producción.
 
 ### Migraciones
 

@@ -43,7 +43,14 @@ class AuditRepository:
         to_date: datetime | None = None,
         limit: int = 50,
         offset: int = 0,
+        scope=None,
     ) -> tuple[list[AuditLog], int]:
+        """`scope` recorta el resultado según quién pregunta.
+
+        Se recibe como función y no como rol para que la regla viva en un solo
+        sitio (`app.services.user_admin_scope`) y este repositorio siga sin
+        saber nada de permisos.
+        """
         conditions = []
         if entity_type:
             conditions.append(AuditLog.entity_type == entity_type)
@@ -57,6 +64,8 @@ class AuditRepository:
         base = select(AuditLog)
         if conditions:
             base = base.where(and_(*conditions))
+        if scope is not None:
+            base = scope(base)
 
         total = self._db.execute(
             base.with_only_columns(func.count(AuditLog.id))
