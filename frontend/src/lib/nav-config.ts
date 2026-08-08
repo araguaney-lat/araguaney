@@ -20,6 +20,9 @@ import {
   Gift,
   ShieldAlert,
   TriangleAlert,
+  MailWarning,
+  Settings,
+  Sparkles,
 } from "lucide-react"
 
 export type IconComponent = React.ComponentType<{ size?: number; className?: string }>
@@ -153,4 +156,71 @@ export function getMobileOverflowItems(centerRole: CenterRole | null): NavItem[]
   return ALL_NON_ADMIN_ITEMS.filter(
     (item) => item.roles.includes(centerRole) && !primaryHrefs.has(item.href)
   )
+}
+
+
+// ── Studio (superadmin) ───────────────────────────────────────────────────────
+//
+// Una sola lista para los dos menús. El sidebar de escritorio y la barra
+// inferior de móvil la leen de aquí, y `STUDIO_PRIMARY_HREFS` decide cuáles
+// quedan fijas abajo. Duplicar la lista es como una sección nueva termina
+// existiendo en escritorio y siendo inalcanzable en un teléfono.
+//
+// Es el mismo patrón que ya usaba el panel operativo aquí arriba.
+
+export type StudioNav = {
+  menu: string
+  metrics: string
+  users: string
+  center_applications: string
+  emails: string
+  ai: string
+  audit: string
+  settings: string
+  logout: string
+  back_to_dashboard: string
+  superadmin: string
+  platform_admin: string
+}
+
+export interface StudioNavItem {
+  href: string
+  labelKey: keyof StudioNav
+  icon: IconComponent
+  /** `/studio` es prefijo de todo lo demás: solo coincide de forma exacta. */
+  exact?: boolean
+}
+
+export const STUDIO_NAV_ITEMS: StudioNavItem[] = [
+  { href: "/studio", labelKey: "metrics", icon: BarChart2, exact: true },
+  { href: "/studio/users", labelKey: "users", icon: Users },
+  { href: "/studio/center-applications", labelKey: "center_applications", icon: Inbox },
+  { href: "/studio/emails", labelKey: "emails", icon: MailWarning },
+  { href: "/studio/ai", labelKey: "ai", icon: Sparkles },
+  { href: "/studio/audit", labelKey: "audit", icon: ScrollText },
+  { href: "/studio/settings", labelKey: "settings", icon: Settings },
+]
+
+/* Las cuatro que quedan al alcance del pulgar son **las cuatro que hoy
+ * funcionan**. `/studio/users`, `/studio/audit` y `/studio/settings` son
+ * marcadores de "Próximamente"; darles un lugar permanente en la barra sería
+ * ofrecer cuatro veces al día algo que no hace nada. Cuando se construyan,
+ * suben. */
+export const STUDIO_PRIMARY_HREFS = [
+  "/studio",
+  "/studio/center-applications",
+  "/studio/emails",
+  "/studio/ai",
+]
+
+export function studioPrimaryItems(): StudioNavItem[] {
+  return STUDIO_NAV_ITEMS.filter((item) => STUDIO_PRIMARY_HREFS.includes(item.href))
+}
+
+export function studioOverflowItems(): StudioNavItem[] {
+  return STUDIO_NAV_ITEMS.filter((item) => !STUDIO_PRIMARY_HREFS.includes(item.href))
+}
+
+export function isStudioItemActive(pathname: string, item: StudioNavItem): boolean {
+  return item.exact ? pathname === item.href : pathname.startsWith(item.href)
 }

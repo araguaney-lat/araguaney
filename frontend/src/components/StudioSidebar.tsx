@@ -19,35 +19,19 @@ import {
 } from "lucide-react"
 import { LanguageSwitcher } from "@/components/LanguageSwitcher"
 import type { Locale } from "@/lib/i18n"
+import {
+  STUDIO_NAV_ITEMS,
+  isStudioItemActive,
+  type StudioNav,
+} from "@/lib/nav-config"
+
+// Se reexporta para no romper a quien ya importaba el tipo desde aquí.
+export type { StudioNav }
 
 const LOGO = "https://res.cloudinary.com/dtvdqlxtd/image/upload/v1782794310/image_degkq9.png"
 const STORAGE_KEY = "studio_sidebar_collapsed"
 
-type StudioNavItem = { href: string; labelKey: keyof StudioNav; exact?: boolean; icon: React.ComponentType<{ size?: number; className?: string }> }
 
-const NAV_ITEMS: StudioNavItem[] = [
-  { href: "/studio", labelKey: "metrics", exact: true, icon: BarChart2 },
-  { href: "/studio/users", labelKey: "users", icon: Users },
-  { href: "/studio/center-applications", labelKey: "center_applications", icon: Inbox },
-  { href: "/studio/emails", labelKey: "emails", icon: MailWarning },
-  { href: "/studio/ai", labelKey: "ai", icon: Sparkles },
-  { href: "/studio/audit", labelKey: "audit", icon: ScrollText },
-  { href: "/studio/settings", labelKey: "settings", icon: Settings },
-]
-
-export type StudioNav = {
-  metrics: string
-  users: string
-  center_applications: string
-  emails: string
-  ai: string
-  audit: string
-  settings: string
-  logout: string
-  back_to_dashboard: string
-  superadmin: string
-  platform_admin: string
-}
 
 interface StudioSidebarProps {
   userName?: string | null
@@ -56,36 +40,18 @@ interface StudioSidebarProps {
   locale: Locale
 }
 
-/** Debajo de esto el sidebar expandido deja de caber.
- *
- * A 224 px de barra sobre una pantalla de 390 px quedan 166 px de contenido, y
- * ahí no cabe una tabla ni un formulario. Es el mismo umbral `md` que usa el
- * panel operativo para esconder el suyo. */
-const ANCHO_MINIMO_EXPANDIDO = 768
-
 export function StudioSidebar({ userName, userEmail, nav, locale }: StudioSidebarProps) {
   const pathname = usePathname()
   const [collapsed, setCollapsed] = useState(false)
   const [mounted, setMounted] = useState(false)
-  // En una pantalla angosta la barra se colapsa **aunque** la preferencia
-  // guardada diga lo contrario: es una restricción de espacio, no un gusto.
-  const [estrecha, setEstrecha] = useState(false)
-
   useEffect(() => {
     const stored = localStorage.getItem(STORAGE_KEY)
     if (stored === "true") setCollapsed(true)
     setMounted(true)
-
-    const consulta = window.matchMedia(`(max-width: ${ANCHO_MINIMO_EXPANDIDO - 1}px)`)
-    const aplicar = () => setEstrecha(consulta.matches)
-    aplicar()
-    consulta.addEventListener("change", aplicar)
-    return () => consulta.removeEventListener("change", aplicar)
   }, [])
 
-  // Colapsada por espacio o por preferencia. La preferencia se conserva
-  // intacta: al volver a una pantalla ancha, la barra vuelve como estaba.
-  const cerrada = estrecha || collapsed
+  // En móvil esta barra no se renderiza: ahí manda `StudioBottomNav`.
+  const cerrada = collapsed
 
   function toggle() {
     setCollapsed((c) => {
@@ -162,8 +128,8 @@ export function StudioSidebar({ userName, userEmail, nav, locale }: StudioSideba
 
       {/* Nav */}
       <nav className="flex-1 overflow-y-auto px-2 py-2 space-y-0.5">
-        {NAV_ITEMS.map((item) => {
-          const isActive = item.exact ? pathname === item.href : pathname.startsWith(item.href)
+        {STUDIO_NAV_ITEMS.map((item) => {
+          const isActive = isStudioItemActive(pathname, item)
           const Icon = item.icon
           const label = nav[item.labelKey]
           return (

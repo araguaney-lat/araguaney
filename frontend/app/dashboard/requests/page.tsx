@@ -9,6 +9,8 @@ import {
   type RequestOut,
 } from "@/lib/request-actions"
 import { useDict } from "@/context/DictionaryContext"
+import { Plus, X } from "lucide-react"
+import { PageAction } from "@/components/PageAction"
 
 const STATUS_COLORS: Record<string, string> = {
   OPEN: "bg-dDraftB text-dDraftT",
@@ -96,12 +98,11 @@ export default function DashboardRequestsPage() {
           <h1 className="text-2xl font-semibold text-tx">{t.title}</h1>
           <p className="text-sm text-mut mt-0.5">{t.subtitle}</p>
         </div>
-        <button
+        <PageAction
           onClick={() => setShowForm((v) => !v)}
-          className="rounded-lg bg-[var(--blue)] px-3 py-1.5 text-sm font-medium text-white hover:opacity-90"
-        >
-          {showForm ? t.cancel : t.new}
-        </button>
+          icon={showForm ? X : Plus}
+          label={showForm ? t.cancel : t.new}
+        />
       </div>
 
       {error && (

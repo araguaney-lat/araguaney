@@ -5,6 +5,8 @@ import { listStudioUsersAction, createStudioUserAction, patchStudioUserAction, r
 import type { UserOut } from "@/types"
 import { useDict } from "@/context/DictionaryContext"
 import { COUNTRIES, flagEmoji } from "@/lib/countries"
+import { Plus, X } from "lucide-react"
+import { PageAction } from "@/components/PageAction"
 
 const ROLES = ["volunteer", "coordinator", "national_admin"]
 const EMPTY_FORM = { email: "", username: "", full_name: "", center_role: "volunteer", center_id: "", country_code: "", password: "" }
@@ -117,12 +119,11 @@ export default function StudioUsersPage() {
             <option value="">{t.filter_all_roles}</option>
             {ROLES.map((r) => <option key={r} value={r}>{r}</option>)}
           </select>
-          <button
+          <PageAction
             onClick={() => setShowForm((v) => !v)}
-            className="rounded-lg bg-[var(--blue)] px-3 py-1.5 text-sm font-medium text-white hover:opacity-90"
-          >
-            {showForm ? t.cancel : t.new_btn}
-          </button>
+            icon={showForm ? X : Plus}
+            label={showForm ? t.cancel : t.new_btn}
+          />
         </div>
       </div>
 

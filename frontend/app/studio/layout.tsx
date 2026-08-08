@@ -1,6 +1,7 @@
 import { auth } from "@/auth"
 import { redirect } from "next/navigation"
 import { StudioSidebar } from "@/components/StudioSidebar"
+import { StudioBottomNav } from "@/components/StudioBottomNav"
 import { DictionaryProvider } from "@/context/DictionaryContext"
 import { getLocale, getDictionary } from "@/lib/i18n"
 
@@ -43,13 +44,23 @@ export default async function StudioLayout({ children }: { children: React.React
   return (
     <DictionaryProvider dict={dict} locale={locale}>
       <div className="flex h-screen overflow-hidden bg-zinc-50">
-        <StudioSidebar
-          userName={userName}
-          userEmail={userEmail}
+        {/* La barra lateral es de escritorio; en móvil manda la de abajo, igual
+            que en el panel operativo. */}
+        <div className="hidden h-full md:flex print:hidden">
+          <StudioSidebar
+            userName={userName}
+            userEmail={userEmail}
+            nav={dict.studio.nav}
+            locale={locale}
+          />
+        </div>
+        <main className="flex-1 overflow-y-auto p-4 pb-24 sm:p-6 md:pb-6">{children}</main>
+        <StudioBottomNav
           nav={dict.studio.nav}
           locale={locale}
+          userName={userName}
+          userEmail={userEmail}
         />
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6">{children}</main>
       </div>
     </DictionaryProvider>
   )

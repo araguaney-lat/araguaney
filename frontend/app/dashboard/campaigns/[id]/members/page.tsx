@@ -6,6 +6,8 @@ import Link from "next/link"
 import { useSession } from "next-auth/react"
 import type { CampaignMember, Campaign, Center, UserOut } from "@/types"
 import { useDict } from "@/context/DictionaryContext"
+import { Plus, X } from "lucide-react"
+import { PageAction } from "@/components/PageAction"
 
 const ROLE_COLORS: Record<string, string> = {
   national_admin: "bg-goldSoft text-[var(--gold)]",
@@ -150,13 +152,11 @@ export default function CampaignMembersPage() {
             <h1 className="text-xl font-semibold text-tx">{campaign?.name ?? t.fallback_name}</h1>
             <p className="text-sm text-mut mt-0.5">{memberCount}</p>
           </div>
-          <button
-            type="button"
+          <PageAction
             onClick={() => setAddOpen((v) => !v)}
-            className="rounded-lg bg-[var(--blue)] px-4 py-2 text-sm font-medium text-white hover:opacity-90"
-          >
-            {addOpen ? t.cancel : t.add_btn}
-          </button>
+            icon={addOpen ? X : Plus}
+            label={addOpen ? t.cancel : t.add_btn}
+          />
         </div>
       </div>
 

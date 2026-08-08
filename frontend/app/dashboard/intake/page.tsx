@@ -5,6 +5,8 @@ import { apiFetch } from "@/lib/api"
 import { getLocale, getDictionary } from "@/lib/i18n"
 import { QueuedCaptureRows } from "@/components/QueuedCaptureRows"
 import type { IntakeOut } from "@/types"
+import { Plus } from "lucide-react"
+import { PageAction } from "@/components/PageAction"
 
 export const revalidate = 30
 
@@ -31,12 +33,7 @@ export default async function IntakePage() {
     <div className="max-w-3xl mx-auto">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-xl font-semibold text-tx">{t.title}</h1>
-        <Link
-          href="/dashboard/intake/new"
-          className="rounded-lg bg-[var(--blue)] px-4 py-2 text-sm font-medium text-white hover:opacity-90"
-        >
-          {t.new}
-        </Link>
+        <PageAction href="/dashboard/intake/new" icon={Plus} label={t.new} />
       </div>
 
       {/* Lo que existe solo en este dispositivo va primero y marcado: si no

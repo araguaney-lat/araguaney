@@ -16,6 +16,8 @@ import {
 } from "@/lib/shipment-actions"
 import { useExportJob } from "@/hooks/useExportJob"
 import { useDict } from "@/context/DictionaryContext"
+import { Plus } from "lucide-react"
+import { PageAction } from "@/components/PageAction"
 
 const STATUS_COLORS: Record<ShipmentStatus, string> = {
   OPEN: "bg-dDraftB text-dDraftT",
@@ -190,12 +192,12 @@ export default function ShipmentsPage() {
     <div className="p-6 max-w-6xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-tx">{t.title}</h1>
-        <button
+        <PageAction
           onClick={() => { setShowCreateForm(true); fetchClosedPallets() }}
-          className="px-4 py-2 bg-[var(--gold)] text-[#3B2A00] rounded-lg text-sm font-medium hover:opacity-90"
-        >
-          {t.new}
-        </button>
+          icon={Plus}
+          label={t.new}
+          variant="destacada"
+        />
       </div>
 
       {error && (

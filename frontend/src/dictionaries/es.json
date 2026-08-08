@@ -1012,7 +1012,8 @@
       "back_to_dashboard": "Dashboard",
       "superadmin": "Superadmin",
       "platform_admin": "Administración de plataforma",
-      "ai": "Gasto de IA"
+      "ai": "Gasto de IA",
+      "menu": "Menú"
     },
     "emails": {
       "title": "Entregas de email",
