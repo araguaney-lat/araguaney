@@ -1120,6 +1120,7 @@
       "since": "Since {date}",
       "model": "Model: {model}",
       "by_capability": "By capability",
+      "by_capability_note": "These capabilities are enabled in the deployment configuration (environment variables). This panel only shows their status; they are not changed here.",
       "col_capability": "Capability",
       "col_switch": "Switch",
       "col_calls": "Calls",

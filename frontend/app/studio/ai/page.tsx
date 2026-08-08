@@ -81,7 +81,11 @@ export default async function StudioAIPage() {
       </div>
 
       <section className="mb-8">
-        <h2 className="mb-3 text-sm font-semibold text-zinc-900">{t.by_capability}</h2>
+        <h2 className="mb-1 text-sm font-semibold text-zinc-900">{t.by_capability}</h2>
+        {/* Read-only por diseño: el interruptor real vive en las variables de
+            entorno. La nota le dice al operador dónde se cambia, para que el
+            panel no se confunda con un control. */}
+        <p className="mb-3 text-xs text-zinc-500">{t.by_capability_note}</p>
         <div className="overflow-x-auto rounded-xl border border-zinc-200 bg-white">
           <table className="w-full text-sm">
             <thead>
