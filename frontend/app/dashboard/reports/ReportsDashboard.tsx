@@ -1,6 +1,7 @@
 "use client"
 
-import { useCallback, useEffect, useState } from "react"
+import { useState } from "react"
+import { useQuery } from "@tanstack/react-query"
 import {
   Bar,
   BarChart,
@@ -149,26 +150,21 @@ export default function ReportsDashboard({ campaigns, defaultCampaignId, centerR
   const [customStart, setCustomStart] = useState("")
   const [customEnd, setCustomEnd] = useState("")
 
-  const [summary, setSummary] = useState<Summary | null>(null)
-  const [shrinkage, setShrinkage] = useState<Shrinkage | null>(null)
-  const [activity, setActivity] = useState<ActivityPoint[]>([])
-  const [byCategory, setByCategory] = useState<CategoryBreakdown[]>([])
-  const [byCenter, setByCenter] = useState<CenterBreakdown[]>([])
-  const [countries, setCountries] = useState<CountryPoint[]>([])
-  const [loading, setLoading] = useState(false)
   const csvExport = useExportJob()
 
   const isNational = centerRole === "national_admin"
 
   const { start, end } = presetDates(preset, customStart, customEnd)
 
-  const fetchAll = useCallback(async () => {
-    if (!campaignId) return
-    setLoading(true)
-    const qs = `?start=${start}&end=${end}`
-    const base = `/api/reports/${campaignId}`
-
-    try {
+  // Los seis paneles se leen en una sola query (fetch en paralelo). Cada endpoint
+  // trae su propio default si falla, así que la query nunca lanza: muestra el
+  // estado vacío. React Query cachea y revalida al cambiar campaña o rango.
+  const reportsQuery = useQuery({
+    queryKey: ["reports", campaignId, start, end],
+    enabled: !!campaignId,
+    queryFn: async () => {
+      const qs = `?start=${start}&end=${end}`
+      const base = `/api/reports/${campaignId}`
       const [sumRes, actRes, catRes, cenRes, cntRes, shrRes] = await Promise.all([
         fetch(`${base}/summary${qs}`),
         fetch(`${base}/activity${qs}`),
@@ -178,7 +174,6 @@ export default function ReportsDashboard({ campaigns, defaultCampaignId, centerR
         // Sin `qs` a propósito: la merma no se acota al rango.
         fetch(`${base}/shrinkage`),
       ])
-
       const [sumData, actData, catData, cenData, cntData, shrData] = await Promise.all([
         sumRes.ok ? sumRes.json() : null,
         actRes.ok ? actRes.json() : [],
@@ -187,22 +182,23 @@ export default function ReportsDashboard({ campaigns, defaultCampaignId, centerR
         cntRes.ok ? cntRes.json() : [],
         shrRes.ok ? shrRes.json() : null,
       ])
-
-      if (sumData) setSummary(sumData)
-      setActivity(actData)
-      setByCategory(catData)
-      setByCenter(cenData)
-      setCountries(cntData)
-      setShrinkage(shrData)
-    } catch {
-      // silently fail — show empty state
-    } finally {
-      setLoading(false)
-    }
-  }, [campaignId, start, end])
-
-  // eslint-disable-next-line react-hooks/set-state-in-effect -- carga inicial de datos al montar/cambiar de campaña; el patrón escalable (SWR/react-query) se rastrea aparte.
-  useEffect(() => { fetchAll() }, [fetchAll])
+      return {
+        summary: sumData as Summary | null,
+        activity: actData as ActivityPoint[],
+        byCategory: catData as CategoryBreakdown[],
+        byCenter: cenData as CenterBreakdown[],
+        countries: cntData as CountryPoint[],
+        shrinkage: shrData as Shrinkage | null,
+      }
+    },
+  })
+  const summary = reportsQuery.data?.summary ?? null
+  const shrinkage = reportsQuery.data?.shrinkage ?? null
+  const activity = reportsQuery.data?.activity ?? []
+  const byCategory = reportsQuery.data?.byCategory ?? []
+  const byCenter = reportsQuery.data?.byCenter ?? []
+  const countries = reportsQuery.data?.countries ?? []
+  const loading = reportsQuery.isFetching
 
   function handleExport() {
     if (!campaignId) return
