@@ -1,6 +1,8 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import { apiFetch } from "@/lib/api"
+import HomeNav from "@/components/HomeNav"
+import HomeFooter from "@/components/HomeFooter"
 import { getDictionary } from "@/lib/i18n"
 import { ogImageUrl, alternates } from "@/lib/seo"
 import { type Locale, localizedPath } from "@/lib/routes"
@@ -95,6 +97,7 @@ export default async function NecesidadesPage({
   params: Promise<{ lang: Locale }>
 }) {
   const { lang: locale } = await params
+  const dict = await getDictionary(locale)
   const t = UI[locale]
   const labels = CATEGORY_LABELS[locale]
 
@@ -109,12 +112,20 @@ export default async function NecesidadesPage({
   }
 
   return (
-    <div className="min-h-screen bg-zinc-50">
-      <div className="mx-auto max-w-2xl px-4 py-12">
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold text-zinc-900">{t.h1}</h1>
-          <p className="mt-1 text-sm text-zinc-500">{t.subtitle}</p>
-        </div>
+    <div style={{ background: "#FBF7EE", minHeight: "100vh", display: "flex", flexDirection: "column" }}>
+      <HomeNav
+        dict={dict.nav}
+        locale={locale}
+        localeLinks={{ es: localizedPath(KEY, "es"), en: localizedPath(KEY, "en") }}
+      />
+      {/* Compensa el HomeNav fijo en móvil para que el título no quede debajo. */}
+      <div className="h-[56px] md:hidden" />
+      <main className="flex-1">
+        <div className="mx-auto max-w-2xl px-4 py-12">
+          <div className="mb-8">
+            <h1 className="text-2xl font-bold text-zinc-900">{t.h1}</h1>
+            <p className="mt-1 text-sm text-zinc-500">{t.subtitle}</p>
+          </div>
 
         {!data || data.by_category.length === 0 ? (
           <div className="rounded-xl border border-zinc-200 bg-white p-8 text-center text-sm text-zinc-500">
@@ -170,8 +181,10 @@ export default async function NecesidadesPage({
           </Link>
         </p>
 
-        <p className="mt-4 text-center text-xs text-zinc-500">{t.privacy}</p>
-      </div>
+          <p className="mt-4 text-center text-xs text-zinc-500">{t.privacy}</p>
+        </div>
+      </main>
+      <HomeFooter dict={dict.footer} locale={locale} />
     </div>
   )
 }
