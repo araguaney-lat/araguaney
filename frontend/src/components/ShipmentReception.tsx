@@ -52,6 +52,7 @@ export function ShipmentReception({
     fetch(`/api/shipments/${shipmentId}/reception`)
       .then((r) => (r.ok ? r.json() : null))
       .then(setReception)
+      .catch(() => setReception(null))
       .finally(() => setLoading(false))
   }, [shipmentId, yaRecibido])
 
