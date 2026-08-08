@@ -520,6 +520,22 @@ mismo que corre en producción.
 - Rate limiting `@limiter.limit()` en todo endpoint público/auth.
 - IP siempre via `get_client_ip(request)` de `utils/cloudflare.py`.
 
+**Compatibilidad dentro de una versión mayor.** La web se despliega junto al
+backend, pero una app nativa no: puede estar corriendo el binario de hace meses.
+Por eso, dentro de `/v1`, los cambios de contrato son **solo aditivos**:
+
+- Un campo de entrada nuevo va **opcional con default**. Volver obligatorio un
+  campo que no lo era rompe a todo cliente viejo: con `extra="forbid"` es un 422,
+  y en la cola offline eso se marca como rechazo definitivo y se pierde la
+  captura. Un cambio así vive en `/v2`, nunca en `/v1`.
+- No se quita ni se renombra una operación (método + ruta) existente.
+- `tests/contract/test_api_contract.py` vigila las dos reglas contra una huella
+  del OpenAPI. Falla solo ante cambios incompatibles, no ante aditivos. Si el
+  cambio incompatible es intencional, se regenera a propósito:
+  `python -m tests.contract.test_api_contract`.
+- `GET /v1/client/version` publica la versión mínima soportada para que la app
+  pida actualización en vez de fallar sola. Los valores viven en el entorno.
+
 ### Background jobs y cache
 
 - Nunca trabajo lento inline → `enqueue(background_tasks, "task_name", *args)`.

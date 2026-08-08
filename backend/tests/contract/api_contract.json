@@ -1,0 +1,278 @@
+{
+  "DELETE /v1/auth/me": [
+    "password"
+  ],
+  "DELETE /v1/campaigns/{campaign_id}/members/{user_id}": [],
+  "DELETE /v1/pallets/{pallet_id}/boxes/{box_code}": [],
+  "DELETE /v1/product-types/{pt_id}/gtins/{gtin_id}": [],
+  "DELETE /v1/public/donations/manage/{token}/photos/{photo_id}": [],
+  "DELETE /v1/shipments/{shipment_id}/pallets/{pallet_id}": [],
+  "GET /b/{code}": [],
+  "GET /b/{code}/qr.png": [],
+  "GET /health": [],
+  "GET /health/jobs": [],
+  "GET /p/{code}": [],
+  "GET /p/{code}/qr.png": [],
+  "GET /v1/auth/me": [],
+  "GET /v1/auth/me/profile": [],
+  "GET /v1/auth/verify-email": [],
+  "GET /v1/boxes": [],
+  "GET /v1/boxes/codes/available": [],
+  "GET /v1/boxes/{box_id}": [],
+  "GET /v1/boxes/{box_id}/events": [],
+  "GET /v1/boxes/{box_id}/qr.png": [],
+  "GET /v1/campaigns": [],
+  "GET /v1/campaigns/mine": [],
+  "GET /v1/campaigns/{campaign_id}": [],
+  "GET /v1/campaigns/{campaign_id}/members": [],
+  "GET /v1/catalog/barcode/{gtin}": [],
+  "GET /v1/catalog/rxnorm": [],
+  "GET /v1/catalog/search": [],
+  "GET /v1/center-applications": [],
+  "GET /v1/centers": [],
+  "GET /v1/centers/{center_id}": [],
+  "GET /v1/centers/{center_id}/users": [],
+  "GET /v1/client/version": [],
+  "GET /v1/d/{code}": [],
+  "GET /v1/d/{code}/qr.png": [],
+  "GET /v1/dashboard/national": [],
+  "GET /v1/dashboard/national/summary": [],
+  "GET /v1/dashboard/weight": [],
+  "GET /v1/donations": [],
+  "GET /v1/donations/{code}": [],
+  "GET /v1/donations/{code}/photos/{photo_id}/url": [],
+  "GET /v1/donations/{code}/suggestions": [],
+  "GET /v1/email-failures": [],
+  "GET /v1/exports/{job_id}": [],
+  "GET /v1/incidents": [],
+  "GET /v1/intakes": [],
+  "GET /v1/intakes/donors/search": [],
+  "GET /v1/messages": [],
+  "GET /v1/messages/attachments/{attachment_id}/url": [],
+  "GET /v1/messages/unread-count": [],
+  "GET /v1/messages/{thread_id}": [],
+  "GET /v1/pallets": [],
+  "GET /v1/pallets/{pallet_id}": [],
+  "GET /v1/pallets/{pallet_id}/events": [],
+  "GET /v1/product-types": [],
+  "GET /v1/product-types/barcode/{gtin}": [],
+  "GET /v1/product-types/search": [],
+  "GET /v1/product-types/{pt_id}": [],
+  "GET /v1/product-types/{pt_id}/gtins": [],
+  "GET /v1/public/campaigns": [],
+  "GET /v1/public/campaigns/{slug}": [],
+  "GET /v1/public/centers": [],
+  "GET /v1/public/donations/manage/{token}": [],
+  "GET /v1/public/donations/manage/{token}/photos/{photo_id}/url": [],
+  "GET /v1/public/needs": [],
+  "GET /v1/public/qr/{code}": [],
+  "GET /v1/reports/campaign/{campaign_id}/activity": [],
+  "GET /v1/reports/campaign/{campaign_id}/by-category": [],
+  "GET /v1/reports/campaign/{campaign_id}/by-center": [],
+  "GET /v1/reports/campaign/{campaign_id}/countries": [],
+  "GET /v1/reports/campaign/{campaign_id}/shrinkage": [],
+  "GET /v1/reports/campaign/{campaign_id}/summary": [],
+  "GET /v1/requests": [],
+  "GET /v1/requests/{request_id}": [],
+  "GET /v1/requests/{request_id}/matches": [],
+  "GET /v1/risk-reviews": [],
+  "GET /v1/shipments": [],
+  "GET /v1/shipments/{shipment_id}": [],
+  "GET /v1/shipments/{shipment_id}/events": [],
+  "GET /v1/shipments/{shipment_id}/incidents": [],
+  "GET /v1/shipments/{shipment_id}/reception": [],
+  "GET /v1/studio/ai-usage": [],
+  "GET /v1/studio/audit": [],
+  "GET /v1/studio/users": [],
+  "GET /v1/transfers": [],
+  "GET /v1/transfers/studio": [],
+  "GET /v1/transfers/{transfer_id}": [],
+  "PATCH /v1/auth/me": [
+    "full_name"
+  ],
+  "PATCH /v1/auth/me/password": [
+    "current_password",
+    "new_password"
+  ],
+  "PATCH /v1/campaigns/{campaign_id}": [],
+  "PATCH /v1/centers/{center_id}": [],
+  "PATCH /v1/messages/{thread_id}/read": [],
+  "PATCH /v1/product-types/{pt_id}": [],
+  "PATCH /v1/requests/{request_id}/status": [
+    "status"
+  ],
+  "PATCH /v1/studio/users/{user_id}": [],
+  "POST /v1/auth/forgot-password": [
+    "email"
+  ],
+  "POST /v1/auth/login": [],
+  "POST /v1/auth/logout": [],
+  "POST /v1/auth/me/accept-terms": [
+    "version"
+  ],
+  "POST /v1/auth/me/avatar": [],
+  "POST /v1/auth/refresh": [
+    "refresh_token"
+  ],
+  "POST /v1/auth/register": [
+    "email",
+    "password",
+    "username"
+  ],
+  "POST /v1/auth/resend-verification": [
+    "email"
+  ],
+  "POST /v1/auth/reset-password": [
+    "new_password",
+    "token"
+  ],
+  "POST /v1/auth/totp/challenge": [
+    "code",
+    "partial_token"
+  ],
+  "POST /v1/auth/totp/confirm": [
+    "code"
+  ],
+  "POST /v1/auth/totp/disable": [
+    "code"
+  ],
+  "POST /v1/auth/totp/setup": [],
+  "POST /v1/boxes/codes/reserve": [
+    "count"
+  ],
+  "POST /v1/boxes/labels/pdf": [],
+  "POST /v1/boxes/{box_id}/seal": [],
+  "POST /v1/campaigns": [
+    "name"
+  ],
+  "POST /v1/campaigns/{campaign_id}/members": [
+    "user_id"
+  ],
+  "POST /v1/center-applications/{app_id}/approve": [],
+  "POST /v1/center-applications/{app_id}/reject": [
+    "reason"
+  ],
+  "POST /v1/centers": [
+    "name"
+  ],
+  "POST /v1/centers/{center_id}/users": [
+    "email",
+    "username"
+  ],
+  "POST /v1/centers/{center_id}/users/{user_id}/reinvite": [],
+  "POST /v1/donations/{code}/photos/{photo_id}/read-label": [],
+  "POST /v1/donations/{code}/receive": [],
+  "POST /v1/email-failures/{failure_id}/resend": [],
+  "POST /v1/incidents/{incident_id}/resolve": [
+    "note"
+  ],
+  "POST /v1/intakes": [
+    "boxes"
+  ],
+  "POST /v1/messages": [
+    "body",
+    "campaign_id",
+    "thread_type",
+    "title"
+  ],
+  "POST /v1/messages/attachments/confirm": [
+    "content_type",
+    "filename",
+    "r2_key",
+    "size_bytes"
+  ],
+  "POST /v1/messages/attachments/upload-url": [
+    "content_type",
+    "filename",
+    "size_bytes"
+  ],
+  "POST /v1/messages/{thread_id}/replies": [
+    "body"
+  ],
+  "POST /v1/pallets": [],
+  "POST /v1/pallets/{pallet_id}/add-box": [],
+  "POST /v1/pallets/{pallet_id}/close": [],
+  "POST /v1/pallets/{pallet_id}/label.pdf": [],
+  "POST /v1/product-types": [
+    "category",
+    "display_name"
+  ],
+  "POST /v1/product-types/{pt_id}/promote": [],
+  "POST /v1/public/center-applications": [
+    "center_name",
+    "contact_email",
+    "contact_name",
+    "country_code"
+  ],
+  "POST /v1/public/center-applications/confirm": [
+    "token"
+  ],
+  "POST /v1/public/donations": [
+    "donor",
+    "items"
+  ],
+  "POST /v1/public/donations/confirm": [
+    "token"
+  ],
+  "POST /v1/public/donations/manage/{token}/cancel": [],
+  "POST /v1/public/donations/manage/{token}/photos": [
+    "content_type",
+    "size_bytes",
+    "storage_key"
+  ],
+  "POST /v1/public/donations/manage/{token}/photos/upload-url": [
+    "content_type",
+    "size_bytes"
+  ],
+  "POST /v1/public/donations/resend": [
+    "email"
+  ],
+  "POST /v1/reports/campaign/{campaign_id}/export.csv": [],
+  "POST /v1/requests": [
+    "description",
+    "title"
+  ],
+  "POST /v1/requests/{request_id}/messages": [
+    "body"
+  ],
+  "POST /v1/risk-reviews/{review_id}/resolve": [
+    "resolution"
+  ],
+  "POST /v1/shipments": [],
+  "POST /v1/shipments/{shipment_id}/add-pallet": [],
+  "POST /v1/shipments/{shipment_id}/close": [],
+  "POST /v1/shipments/{shipment_id}/declaracion.json": [],
+  "POST /v1/shipments/{shipment_id}/declaracion.xlsx": [],
+  "POST /v1/shipments/{shipment_id}/delivered": [],
+  "POST /v1/shipments/{shipment_id}/incidents": [
+    "description",
+    "type"
+  ],
+  "POST /v1/shipments/{shipment_id}/manifest.pdf": [],
+  "POST /v1/shipments/{shipment_id}/manifest.xlsx": [],
+  "POST /v1/shipments/{shipment_id}/milestones": [
+    "milestone"
+  ],
+  "POST /v1/shipments/{shipment_id}/reception": [],
+  "POST /v1/shipments/{shipment_id}/ship": [],
+  "POST /v1/studio/product-types/{pt_id}/promote": [],
+  "POST /v1/studio/users": [
+    "email",
+    "username"
+  ],
+  "POST /v1/studio/users/{user_id}/reinvite": [],
+  "POST /v1/transfers": [
+    "box_ids",
+    "from_center_id",
+    "to_center_id"
+  ],
+  "POST /v1/transfers/{transfer_id}/approve": [],
+  "POST /v1/transfers/{transfer_id}/dispatch": [],
+  "POST /v1/transfers/{transfer_id}/manifest.pdf": [],
+  "POST /v1/transfers/{transfer_id}/receive": [],
+  "POST /v1/transfers/{transfer_id}/reject": [],
+  "POST /webhooks/resend": [],
+  "PUT /v1/public/donations/manage/{token}/items": [
+    "items"
+  ]
+}

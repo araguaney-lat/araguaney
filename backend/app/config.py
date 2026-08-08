@@ -33,6 +33,15 @@ class Settings(BaseSettings):
     # ajustable por entorno si hiciera falta.
     refresh_reuse_leeway_seconds: int = 10
 
+    # ── Versión del cliente nativo ────────────────────────────────────────────
+    # La app instalada (a diferencia de la web) no se actualiza al instante. Estos
+    # valores los publica GET /v1/client/version para que la app decida si puede
+    # seguir o debe pedir actualización, en vez de fallar en silencio con un 422
+    # cuando un schema cambia. Se fijan cuando la app nativa exista; el default
+    # "0.0.0" no obliga a nada.
+    min_supported_client_version: str = "0.0.0"
+    latest_client_version: str = "0.0.0"
+
     # ── Encryption ────────────────────────────────────────────────────────────
     # Fernet key for app.utils.crypto (encrypting sensitive DB values such as
     # third-party API keys). Falls back to secret_key when empty; prefer a
