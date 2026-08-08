@@ -82,8 +82,10 @@ class ThreadRepository(BaseRepository):
         ).scalar_one_or_none() is not None
 
     def is_campaign_member(self, campaign_id: UUID, user_id: UUID) -> bool:
+        # UserCampaign tiene PK compuesta (user_id, campaign_id) y no columna `id`;
+        # se proyecta una columna que sí existe.
         return self.db.execute(
-            select(UserCampaign.id)
+            select(UserCampaign.user_id)
             .where(UserCampaign.campaign_id == campaign_id, UserCampaign.user_id == user_id)
         ).scalar_one_or_none() is not None
 
