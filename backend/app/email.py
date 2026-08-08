@@ -10,6 +10,7 @@ Workflow to add a new template:
   4. Add <meta name="color-scheme" content="light"> for Gmail dark mode safety.
 """
 
+from datetime import datetime, timezone
 from pathlib import Path
 
 import resend
@@ -23,10 +24,25 @@ _jinja = Environment(
     autoescape=select_autoescape(["html"]),
 )
 
+# Logo de marca servido desde Cloudinary (el mismo que usa la app). Vive aquí y
+# no en cada plantilla para no repetir la URL en las 19; las plantillas lo
+# reciben como {{ logo_url }} vía el header compartido (_header.html).
+_LOGO_URL = (
+    "https://res.cloudinary.com/dtvdqlxtd/image/upload"
+    "/w_84,h_84,c_fill/v1782794310/image_degkq9.png"
+)
+
 
 def _render(template_name: str, **kwargs: object) -> str:
     site_url = settings.frontend_url.split(",")[0].strip()
-    return _jinja.get_template(template_name).render(site_url=site_url, **kwargs)
+    # current_year alimenta el año del footer compartido (_footer.html); se
+    # calcula al enviar para que no quede congelado en el texto.
+    return _jinja.get_template(template_name).render(
+        site_url=site_url,
+        logo_url=_LOGO_URL,
+        current_year=datetime.now(timezone.utc).year,
+        **kwargs,
+    )
 
 
 def _send(
