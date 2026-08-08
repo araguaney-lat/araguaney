@@ -7,6 +7,10 @@ import * as Sentry from "@sentry/nextjs"
 export async function register() {
   if (process.env.NEXT_RUNTIME === "nodejs") {
     await import("./sentry.server.config")
+    // Las llamadas del servidor a Railway van directas (sin Cloudflare), así que
+    // añaden el secreto de origen ellas mismas para sobrevivir a CLOUDFLARE_ONLY.
+    const { installBackendOriginAuth } = await import("./src/lib/backend-origin-auth")
+    installBackendOriginAuth()
   }
 
   if (process.env.NEXT_RUNTIME === "edge") {
