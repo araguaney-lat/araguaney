@@ -80,8 +80,10 @@ export default function CenterApplicationForm({
   const [turnstileKey, setTurnstileKey] = useState(0)
 
   // .trim() guards against a trailing newline in the env var value (a common
-  // paste artifact) — Turnstile throws on an invalid sitekey.
-  const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!.trim()
+  // paste artifact) — Turnstile throws on an invalid sitekey. `?? ""` guards
+  // against the var missing entirely: `undefined.trim()` would throw a
+  // TypeError during render and, without an error boundary, blank the page.
+  const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY?.trim() ?? ""
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()

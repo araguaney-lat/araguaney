@@ -41,7 +41,9 @@ export default function ContactForm({ labels: t }: { labels: ContactFormLabels }
   // .trim() guards against a trailing newline in the env var value (a common
   // paste artifact in dashboard UIs) — Turnstile throws an uncaught error on
   // an invalid sitekey, which breaks rendering for the rest of the form.
-  const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!.trim()
+  // `?? ""` guards against the var missing entirely: `undefined.trim()` would
+  // throw a TypeError during render and, without an error boundary, blank the page.
+  const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY?.trim() ?? ""
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()

@@ -81,7 +81,9 @@ export default function BoxPublicFichaPage() {
   // .trim() guards against a trailing newline in the env var value (a common
   // paste artifact in dashboard UIs) — Turnstile throws an uncaught error on
   // an invalid sitekey, which breaks rendering for the rest of the page.
-  const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!.trim()
+  // `?? ""` guards against the var missing entirely: `undefined.trim()` would
+  // throw a TypeError during render and, without an error boundary, blank the page.
+  const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY?.trim() ?? ""
   const publicApiUrl = process.env.NEXT_PUBLIC_API_URL ?? ""
 
   async function handleVerify(token: string) {

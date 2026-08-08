@@ -40,7 +40,9 @@ Thumbs.db
 # Local tooling (not for version control)
 .superpowers/
 .worktrees/
-scripts/
+# Scoped to backend/ on purpose: a bare `scripts/` would silently ignore any
+# future scripts/ folder anywhere in the repo (e.g. frontend/scripts/).
+backend/scripts/
 
 # Screenshots and browser automation artifacts
 screenshots/

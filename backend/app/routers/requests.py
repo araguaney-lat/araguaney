@@ -142,6 +142,8 @@ def match_request_with_stock(
     solicitud = RequestRepository(db).find_by_id(request_id)
     if solicitud is None:
         raise api_error("NOT_FOUND", "Solicitud no encontrada", status_code=404)
+    if current_user.center_role != "national_admin" and solicitud.center_id != current_user.center_id:
+        raise api_error("FORBIDDEN", "Access denied", status_code=403)
 
     return needs_matching.match(
         db, f"{solicitud.title}. {solicitud.description}",
