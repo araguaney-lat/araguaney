@@ -12,7 +12,6 @@ from app.schemas.auth import (
     ChangePasswordRequest,
     DeleteAccountRequest,
     ForgotPasswordRequest,
-    OAuthLogin,
     ResendRequest,
     ResetPasswordRequest,
     Token,
@@ -56,16 +55,6 @@ def login(
     if result.get("requires_totp"):
         return JSONResponse(status_code=202, content=result)
     return result
-
-
-@router.post("/oauth", response_model=Token)
-@limiter.limit("10/5minutes")
-def oauth_login(
-    request: Request,
-    data: OAuthLogin,
-    db: Session = Depends(get_db),
-):
-    return AuthService(db).oauth_login(data)
 
 
 @router.post("/logout", status_code=status.HTTP_204_NO_CONTENT)

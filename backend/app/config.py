@@ -94,10 +94,6 @@ class Settings(BaseSettings):
     # nadie. Vacío = las alertas se registran en el log y no salen a ningún lado.
     slack_alert_channel: str = ""
 
-    # ── OAuth — Google (optional) ─────────────────────────────────────────────
-    google_client_id: str = ""
-    google_client_secret: str = ""
-
     # =========================================================================
     # OPTIONAL LAYERS — uncomment + set env vars to activate
     # See docs/optional-layers.md for full setup instructions
