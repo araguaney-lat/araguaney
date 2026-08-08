@@ -1,7 +1,8 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { useSession } from "next-auth/react"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import {
   listRequestsAction,
   createRequestAction,
@@ -30,62 +31,54 @@ export default function DashboardRequestsPage() {
   const t = dict.dashboard.requests
 
   const { status } = useSession()
-  const [requests, setRequests] = useState<RequestOut[]>([])
-  const [loading, setLoading] = useState(true)
+  const qc = useQueryClient()
   const [showForm, setShowForm] = useState(false)
   const [form, setForm] = useState(EMPTY_FORM)
-  const [saving, setSaving] = useState(false)
-  const [error, setError] = useState<string | null>(null)
   const [selected, setSelected] = useState<RequestOut | null>(null)
   const [reply, setReply] = useState("")
-  const [sending, setSending] = useState(false)
 
-  async function load() {
-    setLoading(true)
-    const data = await listRequestsAction()
-    setRequests(data)
-    setLoading(false)
-  }
+  const requestsQuery = useQuery({
+    queryKey: ["requests"],
+    queryFn: () => listRequestsAction(),
+    enabled: status === "authenticated",
+  })
+  const requests = requestsQuery.data ?? []
+  const loading = requestsQuery.isPending
 
-  useEffect(() => {
-    if (status !== "authenticated") return
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- carga o suscripción de datos intencional al montar o al cambiar de filtro; migrar a una capa de datos (SWR/react-query) se rastrea aparte
-    load()
-  }, [status])
-
-  async function handleCreate(e: React.FormEvent) {
-    e.preventDefault()
-    if (!form.title.trim()) return
-    setSaving(true)
-    setError(null)
-    try {
-      const created = await createRequestAction({
-        title: form.title.trim(),
-        description: form.description.trim(),
-      })
-      setRequests((rs) => [created, ...rs])
+  const createMutation = useMutation({
+    mutationFn: () =>
+      createRequestAction({ title: form.title.trim(), description: form.description.trim() }),
+    onSuccess: () => {
       setForm(EMPTY_FORM)
       setShowForm(false)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : dict.dashboard.common.error_unknown)
-    } finally {
-      setSaving(false)
-    }
+      qc.invalidateQueries({ queryKey: ["requests"] })
+    },
+  })
+  const saving = createMutation.isPending
+  const error = createMutation.error instanceof Error ? createMutation.error.message : null
+
+  const replyMutation = useMutation({
+    mutationFn: (body: string) => addRequestMessageAction(selected!.id, body),
+    onSuccess: (msg) => {
+      setReply("")
+      // El detalle abierto es una copia local; se le agrega el mensaje al vuelo
+      // mientras la lista se revalida del servidor.
+      setSelected((s) => (s ? { ...s, messages: [...s.messages, msg] } : s))
+      qc.invalidateQueries({ queryKey: ["requests"] })
+    },
+  })
+  const sending = replyMutation.isPending
+
+  function handleCreate(e: React.FormEvent) {
+    e.preventDefault()
+    if (!form.title.trim()) return
+    createMutation.mutate()
   }
 
-  async function handleReply(e: React.FormEvent) {
+  function handleReply(e: React.FormEvent) {
     e.preventDefault()
     if (!selected || !reply.trim()) return
-    setSending(true)
-    try {
-      const msg = await addRequestMessageAction(selected.id, reply.trim())
-      setReply("")
-      const updated = { ...selected, messages: [...selected.messages, msg] }
-      setSelected(updated)
-      setRequests((rs) => rs.map((r) => (r.id === updated.id ? updated : r)))
-    } finally {
-      setSending(false)
-    }
+    replyMutation.mutate(reply.trim())
   }
 
   if (status === "loading" || loading) {
