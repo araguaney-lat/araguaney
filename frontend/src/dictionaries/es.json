@@ -1120,6 +1120,7 @@
       "since": "Desde el {date}",
       "model": "Modelo: {model}",
       "by_capability": "Por capacidad",
+      "by_capability_note": "Estas capacidades se encienden en la configuración del despliegue (variables de entorno). Este panel solo muestra su estado; no se cambian desde aquí.",
       "col_capability": "Capacidad",
       "col_switch": "Interruptor",
       "col_calls": "Llamadas",
