@@ -36,6 +36,7 @@ const NAV_ITEMS: StudioNavItem[] = [
 ]
 
 export type StudioNav = {
+  menu: string
   metrics: string
   users: string
   center_applications: string
@@ -56,36 +57,18 @@ interface StudioSidebarProps {
   locale: Locale
 }
 
-/** Debajo de esto el sidebar expandido deja de caber.
- *
- * A 224 px de barra sobre una pantalla de 390 px quedan 166 px de contenido, y
- * ahí no cabe una tabla ni un formulario. Es el mismo umbral `md` que usa el
- * panel operativo para esconder el suyo. */
-const ANCHO_MINIMO_EXPANDIDO = 768
-
 export function StudioSidebar({ userName, userEmail, nav, locale }: StudioSidebarProps) {
   const pathname = usePathname()
   const [collapsed, setCollapsed] = useState(false)
   const [mounted, setMounted] = useState(false)
-  // En una pantalla angosta la barra se colapsa **aunque** la preferencia
-  // guardada diga lo contrario: es una restricción de espacio, no un gusto.
-  const [estrecha, setEstrecha] = useState(false)
-
   useEffect(() => {
     const stored = localStorage.getItem(STORAGE_KEY)
     if (stored === "true") setCollapsed(true)
     setMounted(true)
-
-    const consulta = window.matchMedia(`(max-width: ${ANCHO_MINIMO_EXPANDIDO - 1}px)`)
-    const aplicar = () => setEstrecha(consulta.matches)
-    aplicar()
-    consulta.addEventListener("change", aplicar)
-    return () => consulta.removeEventListener("change", aplicar)
   }, [])
 
-  // Colapsada por espacio o por preferencia. La preferencia se conserva
-  // intacta: al volver a una pantalla ancha, la barra vuelve como estaba.
-  const cerrada = estrecha || collapsed
+  // En móvil esta barra no se renderiza: ahí manda `StudioBottomNav`.
+  const cerrada = collapsed
 
   function toggle() {
     setCollapsed((c) => {
