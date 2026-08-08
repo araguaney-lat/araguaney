@@ -14,7 +14,7 @@ from app.models.token_denylist import TokenDenylist
 from app.models.user import User
 from app.repositories.token_denylist_repository import TokenDenylistRepository
 from app.repositories.user_repository import UserRepository
-from app.schemas.auth import OAuthLogin, UserCreate
+from app.schemas.auth import UserCreate
 from app.services.base import BaseService
 from app.utils.errors import api_error
 
@@ -190,42 +190,6 @@ class AuthService(BaseService):
             repo.commit()
             # TODO: enqueue send_verification_email_task
         return {"message": "If that email is registered and unverified, a new link is on its way."}
-
-    # ── OAuth ──────────────────────────────────────────────────────────────────
-
-    def oauth_login(self, data: OAuthLogin) -> dict:
-        import re
-        repo = UserRepository(self.db)
-        user = repo.find_by_email(data.email)
-        if not user:
-            raw = data.email.split("@")[0]
-            sanitized = re.sub(r"[^a-zA-Z0-9_-]", "_", raw)
-            if not sanitized or not sanitized[0].isalnum():
-                sanitized = "u" + sanitized
-            base_username = sanitized[:28]
-            username = base_username
-            suffix = 1
-            while repo.username_exists(username):
-                username = f"{base_username}{suffix}"
-                suffix += 1
-
-            user = repo.save(User(
-                email=data.email,
-                username=username,
-                full_name=data.name,
-                avatar_url=data.avatar_url,
-                is_verified=True,
-                registered_provider=data.provider,
-            ))
-
-        if not user.is_active:
-            raise api_error("ACCOUNT_DISABLED", "Account is disabled", status_code=403)
-
-        if user.totp_enabled and user.totp_secret:
-            partial = self._create_partial_token(str(user.id))
-            return {"requires_totp": True, "partial_token": partial}
-
-        return {"access_token": self.create_access_token(str(user.id)), "token_type": "bearer"}
 
     # ── Password reset ─────────────────────────────────────────────────────────
 

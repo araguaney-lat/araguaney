@@ -63,13 +63,6 @@ class ResetPasswordRequest(StrictModel):
     new_password: str
 
 
-class OAuthLogin(StrictModel):
-    email: str
-    name: str | None = None
-    avatar_url: str | None = None
-    provider: str = "google"
-
-
 # ── TOTP / 2FA ────────────────────────────────────────────────────────────────
 
 class TOTPSetupOut(StrictModel):
