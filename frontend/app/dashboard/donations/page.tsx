@@ -1,8 +1,9 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import Link from "next/link"
 import { useSession } from "next-auth/react"
+import { useQuery } from "@tanstack/react-query"
 
 import { apiFetch } from "@/lib/api"
 import { useDict } from "@/context/DictionaryContext"
@@ -21,18 +22,14 @@ export default function DonationsPage() {
   const token = session?.accessToken ?? ""
 
   const [tab, setTab] = useState<"incoming" | "received">("incoming")
-  const [rows, setRows] = useState<Donation[]>([])
-  const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    if (!token) return
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- carga o suscripción de datos intencional al montar o al cambiar de filtro; migrar a una capa de datos (SWR/react-query) se rastrea aparte
-    setLoading(true)
-    apiFetch<Donation[]>(`/v1/donations?incoming=${tab === "incoming"}`, { token })
-      .then(setRows)
-      .catch(() => setRows([]))
-      .finally(() => setLoading(false))
-  }, [tab, token])
+  const donationsQuery = useQuery({
+    queryKey: ["donations", tab],
+    queryFn: () => apiFetch<Donation[]>(`/v1/donations?incoming=${tab === "incoming"}`, { token }),
+    enabled: !!token,
+  })
+  const rows = donationsQuery.data ?? []
+  const loading = donationsQuery.isLoading
 
   return (
     <div className="max-w-3xl">
