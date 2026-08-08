@@ -21,7 +21,7 @@ y por qué.
 | **Coordinador** | Su centro | Todo lo del voluntario, más tarimas, envíos, manifiestos y el equipo de su centro |
 | **Administración nacional** | Todos los centros | Crea centros, campañas y catálogo; ve el agregado nacional; resuelve revisiones |
 | **Donante** | Sin cuenta | Puede registrar su donación en línea antes de llevarla, o llegar sin registrar |
-| **Superadmin** | La plataforma, en `/studio` | Crea administración nacional, ve la auditoría general y el gasto de IA. No opera un centro |
+| **Superadmin** | La plataforma, en `/studio` | Hoy: métricas, solicitudes de centro, rebotes de correo y gasto de IA. La gestión de usuarios y la auditoría todavía se hacen desde `/dashboard`. No opera un centro |
 
 ---
 

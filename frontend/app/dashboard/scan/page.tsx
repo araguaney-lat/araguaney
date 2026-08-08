@@ -4,6 +4,7 @@ import { useState, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import dynamic from "next/dynamic"
 import { useDict } from "@/context/DictionaryContext"
+import { useScannerGun } from "@/hooks/useScannerGun"
 
 // @zxing/browser is only needed when the camera scanner actually opens.
 const CameraScanner = dynamic(
@@ -53,6 +54,11 @@ export default function ScanPage() {
     }
   }, [router])
 
+  // Una pistola lectora dispara sin que nadie toque la pantalla. Se desactiva
+  // con la cámara abierta: ahí el código entra por otro camino y atenderlo dos
+  // veces abriría dos fichas.
+  useScannerGun(handleResult, !scanning)
+
   return (
     <div className="max-w-sm mx-auto pt-8 px-4 text-center space-y-6">
       <div>
@@ -85,6 +91,9 @@ export default function ScanPage() {
         <input
           name="code"
           type="text"
+          // Enfocado al abrir: una pistola escribe donde esté el cursor, y en
+          // esta pantalla no hay nada más que escribir.
+          autoFocus
           placeholder={t.code_placeholder}
           className="flex-1 rounded-lg border border-inpB bg-inp px-3 py-2 text-sm text-tx focus:outline-none focus:ring-2 focus:ring-[var(--gold)]"
         />

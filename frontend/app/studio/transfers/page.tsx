@@ -51,13 +51,13 @@ export default function StudioTransfersPage() {
         ))}
       </div>
 
-      <div className="rounded-xl border border-zinc-200 bg-white overflow-hidden">
+      <div className="rounded-xl border border-zinc-200 bg-white overflow-x-auto">
         {loading ? (
           <div className="p-8 text-center text-sm text-zinc-400">{t.loading}</div>
         ) : transfers.length === 0 ? (
           <div className="p-8 text-center text-sm text-zinc-400">{t.empty}</div>
         ) : (
-          <table className="w-full text-sm">
+          <table className="w-full min-w-[34rem] text-sm">
             <thead>
               <tr className="border-b border-zinc-100 bg-zinc-50">
                 <th className="text-left px-4 py-3 text-xs font-semibold text-zinc-500 uppercase tracking-wide">{t.col_origin}</th>

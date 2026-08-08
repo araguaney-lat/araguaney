@@ -162,8 +162,8 @@ export default function CatalogPage() {
           <p className="text-sm text-fnt">{t.empty}</p>
         </div>
       ) : (
-        <div className="rounded-xl border border-cardB bg-card overflow-hidden">
-          <table className="w-full text-sm">
+        <div className="rounded-xl border border-cardB bg-card overflow-x-auto">
+          <table className="w-full min-w-[34rem] text-sm">
             <thead className="border-b border-line bg-card2">
               <tr>
                 <th className="px-4 py-3 text-left text-xs font-medium text-mut uppercase tracking-wide">{t.col_product}</th>

@@ -277,8 +277,8 @@ export default function TeamPage() {
             </form>
           )}
 
-          <div className="rounded-xl border border-cardB bg-card overflow-hidden">
-            <table className="w-full text-sm">
+          <div className="rounded-xl border border-cardB bg-card overflow-x-auto">
+            <table className="w-full min-w-[34rem] text-sm">
               <thead className="bg-card2 border-b border-cardB">
                 <tr>
                   <th className="text-left px-4 py-2.5 text-xs font-medium text-mut">{t.col_member}</th>

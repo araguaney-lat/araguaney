@@ -68,8 +68,8 @@ export function EmailFailuresTable({ initial, labels: t }: Props) {
   }
 
   return (
-    <div className="rounded-xl border border-zinc-200 bg-white overflow-hidden">
-      <table className="w-full text-sm">
+    <div className="rounded-xl border border-zinc-200 bg-white overflow-x-auto">
+      <table className="w-full min-w-[34rem] text-sm">
         <thead>
           <tr className="border-b border-zinc-100 bg-zinc-50">
             <th className="text-left px-4 py-3 text-xs font-semibold text-zinc-500 uppercase tracking-wide">{t.col_date}</th>
