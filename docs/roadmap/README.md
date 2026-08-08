@@ -4,8 +4,8 @@
 
 ```mermaid
 pie title Tareas completadas (457 tareas)
-    "Listas" : 435
-    "Pendientes" : 22
+    "Listas" : 432
+    "Pendientes" : 25
 ```
 
 | Fase | Nombre | Listas | Pendientes | Progreso |
@@ -15,7 +15,7 @@ pie title Tareas completadas (457 tareas)
 | 2 | [Caja homogénea, QR y etiqueta](phase-02-box-qr-label.md) | 6 | 0 | ✅ 100% |
 | 3 | [Tarima, envío y manifiesto](phase-03-pallet-shipment-manifest.md) | 9 | 0 | ✅ 100% |
 | 4 | [Panel agregado nacional + endurecimiento + OTP + scanning móvil](phase-04-national-dashboard-hardening.md) | 23 | 2 | ✅ 92% |
-| 5 | [Studio — panel de administración + solicitudes](phase-05-studio.md) | 39 | 0 | ✅ 100% |
+| 5 | [Studio — panel de administración + solicitudes](phase-05-studio.md) | 36 | 3 | 🟡 92% |
 | 6 | [Catálogos de referencia + lookups en tiempo real](phase-06-catalog-integrations.md) | 37 | 0 | ✅ 100% |
 | 7 | [Transferencias entre centros](phase-07-transfers.md) | 21 | 0 | ✅ 100% |
 | 8 | [Mensajería entre usuarios](phase-08-messaging.md) | 22 | 0 | ✅ 100% |
@@ -36,10 +36,16 @@ pie title Tareas completadas (457 tareas)
 | 23 | [IA asistida: captura, catálogo y necesidades](phase-23-ai-assisted-capture.md) | 11 | 0 | ✅ 100% |
 | 24 | [Observabilidad: que un fallo silencioso deje de serlo](phase-24-observability.md) | 11 | 0 | ✅ 100% |
 | 25 | [Captura sin conexión: cola local y sincronización diferida](phase-25-offline-capture.md) | 14 | 0 | ✅ 100% |
-| **Total** | | **435** | **22** | **🟡 95%** |
+| **Total** | | **432** | **25** | **🟡 95%** |
 
-> **Pendientes (22):**
+> **Pendientes (25):**
 > El grupo A de la Fase 13 (privacidad, lo que aplica hoy) está completo.
+> - **3 de la Fase 5 (Studio):** `/studio/users`, `/studio/audit` y
+>   `/studio/settings` son marcadores de "Próximamente" en producción; estaban
+>   marcadas como hechas por error. La necesidad está cubierta hoy por
+>   `/dashboard/admin/users` y `/dashboard/admin/audit`, que sí existen con tabla
+>   completa para `national_admin`; lo que falta es la versión de `superadmin`
+>   dentro de Studio.
 > - Los borradores legales de la Fase 20 están escritos y esperando revisión de abogado:
 >   [`docs/legal/drafts/`](../legal/drafts/README.md). Sus tareas siguen abiertas hasta que esa
 >   revisión ocurra. El borrador fiscal de la Fase 21 quedó sin uso: la declaración de mercancías

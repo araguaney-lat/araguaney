@@ -57,12 +57,23 @@
 
 ---
 
+> **Corrección (2026-08-07).** Las tasks 12, 13 y 16 estaban marcadas como hechas
+> y no lo están: `/studio/users`, `/studio/audit` y `/studio/settings` renderizan
+> un marcador de "Próximamente" en producción. Se descubrió abriendo las páginas,
+> no leyendo el código.
+>
+> **Lo que sí existe y cubre la necesidad hoy:** `/dashboard/admin/users` y
+> `/dashboard/admin/audit`, con tabla completa, para `national_admin`. Lo que
+> falta es la versión de `superadmin` dentro de Studio. La documentación había
+> confundido las dos cosas.
+
+
 #### Frontend — Usuarios
 
 | # | Tarea | Descripción | Complejidad | Estado |
 |---|-------|-------------|-------------|--------|
-| 12 | Listado de usuarios `/studio/users` | Tabla con nombre, email, centro, rol, estado activo/inactivo; filtro por rol; botón de crear; botón "Reinvitar" por fila | 🟡 | ✅ Hecho |
-| 13 | Formulario de crear/editar usuario | Campos: nombre, email, contraseña temporal, centro (UUID), rol; edición inline de rol e is_active | 🟠 | ✅ Hecho |
+| 12 | Listado de usuarios `/studio/users` | Tabla con nombre, email, centro, rol, estado activo/inactivo; filtro por rol; botón de crear; botón "Reinvitar" por fila | 🟡 | ⬜ |
+| 13 | Formulario de crear/editar usuario | Campos: nombre, email, contraseña temporal, centro (UUID), rol; edición inline de rol e is_active | 🟠 | ⬜ |
 | 27 | Página `/change-password` | Página standalone (sin nav) que aparece tras login con `must_change_password`; formulario: contraseña actual + nueva + confirmación; redirige a dashboard al completar | 🟡 | ✅ Hecho |
 | 28 | Sección de contraseña en perfil | En `/dashboard/settings`: componente `ChangePasswordForm`; disponible para todos los roles | 🟡 | ✅ Hecho |
 | 29 | User manager para coordinador | `/dashboard/team` — coordinador ve usuarios de su centro; botón crear volunteer; botón "Reinvitar" por fila | 🟡 | ✅ Hecho |
@@ -83,7 +94,7 @@
 
 | # | Tarea | Descripción | Complejidad | Estado |
 |---|-------|-------------|-------------|--------|
-| 16 | Log de auditoría `/studio/audit` | Tabla paginada con filtros por tipo de entidad; columnas: fecha/hora, acción, entidad, IP; expandir metadata; paginación | 🟡 | ✅ Hecho |
+| 16 | Log de auditoría `/studio/audit` | Tabla paginada con filtros por tipo de entidad; columnas: fecha/hora, acción, entidad, IP; expandir metadata; paginación | 🟡 | ⬜ |
 
 ---
 

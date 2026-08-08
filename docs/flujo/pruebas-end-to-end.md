@@ -43,7 +43,8 @@ deben poder provocar a propósito.
 
 ### 0.2 Usuarios
 
-- [ ] `superadmin` en `/studio/users` crea el `national_admin`.
+- [ ] El `national_admin` se crea desde `/dashboard/admin/users`. **`/studio/users`
+      todavía es un marcador de "Próximamente"** (Fase 5, tasks 12-13).
 - [ ] `national_admin` en **Usuarios** crea `coordinator` y `volunteer` de
       cualquier centro.
 - [ ] `coordinator` en **Equipo** crea `volunteer`, **solo de su centro**.
@@ -366,10 +367,11 @@ Dos comportamientos que se leen como bug y no lo son:
 
 ## Fase 9 · Plataforma (`/studio`) — `superadmin`
 
-- [ ] `/studio/users`: crear un `national_admin`, bloquear y desbloquear
-      usuarios, reiniciar contraseñas.
-- [ ] `/studio/audit`: la bitácora general de la plataforma.
 - [ ] `/studio/emails`: rebotes y quejas de Resend, con reenvío.
+- [ ] `/studio/users`, `/studio/audit` y `/studio/settings` muestran hoy un
+      marcador de "Próximamente". Verificar que sigue siendo así **a propósito**
+      y no por un fallo de carga: la gestión de usuarios y la auditoría viven
+      mientras tanto en `/dashboard/admin/users` y `/dashboard/admin/audit`.
 - [ ] `/studio/ai` (Fase 23): las cuatro capacidades se listan **aunque tengan
       cero llamadas** —una apagada y una encendida sin uso piden acciones
       opuestas—, con el gasto del mes, la serie diaria y el gasto por centro.

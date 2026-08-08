@@ -56,16 +56,36 @@ interface StudioSidebarProps {
   locale: Locale
 }
 
+/** Debajo de esto el sidebar expandido deja de caber.
+ *
+ * A 224 px de barra sobre una pantalla de 390 px quedan 166 px de contenido, y
+ * ahí no cabe una tabla ni un formulario. Es el mismo umbral `md` que usa el
+ * panel operativo para esconder el suyo. */
+const ANCHO_MINIMO_EXPANDIDO = 768
+
 export function StudioSidebar({ userName, userEmail, nav, locale }: StudioSidebarProps) {
   const pathname = usePathname()
   const [collapsed, setCollapsed] = useState(false)
   const [mounted, setMounted] = useState(false)
+  // En una pantalla angosta la barra se colapsa **aunque** la preferencia
+  // guardada diga lo contrario: es una restricción de espacio, no un gusto.
+  const [estrecha, setEstrecha] = useState(false)
 
   useEffect(() => {
     const stored = localStorage.getItem(STORAGE_KEY)
     if (stored === "true") setCollapsed(true)
     setMounted(true)
+
+    const consulta = window.matchMedia(`(max-width: ${ANCHO_MINIMO_EXPANDIDO - 1}px)`)
+    const aplicar = () => setEstrecha(consulta.matches)
+    aplicar()
+    consulta.addEventListener("change", aplicar)
+    return () => consulta.removeEventListener("change", aplicar)
   }, [])
+
+  // Colapsada por espacio o por preferencia. La preferencia se conserva
+  // intacta: al volver a una pantalla ancha, la barra vuelve como estaba.
+  const cerrada = estrecha || collapsed
 
   function toggle() {
     setCollapsed((c) => {
@@ -75,14 +95,14 @@ export function StudioSidebar({ userName, userEmail, nav, locale }: StudioSideba
     })
   }
 
-  const width = !mounted ? "w-56" : collapsed ? "w-14" : "w-56"
+  const width = !mounted ? "w-56" : cerrada ? "w-14" : "w-56"
 
   return (
     <aside
       className={`flex h-full flex-col border-r border-blue-200 bg-blue-50 transition-all duration-200 ${width} flex-shrink-0`}
     >
       {/* Header */}
-      {collapsed ? (
+      {cerrada ? (
         <div className="flex flex-col items-center gap-1 border-b border-blue-100 px-2 py-3">
           <Image
             src={LOGO}
@@ -129,7 +149,7 @@ export function StudioSidebar({ userName, userEmail, nav, locale }: StudioSideba
       )}
 
       {/* Back to dashboard */}
-      {!collapsed && (
+      {!cerrada && (
         <div className="px-3 pt-3 pb-1">
           <Link
             href="/dashboard"
@@ -150,9 +170,9 @@ export function StudioSidebar({ userName, userEmail, nav, locale }: StudioSideba
             <Link
               key={item.href}
               href={item.href}
-              title={collapsed ? label : undefined}
+              title={cerrada ? label : undefined}
               className={`flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm font-medium transition-colors ${
-                collapsed ? "justify-center" : ""
+                cerrada ? "justify-center" : ""
               } ${
                 isActive
                   ? "bg-blue-200/70 text-blue-900"
@@ -160,7 +180,7 @@ export function StudioSidebar({ userName, userEmail, nav, locale }: StudioSideba
               }`}
             >
               <Icon size={17} className="flex-shrink-0" />
-              {!collapsed && <span className="truncate">{label}</span>}
+              {!cerrada && <span className="truncate">{label}</span>}
             </Link>
           )
         })}
@@ -170,13 +190,13 @@ export function StudioSidebar({ userName, userEmail, nav, locale }: StudioSideba
       <div className="border-t border-blue-100 px-2 py-2 space-y-0.5">
         {(userName || userEmail) && (
           <div
-            className={`flex items-center gap-2.5 rounded-lg px-2.5 py-2 ${collapsed ? "justify-center" : ""}`}
-            title={collapsed ? (userName ?? userEmail ?? undefined) : undefined}
+            className={`flex items-center gap-2.5 rounded-lg px-2.5 py-2 ${cerrada ? "justify-center" : ""}`}
+            title={cerrada ? (userName ?? userEmail ?? undefined) : undefined}
           >
             <span className="flex-shrink-0 flex h-7 w-7 items-center justify-center rounded-full bg-blue-300 text-xs font-bold text-blue-900">
               {(userName ?? userEmail ?? "?")[0].toUpperCase()}
             </span>
-            {!collapsed && (
+            {!cerrada && (
               <div className="min-w-0">
                 <p className="text-xs font-semibold text-blue-900 truncate">{userName ?? userEmail}</p>
                 <p className="text-xs text-blue-700/80 truncate">{nav.superadmin}</p>
@@ -188,11 +208,11 @@ export function StudioSidebar({ userName, userEmail, nav, locale }: StudioSideba
         <LogoutForm>
           <button
             type="submit"
-            title={collapsed ? nav.logout : undefined}
-            className={`flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm text-blue-700 hover:bg-blue-100 hover:text-blue-900 transition-colors ${collapsed ? "justify-center" : ""}`}
+            title={cerrada ? nav.logout : undefined}
+            className={`flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm text-blue-700 hover:bg-blue-100 hover:text-blue-900 transition-colors ${cerrada ? "justify-center" : ""}`}
           >
             <LogOut size={17} className="flex-shrink-0" />
-            {!collapsed && <span>{nav.logout}</span>}
+            {!cerrada && <span>{nav.logout}</span>}
           </button>
         </LogoutForm>
       </div>
