@@ -14,7 +14,7 @@ donde alguien revisa quién responde por la carga.
 
 **El logo se lee del disco y no de la URL de Cloudinary**, aunque Cloudinary sea
 la fuente de verdad de la marca. La copia local se resuelve al desplegar, con
-`scripts/refresh_logo_asset.py`, y no al imprimir. Tres razones, en orden de
+`tools/refresh_logo_asset.py`, y no al imprimir. Tres razones, en orden de
 gravedad:
 
 1. **Un documento reimpreso tiene que verse como el que viajó con la carga.**

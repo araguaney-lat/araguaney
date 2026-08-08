@@ -286,3 +286,35 @@ class TestAtribucionAlPie:
         branding.logo_data_uri.cache_clear()
 
         assert pdf.startswith(b"%PDF")
+
+
+class TestElAssetDeMarcaSeReproduce:
+    """El logo del pie es un binario en el repositorio: tiene que existir la
+    forma de volver a generarlo.
+
+    Sin script versionado, la "única fuente de verdad" de la marca sería un
+    archivo que solo existe en la máquina de quien lo corrió, y nadie más podría
+    regenerarlo cuando la marca cambie.
+    """
+
+    def test_el_script_que_regenera_el_logo_existe(self):
+        """Regresión: el script se escribió en `backend/scripts/`, que está en el
+        `.gitignore` a propósito (ahí viven los que escriben en producción).
+
+        Nunca se versionó, y `branding.py` quedó apuntando a un archivo que no
+        estaba en el repositorio. Vive en `tools/`, que sí se versiona.
+        """
+        from app.utils import branding
+
+        raiz = Path(__file__).resolve().parents[1]
+        assert (raiz / "tools" / "refresh_logo_asset.py").exists()
+        # La ruta citada en la documentación tiene que ser la real.
+        assert "tools/refresh_logo_asset.py" in branding.__doc__
+
+    def test_el_logo_existe_y_es_pequeno(self):
+        from app.utils.branding import LOGO_PATH
+
+        assert LOGO_PATH.exists()
+        # Se incrusta en cada manifiesto: el original de la marca son ~1.7 MB y
+        # para 4 mm de pie sobran unas decenas de KB.
+        assert LOGO_PATH.stat().st_size < 60_000
