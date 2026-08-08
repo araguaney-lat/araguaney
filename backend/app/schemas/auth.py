@@ -27,12 +27,25 @@ class UserCreate(StrictModel):
 
 class Token(StrictModel):
     access_token: str
+    # Nullable porque el paso intermedio de 2FA responde con este mismo esquema
+    # pero sin sesión todavía; una sesión completa siempre lo trae.
+    refresh_token: str | None = None
     token_type: str = "bearer"
     role: str | None = None
     center_role: str | None = None
     center_id: str | None = None
     must_change_password: bool = False
     must_accept_terms: bool = False
+
+
+class RefreshRequest(StrictModel):
+    refresh_token: str
+
+
+class LogoutRequest(StrictModel):
+    # Opcional: si el cliente lo manda, se revoca la familia entera (esa sesión),
+    # no solo se invalida el access actual. El access se revoca siempre por su jti.
+    refresh_token: str | None = None
 
 
 class ChangePasswordRequest(StrictModel):

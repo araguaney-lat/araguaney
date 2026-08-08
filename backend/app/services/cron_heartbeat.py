@@ -24,6 +24,7 @@ CRON_MAX_AGE: dict[str, timedelta] = {
     "purge_attachments_cron": timedelta(hours=36),
     "purge_email_failures_cron": timedelta(hours=36),
     "purge_donations_cron": timedelta(hours=36),
+    "purge_refresh_tokens_cron": timedelta(hours=36),
     "purge_export_jobs_cron": timedelta(hours=3),      # corre cada hora
     "heartbeat_watchdog_cron": timedelta(hours=3),     # corre cada hora
     "bounce_watchdog_cron": timedelta(hours=3),        # corre cada hora

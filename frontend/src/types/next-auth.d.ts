@@ -16,6 +16,7 @@ declare module "next-auth" {
 
   interface User {
     accessToken: string
+    refreshToken: string
     accessTokenExpires?: number
     userId: string
     platformRole: string | null
@@ -29,6 +30,8 @@ declare module "next-auth" {
 declare module "next-auth/jwt" {
   interface JWT {
     accessToken: string
+    // Solo vive aquí (cookie cifrada del servidor); nunca se copia a Session.
+    refreshToken: string
     accessTokenExpires?: number
     error?: string
     userId: string

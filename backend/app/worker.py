@@ -102,6 +102,10 @@ _CRON_PROMISES = {
         "privacidad declara un plazo de conservación para ellos.",
     "purge_export_jobs_cron":
         "Los archivos de exportación dejan de eliminarse de R2 al vencer.",
+    "purge_refresh_tokens_cron":
+        "Los refresh tokens vencidos dejan de purgarse y su tabla crece sin "
+        "límite. No hay riesgo de seguridad (un token vencido se rechaza), pero "
+        "la tabla se infla.",
     "heartbeat_watchdog_cron":
         "Nadie está revisando que los demás crons sigan corriendo.",
     "bounce_watchdog_cron":
@@ -367,6 +371,15 @@ async def purge_export_jobs_cron(ctx) -> None:
 
 
 @alert_on_cron_failure
+async def purge_refresh_tokens_cron(ctx) -> None:
+    from app.database import SessionLocal
+    from app.repositories.refresh_token_repository import RefreshTokenRepository
+    with SessionLocal() as db:
+        deleted = RefreshTokenRepository(db).delete_expired()
+    logger.info("Refresh token purge: deleted %d expired tokens", deleted)
+
+
+@alert_on_cron_failure
 async def purge_audit_logs_cron(ctx) -> None:
     retention_days = int(os.environ.get("AUDIT_RETENTION_DAYS", "90"))
     cutoff = datetime.now(tz=timezone.utc) - timedelta(days=retention_days)
@@ -566,6 +579,7 @@ class WorkerSettings:
         cron(purge_attachments_cron, hour=4, minute=0),
         cron(purge_email_failures_cron, hour=4, minute=30),
         cron(purge_donations_cron, hour=5, minute=0),
+        cron(purge_refresh_tokens_cron, hour=5, minute=30),
         # Export jobs expire 1h after DONE (see ExportJobRepository.DOWNLOAD_TTL_SECONDS) —
         # runs hourly, not daily like the other purges, to keep R2/db lean on that timescale.
         cron(purge_export_jobs_cron, minute=15),

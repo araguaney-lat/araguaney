@@ -18,7 +18,20 @@ class Settings(BaseSettings):
     # ── JWT ───────────────────────────────────────────────────────────────────
     secret_key: str
     algorithm: str = "HS256"
-    access_token_expire_minutes: int = 60 * 24  # 24 hours
+    # Access token corto: si se filtra, la ventana de uso es de minutos. El
+    # cliente lo renueva en silencio con el refresh token, sin re-teclear
+    # contraseña. Antes eran 24h, sin refresh.
+    access_token_expire_minutes: int = 30
+    # Refresh token de larga vida (rotatorio, con detección de reuso). Define
+    # cada cuánto, como máximo, hay que volver a iniciar sesión de verdad.
+    refresh_token_expire_days: int = 30
+    # Ventana de gracia para la detección de reuso. Un cliente puede disparar dos
+    # renovaciones casi a la vez (p. ej. el middleware y la página de Next leen la
+    # sesión en paralelo cerca del vencimiento): reusar el token recién rotado
+    # dentro de esta ventana es ese doble disparo, no un robo, así que no tumba la
+    # sesión. Un reuso más tarde sí es sospechoso. No es un umbral antifraude;
+    # ajustable por entorno si hiciera falta.
+    refresh_reuse_leeway_seconds: int = 10
 
     # ── Encryption ────────────────────────────────────────────────────────────
     # Fernet key for app.utils.crypto (encrypting sensitive DB values such as

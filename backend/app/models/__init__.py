@@ -40,6 +40,7 @@ from app.models import incident  # noqa: F401
 from app.models import reception  # noqa: F401
 from app.models import shipment  # noqa: F401
 from app.models import token_denylist  # noqa: F401
+from app.models import refresh_token  # noqa: F401
 from app.models import transfer  # noqa: F401
 from app.models import user  # noqa: F401
 from app.models import user_campaign  # noqa: F401

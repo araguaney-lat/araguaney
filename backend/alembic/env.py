@@ -10,6 +10,7 @@ from app.database import Base
 # Import all models so their tables are registered in Base.metadata
 import app.models.user            # noqa: F401
 import app.models.token_denylist  # noqa: F401
+import app.models.refresh_token    # noqa: F401
 import app.models.center          # noqa: F401
 import app.models.reception       # noqa: F401
 import app.models.box_code_reservation  # noqa: F401
