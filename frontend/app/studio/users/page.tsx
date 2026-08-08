@@ -1,20 +1,12 @@
-"use client"
-
-import { useDict } from "@/context/DictionaryContext"
-
-export default function StudioUsersPage() {
-  const dict = useDict()
-  const t = dict.studio.users
-
-  return (
-    <div className="max-w-5xl">
-      <div className="mb-8">
-        <h1 className="text-2xl font-semibold text-zinc-900">{t.title}</h1>
-        <p className="text-sm text-zinc-500 mt-1">{t.subtitle}</p>
-      </div>
-      <div className="rounded-xl border border-zinc-200 bg-white p-8 text-center">
-        <p className="text-sm text-zinc-500">{t.coming_soon}</p>
-      </div>
-    </div>
-  )
-}
+/* El gestor de usuarios de la plataforma.
+ *
+ * La implementación vive en `/dashboard/admin/users` desde la Fase 5 y ya
+ * llamaba a `/v1/studio/*`. Lo que faltaba era exponerla **donde el superadmin
+ * la busca**: esta ruta era un marcador de "Próximamente" mientras la pantalla
+ * completa existía a un enlace de distancia.
+ *
+ * Se reexporta en vez de duplicarse. Las dos rutas son la misma pantalla, y lo
+ * que cada quien ve lo decide el backend según su rol, no la URL por la que
+ * entró.
+ */
+export { default } from "../../dashboard/admin/users/page"

@@ -67,6 +67,21 @@ def get_current_superadmin(current_user: User = Depends(get_current_user)) -> Us
 
 # ── Domain role guards ─────────────────────────────────────────────────────────
 
+def require_user_manager(current_user: User = Depends(get_current_user)) -> User:
+    """Quien puede administrar cuentas: la plataforma o la operación nacional.
+
+    Las dos entran por aquí y **ven cosas distintas**; el alcance no se decide
+    en esta puerta sino en `app.services.user_admin_scope`, que es donde viven
+    juntas todas las reglas de quién puede tocar a quién.
+    """
+    if current_user.role == "superadmin" or current_user.center_role == "national_admin":
+        return current_user
+    raise HTTPException(
+        status_code=status.HTTP_403_FORBIDDEN,
+        detail={"code": "FORBIDDEN", "message": "User management access required", "field": None, "meta": None},
+    )
+
+
 def require_national_admin(current_user: User = Depends(get_current_user)) -> User:
     if current_user.center_role != "national_admin":
         raise HTTPException(

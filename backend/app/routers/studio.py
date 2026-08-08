@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 
 from app.arq_pool import enqueue
 from app.database import get_db
-from app.dependencies import get_current_superadmin, get_current_user
+from app.dependencies import get_current_superadmin, get_current_user, require_user_manager
 from app.models.user import User
 from app.repositories.audit_repository import AuditRepository
 from app.repositories.campaign_repository import CampaignRepository
@@ -24,6 +24,12 @@ from app.schemas.studio import (
 )
 from app.schemas.user_domain import UserOut, CENTER_ROLES
 from app.services.ai.usage_report import build_report
+from app.services.user_admin_scope import (
+    ensure_can_assign_role,
+    ensure_can_manage,
+    resolve_center_id,
+    scope_user_query,
+)
 from app.services.auth_service import AuthService
 from app.utils.audit import fire_audit
 from app.utils.cloudflare import get_client_ip
@@ -45,10 +51,11 @@ def list_users(
     limit: int = Query(50, ge=1, le=200),
     offset: int = Query(0, ge=0),
     db: Session = Depends(get_db),
-    _: User = Depends(get_current_superadmin),
+    actor: User = Depends(require_user_manager),
 ):
     from sqlalchemy import select
-    stmt = select(User)
+    # La operación nacional no ve cuentas de plataforma ni a sus pares.
+    stmt = scope_user_query(select(User), actor)
     if center_id is not None:
         stmt = stmt.where(User.center_id == center_id)
     if center_role is not None:
@@ -66,10 +73,12 @@ def create_user(
     data: StudioUserCreate,
     background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
-    admin: User = Depends(get_current_superadmin),
+    admin: User = Depends(require_user_manager),
 ):
     if data.center_role not in CENTER_ROLES:
         raise api_error("INVALID_ROLE", "Invalid center role", field="center_role")
+    ensure_can_assign_role(admin, data.center_role)
+    center_id = resolve_center_id(admin, data.center_id)
 
     repo = UserRepository(db)
     if repo.email_exists(data.email):
@@ -85,7 +94,7 @@ def create_user(
         hashed_password=AuthService.hash_password(raw_password),
         is_verified=True,
         must_change_password=True,
-        center_id=data.center_id,
+        center_id=center_id,
         center_role=data.center_role,
         country_code=data.country_code,
     ))
@@ -115,12 +124,13 @@ def reinvite_user(
     user_id: UUID,
     background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
-    admin: User = Depends(get_current_superadmin),
+    admin: User = Depends(require_user_manager),
 ):
     repo = UserRepository(db)
     user = repo.find_by_id(str(user_id))
     if not user:
         raise api_error("NOT_FOUND", "User not found", status_code=404)
+    ensure_can_manage(admin, user)
     if not user.is_active:
         raise api_error("ACCOUNT_DISABLED", "Cannot reinvite a disabled account", status_code=400)
 
@@ -148,14 +158,18 @@ def patch_user(
     user_id: UUID,
     data: StudioUserPatch,
     db: Session = Depends(get_db),
-    admin: User = Depends(get_current_superadmin),
+    admin: User = Depends(require_user_manager),
 ):
     repo = UserRepository(db)
     user = repo.find_by_id(str(user_id))
     if not user:
         raise api_error("NOT_FOUND", "User not found", status_code=404)
+    ensure_can_manage(admin, user)
     if data.center_role is not None and data.center_role not in CENTER_ROLES:
         raise api_error("INVALID_ROLE", "Invalid center role", field="center_role")
+    # Ni ascender a alguien ni dejarlo sin centro: las dos cosas fabrican una
+    # cuenta de administración nacional por la puerta de atrás.
+    ensure_can_assign_role(admin, data.center_role)
 
     before = {"center_role": user.center_role, "is_active": user.is_active}
     if data.center_id is not None:
