@@ -1,8 +1,10 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
+import { useQuery } from "@tanstack/react-query"
 import type { TransferOut } from "@/types"
 import { useDict } from "@/context/DictionaryContext"
+import { apiGet } from "@/lib/query"
 
 const STATUS_COLORS: Record<string, string> = {
   REQUESTED: "bg-yellow-100 text-yellow-800",
@@ -18,20 +20,15 @@ export default function StudioTransfersPage() {
   const dict = useDict()
   const t = dict.studio.transfers
   const statusLabels = dict.dashboard.transfers.status
-  const [transfers, setTransfers] = useState<TransferOut[]>([])
-  const [loading, setLoading] = useState(true)
   const [statusFilter, setStatusFilter] = useState("")
 
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- carga o suscripción de datos intencional al montar o al cambiar de filtro; migrar a una capa de datos (SWR/react-query) se rastrea aparte
-    setLoading(true)
-    const params = new URLSearchParams()
-    if (statusFilter) params.set("status", statusFilter)
-    fetch(`/api/transfers/studio?${params}`)
-      .then((r) => r.ok ? r.json() : [])
-      .then((data) => { setTransfers(data); setLoading(false) })
-      .catch(() => setLoading(false))
-  }, [statusFilter])
+  const transfersQuery = useQuery({
+    queryKey: ["studio-transfers", statusFilter],
+    queryFn: () =>
+      apiGet<TransferOut[]>(`/api/transfers/studio?${new URLSearchParams(statusFilter ? { status: statusFilter } : {})}`),
+  })
+  const transfers = transfersQuery.data ?? []
+  const loading = transfersQuery.isPending
 
   return (
     <div className="max-w-5xl">
