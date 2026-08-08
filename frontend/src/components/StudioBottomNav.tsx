@@ -3,50 +3,33 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useState } from "react"
-import {
-  BarChart2,
-  Inbox,
-  LogOut,
-  MailWarning,
-  Menu,
-  ScrollText,
-  Settings,
-  Sparkles,
-  Users,
-  X,
-} from "lucide-react"
+import { LogOut, MoreHorizontal, X } from "lucide-react"
 import { LogoutForm } from "@/components/LogoutForm"
 import { LanguageSwitcher } from "@/components/LanguageSwitcher"
-import type { StudioNav } from "@/components/StudioSidebar"
+import {
+  isStudioItemActive,
+  studioOverflowItems,
+  studioPrimaryItems,
+  type StudioNav,
+} from "@/lib/nav-config"
 import type { Locale } from "@/lib/i18n"
 
-/* Menú de Studio en móvil, con la misma forma que el del panel operativo.
+/* Menú de Studio en móvil.
  *
- * Antes la barra lateral se encogía a un riel de iconos: cabía, pero se sentía
- * un escritorio apretado. Una barra abajo es lo que la mano espera en un
- * teléfono, y además pone lo más usado al alcance del pulgar.
+ * La lista de secciones **no vive aquí**: sale de `nav-config`, la misma que
+ * dibuja el sidebar de escritorio. Con dos listas, una sección nueva termina
+ * existiendo en el escritorio y siendo inalcanzable en un teléfono, y nadie se
+ * entera hasta que alguien la busca desde el andén.
  *
- * Siete secciones no caben en una barra: cuatro van fijas y el resto vive
- * detrás de "Menú", igual que en el panel. **Las cuatro fijas son las que hoy
- * funcionan.** `/studio/users`, `/studio/audit` y `/studio/settings` son
- * marcadores de "Próximamente", y darles un lugar permanente en la barra sería
- * ofrecer cuatro veces al día algo que no hace nada.
+ * Siete secciones no caben en una barra: cuatro quedan fijas y el resto vive
+ * detrás de "Más". El criterio de cuáles se fija está en `nav-config`, junto a
+ * la lista.
  */
 
-type Item = { href: string; labelKey: keyof StudioNav; icon: React.ComponentType<{ size?: number }> }
-
-const PRINCIPALES: Item[] = [
-  { href: "/studio", labelKey: "metrics", icon: BarChart2 },
-  { href: "/studio/center-applications", labelKey: "center_applications", icon: Inbox },
-  { href: "/studio/emails", labelKey: "emails", icon: MailWarning },
-  { href: "/studio/ai", labelKey: "ai", icon: Sparkles },
-]
-
-const RESTO: Item[] = [
-  { href: "/studio/users", labelKey: "users", icon: Users },
-  { href: "/studio/audit", labelKey: "audit", icon: ScrollText },
-  { href: "/studio/settings", labelKey: "settings", icon: Settings },
-]
+/** Alto mínimo de un objetivo táctil. Un icono de 20 px con padding puede
+ * quedar en 32 y fallarse con el pulgar en movimiento. */
+const ALTO_PESTANA = "min-h-[56px]"
+const ALTO_FILA = "min-h-[44px]"
 
 interface StudioBottomNavProps {
   nav: StudioNav
@@ -59,34 +42,44 @@ export function StudioBottomNav({ nav, locale, userName, userEmail }: StudioBott
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
 
+  const principales = studioPrimaryItems()
+  const resto = studioOverflowItems()
+  // Si la sección actual vive detrás de "Más", el botón se marca activo. Sin
+  // esto, estando en Auditoría la barra no señala nada y parece que no
+  // estuvieras en ningún sitio.
+  const activoEnResto = resto.some((item) => isStudioItemActive(pathname, item))
+
   return (
     <>
       <nav
         className="fixed bottom-0 inset-x-0 z-40 flex md:hidden print:hidden items-stretch justify-around border-t border-blue-200 bg-blue-50"
         style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
       >
-        {PRINCIPALES.map((item) => {
-          // `/studio` coincide con todo lo que cuelga de él: solo es exacta.
-          const activo = item.href === "/studio" ? pathname === item.href : pathname.startsWith(item.href)
+        {principales.map((item) => {
+          const activo = isStudioItemActive(pathname, item)
           const Icon = item.icon
           return (
             <Link
               key={item.href}
               href={item.href}
-              className={`flex flex-1 flex-col items-center justify-center gap-0.5 py-2 text-[10px] font-medium ${
+              className={`flex flex-1 flex-col items-center justify-center gap-0.5 ${ALTO_PESTANA} px-0.5 text-[10px] font-medium ${
                 activo ? "text-blue-800" : "text-blue-600"
               }`}
             >
               <Icon size={20} />
-              <span className="truncate max-w-full px-0.5">{nav[item.labelKey]}</span>
+              <span className="max-w-full truncate">{nav[item.labelKey]}</span>
             </Link>
           )
         })}
         <button
+          type="button"
           onClick={() => setOpen(true)}
-          className="flex flex-1 flex-col items-center justify-center gap-0.5 py-2 text-[10px] font-medium text-blue-600"
+          aria-label={nav.menu}
+          className={`flex flex-1 flex-col items-center justify-center gap-0.5 ${ALTO_PESTANA} text-[10px] font-medium ${
+            open || activoEnResto ? "text-blue-800" : "text-blue-600"
+          }`}
         >
-          <Menu size={20} />
+          <MoreHorizontal size={20} />
           <span>{nav.menu}</span>
         </button>
       </nav>
@@ -102,22 +95,34 @@ export function StudioBottomNav({ nav, locale, userName, userEmail }: StudioBott
           transition: "transform 0.26s cubic-bezier(.4,0,.2,1)",
         }}
       >
-        <div className="flex items-center justify-between border-b border-zinc-100 px-5 pt-4 pb-3">
+        {/* Tirador: dice sin palabras que esto es una hoja que se cierra. */}
+        <div className="flex justify-center pt-3 pb-1">
+          <div className="h-1 w-10 rounded-full bg-zinc-300" />
+        </div>
+
+        <div className="flex items-center justify-between border-b border-zinc-100 px-5 pb-3">
           <span className="text-sm font-semibold text-zinc-900">{nav.menu}</span>
-          <button onClick={() => setOpen(false)} className="p-1 text-zinc-400 hover:text-zinc-700" aria-label="Cerrar">
+          <button
+            onClick={() => setOpen(false)}
+            className="p-1 text-zinc-400 hover:text-zinc-700"
+            aria-label="Cerrar"
+          >
             <X size={20} />
           </button>
         </div>
 
         <div className="flex-1 px-3 py-2">
-          {RESTO.map((item) => {
+          {resto.map((item) => {
             const Icon = item.icon
+            const activo = isStudioItemActive(pathname, item)
             return (
               <Link
                 key={item.href}
                 href={item.href}
                 onClick={() => setOpen(false)}
-                className="flex items-center gap-2.5 rounded-lg px-2.5 py-2.5 text-sm font-medium text-zinc-700 hover:bg-zinc-50"
+                className={`flex items-center gap-3 ${ALTO_FILA} rounded-xl px-3 text-sm font-medium ${
+                  activo ? "bg-blue-50 text-blue-800" : "text-zinc-700 hover:bg-zinc-50"
+                }`}
               >
                 <Icon size={17} />
                 <span>{nav[item.labelKey]}</span>
@@ -125,15 +130,17 @@ export function StudioBottomNav({ nav, locale, userName, userEmail }: StudioBott
             )
           })}
 
+          {/* Estos tres vivían solo en el sidebar, así que en un teléfono no
+              había forma de cambiar de idioma, volver al panel ni salir. */}
           <div className="mt-2 border-t border-zinc-100 pt-2">
             <Link
               href="/dashboard"
               onClick={() => setOpen(false)}
-              className="flex items-center gap-2.5 rounded-lg px-2.5 py-2.5 text-sm font-medium text-zinc-700 hover:bg-zinc-50"
+              className={`flex items-center gap-3 ${ALTO_FILA} rounded-xl px-3 text-sm font-medium text-zinc-700 hover:bg-zinc-50`}
             >
-              <span>← {nav.back_to_dashboard}</span>
+              ← {nav.back_to_dashboard}
             </Link>
-            <div className="px-2.5 py-2">
+            <div className="px-3 py-2">
               <LanguageSwitcher locale={locale} />
             </div>
           </div>
@@ -148,7 +155,7 @@ export function StudioBottomNav({ nav, locale, userName, userEmail }: StudioBott
           <LogoutForm>
             <button
               type="submit"
-              className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2.5 text-sm font-medium text-zinc-700 hover:bg-zinc-50"
+              className={`flex w-full items-center gap-3 ${ALTO_FILA} rounded-xl px-3 text-sm font-medium text-zinc-700 hover:bg-zinc-50`}
             >
               <LogOut size={17} />
               <span>{nav.logout}</span>
