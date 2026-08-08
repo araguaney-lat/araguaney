@@ -1,6 +1,7 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
+import { useQuery } from "@tanstack/react-query"
 
 import { reconcileReceptionAction } from "@/lib/shipment-actions"
 import type {
@@ -35,8 +36,6 @@ interface Props {
 export function ShipmentReception({
   shipmentId, status, pallets, isNationalAdmin, onDone,
 }: Props) {
-  const [reception, setReception] = useState<ReceptionOut | null>(null)
-  const [loading, setLoading] = useState(true)
   const [outcomes, setOutcomes] = useState<Record<string, ReceptionOutcome>>({})
   const [notes, setNotes] = useState<Record<string, string>>({})
   const [weights, setWeights] = useState<Record<string, string>>({})
@@ -47,15 +46,18 @@ export function ShipmentReception({
 
   const yaRecibido = status === "RECONCILED"
 
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- carga o suscripción de datos intencional al montar o al cambiar de filtro; migrar a una capa de datos (SWR/react-query) se rastrea aparte
-    if (!yaRecibido) { setLoading(false); return }
-    fetch(`/api/shipments/${shipmentId}/reception`)
-      .then((r) => (r.ok ? r.json() : null))
-      .then(setReception)
-      .catch(() => setReception(null))
-      .finally(() => setLoading(false))
-  }, [shipmentId, yaRecibido])
+  // Solo hay recepción registrada cuando el envío está reconciliado; la query se
+  // habilita ahí. Devuelve null si no la encuentra, no lanza.
+  const receptionQuery = useQuery({
+    queryKey: ["shipment-reception", shipmentId],
+    queryFn: () =>
+      fetch(`/api/shipments/${shipmentId}/reception`).then((r) =>
+        r.ok ? (r.json() as Promise<ReceptionOut>) : null,
+      ),
+    enabled: yaRecibido,
+  })
+  const reception = receptionQuery.data ?? null
+  const loading = receptionQuery.isLoading
 
   if (status !== "DELIVERED" && !yaRecibido) return null
   if (loading) return null

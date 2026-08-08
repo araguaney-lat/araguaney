@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useSession } from "next-auth/react"
+import { useQuery } from "@tanstack/react-query"
 import { apiFetch } from "@/lib/api"
 import type { Donor, DonorDraft } from "@/types"
 import { useDict } from "@/context/DictionaryContext"
@@ -20,31 +21,32 @@ export function DonorForm({ value, onChange }: Props) {
   const { data: session } = useSession()
   const token = session?.accessToken ?? ""
 
-  const [matches, setMatches] = useState<Donor[]>([])
-  const [searching, setSearching] = useState(false)
-
   const isMoral = value.donor_type === "moral"
   const set = (field: keyof DonorDraft) => (v: string) => onChange({ ...value, [field]: v })
 
-  // Autocompletado por lo que ya capturó este centro. Se dispara con el email
-  // porque es la llave de reuso; si el donante ya existe, se reutiliza su
-  // registro en vez de crear un duplicado.
+  // El email se antirrebota antes de buscar: el timer vive en un effect (no es
+  // un fetch, es debounce), y el setState ocurre dentro del timeout, no en el
+  // cuerpo del effect. Tras elegir un donante se apunta `appliedEmail` para
+  // ocultar el desplegable sin volver a buscar ese mismo correo.
+  const [debouncedEmail, setDebouncedEmail] = useState("")
+  const [appliedEmail, setAppliedEmail] = useState<string | null>(null)
+
   useEffect(() => {
-    const q = value.email.trim()
-    if (q.length < 2 || !token) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- carga o suscripción de datos intencional al montar o al cambiar de filtro; migrar a una capa de datos (SWR/react-query) se rastrea aparte
-      setMatches([])
-      return
-    }
-    const timer = setTimeout(() => {
-      setSearching(true)
-      apiFetch<Donor[]>(`/v1/intakes/donors/search?q=${encodeURIComponent(q)}`, { token })
-        .then(setMatches)
-        .catch(() => setMatches([]))
-        .finally(() => setSearching(false))
-    }, 350)
+    const timer = setTimeout(() => setDebouncedEmail(value.email.trim()), 350)
     return () => clearTimeout(timer)
-  }, [value.email, token])
+  }, [value.email])
+
+  // Autocompletado por lo que ya capturó este centro. La llave de reuso es el
+  // email; si el donante ya existe, se reutiliza en vez de duplicar.
+  const suppressed = debouncedEmail === appliedEmail
+  const searchQuery = useQuery({
+    queryKey: ["donor-search", debouncedEmail],
+    queryFn: () =>
+      apiFetch<Donor[]>(`/v1/intakes/donors/search?q=${encodeURIComponent(debouncedEmail)}`, { token }),
+    enabled: debouncedEmail.length >= 2 && !!token && !suppressed,
+  })
+  const matches = suppressed ? [] : (searchQuery.data ?? [])
+  const searching = searchQuery.isFetching
 
   const applyMatch = (d: Donor) => {
     onChange({
@@ -55,7 +57,7 @@ export function DonorForm({ value, onChange }: Props) {
       email: d.email ?? "",
       phone: d.phone ?? "",
     })
-    setMatches([])
+    setAppliedEmail((d.email ?? "").trim())
   }
 
   const field = (label: string, key: keyof DonorDraft, required: boolean, type = "text") => (
