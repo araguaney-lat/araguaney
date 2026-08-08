@@ -13,6 +13,8 @@ import {
 } from "@/lib/transfer-actions"
 import { useExportJob } from "@/hooks/useExportJob"
 import { useDict } from "@/context/DictionaryContext"
+import { Plus } from "lucide-react"
+import { PageAction } from "@/components/PageAction"
 
 const STATUS_COLORS: Record<TransferStatus, string> = {
   REQUESTED: "bg-dDraftB text-dDraftT",
@@ -159,12 +161,11 @@ export default function TransfersPage() {
     <div className="max-w-6xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold text-tx">{t.title}</h1>
-        <button
+        <PageAction
           onClick={() => { setShowCreate(true); fetchSealedBoxes() }}
-          className="px-4 py-2 bg-[var(--blue)] text-white rounded-lg text-sm font-medium hover:opacity-90"
-        >
-          {t.new}
-        </button>
+          icon={Plus}
+          label={t.new}
+        />
       </div>
 
       {error && (

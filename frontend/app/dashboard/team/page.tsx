@@ -6,6 +6,8 @@ import { useSession } from "next-auth/react"
 import { apiFetch } from "@/lib/api"
 import type { Center, UserOut } from "@/types"
 import { useDict } from "@/context/DictionaryContext"
+import { UserCog, X } from "lucide-react"
+import { PageAction } from "@/components/PageAction"
 
 const ROLES = ["volunteer", "coordinator"]
 const EMPTY_FORM = { email: "", username: "", full_name: "", center_role: "volunteer" }
@@ -160,12 +162,11 @@ export default function TeamPage() {
           </p>
         </div>
         {canManage && (
-          <button
+          <PageAction
             onClick={() => { setShowManage((v) => !v); setShowForm(false); setError(null); setSuccess(null) }}
-            className="rounded-lg bg-[var(--blue)] px-3 py-1.5 text-sm font-medium text-white hover:opacity-90"
-          >
-            {showManage ? t.cancel : t.manage_team}
-          </button>
+            icon={showManage ? X : UserCog}
+            label={showManage ? t.cancel : t.manage_team}
+          />
         )}
       </div>
 
