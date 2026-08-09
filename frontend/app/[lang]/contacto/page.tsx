@@ -1,13 +1,12 @@
-import Image from "next/image"
-import Link from "next/link"
 import type { Metadata } from "next"
 import ContactForm, { type ContactFormLabels } from "@/components/ContactForm"
+import HomeNav from "@/components/HomeNav"
+import HomeFooter from "@/components/HomeFooter"
+import { getDictionary } from "@/lib/i18n"
 import { alternates } from "@/lib/seo"
 import { type Locale, localizedPath } from "@/lib/routes"
 
 const KEY = "contacto"
-
-const LOGO = "https://res.cloudinary.com/dtvdqlxtd/image/upload/v1782794310/image_degkq9.png"
 
 interface InfoItem {
   title: string
@@ -16,12 +15,6 @@ interface InfoItem {
 interface Content {
   metaTitle: string
   description: string
-  navHome: string
-  navWhy: string
-  navStandards: string
-  navContact: string
-  navLogin: string
-  menuAria: string
   eyebrow: string
   h1a: string
   h1Md: string
@@ -30,8 +23,6 @@ interface Content {
   info: InfoItem[]
   privacyLabel: string
   privacyText: string
-  footerPrivacy: string
-  footerTerms: string
   form: ContactFormLabels
 }
 
@@ -40,12 +31,6 @@ const CONTENT: Record<Locale, Content> = {
     metaTitle: "Contacto",
     description:
       "Contáctanos para sumar tu centro de acopio a la coordinación nacional de ayuda humanitaria.",
-    navHome: "Inicio",
-    navWhy: "Por qué Araguaney",
-    navStandards: "Estándares",
-    navContact: "Contacto",
-    navLogin: "Iniciar sesión",
-    menuAria: "Menú",
     eyebrow: "Hablemos",
     h1a: "¿Tu fundación coordina un centro",
     h1Md: " de acopio",
@@ -59,8 +44,6 @@ const CONTENT: Record<Locale, Content> = {
     privacyLabel: "Privacidad.",
     privacyText:
       " No recopilamos ningún dato de personas beneficiarias. Este formulario solo nos sirve para contactar a tu organización.",
-    footerPrivacy: "Aviso de Privacidad",
-    footerTerms: "Términos",
     form: {
       name: "Nombre",
       namePlaceholder: "Tu nombre",
@@ -85,12 +68,6 @@ const CONTENT: Record<Locale, Content> = {
     metaTitle: "Contact",
     description:
       "Get in touch to add your collection center to the national humanitarian aid coordination.",
-    navHome: "Home",
-    navWhy: "Why Araguaney",
-    navStandards: "Standards",
-    navContact: "Contact",
-    navLogin: "Sign in",
-    menuAria: "Menu",
     eyebrow: "Let's talk",
     h1a: "Does your foundation run a collection",
     h1Md: " center",
@@ -104,8 +81,6 @@ const CONTENT: Record<Locale, Content> = {
     privacyLabel: "Privacy.",
     privacyText:
       " We don't collect any data about aid recipients. This form only lets us contact your organization.",
-    footerPrivacy: "Privacy Notice",
-    footerTerms: "Terms",
     form: {
       name: "Name",
       namePlaceholder: "Your name",
@@ -156,52 +131,17 @@ export default async function ContactoPage({
 }) {
   const { lang: locale } = await params
   const c = CONTENT[locale]
-
-  const home = localizedPath("", locale)
-  const navLinks = [
-    { href: home, label: c.navHome },
-    { href: `${home}#por-que`, label: c.navWhy },
-    { href: `${home}#estandares`, label: c.navStandards },
-    { href: localizedPath(KEY, locale), label: c.navContact, active: true },
-  ]
+  const dict = await getDictionary(locale)
 
   return (
     <div style={{ background: "#FBF7EE", minHeight: "100vh", display: "flex", flexDirection: "column" }}>
-
-      {/* Nav */}
-      <nav style={{ background: "#FBF7EE", borderBottom: "1px solid #EFE7D6" }}
-        className="flex items-center justify-between px-5 md:px-[46px] py-[14px] md:py-5">
-        <Link href={home} className="flex items-center gap-[9px] md:gap-[11px]">
-          <span style={{ borderRadius: "50%", border: "1px solid #EADFC4" }}
-            className="w-8 h-8 md:w-[38px] md:h-[38px] flex items-center justify-center overflow-hidden bg-white flex-none">
-            <Image src={LOGO} alt="" width={34} height={34} className="object-contain" />
-          </span>
-          <span style={{ fontFamily: "var(--font-source-serif)", fontWeight: 600, color: "#2B2723" }}
-            className="text-[18px] md:text-[21px]">Araguaney</span>
-        </Link>
-
-        {/* Desktop nav */}
-        <div className="hidden md:flex items-center gap-[30px]">
-          {navLinks.map((l) => (
-            <Link key={l.href} href={l.href}
-              style={{ fontSize: 14, fontWeight: l.active ? 600 : 400, color: l.active ? "#2B2723" : "#52493D" }}>
-              {l.label}
-            </Link>
-          ))}
-          <Link href="/login"
-            style={{ border: "1.5px solid #1F5E8C", color: "#1F5E8C", borderRadius: 99, fontSize: 13.5, fontWeight: 600 }}
-            className="px-[18px] py-[9px] inline-flex items-center">
-            {c.navLogin}
-          </Link>
-        </div>
-
-        {/* Mobile hamburger */}
-        <button className="md:hidden p-1 flex flex-col gap-[5px]" aria-label={c.menuAria}>
-          <span style={{ width: 20, height: 2, background: "#2B2723", borderRadius: 2, display: "block" }} />
-          <span style={{ width: 20, height: 2, background: "#2B2723", borderRadius: 2, display: "block" }} />
-          <span style={{ width: 13, height: 2, background: "#2B2723", borderRadius: 2, display: "block" }} />
-        </button>
-      </nav>
+      <HomeNav
+        dict={dict.nav}
+        locale={locale}
+        localeLinks={{ es: localizedPath(KEY, "es"), en: localizedPath(KEY, "en") }}
+      />
+      {/* Compensa el HomeNav fijo en móvil para que el contenido no quede debajo. */}
+      <div className="h-[56px] md:hidden" />
 
       {/* Content */}
       <div className="flex-1 grid grid-cols-1 md:grid-cols-[0.9fr_1.1fr]">
@@ -251,16 +191,7 @@ export default async function ContactoPage({
         </div>
       </div>
 
-      {/* Footer */}
-      <footer style={{ background: "#2B2723", color: "#A89E8C" }}
-        className="px-5 md:px-[46px] py-6 md:py-[26px] flex justify-between flex-wrap gap-3 text-[12.5px]">
-        <span style={{ fontFamily: "var(--font-source-serif)", fontSize: 16, color: "#fff", fontWeight: 600 }}>Araguaney</span>
-        <span className="flex items-center gap-4">
-          <Link href={localizedPath("aviso-de-privacidad", locale)} style={{ color: "#E9E2D5", fontWeight: 600 }}>{c.footerPrivacy}</Link>
-          <span>·</span>
-          <Link href={localizedPath("terminos", locale)} style={{ color: "#E9E2D5", fontWeight: 600 }}>{c.footerTerms}</Link>
-        </span>
-      </footer>
+      <HomeFooter dict={dict.footer} locale={locale} />
     </div>
   )
 }
