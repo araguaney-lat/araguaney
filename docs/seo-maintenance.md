@@ -129,16 +129,20 @@ Estos ya están hechos; anótalos por si migras de entorno o alguien pregunta:
 
 ---
 
-## Proceso mensual de medición (Fase 17, tasks 19–21 — pendientes)
+## Proceso mensual de medición (Fase 17, tasks 19–21)
 
-Cuando lo arranquemos, la rutina es:
+El instrumento concreto —banco fijo de prompts, plantillas de registro y definiciones de KPI—
+vive en [`seo/aeo-monitoring.md`](seo/aeo-monitoring.md). La rutina mensual (~30 min) es:
 
-1. **Citas en IA (task 19):** correr un set fijo de prompts (head terms + comparativas, ES/EN) en
+1. **Citas en IA (task 19):** correr el banco fijo de prompts (head terms + comparativas, ES/EN) en
    ChatGPT / Perplexity / Gemini / Google AI Overviews y registrar si Araguaney aparece citado y
-   con qué página. Una fila por mes en una hoja.
-2. **Bing (task 20):** revisar cobertura e impresiones en Bing Webmaster Tools (complementa GSC).
-3. **KPIs de AEO (task 21):** más allá de la posición en Google — share-of-voice en respuestas de
-   IA, menciones de marca y citas.
+   con qué página, con la plantilla de la Parte 1.
+2. **Bing (task 20):** registrar cobertura, impresiones y top queries de Bing Webmaster Tools
+   (complementa GSC), con la plantilla de la Parte 2.
+3. **KPIs de AEO (task 21):** calcular los KPIs de la Parte 3 (share-of-voice como métrica cabecera)
+   y leer la tendencia, no el mes suelto.
+
+El primer mes es la línea base. Apenda el bloque del mes al *Results log* del propio instrumento.
 
 ---
 

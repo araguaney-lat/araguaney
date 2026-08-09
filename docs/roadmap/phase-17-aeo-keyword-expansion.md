@@ -139,9 +139,9 @@ intención **comercial/comparativa** (fondo de embudo — donde la IA ama tablas
 
 | # | Tarea | Descripción | Prioridad | Estado |
 |---|-------|-------------|-----------|--------|
-| 19 | Monitoreo de citas en IA | Set fijo de prompts (head terms + comparativas, ES/EN) corridos mensualmente en ChatGPT/Perplexity/Gemini/AI Overviews; registrar si Araguaney es citado y con qué página. Complementa el rank tracking de Google (Fase 11 task 22). | 🟠 | ⬜ |
-| 20 | Analítica de Bing | Cobertura e impresiones en Bing Webmaster Tools (complementa GSC). Depende de la task 1. | 🟢 | ⬜ |
-| 21 | KPIs de AEO | Definir métricas más allá de la posición en Google: share-of-voice en respuestas de IA, menciones de marca y citas. Revisar con las tasks 19–20. | 🟢 | ⬜ |
+| 19 | Monitoreo de citas en IA | Set fijo de prompts (head terms + comparativas, ES/EN) corridos mensualmente en ChatGPT/Perplexity/Gemini/AI Overviews; registrar si Araguaney es citado y con qué página. Complementa el rank tracking de Google (Fase 11 task 22). | 🟠 | 🟡 Preparada — instrumento listo en [`docs/seo/aeo-monitoring.md`](../seo/aeo-monitoring.md): banco fijo de 18 prompts (ES/EN por clusters E/F/G/H) + plantilla de registro por mes/motor. Correrlo cada mes es mantenimiento del operador. |
+| 20 | Analítica de Bing | Cobertura e impresiones en Bing Webmaster Tools (complementa GSC). Depende de la task 1. | 🟢 | 🟡 Preparada — qué extraer de Bing WMT cada mes (índice n/33, impresiones, clics, top queries vs GSC) definido en [`docs/seo/aeo-monitoring.md`](../seo/aeo-monitoring.md), Parte 2. La revisión mensual del dashboard es manual. |
+| 21 | KPIs de AEO | Definir métricas más allá de la posición en Google: share-of-voice en respuestas de IA, menciones de marca y citas. Revisar con las tasks 19–20. | 🟢 | ✅ Done — KPIs definidos con fórmula y línea base en [`docs/seo/aeo-monitoring.md`](../seo/aeo-monitoring.md), Parte 3: share-of-voice (métrica cabecera), tasa de cita por motor, distribución por página citada, exactitud de la respuesta, cobertura de índice en Bing y menciones de marca. |
 
 ---
 

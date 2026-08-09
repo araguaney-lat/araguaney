@@ -4,8 +4,8 @@
 
 ```mermaid
 pie title Tareas completadas (457 tareas)
-    "Listas" : 435
-    "Pendientes" : 22
+    "Listas" : 436
+    "Pendientes" : 21
 ```
 
 | Fase | Nombre | Listas | Pendientes | Progreso |
@@ -27,7 +27,7 @@ pie title Tareas completadas (457 tareas)
 | 14 | [Auto-registro de centros con aprobación](phase-14-center-self-registration.md) | 17 | 0 | ✅ 100% |
 | 15 | [Deliverability de emails + aviso de solicitudes](phase-15-email-deliverability.md) | 15 | 0 | ✅ 100% |
 | 16 | [Rediseño de plantillas de email con marca](phase-16-email-brand-redesign.md) | 10 | 0 | ✅ 100% |
-| 17 | [AEO/GEO + expansión de keywords](phase-17-aeo-keyword-expansion.md) | 15 | 6 | 🟡 71% |
+| 17 | [AEO/GEO + expansión de keywords](phase-17-aeo-keyword-expansion.md) | 16 | 5 | 🟡 76% |
 | 18 | [Pre-registro de donaciones por el donante](phase-18-donor-preregistration.md) | 23 | 0 | ✅ 100% |
 | 19 | [Identidad estructurada del donante en el intake](phase-19-structured-donor-identity.md) | 9 | 0 | ✅ 100% |
 | 20 | [Prevención de riesgos: responsabilidad y anti-lavado en especie](phase-20-risk-prevention.md) | 6 | 4 | 🟡 60% |
@@ -36,9 +36,9 @@ pie title Tareas completadas (457 tareas)
 | 23 | [IA asistida: captura, catálogo y necesidades](phase-23-ai-assisted-capture.md) | 11 | 0 | ✅ 100% |
 | 24 | [Observabilidad: que un fallo silencioso deje de serlo](phase-24-observability.md) | 11 | 0 | ✅ 100% |
 | 25 | [Captura sin conexión: cola local y sincronización diferida](phase-25-offline-capture.md) | 14 | 0 | ✅ 100% |
-| **Total** | | **435** | **22** | **🟡 95%** |
+| **Total** | | **436** | **21** | **🟡 95%** |
 
-> **Pendientes (22):**
+> **Pendientes (21):**
 > El grupo A de la Fase 13 (privacidad, lo que aplica hoy) está completo.
 > - Los borradores legales de la Fase 20 están escritos y esperando revisión de abogado:
 >   [`docs/legal/drafts/`](../legal/drafts/README.md). Sus tareas siguen abiertas hasta que esa
@@ -59,9 +59,12 @@ pie title Tareas completadas (457 tareas)
 >   legal/contable, procesador de pagos, T&C de donación, transparencia). Todo el bloque de
 >   donativos depende de una decisión previa —"¿Araguaney recibe dinero?"— que además
 >   contradice el no-objetivo declarado en `CLAUDE.md`.
-> - **6 ejecutables (Fase 17):** tasks 6 (Wikidata) y 8 (directorios) preparadas en
->   [`docs/seo/entity-registration.md`](../seo/entity-registration.md); 17 (video demo),
->   19 (monitoreo de citas en IA), 20 (analítica de Bing) y 21 (KPIs de AEO).
+> - **5 ejecutables (Fase 17):** tasks 6 (Wikidata) y 8 (directorios) preparadas en
+>   [`docs/seo/entity-registration.md`](../seo/entity-registration.md); 17 (video demo, requiere
+>   grabar el video). Las de medición (19 monitoreo de citas en IA, 20 analítica de Bing) quedan
+>   **preparadas** con el instrumento de [`docs/seo/aeo-monitoring.md`](../seo/aeo-monitoring.md)
+>   (banco de prompts, plantillas y KPIs); correrlas cada mes es mantenimiento. La task 21 (definir
+>   KPIs) quedó **cerrada** con ese mismo instrumento.
 
 > Envs opcionales (Sentry, Slack, Google Safe Browsing, Encryption Key) se pueden agregar en cualquier momento sin cambios de código.
 
