@@ -31,6 +31,7 @@ sondeos de exploits, Turnstile en formularios públicos.
 
 | Fecha | Movimiento |
 |---|---|
+| 2026-07-27 | Se envía la nominación de Araguaney a la Digital Public Goods Alliance. Estado: en revisión |
 | 2026-08 | Se envía la solicitud a Project Galileo para `araguaney.lat` |
 | 2026-08-10 | Cloudflare responde (coordinación del programa de impacto) pidiendo **documentación del estatus sin fines de lucro** de la organización |
 | — | **Pendiente:** responder. Ver "El hueco" abajo |
@@ -74,6 +75,13 @@ Lo que sí es cierto y sí se puede evidenciar:
   registro público**: mientras no concluya la revisión, se dice "sometido a revisión",
   nunca "es un DPG". Sobrevender ese estado ante Cloudflare costaría más que el
   beneficio de mencionarlo.
+
+> **Los identificadores de esa solicitud no se escriben aquí.** El registro público
+> solo lista proyectos con revisión concluida, así que hoy el número no se puede
+> resolver desde fuera: no le sirve a quien lea este repositorio y sí es un
+> identificador de una solicitud en curso. Ante Cloudflare se ofrece bajo pedido, para
+> que confirmen con la Alianza directamente. La fecha y el estado sí van arriba,
+> porque son lo que hace verificable la afirmación.
 
 Galileo no publica un requisito rígido de registro legal: la elegibilidad se evalúa
 por misión y vulnerabilidad, y una de las vías de entrada es que una **organización
@@ -146,9 +154,12 @@ para que nadie lo reabra cada vez que un formulario pida un acta constitutiva.
 >
 > I have also submitted the project to the **Digital Public Goods Alliance** — the
 > multi-stakeholder initiative co-founded by UNICEF and the Government of Norway — for
-> assessment against the DPG Standard. The nomination is currently under review, and
-> if it is approved the project would be listed on the public DPG registry. I mention
-> it because that review examines much of what your question is aimed at: open
+> assessment against the DPG Standard. The nomination was submitted on 27 July 2026
+> and is currently under review; it is not yet listed publicly, since the DPG registry
+> lists only projects that have completed review. I am happy to share our DPG
+> application reference so that you can confirm the submission with the Alliance
+> directly. I mention it because that review examines much of what your question is
+> aimed at: open
 > licensing, clear ownership, platform independence, documentation, and do-no-harm
 > requirements covering privacy and data protection. It is an independent assessment
 > of the project's public-interest character, rather than a claim I am making about
