@@ -31,9 +31,11 @@ sondeos de exploits, Turnstile en formularios públicos.
 
 | Fecha | Movimiento |
 |---|---|
+| 2026-07-27 | Se envía la nominación de Araguaney a la Digital Public Goods Alliance. Estado: en revisión |
 | 2026-08 | Se envía la solicitud a Project Galileo para `araguaney.lat` |
 | 2026-08-10 | Cloudflare responde (coordinación del programa de impacto) pidiendo **documentación del estatus sin fines de lucro** de la organización |
-| — | **Pendiente:** responder. Ver "El hueco" abajo |
+| 2026-08-10 | Se responde por el camino 1: no hay figura legal ni la habrá, con el paquete de evidencia sustituta y la nominación ante la DPGA. Se cierra con una sola pregunta, la de patrocinio por organización socia |
+| — | **Pendiente:** respuesta del programa |
 
 Cloudflare aclara en su respuesta que nunca menciona públicamente a un sitio como
 cliente del programa ni comenta su interés en él sin permiso escrito explícito.
@@ -65,6 +67,22 @@ Lo que sí es cierto y sí se puede evidenciar:
 - **Documentación legal en preparación**: términos de donación en especie, política
   de aceptación y exención de plataforma, en `docs/legal/drafts/`, pendientes de
   revisión profesional.
+- **Nominación ante la Digital Public Goods Alliance**, la iniciativa cofundada por
+  UNICEF y el gobierno de Noruega. Es la evidencia sustituta más fuerte que hay hoy,
+  porque es un tercero el que evalúa —contra los nueve indicadores del DPG Standard:
+  licencia abierta, propiedad clara, independencia de plataforma, documentación y
+  *do-no-harm* con privacidad y protección de datos— y no el proyecto hablando de sí
+  mismo. El flujo es **nominación → revisión técnica → reconocimiento y alta en el
+  registro público**: mientras no concluya la revisión, se dice "sometido a revisión",
+  nunca "es un DPG". Sobrevender ese estado ante Cloudflare costaría más que el
+  beneficio de mencionarlo.
+
+> **Los identificadores de esa solicitud no se escriben aquí.** El registro público
+> solo lista proyectos con revisión concluida, así que hoy el número no se puede
+> resolver desde fuera: no le sirve a quien lea este repositorio y sí es un
+> identificador de una solicitud en curso. Ante Cloudflare se ofrece bajo pedido, para
+> que confirmen con la Alianza directamente. La fecha y el estado sí van arriba,
+> porque son lo que hace verificable la afirmación.
 
 Galileo no publica un requisito rígido de registro legal: la elegibilidad se evalúa
 por misión y vulnerabilidad, y una de las vías de entrada es que una **organización
@@ -95,7 +113,11 @@ para que nadie lo reabra cada vez que un formulario pida un acta constitutiva.
 
 **Orden recomendado:** responder ya por el camino 1 y empujar el 2 en paralelo.
 
-## Borrador de respuesta (inglés)
+## Respuesta enviada el 2026-08-10 (inglés)
+
+> Se conserva el texto tal como salió. Cierra con **una sola** pregunta, la de
+> patrocinio: un correo que pregunta dos cosas invita a que contesten la más fácil,
+> y aquí la que abre camino concreto es esa.
 
 > Dear <nombre de quien coordina el programa>,
 >
@@ -135,6 +157,19 @@ para que nadie lo reabra cada vez que un formulario pida un acta constitutiva.
 >   disclaimer are written and awaiting review by a lawyer practising in Mexico
 >   before they are published.
 >
+> I have also submitted the project to the **Digital Public Goods Alliance** — the
+> multi-stakeholder initiative co-founded by UNICEF and the Government of Norway — for
+> assessment against the DPG Standard. The nomination was submitted on 27 July 2026
+> and is currently under review; it is not yet listed publicly, since the DPG registry
+> lists only projects that have completed review. I am happy to share our DPG
+> application reference so that you can confirm the submission with the Alliance
+> directly. I mention it because that review examines much of what your question is
+> aimed at: open
+> licensing, clear ownership, platform independence, documentation, and do-no-harm
+> requirements covering privacy and data protection. It is an independent assessment
+> of the project's public-interest character, rather than a claim I am making about
+> myself.
+>
 > The project was built in response to the June 2026 earthquakes in northern
 > Venezuela, and it is currently being evaluated by registered disaster-response
 > organizations in Mexico that operate collection centres. If a letter of support
@@ -142,10 +177,8 @@ para que nadie lo reabra cada vez que un formulario pida un acta constitutiva.
 > approach them only once I know it is useful to you, and I will not name any third
 > party before they have agreed in writing.
 >
-> So my question is this: where an applicant has no legal registration by design,
-> what evidence does Project Galileo accept in place of non-profit documentation?
-> And in our case, would the partner-sponsorship route be more appropriate than a
-> direct application?
+> So my question is this: in our case, would the partner-sponsorship route be more
+> appropriate than a direct application?
 >
 > I am happy to provide anything else that helps you assess this.
 >
