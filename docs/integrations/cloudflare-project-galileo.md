@@ -34,7 +34,8 @@ sondeos de exploits, Turnstile en formularios públicos.
 | 2026-07-27 | Se envía la nominación de Araguaney a la Digital Public Goods Alliance. Estado: en revisión |
 | 2026-08 | Se envía la solicitud a Project Galileo para `araguaney.lat` |
 | 2026-08-10 | Cloudflare responde (coordinación del programa de impacto) pidiendo **documentación del estatus sin fines de lucro** de la organización |
-| — | **Pendiente:** responder. Ver "El hueco" abajo |
+| 2026-08-10 | Se responde por el camino 1: no hay figura legal ni la habrá, con el paquete de evidencia sustituta y la nominación ante la DPGA. Se cierra con una sola pregunta, la de patrocinio por organización socia |
+| — | **Pendiente:** respuesta del programa |
 
 Cloudflare aclara en su respuesta que nunca menciona públicamente a un sitio como
 cliente del programa ni comenta su interés en él sin permiso escrito explícito.
@@ -112,7 +113,11 @@ para que nadie lo reabra cada vez que un formulario pida un acta constitutiva.
 
 **Orden recomendado:** responder ya por el camino 1 y empujar el 2 en paralelo.
 
-## Borrador de respuesta (inglés)
+## Respuesta enviada el 2026-08-10 (inglés)
+
+> Se conserva el texto tal como salió. Cierra con **una sola** pregunta, la de
+> patrocinio: un correo que pregunta dos cosas invita a que contesten la más fácil,
+> y aquí la que abre camino concreto es esa.
 
 > Dear <nombre de quien coordina el programa>,
 >
@@ -172,10 +177,8 @@ para que nadie lo reabra cada vez que un formulario pida un acta constitutiva.
 > approach them only once I know it is useful to you, and I will not name any third
 > party before they have agreed in writing.
 >
-> So my question is this: where an applicant has no legal registration by design,
-> what evidence does Project Galileo accept in place of non-profit documentation?
-> And in our case, would the partner-sponsorship route be more appropriate than a
-> direct application?
+> So my question is this: in our case, would the partner-sponsorship route be more
+> appropriate than a direct application?
 >
 > I am happy to provide anything else that helps you assess this.
 >
