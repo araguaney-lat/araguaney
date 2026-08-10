@@ -44,6 +44,13 @@ Araguaney **no está constituida**. No hay asociación civil, no hay fundación,
 acta constitutiva. Es un proyecto de voluntariado que publica software libre. No
 existe el documento que Cloudflare pide, y no tiene sentido inventar un equivalente.
 
+**Y no es un trámite pendiente: es la forma del proyecto.** No hay intención de crear
+una fundación. Quien lo mantiene aporta lo que sabe hacer —construir, corregir y
+mejorar el software— y lo entrega gratis a cualquier centro que lo necesite. La
+operación humanitaria la hacen las organizaciones que usan la plataforma; el proyecto
+pone la herramienta. Decirlo así ante Cloudflare es más limpio que insinuar una
+constitución que nunca va a llegar.
+
 Lo que sí es cierto y sí se puede evidenciar:
 
 - **No hay actividad comercial.** La plataforma no cobra, no procesa pagos y no
@@ -79,59 +86,71 @@ con organizaciones de rescate en México, todavía en revisión del producto. **
 menciona ninguna por nombre ante Cloudflare hasta que acepten por escrito**: nombrar
 a un tercero como respaldo antes de que lo sea es un problema propio.
 
-**3. Constituir la A.C. (lento, y no bloquea).**
-Es la solución definitiva y la que además desbloquea otras cosas (recibir donativos,
-convenios formales). Toma semanas o meses y cuesta dinero. Se puede iniciar en
-paralelo, pero la respuesta a Cloudflare no debe esperarla.
+**3. Constituir una A.C. — descartado.**
+Sería la vía que resuelve el papel, pero implica convertir el proyecto en una
+organización con órganos de gobierno, contabilidad y obligaciones fiscales, y eso no
+es lo que se está construyendo. La aportación es técnica: software libre, mantenido y
+mejorado, disponible sin costo. Queda registrado como decisión, no como pendiente,
+para que nadie lo reabra cada vez que un formulario pida un acta constitutiva.
 
-**Orden recomendado:** responder ya por el camino 1, empujar el 2 en paralelo, y
-tratar el 3 como decisión de proyecto aparte, no como requisito de esta solicitud.
+**Orden recomendado:** responder ya por el camino 1 y empujar el 2 en paralelo.
 
 ## Borrador de respuesta (inglés)
 
 > Dear <nombre de quien coordina el programa>,
 >
-> Thank you for getting back to us, and for the clarification regarding
-> confidentiality.
+> Thank you for your reply, and for the clarification regarding confidentiality.
 >
-> I want to be straightforward with you: Araguaney is not a registered non-profit,
-> so there is no incorporation or tax-exempt documentation I can send. It is an
-> unincorporated, volunteer-run project. We are not a company, we have no revenue,
-> and we are not seeking any. I would rather tell you this plainly than send you
-> something that does not answer your question.
+> I want to answer your question plainly rather than send you something that does not
+> address it: Araguaney is **not a registered non-profit, and it is not on its way to
+> becoming one**. There is no incorporation certificate or tax-exempt determination I
+> can provide, because no legal entity exists.
 >
-> What I can document is the nature of the project:
+> That is not an administrative gap. It is what the project is. Araguaney is software
+> I build and maintain personally, and give away at no cost to any collection centre
+> that needs it. Software engineering is what I know how to do, and this is how I
+> contribute to humanitarian relief: I write the code, fix it, improve it and keep it
+> running. The humanitarian operation itself is carried out by the organizations that
+> use the platform. I do not run a charity, I do not raise funds, and I have no
+> intention of forming a foundation in order to keep doing this.
 >
-> - **It handles no money.** The platform does not process payments, donations of
->   money, or any financial transaction. It coordinates physical in-kind donations
->   only — medicines, food, water, hygiene items, tools — for relief shipments.
-> - **It handles no beneficiary personal data.** The system tracks inventory, not
->   people.
-> - **It is free software**, released under AGPL-3.0, with the entire source code
->   public: https://github.com/araguaney-lat/araguaney
+> What I can evidence is the nature of the project:
+>
+> - **The source code is publicly released** under the AGPL-3.0 licence — free
+>   software in the strict sense, auditable and reusable by anyone:
+>   https://github.com/araguaney-lat/araguaney
+> - **It is provided free of charge.** There is no licence fee, no paid tier, no
+>   revenue of any kind, and none is planned.
+> - **It handles no money.** The platform does not process payments or monetary
+>   donations. It coordinates physical in-kind donations only — medicines, food,
+>   water, hygiene supplies, tools — for relief shipments.
+> - **It handles no beneficiary personal data.** The system tracks humanitarian
+>   inventory, not people.
 > - **It follows sector standards** for donated goods: WHO Guidelines for Medicine
->   Donations, IFRC/ICRC and IOM relief item catalogues, UNSPSC and GS1.
+>   Donations, the IFRC/ICRC and IOM relief item catalogues, UNSPSC and GS1.
 > - **It implements anti-diversion controls** on in-kind donations, so that
 >   humanitarian aid channels are not misused for trade-based money laundering.
-> - Our terms of donation and platform disclaimers are drafted and pending review
->   by a lawyer practising in Mexico.
+> - **Legal documentation is drafted and pending professional review.** The terms
+>   governing in-kind donations, the donation acceptance policy and the platform
+>   disclaimer are written and awaiting review by a lawyer practising in Mexico
+>   before they are published.
 >
 > The project was built in response to the June 2026 earthquakes in northern
 > Venezuela, and it is currently being evaluated by registered disaster-response
-> organizations in Mexico that operate collection centres. If a formal letter of
-> support from one of them would help the application, I can pursue that — I would
-> only approach them once I know it is useful to you, and I will not name any
-> third party to you before they have agreed in writing.
+> organizations in Mexico that operate collection centres. If a letter of support
+> from one of them would help the application, I am glad to pursue it — I will
+> approach them only once I know it is useful to you, and I will not name any third
+> party before they have agreed in writing.
 >
-> So my question is this: for a project with no legal registration, what evidence
-> does Project Galileo accept in place of non-profit documentation? And would the
-> partner-sponsorship route be more appropriate in our case than a direct
-> application?
+> So my question is this: where an applicant has no legal registration by design,
+> what evidence does Project Galileo accept in place of non-profit documentation?
+> And in our case, would the partner-sponsorship route be more appropriate than a
+> direct application?
 >
-> Happy to provide anything else that helps you assess this.
+> I am happy to provide anything else that helps you assess this.
 >
 > Kind regards,
-> Antony
+> Antony Delgado
 
 ## Textos de la solicitud original
 
