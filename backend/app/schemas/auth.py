@@ -38,6 +38,24 @@ class Token(StrictModel):
     must_accept_terms: bool = False
 
 
+class TotpPending(StrictModel):
+    """Respuesta del inicio de sesión cuando la cuenta tiene segundo factor.
+
+    El inicio de sesión tiene dos desenlaces y esta es la mitad que faltaba
+    describir: credenciales correctas, sesión todavía no. El `partial_token`
+    caduca en minutos y solo sirve para `POST /v1/auth/totp/challenge`; no abre
+    ningún otro endpoint.
+
+    Se declara para que el contrato publicado no mienta sobre lo que devuelve el
+    endpoint. Aun así, un cliente tipado no puede expresar "200 → Token u 202 →
+    esto" en un solo método, así que seguirá tratando el inicio de sesión aparte
+    (Fase 26, task 3).
+    """
+
+    requires_totp: bool = True
+    partial_token: str
+
+
 class RefreshRequest(StrictModel):
     refresh_token: str
 

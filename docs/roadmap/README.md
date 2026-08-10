@@ -4,8 +4,8 @@
 
 ```mermaid
 pie title Tareas completadas (466 tareas)
-    "Listas" : 436
-    "Pendientes" : 30
+    "Listas" : 441
+    "Pendientes" : 25
 ```
 
 | Fase | Nombre | Listas | Pendientes | Progreso |
@@ -36,14 +36,16 @@ pie title Tareas completadas (466 tareas)
 | 23 | [IA asistida: captura, catálogo y necesidades](phase-23-ai-assisted-capture.md) | 11 | 0 | ✅ 100% |
 | 24 | [Observabilidad: que un fallo silencioso deje de serlo](phase-24-observability.md) | 11 | 0 | ✅ 100% |
 | 25 | [Captura sin conexión: cola local y sincronización diferida](phase-25-offline-capture.md) | 14 | 0 | ✅ 100% |
-| 26 | [Soporte de backend para el cliente nativo](phase-26-native-client-support.md) | 0 | 9 | ⬜ 0% |
-| **Total** | | **436** | **30** | **🟡 94%** |
+| 26 | [Soporte de backend para el cliente nativo](phase-26-native-client-support.md) | 5 | 4 | 🟡 56% |
+| **Total** | | **441** | **25** | **🟡 95%** |
 
-> **Pendientes (30):**
-> - **9 de la Fase 26 (soporte al cliente nativo):** fase nueva, abierta al generar por
->   primera vez el cliente Dart de la aplicación móvil. Cuatro tareas corrigen el contrato
->   publicado, cuatro habilitan los avisos a la aplicación instalada y una documenta cuándo
->   se sube la versión mínima soportada. Todo es aditivo dentro de `/v1`.
+> **Pendientes (25):**
+> - **4 de la Fase 26 (soporte al cliente nativo):** el bloque de contrato está cerrado
+>   (los dos defectos corregidos, el 202 del login documentado, y una prueba que impide la
+>   recaída) junto con el runbook de versión mínima. Lo que queda son las cuatro de avisos
+>   push, que necesitan un proyecto de Firebase antes de poder probarse de punta a punta.
+>   Deuda declarada por esa prueba: 20 operaciones de `/v1` siguen sin declarar su respuesta,
+>   en una lista de excepciones que solo puede encoger.
 > El grupo A de la Fase 13 (privacidad, lo que aplica hoy) está completo.
 > - Los borradores legales de la Fase 20 están escritos y esperando revisión de abogado:
 >   [`docs/legal/drafts/`](../legal/drafts/README.md). Sus tareas siguen abiertas hasta que esa
