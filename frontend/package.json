@@ -17,7 +17,7 @@
     "@zxing/browser": "^0.2.0",
     "@zxing/library": "^0.23.0",
     "idb": "^8.0.3",
-    "lucide-react": "^1.28.0",
+    "lucide-react": "^1.29.0",
     "next": "^16.3.0",
     "next-auth": "^5.0.0-beta.31",
     "prop-types": "^15.8.1",
