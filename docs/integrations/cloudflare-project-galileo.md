@@ -65,6 +65,15 @@ Lo que sí es cierto y sí se puede evidenciar:
 - **Documentación legal en preparación**: términos de donación en especie, política
   de aceptación y exención de plataforma, en `docs/legal/drafts/`, pendientes de
   revisión profesional.
+- **Nominación ante la Digital Public Goods Alliance**, la iniciativa cofundada por
+  UNICEF y el gobierno de Noruega. Es la evidencia sustituta más fuerte que hay hoy,
+  porque es un tercero el que evalúa —contra los nueve indicadores del DPG Standard:
+  licencia abierta, propiedad clara, independencia de plataforma, documentación y
+  *do-no-harm* con privacidad y protección de datos— y no el proyecto hablando de sí
+  mismo. El flujo es **nominación → revisión técnica → reconocimiento y alta en el
+  registro público**: mientras no concluya la revisión, se dice "sometido a revisión",
+  nunca "es un DPG". Sobrevender ese estado ante Cloudflare costaría más que el
+  beneficio de mencionarlo.
 
 Galileo no publica un requisito rígido de registro legal: la elegibilidad se evalúa
 por misión y vulnerabilidad, y una de las vías de entrada es que una **organización
@@ -134,6 +143,16 @@ para que nadie lo reabra cada vez que un formulario pida un acta constitutiva.
 >   governing in-kind donations, the donation acceptance policy and the platform
 >   disclaimer are written and awaiting review by a lawyer practising in Mexico
 >   before they are published.
+>
+> I have also submitted the project to the **Digital Public Goods Alliance** — the
+> multi-stakeholder initiative co-founded by UNICEF and the Government of Norway — for
+> assessment against the DPG Standard. The nomination is currently under review, and
+> if it is approved the project would be listed on the public DPG registry. I mention
+> it because that review examines much of what your question is aimed at: open
+> licensing, clear ownership, platform independence, documentation, and do-no-harm
+> requirements covering privacy and data protection. It is an independent assessment
+> of the project's public-interest character, rather than a claim I am making about
+> myself.
 >
 > The project was built in response to the June 2026 earthquakes in northern
 > Venezuela, and it is currently being evaluated by registered disaster-response
