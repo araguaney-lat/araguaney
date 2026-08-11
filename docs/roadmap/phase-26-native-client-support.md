@@ -40,6 +40,28 @@
 | 3 | Documentar la respuesta 202 del inicio de sesión | El inicio de sesión tiene dos desenlaces: sesión completa (200) o segundo factor pendiente (202, con `partial_token`). El contrato solo describirá el primero tras la task 2. Declarar el 202 en `responses` deja el contrato completo para cualquier cliente. **Ojo:** aun así, un cliente tipado no puede expresar "200 → `Token` u 202 → otra forma" en un solo método, así que la aplicación seguirá tratando el inicio de sesión aparte; el valor aquí es que el contrato deje de mentir, no ahorrarle trabajo a un cliente. | 🟢 Baja | ✅ Done |
 | 4 | Prueba de contrato: toda operación declara su respuesta | Extender `tests/contract/` para que falle si un endpoint de `/v1` publica un esquema de respuesta vacío o si dos operaciones comparten `operationId`. Sin esto, el siguiente endpoint vuelve a nacer con el mismo hueco. **Al escribirla apareció que no era un caso aislado: 20 operaciones de `/v1` tampoco declaran su respuesta.** No se arreglan a ciegas porque `response_model` filtra el cuerpo y podría quitar campos que alguien ya consume; cada una pide la comprobación que se hizo para el login. La prueba nace como trinquete, con esas 20 en una lista de excepciones que solo puede encoger. | 🟠 Media | ✅ Done |
 
+### Reducir la deuda de respuestas sin declarar
+
+> Las 20 operaciones de `/v1` que no declaran su respuesta viven en la lista de
+> excepciones de `tests/contract/test_openapi_quality.py`, que solo puede
+> encoger. No se arreglan de una sentada: `response_model` **filtra** el cuerpo,
+> así que declarar veinte a ciegas podría quitar en silencio un campo que la web
+> ya lee. Cada una pide la comprobación que recibió el login (qué devuelve de
+> verdad, qué lee quien lo consume, si hay ramas que devuelvan `Response`).
+>
+> Se agrupan por tipo porque el trabajo y el riesgo cambian según el grupo, y
+> porque un PR que hace una sola clase de cambio se revisa de verdad.
+
+| # | Tarea | Descripción | Complejidad | Estado |
+|---|-------|-------------|-------------|--------|
+| 10 | Grupo A: respuestas de imagen (2) | `GET /v1/boxes/{box_id}/qr.png` y `GET /v1/d/{code}/qr.png`. No piden modelo sino `response_class` y un `responses` con `image/png`. **Riesgo nulo:** devuelven un `Response` ya construido, que FastAPI nunca filtra. Conviene arreglar de paso los dos equivalentes fuera de `/v1` (`/b/{code}/qr.png`, `/p/{code}/qr.png`), que tienen el mismo defecto aunque la prueba no los vigile. | 🟢 Baja | ⬜ Pendiente |
+| 11 | Grupo B: acciones sin cuerpo útil (8) | `verify-email`, `resend-verification`, `forgot-password`, `me/accept-terms`, `reset-password`, `totp/disable` y los dos `reinvite`. Devuelven confirmaciones pequeñas. Antes de declarar nada: comprobar si alguien lee alguna clave; si el cuerpo no aporta, la respuesta honesta puede ser `204` en vez de un modelo, y eso sí es un cambio de contrato que no va en `/v1`. | 🟠 Media | ⬜ Pendiente |
+| 12 | Grupo C: creaciones con 201 (4) | `auth/register`, `campaigns/{campaign_id}/members`, `public/donations` y `public/donations/resend`. Cada una devuelve algo distinto; el pre-registro público es el más delicado porque su respuesta la consume la página de donación. | 🟠 Media | ⬜ Pendiente |
+| 13 | Grupo D: lecturas (6) | `product-types/barcode/{gtin}`, `messages/unread-count`, las tres de URL firmada de adjuntos y fotos, y `public/qr/{code}`. La última es pública y cacheable en el edge, así que su forma es la que ve cualquiera que escanee un código. | 🟠 Media | ⬜ Pendiente |
+
+Al cerrar cada grupo se quitan sus entradas de `_UNDECLARED_RESPONSES`; hay una
+prueba que falla si se quedan de más.
+
 ### Avisos a la aplicación instalada
 
 | # | Tarea | Descripción | Complejidad | Estado |
@@ -61,6 +83,10 @@
 
 1 → 2 → 3 → 4 (el contrato primero: es barato y desbloquea a cualquier cliente
 generado) → 9 → 5 → 6 → 7 → 8.
+
+Las tasks 10 a 13 no bloquean a nadie y se toman cuando haya hueco. Si se hace
+alguna, la 10 va primero: es la única de riesgo nulo y deja el patrón escrito
+para las demás.
 
 Las tasks 5 a 8 son la compuerta externa de la Fase 07 del roadmap de la
 aplicación; hasta que existan, la aplicación no puede recibir avisos.
