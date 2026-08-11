@@ -17,6 +17,7 @@ from app.schemas.auth import (
     ResendRequest,
     ResetPasswordRequest,
     Token,
+    TotpPending,
     TOTPChallengeIn,
     TOTPConfirmIn,
     TOTPConfirmOut,
@@ -46,13 +47,29 @@ async def register(
     return AuthService(db).register(data, background_tasks)
 
 
-@router.post("/login")
+@router.post(
+    "/login",
+    response_model=Token,
+    responses={
+        202: {
+            "model": TotpPending,
+            "description": "Credenciales correctas; falta el segundo factor.",
+        }
+    },
+)
 @limiter.limit("10/5minutes")
 def login(
     request: Request,
     form: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db),
 ):
+    """Abre sesión. Dos desenlaces: sesión completa (200) o 2FA pendiente (202).
+
+    El `response_model=Token` describe el primero. El segundo se devuelve como
+    `JSONResponse`, y FastAPI no le aplica el modelo de respuesta a un `Response`
+    ya construido, así que sale intacto; queda declarado en `responses` para que
+    el contrato publicado lo describa (Fase 26, tasks 2 y 3).
+    """
     result = AuthService(db).login(form.username.strip(), form.password)
     if result.get("requires_totp"):
         return JSONResponse(status_code=202, content=result)

@@ -360,7 +360,15 @@ def health():
 # dejan elegir el método. Esta versión de FastAPI no agrega HEAD sola al declarar
 # GET, así que un monitor recibiría 405 en la ruta que existe justamente para que
 # la consulte. HEAD sale gratis: mismo código de estado, sin cuerpo.
-@app.api_route("/health/jobs", methods=["GET", "HEAD"])
+#
+# Van como dos rutas con `operation_id` explícito y no como un solo `api_route`
+# con ambos métodos: en ese caso FastAPI le pone a los dos el mismo
+# `operationId`, cosa que la especificación OpenAPI no permite porque exige que
+# sea único en todo el documento. Mientras cada cliente se escribía a mano nadie
+# lo notaba; un generador produce dos métodos con el mismo nombre y el código no
+# compila. Lo destapó el cliente Dart de la aplicación móvil (Fase 26, task 1).
+@app.get("/health/jobs", operation_id="health_jobs")
+@app.head("/health/jobs", operation_id="health_jobs_head")
 @limiter.limit("30/minute")
 def health_jobs(request: Request, response: Response, db: Session = Depends(get_db)):
     """Estado del trabajo de fondo, para vigilancia externa.
