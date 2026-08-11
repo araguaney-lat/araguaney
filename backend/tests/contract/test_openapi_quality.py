@@ -45,7 +45,7 @@ _UNDECLARED_RESPONSES = {
     "GET /v1/donations/{code}/photos/{photo_id}/url",
     "GET /v1/public/donations/manage/{token}/photos/{photo_id}/url",
     "GET /v1/public/qr/{code}",
-    # Estas tres devuelven una imagen, no JSON. Declararlas pide
+    # Estas dos devuelven una imagen, no JSON. Declararlas pide
     # `response_class` y un `responses` con `image/png`, no un modelo.
     "GET /v1/boxes/{box_id}/qr.png",
     "GET /v1/d/{code}/qr.png",
