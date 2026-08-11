@@ -19,6 +19,7 @@ from app.services import box_code_service
 from app.services.box_service import BoxService
 from app.repositories.audit_repository import AuditRepository
 from app.utils.cloudflare import get_client_ip
+from app.utils.openapi import png_response
 from app.utils.qr import box_qr_png
 from app.utils.rate_limit import limiter
 
@@ -45,7 +46,11 @@ def box_public_ficha(
     )
 
 
-@router.get("/b/{code}/qr.png")
+@router.get(
+    "/b/{code}/qr.png",
+    response_class=Response,
+    responses=png_response("QR de la caja, listo para imprimir."),
+)
 @limiter.limit("120/minute")
 def box_qr_image(
     request: Request,
@@ -107,7 +112,11 @@ def seal_box(
     return box
 
 
-@router.get("/v1/boxes/{box_id}/qr.png")
+@router.get(
+    "/v1/boxes/{box_id}/qr.png",
+    response_class=Response,
+    responses=png_response("QR de la caja, para previsualizar la etiqueta."),
+)
 @limiter.limit("60/minute")
 def box_qr_authenticated(
     request: Request,

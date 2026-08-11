@@ -36,6 +36,7 @@ from app.services.donation_photo_service import DonationPhotoService
 from app.schemas.product_type import ProductTypeOut
 from app.services.ai import label_ocr, text_mapping
 from app.services.donation_service import DonationService
+from app.utils.openapi import png_response
 from app.utils.rate_limit import limiter
 
 router = APIRouter(tags=["donations"])
@@ -218,7 +219,11 @@ def public_donation(
     return donation
 
 
-@router.get("/d/{code}/qr.png")
+@router.get(
+    "/d/{code}/qr.png",
+    response_class=Response,
+    responses=png_response("QR de la donación pre-registrada."),
+)
 @limiter.limit("60/minute")
 def public_donation_qr(request: Request, code: str, db: Session = Depends(get_db)):
     from app.config import settings

@@ -42,7 +42,7 @@
 
 ### Reducir la deuda de respuestas sin declarar
 
-> Las 20 operaciones de `/v1` que no declaran su respuesta viven en la lista de
+> Las operaciones de `/v1` que no declaran su respuesta viven en la lista de
 > excepciones de `tests/contract/test_openapi_quality.py`, que solo puede
 > encoger. No se arreglan de una sentada: `response_model` **filtra** el cuerpo,
 > así que declarar veinte a ciegas podría quitar en silencio un campo que la web
@@ -54,7 +54,7 @@
 
 | # | Tarea | Descripción | Complejidad | Estado |
 |---|-------|-------------|-------------|--------|
-| 10 | Grupo A: respuestas de imagen (2) | `GET /v1/boxes/{box_id}/qr.png` y `GET /v1/d/{code}/qr.png`. No piden modelo sino `response_class` y un `responses` con `image/png`. **Riesgo nulo:** devuelven un `Response` ya construido, que FastAPI nunca filtra. Conviene arreglar de paso los dos equivalentes fuera de `/v1` (`/b/{code}/qr.png`, `/p/{code}/qr.png`), que tienen el mismo defecto aunque la prueba no los vigile. | 🟢 Baja | ⬜ Pendiente |
+| 10 | Grupo A: respuestas de imagen (2) | `GET /v1/boxes/{box_id}/qr.png` y `GET /v1/d/{code}/qr.png`. No piden modelo sino `response_class` y un `responses` con `image/png`. **Riesgo nulo:** devuelven un `Response` ya construido, que FastAPI nunca filtra. Conviene arreglar de paso los dos equivalentes fuera de `/v1` (`/b/{code}/qr.png`, `/p/{code}/qr.png`), que tienen el mismo defecto aunque la prueba no los vigile. | 🟢 Baja | ✅ Done |
 | 11 | Grupo B: acciones sin cuerpo útil (8) | `verify-email`, `resend-verification`, `forgot-password`, `me/accept-terms`, `reset-password`, `totp/disable` y los dos `reinvite`. Devuelven confirmaciones pequeñas. Antes de declarar nada: comprobar si alguien lee alguna clave; si el cuerpo no aporta, la respuesta honesta puede ser `204` en vez de un modelo, y eso sí es un cambio de contrato que no va en `/v1`. | 🟠 Media | ⬜ Pendiente |
 | 12 | Grupo C: creaciones con 201 (4) | `auth/register`, `campaigns/{campaign_id}/members`, `public/donations` y `public/donations/resend`. Cada una devuelve algo distinto; el pre-registro público es el más delicado porque su respuesta la consume la página de donación. | 🟠 Media | ⬜ Pendiente |
 | 13 | Grupo D: lecturas (6) | `product-types/barcode/{gtin}`, `messages/unread-count`, las tres de URL firmada de adjuntos y fotos, y `public/qr/{code}`. La última es pública y cacheable en el edge, así que su forma es la que ve cualquiera que escanee un código. | 🟠 Media | ⬜ Pendiente |

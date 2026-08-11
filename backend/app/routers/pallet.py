@@ -17,6 +17,7 @@ from app.schemas.qr_ficha import QrEventOut
 from app.services.pallet_service import PalletService
 from app.repositories.audit_repository import AuditRepository
 from app.utils.cloudflare import get_client_ip
+from app.utils.openapi import png_response
 from app.utils.qr import pallet_qr_png
 from app.routers.box import _print_lang
 from app.utils.rate_limit import limiter
@@ -49,7 +50,11 @@ def pallet_public_ficha(
     )
 
 
-@router.get("/p/{code}/qr.png")
+@router.get(
+    "/p/{code}/qr.png",
+    response_class=Response,
+    responses=png_response("QR de la tarima, listo para imprimir."),
+)
 @limiter.limit("120/minute")
 def pallet_qr_image(
     request: Request,
