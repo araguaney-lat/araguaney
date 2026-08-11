@@ -6,7 +6,9 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.dependencies import get_current_user
 from app.models.user import User
+from app.schemas.common import SignedUrlOut
 from app.schemas.messaging import (
+    UnreadCountOut,
     AttachmentOut,
     ConfirmAttachmentRequest,
     ReplyCreate,
@@ -48,7 +50,7 @@ def confirm_attachment(
     return ThreadService(db).confirm_attachment(data, current_user)
 
 
-@router.get("/attachments/{attachment_id}/url")
+@router.get("/attachments/{attachment_id}/url", response_model=SignedUrlOut)
 @limiter.limit("60/minute")
 def get_download_url(
     request: Request,
@@ -94,7 +96,7 @@ def list_threads(
     return ThreadService(db).list(current_user, thread_type, campaign_id)
 
 
-@router.get("/unread-count")
+@router.get("/unread-count", response_model=UnreadCountOut)
 @limiter.limit("60/minute")
 def get_unread_count(
     request: Request,

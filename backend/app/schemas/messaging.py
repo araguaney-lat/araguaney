@@ -7,6 +7,12 @@ from app.schemas._base import StrictModel, StrictORMModel, StrictUUID
 from app.utils.r2 import ALLOWED_CONTENT_TYPES, MAX_FILE_SIZE_BYTES, MAX_FILES_PER_MESSAGE
 
 
+class UnreadCountOut(StrictModel):
+    """Mensajes privados sin leer de quien consulta. Lo pinta el badge del menú."""
+
+    unread: int
+
+
 class UploadUrlRequest(StrictModel):
     filename: str
     content_type: str

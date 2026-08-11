@@ -14,14 +14,15 @@ mismo `openapi.json`, y ahí las omisiones dejan de ser inocuas:
 
 Ambas se corrigieron en la Fase 26. Estas pruebas existen para que no vuelvan.
 
-**Sobre la lista de excepciones.** Quedan 18 operaciones de `/v1` que todavía no
+**Sobre la lista de excepciones.** Quedan 12 operaciones de `/v1` que todavía no
 declaran su respuesta. No se arreglan de una sentada a propósito: declarar un
 `response_model` no solo documenta, también **filtra** la respuesta, así que
 hacerlo a ciegas podría quitar en silencio campos que alguien ya consume. Cada
 una pide la misma comprobación que se hizo para el login, y por eso van por
-grupos (Fase 26, tasks 10 a 13). El grupo de imágenes ya salió. Mientras tanto
-la lista funciona como trinquete: impide que nazca la número 19 y obliga a que
-quien arregle una la quite de aquí.
+grupos (Fase 26, tasks 10 a 13). Ya salieron el grupo de imágenes y el de
+lecturas; quedan las acciones sin cuerpo útil y las creaciones con 201.
+Mientras tanto la lista funciona como trinquete: impide que nazca la número 13
+y obliga a que quien arregle una la quite de aquí.
 """
 
 from app.main import app
@@ -40,12 +41,6 @@ _UNDECLARED_RESPONSES = {
     "POST /v1/auth/totp/disable",
     "POST /v1/centers/{center_id}/users/{user_id}/reinvite",
     "POST /v1/studio/users/{user_id}/reinvite",
-    "GET /v1/product-types/barcode/{gtin}",
-    "GET /v1/messages/unread-count",
-    "GET /v1/messages/attachments/{attachment_id}/url",
-    "GET /v1/donations/{code}/photos/{photo_id}/url",
-    "GET /v1/public/donations/manage/{token}/photos/{photo_id}/url",
-    "GET /v1/public/qr/{code}",
     # Devuelven 201 con un cuerpo sin describir.
     "POST /v1/auth/register",
     "POST /v1/campaigns/{campaign_id}/members",
