@@ -121,7 +121,21 @@ def weight_dashboard(
 _QR_TTL = 60  # 1 minute; edge can extend with stale-while-revalidate
 
 
-@router.get("/public/qr/{code}")
+@router.get(
+    "/public/qr/{code}",
+    # Se declara por `responses` y no por `response_model` a propósito. La ruta
+    # devuelve un `JSONResponse` ya construido, para poder servir la copia
+    # cacheada sin volver a validarla, y FastAPI no filtra un `Response`. Poner
+    # aquí un `response_model` daría la falsa impresión de que valida algo.
+    # Además el cuerpo tiene dos formas según el código escaneado sea de caja o
+    # de tarima, y quien lo consume distingue por los campos que trae.
+    responses={
+        200: {
+            "model": QrBoxFicha | QrPalletFicha,
+            "description": "Ficha pública de la caja o de la tarima del código.",
+        }
+    },
+)
 @limiter.limit("120/minute")
 def qr_ficha(
     request: Request,

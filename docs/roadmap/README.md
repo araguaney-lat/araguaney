@@ -4,8 +4,8 @@
 
 ```mermaid
 pie title Tareas completadas (470 tareas)
-    "Listas" : 442
-    "Pendientes" : 28
+    "Listas" : 443
+    "Pendientes" : 27
 ```
 
 | Fase | Nombre | Listas | Pendientes | Progreso |
@@ -36,19 +36,19 @@ pie title Tareas completadas (470 tareas)
 | 23 | [IA asistida: captura, catálogo y necesidades](phase-23-ai-assisted-capture.md) | 11 | 0 | ✅ 100% |
 | 24 | [Observabilidad: que un fallo silencioso deje de serlo](phase-24-observability.md) | 11 | 0 | ✅ 100% |
 | 25 | [Captura sin conexión: cola local y sincronización diferida](phase-25-offline-capture.md) | 14 | 0 | ✅ 100% |
-| 26 | [Soporte de backend para el cliente nativo](phase-26-native-client-support.md) | 6 | 7 | 🟡 46% |
-| **Total** | | **442** | **28** | **🟡 94%** |
+| 26 | [Soporte de backend para el cliente nativo](phase-26-native-client-support.md) | 7 | 6 | 🟡 54% |
+| **Total** | | **443** | **27** | **🟡 94%** |
 
-> **Pendientes (28):**
+> **Pendientes (27):**
 > - **4 de la Fase 26 (soporte al cliente nativo):** el bloque de contrato está cerrado
 >   (los dos defectos corregidos, el 202 del login documentado, y una prueba que impide la
 >   recaída) junto con el runbook de versión mínima. Lo que queda son las cuatro de avisos
 >   push, que necesitan un proyecto de Firebase antes de poder probarse de punta a punta.
->   Deuda declarada por esa prueba: quedan 18 operaciones de `/v1` sin declarar su respuesta,
->   en una lista de excepciones que solo puede encoger. El grupo de imágenes (task 10) ya salió;
->   los otros tres (11 a 13) siguen agrupados por tipo de respuesta, porque el riesgo cambia
->   según el grupo y un PR que hace una sola clase de cambio se revisa de verdad. No bloquean
->   a nadie.
+>   Deuda declarada por esa prueba: quedan 12 operaciones de `/v1` sin declarar su respuesta,
+>   en una lista de excepciones que solo puede encoger. Ya salieron el grupo de imágenes
+>   (task 10) y el de lecturas (task 13); quedan las acciones sin cuerpo útil (11) y las
+>   creaciones con 201 (12). La 11 trae dentro una decisión de contrato, no solo trabajo
+>   mecánico: si el cuerpo no aporta nada, lo honesto sería `204`, y eso no cabe en `/v1`.
 > El grupo A de la Fase 13 (privacidad, lo que aplica hoy) está completo.
 > - Los borradores legales de la Fase 20 están escritos y esperando revisión de abogado:
 >   [`docs/legal/drafts/`](../legal/drafts/README.md). Sus tareas siguen abiertas hasta que esa

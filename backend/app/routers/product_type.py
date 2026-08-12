@@ -7,6 +7,7 @@ from app.database import get_db
 from app.dependencies import get_current_user, require_national_admin
 from app.models.user import User
 from app.schemas.product_type import (
+    BarcodeResult,
     ProductGtinOut,
     ProductTypeCreate,
     ProductTypeOut,
@@ -42,7 +43,7 @@ def search_product_types(
     return ProductTypeService(db).search(q, category=category)
 
 
-@router.get("/barcode/{gtin}")
+@router.get("/barcode/{gtin}", response_model=BarcodeResult)
 @limiter.limit("30/minute")
 async def lookup_by_barcode(
     request: Request,

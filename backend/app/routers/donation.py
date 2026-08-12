@@ -36,6 +36,7 @@ from app.services.donation_photo_service import DonationPhotoService
 from app.schemas.product_type import ProductTypeOut
 from app.services.ai import label_ocr, text_mapping
 from app.services.donation_service import DonationService
+from app.schemas.common import SignedUrlOut
 from app.utils.openapi import png_response
 from app.utils.rate_limit import limiter
 
@@ -178,7 +179,10 @@ def confirm_photo(
     )
 
 
-@router.get("/public/donations/manage/{token}/photos/{photo_id}/url")
+@router.get(
+    "/public/donations/manage/{token}/photos/{photo_id}/url",
+    response_model=SignedUrlOut,
+)
 @limiter.limit("60/hour")
 def donor_photo_url(
     request: Request,
@@ -303,7 +307,7 @@ def get_donation(
     return donation
 
 
-@router.get("/donations/{code}/photos/{photo_id}/url")
+@router.get("/donations/{code}/photos/{photo_id}/url", response_model=SignedUrlOut)
 @limiter.limit("120/minute")
 def center_photo_url(
     request: Request,
