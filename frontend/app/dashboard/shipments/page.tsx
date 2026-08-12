@@ -18,7 +18,7 @@ import {
 } from "@/lib/shipment-actions"
 import { useExportJob } from "@/hooks/useExportJob"
 import { useDict } from "@/context/DictionaryContext"
-import { Plus } from "lucide-react"
+
 import { PageAction } from "@/components/PageAction"
 
 const STATUS_COLORS: Record<ShipmentStatus, string> = {
@@ -179,7 +179,7 @@ export default function ShipmentsPage() {
         <h1 className="text-2xl font-bold text-tx">{t.title}</h1>
         <PageAction
           onClick={() => { setShowCreateForm(true); fetchClosedPallets() }}
-          icon={Plus}
+          icon="plus"
           label={t.new}
           variant="destacada"
         />

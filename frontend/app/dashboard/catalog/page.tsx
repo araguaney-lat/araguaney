@@ -6,7 +6,7 @@ import { useSession } from "next-auth/react"
 import type { ProductType, Campaign, ProductGtin } from "@/types"
 import { promoteProductTypeAction, unlinkProductGtinAction } from "@/lib/catalog-actions"
 import { useDict } from "@/context/DictionaryContext"
-import { Plus } from "lucide-react"
+
 import { PageAction } from "@/components/PageAction"
 
 type ProductTypeWithCampaign = ProductType & { campaign_id: string | null }
@@ -108,7 +108,7 @@ export default function CatalogPage() {
           </p>
         </div>
         {isAdmin && (
-          <PageAction href="/dashboard/catalog/new" icon={Plus} label={t.new} />
+          <PageAction href="/dashboard/catalog/new" icon="plus" label={t.new} />
         )}
       </div>
 

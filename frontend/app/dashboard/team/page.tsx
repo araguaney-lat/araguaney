@@ -7,7 +7,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { apiFetch } from "@/lib/api"
 import type { Center, UserOut } from "@/types"
 import { useDict } from "@/context/DictionaryContext"
-import { UserCog, X } from "lucide-react"
+
 import { PageAction } from "@/components/PageAction"
 
 const ROLES = ["volunteer", "coordinator"]
@@ -151,7 +151,7 @@ export default function TeamPage() {
         {canManage && (
           <PageAction
             onClick={() => { setShowManage((v) => !v); setShowForm(false); createMutation.reset(); reinviteMutation.reset(); setSuccess(null) }}
-            icon={showManage ? X : UserCog}
+            icon={showManage ? "x" : "userCog"}
             label={showManage ? t.cancel : t.manage_team}
           />
         )}

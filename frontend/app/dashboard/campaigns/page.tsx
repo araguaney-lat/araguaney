@@ -7,7 +7,7 @@ import { createCampaignAction, updateCampaignAction } from "@/lib/campaign-actio
 import { COUNTRIES, countryName, flagEmoji } from "@/lib/countries"
 import type { Campaign, Center } from "@/types"
 import { useDict } from "@/context/DictionaryContext"
-import { Plus } from "lucide-react"
+
 import { PageAction } from "@/components/PageAction"
 
 const EMPTY_FORM = {
@@ -121,7 +121,7 @@ export default function CampaignsPage() {
             {campaigns.length === 1 ? t.count_one : t.count_other.replace("{count}", String(campaigns.length))}
           </span>
           {isAdmin && !showForm && (
-            <PageAction onClick={() => setShowForm(true)} icon={Plus} label={t.new} />
+            <PageAction onClick={() => setShowForm(true)} icon="plus" label={t.new} />
           )}
         </div>
       </div>

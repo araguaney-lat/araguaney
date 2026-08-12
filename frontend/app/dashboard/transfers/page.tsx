@@ -15,7 +15,7 @@ import {
 } from "@/lib/transfer-actions"
 import { useExportJob } from "@/hooks/useExportJob"
 import { useDict } from "@/context/DictionaryContext"
-import { Plus } from "lucide-react"
+
 import { PageAction } from "@/components/PageAction"
 
 const STATUS_COLORS: Record<TransferStatus, string> = {
@@ -157,7 +157,7 @@ export default function TransfersPage() {
         <h1 className="text-xl font-semibold text-tx">{t.title}</h1>
         <PageAction
           onClick={() => { setShowCreate(true); fetchSealedBoxes() }}
-          icon={Plus}
+          icon="plus"
           label={t.new}
         />
       </div>
