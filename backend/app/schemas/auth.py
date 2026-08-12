@@ -38,6 +38,13 @@ class Token(StrictModel):
     must_accept_terms: bool = False
 
 
+class AcceptTermsOut(StrictModel):
+    """Resultado de aceptar los términos: qué versión quedó registrada."""
+
+    accepted_terms_version: str
+    must_accept_terms: bool
+
+
 class TotpPending(StrictModel):
     """Respuesta del inicio de sesión cuando la cuenta tiene segundo factor.
 

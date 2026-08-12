@@ -8,6 +8,7 @@ from app.database import get_db
 from app.dependencies import get_current_user
 from app.models.user import User
 from app.schemas.auth import (
+    AcceptTermsOut,
     AcceptTermsRequest,
     ChangePasswordRequest,
     DeleteAccountRequest,
@@ -24,6 +25,7 @@ from app.schemas.auth import (
     TOTPSetupOut,
     UserCreate,
 )
+from app.schemas.common import MessageOut
 from app.schemas.user_domain import AvatarOut, UserOut, UserProfileOut, UserUpdate
 from app.services.auth_service import AuthService
 from app.services.account_deletion_service import AccountDeletionService
@@ -102,13 +104,13 @@ def logout(
     AuthService(db).logout(token, refresh_token=data.refresh_token if data else None)
 
 
-@router.get("/verify-email")
+@router.get("/verify-email", response_model=MessageOut)
 @limiter.limit("10/hour")
 def verify_email(request: Request, token: str, db: Session = Depends(get_db)):
     return AuthService(db).verify_email(token)
 
 
-@router.post("/resend-verification")
+@router.post("/resend-verification", response_model=MessageOut)
 @limiter.limit("3/hour")
 async def resend_verification(
     request: Request,
@@ -119,7 +121,7 @@ async def resend_verification(
     return AuthService(db).resend_verification(data.email, background_tasks)
 
 
-@router.post("/forgot-password")
+@router.post("/forgot-password", response_model=MessageOut)
 @limiter.limit("3/hour")
 async def forgot_password(
     request: Request,
@@ -226,7 +228,7 @@ def delete_own_account(
     db.commit()
 
 
-@router.post("/me/accept-terms")
+@router.post("/me/accept-terms", response_model=AcceptTermsOut)
 @limiter.limit("20/hour")
 def accept_terms(
     request: Request,
@@ -249,7 +251,7 @@ def accept_terms(
     return result
 
 
-@router.post("/reset-password")
+@router.post("/reset-password", response_model=MessageOut)
 @limiter.limit("5/hour")
 def reset_password(
     request: Request,
@@ -285,7 +287,7 @@ def totp_confirm(
     return AuthService(db).totp_confirm(current_user, data.code)
 
 
-@router.post("/totp/disable")
+@router.post("/totp/disable", response_model=MessageOut)
 @limiter.limit("5/hour")
 def totp_disable(
     request: Request,

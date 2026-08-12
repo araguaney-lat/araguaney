@@ -35,6 +35,7 @@ from app.services.auth_service import AuthService
 from app.utils.audit import fire_audit
 from app.utils.cloudflare import get_client_ip
 from app.utils.errors import api_error
+from app.schemas.common import MessageOut
 from app.utils.rate_limit import limiter
 
 router = APIRouter(prefix="/studio", tags=["studio"])
@@ -118,7 +119,7 @@ def create_user(
     return user
 
 
-@router.post("/users/{user_id}/reinvite", status_code=200)
+@router.post("/users/{user_id}/reinvite", status_code=200, response_model=MessageOut)
 @limiter.limit("10/hour")
 def reinvite_user(
     request: Request,

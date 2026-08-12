@@ -14,15 +14,15 @@ mismo `openapi.json`, y ahí las omisiones dejan de ser inocuas:
 
 Ambas se corrigieron en la Fase 26. Estas pruebas existen para que no vuelvan.
 
-**Sobre la lista de excepciones.** Quedan 12 operaciones de `/v1` que todavía no
-declaran su respuesta. No se arreglan de una sentada a propósito: declarar un
-`response_model` no solo documenta, también **filtra** la respuesta, así que
-hacerlo a ciegas podría quitar en silencio campos que alguien ya consume. Cada
-una pide la misma comprobación que se hizo para el login, y por eso van por
-grupos (Fase 26, tasks 10 a 13). Ya salieron el grupo de imágenes y el de
-lecturas; quedan las acciones sin cuerpo útil y las creaciones con 201.
-Mientras tanto la lista funciona como trinquete: impide que nazca la número 13
-y obliga a que quien arregle una la quite de aquí.
+**Sobre la lista de excepciones.** Quedan 4 operaciones de `/v1` que todavía no
+declaran su respuesta, todas creaciones que responden `201` con cuerpos
+distintos entre sí (Fase 26, task 12). No se arreglan de una sentada a
+propósito: declarar un `response_model` no solo documenta, también **filtra** la
+respuesta, así que hacerlo a ciegas podría quitar en silencio campos que alguien
+ya consume. Cada una pide la misma comprobación que se hizo para el login. Ya
+salieron los grupos de imágenes, lecturas y acciones. Mientras tanto la lista
+funciona como trinquete: impide que nazca la número 5 y obliga a que quien
+arregle una la quite de aquí.
 """
 
 from app.main import app
@@ -33,14 +33,6 @@ _METHODS = ("get", "post", "put", "patch", "delete", "head")
 # La lista solo puede encoger. Al arreglar una, quítala de aquí: hay una prueba
 # que falla si sigue listada y ya no hace falta.
 _UNDECLARED_RESPONSES = {
-    "GET /v1/auth/verify-email",
-    "POST /v1/auth/resend-verification",
-    "POST /v1/auth/forgot-password",
-    "POST /v1/auth/me/accept-terms",
-    "POST /v1/auth/reset-password",
-    "POST /v1/auth/totp/disable",
-    "POST /v1/centers/{center_id}/users/{user_id}/reinvite",
-    "POST /v1/studio/users/{user_id}/reinvite",
     # Devuelven 201 con un cuerpo sin describir.
     "POST /v1/auth/register",
     "POST /v1/campaigns/{campaign_id}/members",
