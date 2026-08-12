@@ -9,6 +9,28 @@ export function isLocale(v: string): v is Locale {
   return (LOCALES as string[]).includes(v)
 }
 
+/* Un idioma utilizable a partir de lo que venga en la URL.
+ *
+ * El segmento `[lang]` casa con **cualquier** ruta de un solo tramo, así que
+ * llegan cosas que no son idiomas: `/favicon.svg` es la más frecuente, porque
+ * los navegadores la piden sola. El tipo de los params dice `Locale`, pero eso
+ * es una promesa que Next no puede cumplir: en tiempo de ejecución es una
+ * cadena cualquiera.
+ *
+ * Quien pide un idioma inexistente termina en un 404 igual, porque el layout de
+ * `[lang]` valida y llama `notFound()`. El problema es que `generateMetadata`
+ * de cada página corre **antes** de esa validación, así que sin esta función
+ * reventaba ahí: 94 excepciones en una semana, que no rompían ninguna página
+ * pero llenaban el registro de errores y escondieron un fallo real durante
+ * días.
+ *
+ * Por eso responde con el idioma por defecto en vez de lanzar: el 404 ya está
+ * garantizado más adelante, y lo que se evita aquí es convertir una petición
+ * inofensiva en una excepción. */
+export function resolveLocale(value: string | undefined): Locale {
+  return value && isLocale(value) ? value : DEFAULT_LOCALE
+}
+
 // ── Central route map ─────────────────────────────────────────────────────────
 // Single source of truth for localized URLs. The KEY is the canonical route id
 // (chosen to equal the Spanish slug). Each key maps to a slug per locale.
@@ -94,12 +116,18 @@ export function isMigrated(key: string): key is RouteKey {
 // Build the public, outward-facing path for a route in a locale.
 // es (default) → unprefixed: "/centro-de-acopio", ""→"/".
 // other locale → prefixed:   "/en/collection-center".
-export function localizedPath(key: RouteKey, locale: Locale): string {
-  const slug = ROUTE_SLUGS[key][locale]
-  if (locale === DEFAULT_LOCALE) {
+/* Normaliza el idioma antes de indexar.
+ *
+ * Recibe lo que venga del segmento `[lang]`, que no siempre es un idioma (ver
+ * `resolveLocale`). Sin esto, un tramo desconocido produce `undefined` y el
+ * fallo aparece más adelante, en quien use el resultado, lejos de la causa. */
+export function localizedPath(key: RouteKey, locale: string): string {
+  const safe = resolveLocale(locale)
+  const slug = ROUTE_SLUGS[key][safe]
+  if (safe === DEFAULT_LOCALE) {
     return slug ? `/${slug}` : "/"
   }
-  return slug ? `/${locale}/${slug}` : `/${locale}`
+  return slug ? `/${safe}/${slug}` : `/${safe}`
 }
 
 // Reverse lookup: a localized slug (as seen in the URL for that locale) → key.
