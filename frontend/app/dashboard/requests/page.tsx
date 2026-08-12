@@ -10,7 +10,7 @@ import {
   type RequestOut,
 } from "@/lib/request-actions"
 import { useDict } from "@/context/DictionaryContext"
-import { Plus, X } from "lucide-react"
+
 import { PageAction } from "@/components/PageAction"
 
 const STATUS_COLORS: Record<string, string> = {
@@ -94,7 +94,7 @@ export default function DashboardRequestsPage() {
         </div>
         <PageAction
           onClick={() => setShowForm((v) => !v)}
-          icon={showForm ? X : Plus}
+          icon={showForm ? "x" : "plus"}
           label={showForm ? t.cancel : t.new}
         />
       </div>

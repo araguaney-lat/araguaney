@@ -8,7 +8,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query"
 import type { CampaignMember, Campaign, Center, UserOut } from "@/types"
 import { apiGet } from "@/lib/query"
 import { useDict } from "@/context/DictionaryContext"
-import { Plus, X } from "lucide-react"
+
 import { PageAction } from "@/components/PageAction"
 
 const ROLE_COLORS: Record<string, string> = {
@@ -154,7 +154,7 @@ export default function CampaignMembersPage() {
           </div>
           <PageAction
             onClick={toggleAdd}
-            icon={addOpen ? X : Plus}
+            icon={addOpen ? "x" : "plus"}
             label={addOpen ? t.cancel : t.add_btn}
           />
         </div>

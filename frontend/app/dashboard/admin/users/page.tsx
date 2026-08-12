@@ -6,7 +6,7 @@ import { listStudioUsersAction, createStudioUserAction, patchStudioUserAction, r
 import type { UserOut } from "@/types"
 import { useDict } from "@/context/DictionaryContext"
 import { COUNTRIES, flagEmoji } from "@/lib/countries"
-import { Plus, X } from "lucide-react"
+
 import { PageAction } from "@/components/PageAction"
 
 const ROLES = ["volunteer", "coordinator", "national_admin"]
@@ -120,7 +120,7 @@ export default function StudioUsersPage() {
           </select>
           <PageAction
             onClick={() => setShowForm((v) => !v)}
-            icon={showForm ? X : Plus}
+            icon={showForm ? "x" : "plus"}
             label={showForm ? t.cancel : t.new_btn}
           />
         </div>
