@@ -14,31 +14,31 @@ mismo `openapi.json`, y ahí las omisiones dejan de ser inocuas:
 
 Ambas se corrigieron en la Fase 26. Estas pruebas existen para que no vuelvan.
 
-**Sobre la lista de excepciones.** Quedan 4 operaciones de `/v1` que todavía no
-declaran su respuesta, todas creaciones que responden `201` con cuerpos
-distintos entre sí (Fase 26, task 12). No se arreglan de una sentada a
-propósito: declarar un `response_model` no solo documenta, también **filtra** la
-respuesta, así que hacerlo a ciegas podría quitar en silencio campos que alguien
-ya consume. Cada una pide la misma comprobación que se hizo para el login. Ya
-salieron los grupos de imágenes, lecturas y acciones. Mientras tanto la lista
-funciona como trinquete: impide que nazca la número 5 y obliga a que quien
-arregle una la quite de aquí.
+**La lista de excepciones está vacía.** Empezó con 20 operaciones y se saldó por
+grupos (Fase 26, tasks 10 a 13): imágenes, lecturas, acciones y creaciones. No
+se saldaron de una sentada porque declarar un `response_model` no solo documenta,
+también **filtra** la respuesta, y hacerlo a ciegas habría quitado en silencio
+campos que alguien ya consume; cada una recibió la comprobación que se hizo para
+el login.
+
+La lista se conserva vacía a propósito. El trinquete sigue sirviendo: una
+operación nueva que nazca sin declarar su respuesta falla aquí, en vez de
+sumarse a una deuda que ya no existe.
 """
 
 from app.main import app
 
 _METHODS = ("get", "post", "put", "patch", "delete", "head")
 
-# Operaciones de /v1 que hoy no declaran el esquema de su respuesta exitosa.
-# La lista solo puede encoger. Al arreglar una, quítala de aquí: hay una prueba
-# que falla si sigue listada y ya no hace falta.
-_UNDECLARED_RESPONSES = {
-    # Devuelven 201 con un cuerpo sin describir.
-    "POST /v1/auth/register",
-    "POST /v1/campaigns/{campaign_id}/members",
-    "POST /v1/public/donations",
-    "POST /v1/public/donations/resend",
-}
+# Operaciones de /v1 sin esquema de respuesta declarado. **Está vacía**, y esa
+# es la meta: toda operación de /v1 describe lo que devuelve.
+#
+# Se conserva la lista, y no se borra junto con su última entrada, porque el
+# trinquete sigue siendo útil vacío: una operación nueva que nazca sin declarar
+# su respuesta falla la prueba en vez de sumarse en silencio a una deuda que ya
+# no existe. Si alguna vez hace falta añadir una excepción, que sea una decisión
+# escrita y no el estado por omisión.
+_UNDECLARED_RESPONSES: set[str] = set()
 
 
 def _operations() -> dict[str, dict]:

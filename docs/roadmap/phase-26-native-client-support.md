@@ -56,11 +56,12 @@
 |---|-------|-------------|-------------|--------|
 | 10 | Grupo A: respuestas de imagen (2) | `GET /v1/boxes/{box_id}/qr.png` y `GET /v1/d/{code}/qr.png`. No piden modelo sino `response_class` y un `responses` con `image/png`. **Riesgo nulo:** devuelven un `Response` ya construido, que FastAPI nunca filtra. Conviene arreglar de paso los dos equivalentes fuera de `/v1` (`/b/{code}/qr.png`, `/p/{code}/qr.png`), que tienen el mismo defecto aunque la prueba no los vigile. | 🟢 Baja | ✅ Done |
 | 11 | Grupo B: acciones sin cuerpo útil (8) | `verify-email`, `resend-verification`, `forgot-password`, `me/accept-terms`, `reset-password`, `totp/disable` y los dos `reinvite`. Devuelven confirmaciones pequeñas. Se comprobó que **ningún consumidor lee esas claves**: el frontend mira el estado HTTP y sigue. Siete responden `{"message": ...}` y quedan con un `MessageOut` compartido; la aceptación de términos declara la versión que registró. Que el cuerpo no aporte nada confirma que la respuesta honesta sería `204`, pero cambiar `200` con cuerpo por `204` es incompatible y dentro de `/v1` los cambios son solo aditivos: queda anotado para una `/v2`. | 🟠 Media | ✅ Done |
-| 12 | Grupo C: creaciones con 201 (4) | `auth/register`, `campaigns/{campaign_id}/members`, `public/donations` y `public/donations/resend`. Cada una devuelve algo distinto; el pre-registro público es el más delicado porque su respuesta la consume la página de donación. | 🟠 Media | ⬜ Pendiente |
+| 12 | Grupo C: creaciones con 201 (4) | `auth/register`, `campaigns/{campaign_id}/members`, `public/donations` y `public/donations/resend`. Tres responden `{"ok": true}` y comparten un `OkOut`; el alta de cuenta declara un token opcional porque tiene dos formas según se exija verificar el correo. El pre-registro público se anticipó como el delicado porque su respuesta alimenta la página de donación: resultó que devuelve `{"ok": true}` y que la página nunca la mira. **Con este grupo la lista de excepciones queda en cero.** | 🟠 Media | ✅ Done |
 | 13 | Grupo D: lecturas (6) | `product-types/barcode/{gtin}`, `messages/unread-count`, las tres de URL firmada de adjuntos y fotos, y `public/qr/{code}`. La última es pública y cacheable en el edge, así que su forma es la que ve cualquiera que escanee un código. | 🟠 Media | ✅ Done |
 
-Al cerrar cada grupo se quitan sus entradas de `_UNDECLARED_RESPONSES`; hay una
-prueba que falla si se quedan de más.
+Los cuatro grupos están cerrados y `_UNDECLARED_RESPONSES` quedó vacía. Se
+conserva vacía a propósito: el trinquete sigue sirviendo para que una operación
+nueva no pueda nacer sin declarar su respuesta.
 
 ### Avisos a la aplicación instalada
 

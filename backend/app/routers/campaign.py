@@ -12,6 +12,7 @@ from app.repositories.user_repository import UserRepository
 from app.schemas.campaign import CampaignCreate, CampaignMemberAdd, CampaignMemberOut, CampaignOut, CampaignUpdate
 from app.services.campaign_service import CampaignService
 from app.utils.errors import api_error
+from app.schemas.common import OkOut
 from app.utils.rate_limit import limiter
 
 router = APIRouter(prefix="/v1/campaigns", tags=["campaigns"])
@@ -97,7 +98,7 @@ def list_members(
     return [m for m in members if m.center_id == current_user.center_id]
 
 
-@router.post("/{campaign_id}/members", status_code=201)
+@router.post("/{campaign_id}/members", status_code=201, response_model=OkOut)
 @limiter.limit("30/minute")
 def add_member(
     request: Request,

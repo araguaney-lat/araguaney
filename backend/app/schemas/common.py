@@ -36,3 +36,15 @@ class MessageOut(StrictModel):
     """
 
     message: str
+
+
+class OkOut(StrictModel):
+    """Acuse de una operación que no devuelve nada que leer.
+
+    Lo usan el alta de una persona en una campaña y las dos escrituras públicas
+    de donación. Vale aquí la misma nota que en [MessageOut]: quien las llama
+    descarta el cuerpo, así que la respuesta honesta sería un `204`, y cambiarlo
+    dentro de `/v1` rompería a un cliente instalado. Material para una `/v2`.
+    """
+
+    ok: bool

@@ -4,8 +4,8 @@
 
 ```mermaid
 pie title Tareas completadas (470 tareas)
-    "Listas" : 444
-    "Pendientes" : 26
+    "Listas" : 445
+    "Pendientes" : 25
 ```
 
 | Fase | Nombre | Listas | Pendientes | Progreso |
@@ -36,19 +36,22 @@ pie title Tareas completadas (470 tareas)
 | 23 | [IA asistida: captura, catálogo y necesidades](phase-23-ai-assisted-capture.md) | 11 | 0 | ✅ 100% |
 | 24 | [Observabilidad: que un fallo silencioso deje de serlo](phase-24-observability.md) | 11 | 0 | ✅ 100% |
 | 25 | [Captura sin conexión: cola local y sincronización diferida](phase-25-offline-capture.md) | 14 | 0 | ✅ 100% |
-| 26 | [Soporte de backend para el cliente nativo](phase-26-native-client-support.md) | 8 | 5 | 🟡 62% |
-| **Total** | | **444** | **26** | **🟡 94%** |
+| 26 | [Soporte de backend para el cliente nativo](phase-26-native-client-support.md) | 9 | 4 | 🟡 69% |
+| **Total** | | **445** | **25** | **🟡 95%** |
 
-> **Pendientes (26):**
+> **Pendientes (25):**
 > - **4 de la Fase 26 (soporte al cliente nativo):** el bloque de contrato está cerrado
 >   (los dos defectos corregidos, el 202 del login documentado, y una prueba que impide la
 >   recaída) junto con el runbook de versión mínima. Lo que queda son las cuatro de avisos
 >   push, que necesitan un proyecto de Firebase antes de poder probarse de punta a punta.
->   Deuda declarada por esa prueba: quedan 4 operaciones de `/v1` sin declarar su respuesta,
->   todas creaciones con `201` (task 12), en una lista de excepciones que solo puede encoger.
->   Ya salieron imágenes (10), lecturas (13) y acciones (11). De esa última quedó anotado que
->   la respuesta honesta de siete de ellas sería `204` sin cuerpo, pero cambiarlo es
->   incompatible y `/v1` solo admite cambios aditivos: es material para una `/v2`.
+>   **El bloque de contrato está cerrado por completo.** La deuda que destapó la prueba
+>   —20 operaciones de `/v1` sin declarar su respuesta— se saldó por grupos (tasks 10 a 13:
+>   imágenes, lecturas, acciones y creaciones) y la lista de excepciones quedó vacía. Se
+>   conserva vacía para que una operación nueva no pueda nacer sin declarar lo que devuelve.
+>   Quedó anotado que la respuesta honesta de varias sería `204` sin cuerpo, pero cambiarlo
+>   es incompatible y `/v1` solo admite cambios aditivos: es material para una `/v2`.
+>   Lo único pendiente de la fase son las 4 tareas de avisos push, que esperan un proyecto
+>   de Firebase.
 > El grupo A de la Fase 13 (privacidad, lo que aplica hoy) está completo.
 > - Los borradores legales de la Fase 20 están escritos y esperando revisión de abogado:
 >   [`docs/legal/drafts/`](../legal/drafts/README.md). Sus tareas siguen abiertas hasta que esa

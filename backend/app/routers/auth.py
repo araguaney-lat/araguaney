@@ -16,6 +16,7 @@ from app.schemas.auth import (
     LogoutRequest,
     RefreshRequest,
     ResendRequest,
+    RegistrationOut,
     ResetPasswordRequest,
     Token,
     TotpPending,
@@ -38,7 +39,11 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 _oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/v1/auth/login")
 
 
-@router.post("/register", status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/register",
+    status_code=status.HTTP_201_CREATED,
+    response_model=RegistrationOut,
+)
 @limiter.limit("5/hour")
 async def register(
     request: Request,
