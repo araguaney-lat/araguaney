@@ -1,7 +1,7 @@
 import Image from "next/image"
 import Link from "next/link"
 import type { Dictionary, Locale } from "@/lib/i18n"
-import { localizedPath } from "@/lib/routes"
+import { localizedPath, resolveLocale } from "@/lib/routes"
 import { SOURCE_REPO_URL } from "@/lib/seo"
 
 const LOGO =
@@ -22,7 +22,8 @@ interface Props {
 const LINK_STYLE = { fontSize: 12.5, color: "#E9E2D5", fontWeight: 600 } as const
 
 export default function HomeFooter({ dict, locale = "es" }: Props) {
-  const legal = LEGAL_LINKS[locale]
+  // El idioma llega del segmento de la URL y no siempre es uno válido.
+  const legal = LEGAL_LINKS[resolveLocale(locale)]
 
   const links: readonly { href: string; label: string; external?: boolean }[] = [
     {

@@ -1,8 +1,8 @@
 import "server-only"
 import { cookies, headers } from "next/headers"
-import { type Locale, LOCALES, DEFAULT_LOCALE, isLocale } from "@/lib/routes"
+import { type Locale, LOCALES, DEFAULT_LOCALE, isLocale, resolveLocale } from "@/lib/routes"
 
-export { type Locale, LOCALES, DEFAULT_LOCALE, isLocale }
+export { type Locale, LOCALES, DEFAULT_LOCALE, isLocale, resolveLocale }
 
 export const LOCALE_COOKIE = "locale"
 
@@ -25,8 +25,14 @@ const dictionaries = {
     import("@/dictionaries/en.json").then((m) => m.default),
 }
 
-export async function getDictionary(locale: Locale) {
-  return dictionaries[locale]()
+/* Acepta `string` y no `Locale` a propósito.
+ *
+ * Lo llaman los `generateMetadata` de las páginas bajo `[lang]`, que reciben el
+ * segmento tal cual viene de la URL. Tipar ese parámetro como `Locale` describe
+ * un deseo, no la realidad: `/favicon.svg` llega aquí como idioma. Ver
+ * `resolveLocale` en `@/lib/routes`. */
+export async function getDictionary(locale: string) {
+  return dictionaries[resolveLocale(locale)]()
 }
 
 export type Dictionary = Awaited<ReturnType<typeof getDictionary>>

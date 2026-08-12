@@ -72,7 +72,7 @@ export function ogImageUrl(title: string, eyebrow?: string): string {
 // Emits one `hreflang` per supported locale plus `x-default` (the default locale).
 // Paths are relative; Next resolves them against metadataBase. Generic over
 // LOCALES so a new language is included automatically.
-export function alternates(key: RouteKey, locale: Locale) {
+export function alternates(key: RouteKey, locale: string) {
   const languages: Record<string, string> = {}
   for (const l of LOCALES) {
     languages[l] = localizedPath(key, l)
