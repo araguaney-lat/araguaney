@@ -131,6 +131,14 @@ class Settings(BaseSettings):
     # Capa OpenAI-compatible: OpenAI, DeepSeek, Groq, Together u Ollama local
     # entran cambiando `ai_base_url`. Sin `ai_api_key` la IA queda apagada y la
     # aplicación se comporta exactamente como antes de esta fase.
+    # ── Avisos push (Fase 26) ────────────────────────────────────────────────
+    # Apagado por defecto: con `push_enabled=False` los tokens se registran pero
+    # no sale ningún aviso, y la aplicación se comporta como antes de la fase.
+    push_enabled: bool = False
+    # El JSON completo de la cuenta de servicio, en una línea. Es una credencial
+    # y por eso vive en el entorno, nunca en el repositorio.
+    firebase_service_account_json: str = ""
+
     ai_api_key: str = ""
     ai_base_url: str = "https://api.openai.com/v1"
     ai_model: str = "gpt-4o-mini"

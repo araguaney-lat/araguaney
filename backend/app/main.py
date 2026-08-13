@@ -26,7 +26,7 @@ from app.utils.cloudflare import get_client_ip
 from app.utils.rate_limit import limiter
 
 # ── Routers ────────────────────────────────────────────────────────────────────
-from app.routers import auth, box, campaign, catalog, center, client, dashboard, exports, intake, messaging, pallet, product_type, report, shipment, transfer, users, studio, requests as requests_router, center_application, donation, email_failures, resend_webhook, risk_review, incident
+from app.routers import auth, box, campaign, catalog, center, client, dashboard, device_token, exports, intake, messaging, pallet, product_type, report, shipment, transfer, users, studio, requests as requests_router, center_application, donation, email_failures, resend_webhook, risk_review, incident
 
 # ── Models (ensure tables are registered with SQLAlchemy) ─────────────────────
 from app.models import user as _user_model                  # noqa: F401
@@ -342,6 +342,7 @@ app.include_router(catalog.router)
 app.include_router(report.router)
 app.include_router(incident.router)
 app.include_router(exports.router)
+app.include_router(device_token.router, prefix=_V1)
 
 
 # ── Health ─────────────────────────────────────────────────────────────────────
