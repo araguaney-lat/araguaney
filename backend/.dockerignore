@@ -1,0 +1,52 @@
+# Qué NO entra en la imagen.
+#
+# Railway construye desde el repositorio, así que hoy su contexto ya viene
+# limpio: lo que está en `.gitignore` nunca llega. Este archivo no arregla eso,
+# porque no está roto. Existe para el otro caso, que sí es una trampa: un
+# `docker build` desde este directorio usa el **directorio**, no el repositorio,
+# y ahí sí se cuela todo lo local.
+#
+# Hoy eso significaría copiar dentro de la imagen un entorno virtual de 235 MB y
+# un `.env` con credenciales de desarrollo. Docker no lee `.gitignore`, así que
+# la única forma de impedirlo es esta.
+#
+# Las pruebas, el arnés de evaluación y las pruebas de carga **sí entran**, a
+# propósito. La imagen se usa para diagnosticar en producción (ver
+# `docs/flujo/avisos-push.md`), y poder correr esas cosas dentro del contenedor
+# vale más que los 76 KB que ahorra excluirlas. Lo que se excluye abajo pesa
+# tres órdenes de magnitud más y no sirve para nada ahí dentro.
+
+# Credenciales y configuración local. Lo primero de la lista por lo que cuesta
+# equivocarse aquí.
+.env
+.env.*
+*.pem
+*.key
+
+# Entornos virtuales: cientos de megas de paquetes compilados para otro sistema
+# operativo, que además pisarían los que instala el builder.
+.venv/
+venv/
+env/
+
+# Artefactos de Python. Sin esto viajan cerca de 500 carpetas de bytecode, que
+# ni sirven en la imagen ni corresponden necesariamente a esta versión de Python.
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Metadatos de git: la imagen no necesita el historial, y en un repositorio con
+# historial largo es de lo más pesado del contexto.
+.git/
+.gitignore
+
+# Ruido del sistema y del editor.
+.DS_Store
+*.swp
+.idea/
+.vscode/
