@@ -36,7 +36,9 @@ import sys
 from app.config import settings
 from app.services.push.fcm_client import FcmClient, PushNotConfigured
 
-# Un token con la forma correcta pero que no corresponde a ninguna instalación.
+# Un token que FCM va a rechazar sí o sí. No imita la forma de uno real a
+# propósito: lo que se busca es que FCM conteste **algo** sobre el token, porque
+# para contestar eso ya tuvo que aceptar la credencial.
 _TOKEN_INVENTADO = "credential-check-" + "x" * 140
 
 
@@ -69,7 +71,7 @@ async def main() -> int:
 
     if resultado.unregistered:
         print("✓ La credencial funciona: Google la aceptó y FCM procesó la petición.")
-        print("  El token de prueba no existe, que es exactamente lo esperado.")
+        print("  FCM rechazó el token de prueba, que es exactamente lo esperado.")
         print("  Falta solo la última capa: que un dispositivo real registre su token.")
         return 0
 
