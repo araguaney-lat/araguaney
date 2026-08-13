@@ -13,13 +13,28 @@ puesta desde el principio.
 
 ## La comprobación de credencial
 
-Se ejecuta **dentro del servicio del backend**, donde ya están el código y sus
-dependencias:
+Se ejecuta **dentro de los servicios desplegados**, donde ya están el código y
+sus dependencias. Hay que correrlo en los **dos**:
 
 ```
-railway ssh --service <servicio-backend>
+railway ssh --service "<servicio-backend>"
 python -m scripts.check_push_credential
 ```
+
+```
+railway ssh --service "<servicio-worker>"
+python -m scripts.check_push_credential
+```
+
+El del worker es el que de verdad importa, y es fácil olvidarlo. El despacho va
+encolado en ARQ, así que **quien habla con FCM es el worker, no el backend**. Si
+la credencial estuviera bien en uno y mal en el otro —un pegado incompleto, una
+variable que se puso en un solo servicio— la comprobación saldría verde y los
+avisos seguirían sin llegar, sin más rastro que un error tragado por el
+despachador.
+
+Que ambos servicios *tengan* la variable no basta para saber que las dos son
+válidas; eso solo lo dice ejecutar la comprobación en cada uno.
 
 Conviene no confundirlo con `railway run`, que ejecuta el comando **en tu
 máquina** con las variables del servicio inyectadas. Sirve para otras cosas,
@@ -52,7 +67,8 @@ nada.
 
 ## El orden recomendado al encender
 
-1. Correr la comprobación de credencial. Si falla, nada de lo demás tiene sentido.
+1. Correr la comprobación de credencial **en el backend y en el worker**. Si
+   falla en cualquiera de los dos, nada de lo demás tiene sentido.
 2. Poner `PUSH_ENABLED=true`.
 3. Registrar un dispositivo de verdad desde la aplicación.
 4. Provocar uno de los dos hechos que avisan (una revisión de riesgo o un envío
