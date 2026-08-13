@@ -42,7 +42,18 @@ Thumbs.db
 .worktrees/
 # Scoped to backend/ on purpose: a bare `scripts/` would silently ignore any
 # future scripts/ folder anywhere in the repo (e.g. frontend/scripts/).
-backend/scripts/
+#
+# Se ignora el **contenido** y no la carpeta, porque git no reincluye un archivo
+# si su directorio entera está excluida. La regla por defecto sigue siendo "no
+# se versiona": aquí viven las semillas de datos de prueba, que listan correos
+# de cuentas de QA y no deben salir en un repositorio público (REGLA #2).
+#
+# La excepción es para scripts **operativos que un runbook referencia**: sin
+# versionarlos, la documentación apuntaría a un archivo que quien clona no
+# tiene. Agregar una excepción es afirmar que ese script no lleva nada que no
+# pueda leerse desde fuera.
+backend/scripts/*
+!backend/scripts/check_push_credential.py
 
 # Screenshots and browser automation artifacts
 screenshots/
