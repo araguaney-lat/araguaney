@@ -67,10 +67,10 @@ nueva no pueda nacer sin declarar su respuesta.
 
 | # | Tarea | Descripción | Complejidad | Estado |
 |---|-------|-------------|-------------|--------|
-| 5 | Registro de dispositivos | Tabla `device_tokens` (usuario, token, plataforma, alta y baja) con endpoints autenticados para registrar y dar de baja. Un token es por dispositivo y por usuario: el dispositivo se comparte en un centro. | 🟠 Media | ⬜ Pendiente |
-| 6 | Despacho de avisos | Trabajo en ARQ que manda a FCM (HTTP v1) los hechos que ya existen en el dominio: revisión de riesgo abierta, envío entregado, mensaje recibido. Credencial por entorno, nunca en el repositorio. | 🔴 Alta | ⬜ Pendiente |
-| 7 | Baja de tokens muertos | FCM avisa cuando un token dejó de existir; darlo de baja evita acumular destinos inválidos y ruido en el registro. | 🟠 Media | ⬜ Pendiente |
-| 8 | Observabilidad del despacho | El despacho es trabajo de fondo, así que avisa cuando falla y declara su ventana de latido, como manda la sección de observabilidad de `CLAUDE.md`. | 🟠 Media | ⬜ Pendiente |
+| 5 | Registro de dispositivos | Tabla `device_tokens` (usuario, token, plataforma, alta y baja) con endpoints autenticados para registrar y dar de baja. Un token es por dispositivo y por usuario: el dispositivo se comparte en un centro. | 🟠 Media | ✅ Done |
+| 6 | Despacho de avisos | Trabajo en ARQ que manda a FCM (HTTP v1) los hechos que ya existen en el dominio: revisión de riesgo abierta, envío entregado, mensaje recibido. Credencial por entorno, nunca en el repositorio. | 🔴 Alta | ✅ Done |
+| 7 | Baja de tokens muertos | FCM avisa cuando un token dejó de existir; darlo de baja evita acumular destinos inválidos y ruido en el registro. | 🟠 Media | ✅ Done |
+| 8 | Observabilidad del despacho | El despacho es trabajo de fondo, así que avisa cuando falla y declara su ventana de latido, como manda la sección de observabilidad de `CLAUDE.md`. | 🟠 Media | ✅ Done |
 
 ### Versión mínima soportada
 

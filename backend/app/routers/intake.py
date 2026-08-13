@@ -29,7 +29,12 @@ def create_intake(
     scope: UUID | None = Depends(tenant_scope),
 ):
     center_id = resolve_write_center_id(current_user, data.center_id)
-    intake = IntakeService(db).create(data, center_id=center_id, user_id=current_user.id)
+    intake = IntakeService(db).create(
+        data,
+        center_id=center_id,
+        user_id=current_user.id,
+        background_tasks=background_tasks,
+    )
     fire_audit(background_tasks, "INTAKE_CREATED", "intake",
                user_id=current_user.id, entity_id=str(intake.id), ip=get_client_ip(request))
     return intake
