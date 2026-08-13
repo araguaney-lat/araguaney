@@ -5,6 +5,7 @@ from datetime import datetime, timedelta, timezone
 from fastapi import BackgroundTasks
 from sqlalchemy.orm import Session
 
+from app.services.push import events as push_events
 from app.models.messaging import Thread, ThreadAttachment, ThreadReply
 from app.models.user import User
 from app.repositories.thread_repository import ThreadRepository
@@ -162,6 +163,19 @@ class ThreadService:
                         user.full_name or user.username or user.email,
                         data.title,
                     )
+
+            # Un hilo recién creado no tiene actividad anterior, así que nadie
+            # puede tener algo sin leer: `since=None` los incluye a todos.
+            push_events.private_message_received(
+                self.repo.db,
+                background_tasks,
+                thread_id=saved.id,
+                recipient_ids=self.repo.participants_with_nothing_unread(
+                    saved.id, user.id, since=None
+                ),
+                sender_name=user.full_name or user.username or user.email,
+                title=data.title,
+            )
         else:
             emails = self.repo.get_campaign_member_emails(data.campaign_id, user.id)
             for email in emails:
@@ -236,6 +250,11 @@ class ThreadService:
             raise api_error("NOT_FOUND", "Hilo no encontrado", status_code=404)
         self._access_guard(thread, user)
 
+        # La marca de la última actividad se lee **antes** de tocar el hilo:
+        # después, `updated_at` ya sería la de este mismo mensaje y nadie
+        # pasaría el filtro de "ya leyó lo anterior".
+        actividad_previa = thread.updated_at
+
         reply = ThreadReply(thread_id=thread_id, sender_id=user.id, body=data.body)
         saved = self.repo.save_reply(reply)
         self.repo.touch_thread(thread_id)
@@ -256,6 +275,18 @@ class ThreadService:
                 thread.title,
                 data.body[:200],
                 sender_name,
+            )
+
+        if thread.thread_type == "PRIVATE":
+            push_events.private_message_received(
+                self.repo.db,
+                background_tasks,
+                thread_id=thread_id,
+                recipient_ids=self.repo.participants_with_nothing_unread(
+                    thread_id, user.id, since=actividad_previa
+                ),
+                sender_name=sender_name,
+                title=thread.title,
             )
 
         return ThreadReplyOut(

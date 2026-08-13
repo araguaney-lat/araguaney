@@ -84,6 +84,47 @@ def risk_review_opened(
     )
 
 
+def private_message_received(
+    db: Session,
+    background_tasks: BackgroundTasks | None,
+    *,
+    thread_id: UUID,
+    recipient_ids: list[UUID],
+    sender_name: str,
+    title: str,
+) -> None:
+    """Alguien escribió en un hilo privado.
+
+    Solo los hilos privados avisan. Los de campaña son difusión, y hacer vibrar
+    a todos sus miembros por cada respuesta es la forma más rápida de que la
+    gente apague las notificaciones y deje de ver también las que sí piden algo.
+    El correo, que espera en una bandeja en vez de interrumpir, sigue saliendo
+    para ambos tipos.
+
+    Quién entra en `recipient_ids` lo decide el repositorio: solo quienes ya
+    leyeron lo anterior. A quien tiene el mensaje previo sin abrir ya se le
+    avisó por ese.
+
+    El aviso lleva el título del hilo y quién escribe, y **no el cuerpo del
+    mensaje**. Se lee en una pantalla de bloqueo, y un mensaje entre operadores
+    puede hablar de una donación con nombre y apellido.
+    """
+    if background_tasks is None or not recipient_ids:
+        return
+    try:
+        for user_id in recipient_ids:
+            enqueue(
+                background_tasks,
+                "push_notify_user_task",
+                str(user_id),
+                f"Mensaje de {sender_name}",
+                title,
+                {"kind": "private_message", "thread_id": str(thread_id)},
+            )
+    except Exception:
+        logger.exception("No se pudo encolar el aviso de mensaje privado")
+
+
 def shipment_delivered(
     db: Session,
     background_tasks: BackgroundTasks | None,
