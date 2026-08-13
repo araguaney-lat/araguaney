@@ -38,6 +38,18 @@ class Token(StrictModel):
     must_accept_terms: bool = False
 
 
+class RegistrationOut(StrictModel):
+    """Resultado de darse de alta.
+
+    Tiene dos formas según la configuración de verificación por correo: con
+    sesión inmediata, o solo el aviso de que hay un correo en camino. Por eso el
+    token es opcional, y no porque a veces falte por descuido.
+    """
+
+    message: str
+    access_token: str | None = None
+
+
 class AcceptTermsOut(StrictModel):
     """Resultado de aceptar los términos: qué versión quedó registrada."""
 

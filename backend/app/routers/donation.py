@@ -36,7 +36,7 @@ from app.services.donation_photo_service import DonationPhotoService
 from app.schemas.product_type import ProductTypeOut
 from app.services.ai import label_ocr, text_mapping
 from app.services.donation_service import DonationService
-from app.schemas.common import SignedUrlOut
+from app.schemas.common import OkOut, SignedUrlOut
 from app.utils.openapi import png_response
 from app.utils.rate_limit import limiter
 
@@ -69,7 +69,7 @@ class ItemsIn(StrictModel):
 
 # ── Alta y confirmación ──────────────────────────────────────────────────────
 
-@router.post("/public/donations", status_code=202)
+@router.post("/public/donations", status_code=202, response_model=OkOut)
 @limiter.limit("5/hour")
 def submit_donation(
     request: Request,
@@ -99,7 +99,7 @@ def confirm_donation(
     return DonationService(db).confirm_email(data.token, background_tasks)
 
 
-@router.post("/public/donations/resend", status_code=202)
+@router.post("/public/donations/resend", status_code=202, response_model=OkOut)
 @limiter.limit("3/hour")
 def resend_donation_confirmation(
     request: Request,
