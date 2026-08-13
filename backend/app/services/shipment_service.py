@@ -1,9 +1,14 @@
 from datetime import datetime, timezone
+from typing import TYPE_CHECKING
 from uuid import UUID
 
 from app.arq_pool import enqueue
 from app.models.events import SHIPMENT_MILESTONES, BoxEvent, PalletEvent, ShipmentEvent
 from app.models.shipment import Shipment
+from app.services.push import events as push_events
+
+if TYPE_CHECKING:  # pragma: no cover - solo para la anotación
+    from fastapi import BackgroundTasks
 from app.repositories.donation_repository import DonationRepository
 from app.repositories.pallet_repository import PalletRepository
 from app.repositories.shipment_repository import ShipmentRepository
@@ -203,6 +208,7 @@ class ShipmentService(BaseService):
     def mark_delivered(
         self, shipment_id: UUID, center_id: UUID | None, user_id: UUID,
         note: str | None = None, delivered_at: datetime | None = None,
+        background_tasks: "BackgroundTasks | None" = None,
     ) -> Shipment:
         """SHIPPED → DELIVERED. Llegó; qué llegó se registra en la recepción."""
         repo = ShipmentRepository(self.db)
@@ -225,6 +231,18 @@ class ShipmentService(BaseService):
         repo.commit()
         # La ficha pública de cada caja y tarima pasa a decir "entregada".
         self._purge_qr_cache(shipment_id)
+
+        # Después del commit, por lo mismo que en el intake: nadie debe recibir
+        # el aviso de una entrega que no quedó guardada. Se usa el centro del
+        # envío y no el del scope, porque una administración nacional marca
+        # entregas de cualquier centro y el aviso es para el de origen.
+        push_events.shipment_delivered(
+            self.db,
+            background_tasks,
+            center_id=shipment.center_id,
+            shipment_id=shipment.id,
+            reference=shipment.reference,
+        )
         return shipment
 
     def _purge_qr_cache(self, shipment_id: UUID) -> None:

@@ -180,6 +180,7 @@ def add_milestone(
 @limiter.limit("10/minute")
 def mark_delivered(
     request: Request,
+    background_tasks: BackgroundTasks,
     shipment_id: UUID,
     data: DeliveredIn,
     db: Session = Depends(get_db),
@@ -189,6 +190,7 @@ def mark_delivered(
     shipment = ShipmentService(db).mark_delivered(
         shipment_id, center_id=scope, user_id=current_user.id,
         note=data.note, delivered_at=data.delivered_at,
+        background_tasks=background_tasks,
     )
     AuditRepository(db).log("SHIPMENT_DELIVERED", "shipment",
         user_id=current_user.id, entity_id=str(shipment_id), ip=get_client_ip(request))

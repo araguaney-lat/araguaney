@@ -132,6 +132,15 @@ Huecos conocidos, a la fecha de este documento:
 5. **La llave pública de Sentry es legible en el bundle**, y así seguirá: el SDK
    la necesita. Lo que se puede acotar está acotado (ver la sección propia); lo
    que falta es de pago o de consola.
+6. **Un aviso push que no llega no genera alerta por sí solo.** Lo que sí alerta
+   es que la tarea de despacho se rinda tras sus reintentos, igual que cualquier
+   otra tarea de fondo. La diferencia importa: si FCM rechaza un token concreto,
+   eso es normal —alguien desinstaló la aplicación— y el token se da de baja en
+   silencio; si el despacho entero se rompe, por una credencial vencida o un
+   cambio en la API, la tarea falla y sí avisa. Lo que no existe todavía es una
+   señal de degradación intermedia: muchos tokens cayéndose a la vez se vería
+   como bajas normales. La forma de detectarlo sería vigilar el ritmo de bajas
+   con motivo `unregistered`, y no está hecho.
 
 ---
 

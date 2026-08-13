@@ -52,6 +52,28 @@ class UserRepository(BaseRepository[User]):
         )
         return [e for (e,) in supers]
 
+    def coordinator_ids(self, center_id: UUID) -> list[UUID]:
+        """Quién coordina ese centro, para avisarle de algo que le toca resolver.
+
+        Solo coordinación, no voluntariado: las dos cosas que hoy generan aviso
+        —una revisión de riesgo y un envío entregado— son suyas por el modelo de
+        roles. Avisarle a quien captura de una revisión sería además invitarlo a
+        intervenir en algo que la regla del dominio le prohíbe resolver.
+
+        La administración nacional no entra aquí: no tiene centro, y sus avisos
+        (si algún día los hay) se resuelven por otra vía.
+        """
+        rows = (
+            self.db.query(User.id)
+            .filter(
+                User.is_active.is_(True),
+                User.center_id == center_id,
+                User.center_role == "coordinator",
+            )
+            .all()
+        )
+        return [row_id for (row_id,) in rows]
+
     def email_exists(self, email: str) -> bool:
         return self.db.query(User).filter(User.email == email).first() is not None
 

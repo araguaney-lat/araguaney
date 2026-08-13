@@ -1,10 +1,15 @@
 import secrets
 from datetime import date, timezone
+from typing import TYPE_CHECKING
 from uuid import UUID
+
+if TYPE_CHECKING:  # pragma: no cover - solo para la anotación
+    from fastapi import BackgroundTasks
 
 from sqlalchemy.exc import IntegrityError
 
 from app.models.box import Box
+from app.services.push import events as push_events
 from app.models.events import BoxEvent
 from app.models.intake import Intake
 from app.models.risk_review import RiskReview
@@ -30,7 +35,13 @@ def _box_code() -> str:
 
 class IntakeService(BaseService):
 
-    def create(self, data: IntakeCreate, center_id: UUID, user_id: UUID) -> IntakeOut:
+    def create(
+        self,
+        data: IntakeCreate,
+        center_id: UUID,
+        user_id: UUID,
+        background_tasks: "BackgroundTasks | None" = None,
+    ) -> IntakeOut:
         # Idempotencia primero (Fase 25). Una captura offline reintenta con la
         # misma llave, y una respuesta perdida no puede convertirse en inventario
         # duplicado: cajas que nadie audita, que inflan el stock nacional y que
@@ -134,7 +145,7 @@ class IntakeService(BaseService):
             return self._write(
                 data, center_id, user_id, campaign_id, donor, donation,
                 product_types, capture_date, intake_repo, pt_repo,
-                unusual_volume, exception_reason,
+                unusual_volume, exception_reason, background_tasks,
             )
         except IntegrityError:
             # Dos reintentos concurrentes de la misma captura. El unique de la
@@ -150,7 +161,7 @@ class IntakeService(BaseService):
     def _write(
         self, data, center_id, user_id, campaign_id, donor, donation,
         product_types, capture_date, intake_repo, pt_repo,
-        unusual_volume, exception_reason,
+        unusual_volume, exception_reason, background_tasks=None,
     ) -> IntakeOut:
         """La escritura propiamente dicha, aislada para poder reintentarla."""
         intake = intake_repo.save_intake(Intake(
@@ -240,6 +251,18 @@ class IntakeService(BaseService):
             donation.intake_id = intake.id
 
         intake_repo.commit()
+
+        # El aviso va **después** del commit: si se encolara antes y la
+        # transacción fallara, alguien recibiría el aviso de una revisión que no
+        # existe. Falla en silencio por dentro, porque el intake ya está hecho y
+        # eso es lo que le importa a quien capturó.
+        if unusual_volume:
+            push_events.risk_review_opened(
+                self.db,
+                background_tasks,
+                center_id=center_id,
+                intake_id=intake.id,
+            )
 
         # Refresh boxes to get generated IDs
         for box in saved_boxes:

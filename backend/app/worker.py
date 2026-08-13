@@ -495,6 +495,33 @@ async def bounce_watchdog_cron(ctx) -> None:
 # ── Fallbacks (called directly when Redis is unavailable) ──────────────────────
 # These are the underlying callables, invoked WITHOUT the ARQ ctx argument.
 
+async def _push_notify_user_fallback(
+    user_id: str, title: str, body: str, data: dict | None = None
+) -> None:
+    """El aviso, ejecutado en proceso cuando no hay Redis.
+
+    Sin esto `enqueue` no encuentra a quién llamar y **descarta el aviso en
+    silencio**, que es justo lo que el mecanismo de respaldo existe para evitar.
+    """
+    from uuid import UUID
+
+    from app.database import SessionLocal
+    from app.services.push.dispatch import notify_user
+
+    db = SessionLocal()
+    try:
+        await notify_user(
+            db,
+            user_id=UUID(user_id),
+            title=title,
+            body=body,
+            data={k: str(v) for k, v in (data or {}).items()},
+        )
+        db.commit()
+    finally:
+        db.close()
+
+
 def _build_fallbacks() -> dict:
     from app.utils.slack import notify_slack
     from app.email import (
@@ -522,6 +549,7 @@ def _build_fallbacks() -> dict:
 
     return {
         "notify_slack_task": notify_slack,
+        "push_notify_user_task": _push_notify_user_fallback,
         "submit_indexnow_task": submit_url,
         "send_verification_email_task": send_verification_email,
         "send_password_reset_email_task": send_password_reset_email,

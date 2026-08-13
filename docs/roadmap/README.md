@@ -4,8 +4,8 @@
 
 ```mermaid
 pie title Tareas completadas (470 tareas)
-    "Listas" : 445
-    "Pendientes" : 25
+    "Listas" : 449
+    "Pendientes" : 21
 ```
 
 | Fase | Nombre | Listas | Pendientes | Progreso |
@@ -36,10 +36,10 @@ pie title Tareas completadas (470 tareas)
 | 23 | [IA asistida: captura, catálogo y necesidades](phase-23-ai-assisted-capture.md) | 11 | 0 | ✅ 100% |
 | 24 | [Observabilidad: que un fallo silencioso deje de serlo](phase-24-observability.md) | 11 | 0 | ✅ 100% |
 | 25 | [Captura sin conexión: cola local y sincronización diferida](phase-25-offline-capture.md) | 14 | 0 | ✅ 100% |
-| 26 | [Soporte de backend para el cliente nativo](phase-26-native-client-support.md) | 9 | 4 | 🟡 69% |
-| **Total** | | **445** | **25** | **🟡 95%** |
+| 26 | [Soporte de backend para el cliente nativo](phase-26-native-client-support.md) | 13 | 0 | ✅ 100% |
+| **Total** | | **449** | **21** | **🟡 96%** |
 
-> **Pendientes (25):**
+> **Pendientes (21):**
 > - **4 de la Fase 26 (soporte al cliente nativo):** el bloque de contrato está cerrado
 >   (los dos defectos corregidos, el 202 del login documentado, y una prueba que impide la
 >   recaída) junto con el runbook de versión mínima. Lo que queda son las cuatro de avisos
@@ -50,8 +50,11 @@ pie title Tareas completadas (470 tareas)
 >   conserva vacía para que una operación nueva no pueda nacer sin declarar lo que devuelve.
 >   Quedó anotado que la respuesta honesta de varias sería `204` sin cuerpo, pero cambiarlo
 >   es incompatible y `/v1` solo admite cambios aditivos: es material para una `/v2`.
->   Lo único pendiente de la fase son las 4 tareas de avisos push, que esperan un proyecto
->   de Firebase.
+>   La fase quedó **completa**: el bloque de contrato y el de avisos push. El despacho se
+>   despliega apagado (`PUSH_ENABLED=false`) y hoy avisa de dos hechos: una revisión de
+>   riesgo abierta y un envío entregado, ambos a la coordinación del centro. Los avisos por
+>   mensaje quedaron **fuera a propósito**, pendientes de decidir una regla que no enseñe a
+>   ignorar las notificaciones.
 > El grupo A de la Fase 13 (privacidad, lo que aplica hoy) está completo.
 > - Los borradores legales de la Fase 20 están escritos y esperando revisión de abogado:
 >   [`docs/legal/drafts/`](../legal/drafts/README.md). Sus tareas siguen abiertas hasta que esa
