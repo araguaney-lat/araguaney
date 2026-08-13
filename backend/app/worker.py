@@ -182,6 +182,41 @@ async def notify_slack_task(ctx, text: str, channel: str) -> None:
     await notify_slack(text, channel)
 
 
+async def push_notify_user_task(
+    ctx, user_id: str, title: str, body: str, data: dict | None = None
+) -> None:
+    """Manda un aviso a los dispositivos de una persona.
+
+    Va encolado y no en línea porque hablar con FCM cuesta una petición de red
+    por dispositivo, y nada de eso debe hacer esperar a quien acaba de abrir una
+    revisión de riesgo o de marcar un envío como entregado.
+
+    Se registra con `alert_on_final_failure` como todas las demás. La tentación
+    de eximirla existe —un aviso perdido no incumple ninguna promesa publicada—
+    y es equivocada: si el despacho se rompe entero, por una credencial vencida
+    o un cambio en FCM, sin alerta nadie se enteraría nunca. Y el ruido que se
+    teme ya está resuelto aguas arriba, porque esa alerta solo se dispara en el
+    último intento y pasa por el presupuesto de alertas.
+    """
+    from uuid import UUID
+
+    from app.database import SessionLocal
+    from app.services.push.dispatch import notify_user
+
+    db = SessionLocal()
+    try:
+        await notify_user(
+            db,
+            user_id=UUID(user_id),
+            title=title,
+            body=body,
+            data={k: str(v) for k, v in (data or {}).items()},
+        )
+        db.commit()
+    finally:
+        db.close()
+
+
 async def send_verification_email_task(ctx, to: str, token: str) -> None:
     from app.email import send_verification_email
     await asyncio.to_thread(send_verification_email, to, token)
@@ -542,6 +577,7 @@ class WorkerSettings:
     # edita al agregar una tarea nueva.
     functions = [
         alert_on_final_failure(notify_slack_task),
+        alert_on_final_failure(push_notify_user_task),
         alert_on_final_failure(submit_indexnow_task),
         alert_on_final_failure(send_verification_email_task),
         alert_on_final_failure(send_password_reset_email_task),

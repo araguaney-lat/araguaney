@@ -18,6 +18,7 @@ Al agregar un modelo nuevo, agrégalo también aquí y en `alembic/env.py`.
 
 from app.models import audit_log  # noqa: F401
 from app.models import box  # noqa: F401
+from app.models import device_token  # noqa: F401
 from app.models import campaign  # noqa: F401
 from app.models import center  # noqa: F401
 from app.models import center_application  # noqa: F401
