@@ -213,3 +213,43 @@ async def test_someone_without_devices_is_not_an_error(db, monkeypatch):
     _enable(monkeypatch)
 
     assert await dispatch.notify_user(db, user_id=solo.id, title="t", body="b") == 0
+
+
+# ── Cómo se lee la respuesta de FCM ──────────────────────────────────────────
+#
+# Se agregaron tras correr el diagnóstico de credencial contra producción: FCM
+# contestó 400 con INVALID_ARGUMENT sobre el token, un caso que el cliente
+# clasificaba como error genérico y que en realidad significa que ese destino no
+# va a funcionar nunca.
+
+
+def _respuesta(status: int, cuerpo: str):
+    import httpx
+
+    return httpx.Response(status_code=status, text=cuerpo)
+
+
+def test_an_unregistered_token_is_recognised():
+    from app.services.push.fcm_client import FcmClient
+
+    resultado = FcmClient._classify(_respuesta(404, '{"error":{"status":"UNREGISTERED"}}'))
+    assert resultado.unregistered is True
+
+
+def test_a_malformed_token_is_recognised_too():
+    # El caso que destapó el diagnóstico: el token no tiene forma de token.
+    from app.services.push.fcm_client import FcmClient
+
+    cuerpo = '{"error":{"code":400,"message":"The registration token is not a valid FCM registration token","status":"INVALID_ARGUMENT"}}'
+    assert FcmClient._classify(_respuesta(400, cuerpo)).unregistered is True
+
+
+def test_a_bad_payload_does_not_kill_the_token():
+    # También es 400 con INVALID_ARGUMENT, pero el error es nuestro. Dar de baja
+    # el token aquí borraría un destino bueno por un fallo de quien envía.
+    from app.services.push.fcm_client import FcmClient
+
+    cuerpo = '{"error":{"code":400,"message":"Invalid JSON payload received.","status":"INVALID_ARGUMENT"}}'
+    resultado = FcmClient._classify(_respuesta(400, cuerpo))
+    assert resultado.unregistered is False
+    assert resultado.delivered is False

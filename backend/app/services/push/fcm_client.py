@@ -127,13 +127,40 @@ class FcmClient:
                 },
             )
 
+        return self._classify(response)
+
+    @staticmethod
+    def _classify(response: httpx.Response) -> PushResult:
+        """Traduce la respuesta de FCM a una decisión.
+
+        Va aparte de `send` para poder probarse sin red, que es lo que hace
+        falta: lo delicado aquí no es la petición sino distinguir un destino
+        muerto de un error nuestro.
+        """
         if response.status_code == 200:
             return PushResult(delivered=True)
 
-        # 404 con UNREGISTERED, y 400 con INVALID_ARGUMENT sobre el token, son
-        # las dos formas en que FCM dice "ese destino ya no existe".
-        detail = response.text[:300]
-        if response.status_code == 404 or "UNREGISTERED" in detail:
+        detail = response.text[:400]
+
+        # FCM tiene dos formas de decir que un destino no sirve, y conviene no
+        # confundirlas con un fallo nuestro:
+        #
+        # - **404 / UNREGISTERED**: el token era bueno y la aplicación se
+        #   desinstaló. El caso normal.
+        # - **400 / INVALID_ARGUMENT sobre el token**: el token está mal formado
+        #   y no va a funcionar nunca; llegó así desde un cliente con un error.
+        #
+        # El segundo se reconoce por el texto y no por el código, y eso es
+        # deliberado: un 400 con INVALID_ARGUMENT también aparece cuando el
+        # mensaje que armamos está mal, y dar de baja un token por un error
+        # nuestro borraría un destino bueno. Si Google cambia la redacción,
+        # esto deja de casar y el token sobrevive como error genérico, que es
+        # el modo de fallo correcto para una coincidencia frágil.
+        token_invalido = (
+            response.status_code == 400
+            and "not a valid FCM registration token" in detail
+        )
+        if response.status_code == 404 or "UNREGISTERED" in detail or token_invalido:
             return PushResult(delivered=False, unregistered=True, error=detail)
 
         return PushResult(delivered=False, error=f"{response.status_code}: {detail}")
