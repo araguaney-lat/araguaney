@@ -4,6 +4,7 @@ from uuid import UUID
 from sqlalchemy import func, select, or_
 from sqlalchemy.orm import Session, selectinload
 
+from app.models.user import User
 from app.models.messaging import Thread, ThreadAttachment, ThreadParticipant, ThreadReply
 from app.models.user_campaign import UserCampaign
 from app.repositories.base import BaseRepository
@@ -164,6 +165,38 @@ class ThreadRepository(BaseRepository):
                 User.is_active.is_(True),
             )
         )
+        return list(self.db.execute(stmt).scalars())
+
+    def participants_with_nothing_unread(
+        self, thread_id: UUID, exclude_user_id: UUID, since: datetime | None
+    ) -> list[UUID]:
+        """Participantes que ya leyeron todo lo anterior de este hilo.
+
+        Es la lista a la que vale la pena mandar un aviso push. A quien todavía
+        no ha abierto el mensaje previo ya se le avisó por ese, y volver a
+        vibrarle por cada respuesta es exactamente lo que enseña a silenciar las
+        notificaciones. El correo, que no interrumpe, sí sale para todos.
+
+        `since` es la marca de la última actividad **anterior** a este mensaje.
+        Con `None` —un hilo que acaba de nacer— nadie puede tener nada sin leer,
+        así que entran todos.
+        """
+        stmt = (
+            select(ThreadParticipant.user_id)
+            .join(User, User.id == ThreadParticipant.user_id)
+            .where(
+                ThreadParticipant.thread_id == thread_id,
+                ThreadParticipant.user_id != exclude_user_id,
+                User.is_active.is_(True),
+            )
+        )
+        if since is not None:
+            # `last_read_at` nulo con actividad previa significa que nunca abrió
+            # el hilo: tiene algo pendiente y no se le vuelve a avisar.
+            stmt = stmt.where(
+                ThreadParticipant.last_read_at.isnot(None),
+                ThreadParticipant.last_read_at >= since,
+            )
         return list(self.db.execute(stmt).scalars())
 
     def get_participant_emails(self, thread_id: UUID, exclude_user_id: UUID) -> list[str]:

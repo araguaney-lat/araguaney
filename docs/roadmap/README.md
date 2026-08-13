@@ -52,9 +52,10 @@ pie title Tareas completadas (470 tareas)
 >   es incompatible y `/v1` solo admite cambios aditivos: es material para una `/v2`.
 >   La fase quedó **completa**: el bloque de contrato y el de avisos push. El despacho se
 >   despliega apagado (`PUSH_ENABLED=false`) y hoy avisa de dos hechos: una revisión de
->   riesgo abierta y un envío entregado, ambos a la coordinación del centro. Los avisos por
->   mensaje quedaron **fuera a propósito**, pendientes de decidir una regla que no enseñe a
->   ignorar las notificaciones.
+>   riesgo abierta, un envío entregado y un mensaje privado recibido. Los dos primeros van a
+>   la coordinación del centro. El de mensajes solo cubre hilos privados y no repite mientras
+>   quien recibe no haya abierto el anterior: los hilos de campaña son difusión y el correo,
+>   que no interrumpe, ya los cubre.
 > El grupo A de la Fase 13 (privacidad, lo que aplica hoy) está completo.
 > - Los borradores legales de la Fase 20 están escritos y esperando revisión de abogado:
 >   [`docs/legal/drafts/`](../legal/drafts/README.md). Sus tareas siguen abiertas hasta que esa
