@@ -26,6 +26,58 @@ interface Props {
 const FLAG: Record<Locale, string> = { es: "🇲🇽", en: "🇺🇸" }
 const OTHER_LOCALE: Record<Locale, Locale> = { es: "en", en: "es" }
 
+const PILL_PRIMARY = { background: "#1F5E8C", color: "#fff", borderRadius: 99 }
+const PILL_OUTLINE = {
+  border: "1.5px solid #1F5E8C",
+  color: "#1F5E8C",
+  borderRadius: 99,
+}
+
+interface LocaleSwitcherProps {
+  locale: Locale
+  /** Cuando la página existe con URL propia por idioma, se navega a ella. */
+  href?: string
+  className: string
+  onSwitch: () => void
+}
+
+/**
+ * Un solo control de idioma para las tres barras (móvil, tableta y escritorio):
+ * lo único que cambia entre ellas es el tamaño, y tenerlo cuatro veces escrito
+ * a mano hacía que se desincronizaran al primer ajuste.
+ */
+function LocaleSwitcher({
+  locale,
+  href,
+  className,
+  onSwitch,
+}: LocaleSwitcherProps) {
+  const other = OTHER_LOCALE[locale]
+  const label = `Switch to ${other === "en" ? "English" : "Español"}`
+  const style = { border: "1.5px solid #EAD9B0", color: "#52493D" }
+  const content = (
+    <>
+      <span>{FLAG[other]}</span>
+      <span>{other === "en" ? "EN" : "ES"}</span>
+    </>
+  )
+
+  return href ? (
+    <Link href={href} className={className} style={style} aria-label={label}>
+      {content}
+    </Link>
+  ) : (
+    <button
+      onClick={onSwitch}
+      className={className}
+      style={style}
+      aria-label={label}
+    >
+      {content}
+    </button>
+  )
+}
+
 export default function HomeNav({ dict, locale, localeLinks }: Props) {
   const [open, setOpen] = useState(false)
   const [, startTransition] = useTransition()
@@ -49,7 +101,18 @@ export default function HomeNav({ dict, locale, localeLinks }: Props) {
 
   return (
     <>
-      {/* Nav bar — fixed on mobile, sticky on desktop */}
+      {/*
+        Dos breakpoints distintos, a propósito.
+
+        `md` decide fixed contra sticky: el spacer que compensa la barra fija
+        vive en cada página pública como `h-[56px] md:hidden`, así que mover ese
+        breakpoint aquí obliga a tocar dos docenas de archivos.
+
+        `xl` decide links contra cajón. La fila de la derecha mide ~780px en
+        español; con el logo y el padding pide ~1030px de viewport. Una tableta
+        en vertical no los tiene —tampoco el iPad Pro de 1024px— y por eso ahí
+        va el cajón.
+      */}
       <nav
         className="fixed md:sticky top-0 left-0 right-0 z-50 md:z-40"
         style={{ background: "#FBF7EE", borderBottom: "1px solid #EFE7D6" }}
@@ -82,7 +145,7 @@ export default function HomeNav({ dict, locale, localeLinks }: Props) {
           </Link>
 
           {/* Desktop nav */}
-          <div className="hidden md:flex items-center gap-[26px]">
+          <div className="hidden xl:flex items-center gap-[26px]">
             {links.map((l) => (
               <Link
                 key={l.href}
@@ -93,37 +156,19 @@ export default function HomeNav({ dict, locale, localeLinks }: Props) {
               </Link>
             ))}
 
-            {/* Language switcher */}
-            {showSwitcher && (otherHref ? (
-              <Link
+            {showSwitcher && (
+              <LocaleSwitcher
+                locale={locale}
                 href={otherHref}
+                onSwitch={switchLocale}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[13px] font-semibold transition-colors"
-                style={{ border: "1.5px solid #EAD9B0", color: "#52493D" }}
-                aria-label={`Switch to ${other === "en" ? "English" : "Español"}`}
-              >
-                <span>{FLAG[other]}</span>
-                <span>{other === "en" ? "EN" : "ES"}</span>
-              </Link>
-            ) : (
-              <button
-                onClick={switchLocale}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[13px] font-semibold transition-colors"
-                style={{ border: "1.5px solid #EAD9B0", color: "#52493D" }}
-                aria-label={`Switch to ${other === "en" ? "English" : "Español"}`}
-              >
-                <span>{FLAG[other]}</span>
-                <span>{other === "en" ? "EN" : "ES"}</span>
-              </button>
-            ))}
+              />
+            )}
 
             <Link
               href={localizedPath("registrar-centro", locale)}
               className="px-[18px] py-[9px] inline-flex items-center text-[13.5px] font-semibold"
-              style={{
-                background: "#1F5E8C",
-                color: "#fff",
-                borderRadius: 99,
-              }}
+              style={PILL_PRIMARY}
             >
               {dict.register_center}
             </Link>
@@ -131,39 +176,35 @@ export default function HomeNav({ dict, locale, localeLinks }: Props) {
             <Link
               href="/login"
               className="px-[18px] py-[9px] inline-flex items-center text-[13.5px] font-semibold"
-              style={{
-                border: "1.5px solid #1F5E8C",
-                color: "#1F5E8C",
-                borderRadius: 99,
-              }}
+              style={PILL_OUTLINE}
             >
               {dict.login}
             </Link>
           </div>
 
-          {/* Mobile right side */}
-          <div className="md:hidden flex items-center gap-3">
-            {showSwitcher && (otherHref ? (
-              <Link
+          {/* Mobile and tablet right side */}
+          <div className="xl:hidden flex items-center gap-3 md:gap-4">
+            {showSwitcher && (
+              <LocaleSwitcher
+                locale={locale}
                 href={otherHref}
-                className="flex items-center gap-1 px-2.5 py-1 rounded-full text-[12px] font-semibold"
-                style={{ border: "1.5px solid #EAD9B0", color: "#52493D" }}
-                aria-label={`Switch to ${other === "en" ? "English" : "Español"}`}
-              >
-                <span>{FLAG[other]}</span>
-                <span>{other === "en" ? "EN" : "ES"}</span>
-              </Link>
-            ) : (
-              <button
-                onClick={switchLocale}
-                className="flex items-center gap-1 px-2.5 py-1 rounded-full text-[12px] font-semibold"
-                style={{ border: "1.5px solid #EAD9B0", color: "#52493D" }}
-                aria-label={`Switch to ${other === "en" ? "English" : "Español"}`}
-              >
-                <span>{FLAG[other]}</span>
-                <span>{other === "en" ? "EN" : "ES"}</span>
-              </button>
-            ))}
+                onSwitch={switchLocale}
+                className="flex items-center gap-1 md:gap-1.5 px-2.5 md:px-3 py-1 md:py-1.5 rounded-full text-[12px] md:text-[13px] font-semibold transition-colors"
+              />
+            )}
+
+            {/*
+              En tableta sobra ancho para la acción principal aunque los links
+              se hayan ido al cajón; esconderla ahí costaría lo único que la
+              página pide. En teléfono no cabe y se queda solo en el cajón.
+            */}
+            <Link
+              href={localizedPath("registrar-centro", locale)}
+              className="hidden md:inline-flex px-[18px] py-[9px] items-center text-[13.5px] font-semibold"
+              style={PILL_PRIMARY}
+            >
+              {dict.register_center}
+            </Link>
 
             <button
               onClick={() => setOpen(true)}
@@ -202,20 +243,19 @@ export default function HomeNav({ dict, locale, localeLinks }: Props) {
         </div>
       </nav>
 
-      {/* Mobile drawer overlay */}
+      {/* Drawer overlay */}
       {open && (
         <div
-          className="fixed inset-0 z-[60] md:hidden"
+          className="fixed inset-0 z-[60] xl:hidden"
           style={{ background: "rgba(43,39,35,0.45)" }}
           onClick={() => setOpen(false)}
         />
       )}
 
-      {/* Mobile drawer panel */}
+      {/* Drawer panel */}
       <div
-        className="fixed top-0 right-0 bottom-0 z-[70] md:hidden flex flex-col"
+        className="fixed top-0 right-0 bottom-0 z-[70] xl:hidden flex flex-col w-[260px] md:w-[320px]"
         style={{
-          width: 260,
           background: "#FBF7EE",
           boxShadow: "-8px 0 32px rgba(43,39,35,.18)",
           transform: open ? "translateX(0)" : "translateX(100%)",
@@ -268,6 +308,11 @@ export default function HomeNav({ dict, locale, localeLinks }: Props) {
           ))}
         </nav>
 
+        {/*
+          En tableta "Registrar centro" queda repetido: está aquí y en la barra.
+          Quien abre el cajón busca la lista completa, y un hueco donde debería
+          ir la acción principal se lee como olvido.
+        */}
         <div className="px-5 pb-8 pt-5 flex flex-col gap-3">
           <Link
             href={localizedPath("registrar-centro", locale)}
