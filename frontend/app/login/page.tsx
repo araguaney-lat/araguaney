@@ -1,6 +1,6 @@
 "use client"
 
-import { useActionState, useEffect } from "react"
+import { useActionState, useEffect, useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -20,6 +20,7 @@ export default function LoginPage() {
   const termsHref = locale === "en" ? "/terms" : "/terminos"
   const privacyHref = locale === "en" ? "/privacy" : "/aviso-de-privacidad"
   const [state, formAction, isPending] = useActionState(loginAction, null)
+  const [showPassword, setShowPassword] = useState(false)
 
   // Bandera ?expired=1 que el middleware pone al rebotar una sesión vencida.
   // Se lee sin useSearchParams para no forzar Suspense/deopt en esta página.
@@ -123,18 +124,37 @@ export default function LoginPage() {
             <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#52493D", marginBottom: 6 }}>
               {t.password_label}
             </label>
-            <input
-              name="password"
-              type="password"
-              autoComplete="current-password"
-              required
-              placeholder="••••••••"
-              style={{
-                display: "block", width: "100%", height: 46, background: "#fff",
-                border: "1.5px solid #E6DCC8", borderRadius: 10, padding: "0 14px",
-                fontSize: 14, color: "#2B2723", marginBottom: 10, outline: "none",
-              }}
-            />
+            {/* Contraseñas largas de un gestor se pegan, pero las que se
+                escriben a mano se equivocan, y en un teléfono en un centro de
+                acopio no hay forma de comprobarlas. Por eso se puede mirar lo
+                que se escribió. */}
+            <div style={{ position: "relative", marginBottom: 10 }}>
+              <input
+                name="password"
+                type={showPassword ? "text" : "password"}
+                autoComplete="current-password"
+                required
+                placeholder="••••••••"
+                style={{
+                  display: "block", width: "100%", height: 46, background: "#fff",
+                  border: "1.5px solid #E6DCC8", borderRadius: 10,
+                  padding: "0 78px 0 14px",
+                  fontSize: 14, color: "#2B2723", outline: "none",
+                }}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((visible) => !visible)}
+                style={{
+                  position: "absolute", top: 0, right: 0, height: 46,
+                  padding: "0 14px", background: "none", border: "none",
+                  fontSize: 12.5, fontWeight: 600, color: "#1F5E8C",
+                  cursor: "pointer",
+                }}
+              >
+                {showPassword ? t.hide_password : t.show_password}
+              </button>
+            </div>
 
             <div style={{ textAlign: "right", marginBottom: 24 }}>
               <Link href="/forgot-password" style={{ fontSize: 12.5, color: "#1F5E8C", fontWeight: 600 }}>{t.forgot_password}</Link>
