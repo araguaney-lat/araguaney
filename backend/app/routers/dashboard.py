@@ -38,6 +38,19 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter(tags=["dashboard"])
 
+# La ficha pública del QR va en su propio router, con su propia etiqueta.
+#
+# No es cosmética: el cliente móvil se genera desde el snapshot de OpenAPI, y su
+# generador no sabe expresar la unión de dos formas que esa ruta declara
+# (`QrBoxFicha | QrPalletFicha`). Para esquivarla excluía la etiqueta entera, y
+# con ella se llevaba `/dashboard/national` y `/dashboard/weight` —que no son
+# nacionales: `tenant_scope` las acota al centro de quien llama— y con ellas los
+# agregados de la pantalla de inicio de la aplicación. Seis rutas caían por una.
+#
+# FastAPI **suma** las etiquetas de la ruta a las del router, así que declarar
+# `tags=["qr"]` en el decorador no basta: la ruta seguiría llevando `dashboard`.
+qr_router = APIRouter(tags=["qr"])
+
 _DASHBOARD_TTL = 120   # 2 minutes — fresh enough, cheap enough
 _PUBLIC_TTL = 300      # 5 minutes — cacheable at edge too
 
@@ -121,7 +134,7 @@ def weight_dashboard(
 _QR_TTL = 60  # 1 minute; edge can extend with stale-while-revalidate
 
 
-@router.get(
+@qr_router.get(
     "/public/qr/{code}",
     # Se declara por `responses` y no por `response_model` a propósito. La ruta
     # devuelve un `JSONResponse` ya construido, para poder servir la copia

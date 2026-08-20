@@ -3,9 +3,9 @@
 ## Progreso general
 
 ```mermaid
-pie title Tareas completadas (470 tareas)
-    "Listas" : 449
-    "Pendientes" : 21
+pie title Tareas completadas (477 tareas)
+    "Listas" : 450
+    "Pendientes" : 27
 ```
 
 | Fase | Nombre | Listas | Pendientes | Progreso |
@@ -36,8 +36,8 @@ pie title Tareas completadas (470 tareas)
 | 23 | [IA asistida: captura, catálogo y necesidades](phase-23-ai-assisted-capture.md) | 11 | 0 | ✅ 100% |
 | 24 | [Observabilidad: que un fallo silencioso deje de serlo](phase-24-observability.md) | 11 | 0 | ✅ 100% |
 | 25 | [Captura sin conexión: cola local y sincronización diferida](phase-25-offline-capture.md) | 14 | 0 | ✅ 100% |
-| 26 | [Soporte de backend para el cliente nativo](phase-26-native-client-support.md) | 13 | 0 | ✅ 100% |
-| **Total** | | **449** | **21** | **🟡 96%** |
+| 26 | [Soporte de backend para el cliente nativo](phase-26-native-client-support.md) | 14 | 6 | 🟨 70% |
+| **Total** | | **450** | **27** | **🟡 94%** |
 
 > **Pendientes (21):**
 > - **4 de la Fase 26 (soporte al cliente nativo):** el bloque de contrato está cerrado
