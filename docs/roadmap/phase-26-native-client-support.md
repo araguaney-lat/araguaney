@@ -91,3 +91,34 @@ para las demás.
 
 Las tasks 5 a 8 son la compuerta externa de la Fase 07 del roadmap de la
 aplicación; hasta que existan, la aplicación no puede recibir avisos.
+
+---
+
+## Pendiente — lo que el cliente nativo pide hoy
+
+Anotado desde el repositorio de la aplicación el 2026-08-20. Ninguna de estas
+tareas se implementó aquí: se documentan para que la decisión de tocarlas sea de
+quien mantiene este backend, que está en producción.
+
+| # | Tarea | Descripción | Complejidad | Estado |
+|---|-------|-------------|-------------|--------|
+| 14 | Aislar la ficha pública del QR en su propia etiqueta ✅ hecho en este PR | `GET /v1/public/qr/{code}` declara una unión (`QrBoxFicha \| QrPalletFicha`) que el generador del cliente Dart no expresa, así que la aplicación excluye su **etiqueta** entera. Como la ruta lleva `dashboard`, la exclusión se lleva también `/v1/dashboard/national` y `/v1/dashboard/weight` —que no son nacionales: `tenant_scope` las acota al centro de quien llama— y con ellas los agregados de la pantalla de inicio del móvil. Seis rutas caen por una. | 🟢 Baja | ✅ Done |
+| 15 | Un stock por categoría que sea stock | `GET /v1/reports/campaign/{id}/by-category` ya se acota al centro y la aplicación lo usa, pero cuenta cajas creadas en una ventana **sin mirar su estado**: lo despachado sigue sumando. La pantalla móvil se titula «Capturado por categoría» por eso. Para leerla como inventario hace falta un filtro por estado, o una ruta hermana con la misma forma de respuesta. | 🟠 Media | ⬜ Pendiente |
+| 16 | Identidad en `POST /v1/auth/refresh` | El login devuelve `role`, `center_id` y `center_role`; refresh devuelve solo los tokens, aunque el access token lleva esas claims dentro. La aplicación restaura la sesión por refresh, así que cada reinicio devolvía a quien coordina convertido en voluntariado. Ya lo resuelve preguntando `GET /v1/auth/me`, a costa de una petición extra en cada arranque en frío. | 🟢 Baja | ⬜ Pendiente |
+| 17 | Códigos con nombre y mensajes en español donde los lee una persona | Nueve rechazos llegan a quien opera: `EMAIL_TAKEN`, `USERNAME_TAKEN`, `INVALID_ROLE`, `PROTECTED_CAMPAIGN`, `ACCOUNT_DISABLED`, `EMAIL_NOT_VERIFIED`, `NOT_CAMPAIGN_MEMBER`, `SELF_REVIEW` y el 403 de hilo de campaña, que además usa el código genérico `FORBIDDEN` y por eso la aplicación no puede distinguirlo de un «esto no te toca». Varios están redactados en inglés. | 🟠 Media | ⬜ Pendiente |
+| 18 | Nombres de centro en `TransferOut` | Lleva `from_center_id` y `to_center_id`, y `GET /v1/centers` exige `national_admin`, así que una coordinación no puede nombrar al otro centro de su propia transferencia. La aplicación las muestra por dirección —entrante o saliente— y deja al otro centro sin nombre. | 🟢 Baja | ⬜ Pendiente |
+| 19 | `GET /v1/intakes/{id}` | Existe la lista y la creación, no el detalle. Un aviso de revisión de riesgo apunta a una captura concreta y la aplicación solo puede abrir la lista. | 🟢 Baja | ⬜ Pendiente |
+| 20 | Cuerpo tipado en `POST /v1/pallets/{id}/add-box` | Recibe un `dict` sin declarar, así que el cliente generado no tiene modelo y la clave `code` se escribe a mano. | 🟢 Baja | ⬜ Pendiente |
+
+### Sobre la tarea 14, ya aplicada
+
+**`tags=["qr"]` en el decorador no basta**:
+FastAPI suma las etiquetas de la ruta a las del router, y la ruta queda con
+`["dashboard", "qr"]`, que la exclusión sigue atrapando. Hace falta un
+`APIRouter` propio montado aparte, que es como quedó. El contrato que exige que
+esa ruta no tenga `response_model` se mantiene —solo se lee del router nuevo— y
+una prueba nueva falla si alguien devuelve la ficha a una etiqueta compartida.
+
+El detalle completo de cada petición, con lo que la aplicación hace mientras
+tanto, vive en
+[`araguaney-app/docs/backend-requests.md`](https://github.com/araguaney-lat/araguaney-app/blob/main/docs/backend-requests.md).
