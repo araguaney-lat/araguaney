@@ -87,11 +87,14 @@ def test_the_public_qr_record_is_not_filtered_by_a_response_model():
     `response_model` la haría pasar por una validación que hoy no ocurre, y una
     forma que el modelo no contemple dejaría de servirse.
     """
-    from app.routers.dashboard import router
+    # Vive en `qr_router` y no en el router del panel: se aisló para que el
+    # generador del cliente móvil pudiera excluirla sin llevarse con ella las
+    # rutas del panel acotadas por centro.
+    from app.routers.dashboard import qr_router
 
     route = next(
         r
-        for r in router.routes
+        for r in qr_router.routes
         if getattr(r, "path", None) == "/public/qr/{code}"
         and "GET" in getattr(r, "methods", set())
     )
@@ -101,3 +104,37 @@ def test_the_public_qr_record_is_not_filtered_by_a_response_model():
         "por `responses`. Ponerle un response_model haría que FastAPI validara "
         "y filtrara una respuesta que hoy sale intacta desde la caché."
     )
+
+
+def test_the_public_qr_record_does_not_carry_the_dashboard_tag():
+    """Su etiqueta decide si el cliente móvil puede leer el panel del centro.
+
+    Esta ruta declara una unión de dos formas (`QrBoxFicha | QrPalletFicha`) que
+    el generador del cliente móvil no sabe expresar, así que ese repositorio
+    excluye su etiqueta entera. Mientras compartió etiqueta con el panel, la
+    exclusión se llevaba también `/dashboard/national` y `/dashboard/weight`
+    —que no son nacionales: `tenant_scope` las acota al centro de quien llama— y
+    con ellas los agregados de la pantalla de inicio de la aplicación.
+
+    FastAPI suma las etiquetas de la ruta a las del router, así que aislarla
+    exige un router propio y no un `tags=` en el decorador.
+    """
+    from app.main import app
+
+    spec = app.openapi()
+    qr = spec["paths"]["/v1/public/qr/{code}"]["get"]
+
+    assert qr["tags"] == ["qr"], (
+        "La ficha pública del QR volvió a compartir etiqueta con otra cosa. "
+        "Excluirla en el cliente móvil vuelve a llevarse por delante las rutas "
+        "que compartan esa etiqueta."
+    )
+
+    dashboard = [
+        path
+        for path, ops in spec["paths"].items()
+        for method, op in ops.items()
+        if isinstance(op, dict) and "dashboard" in op.get("tags", [])
+    ]
+    assert "/v1/dashboard/national" in dashboard
+    assert "/v1/public/qr/{code}" not in dashboard
