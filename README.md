@@ -1,5 +1,10 @@
 # Araguaney
 
+[![Backend tests](https://img.shields.io/github/actions/workflow/status/araguaney-lat/araguaney/backend-tests.yml?branch=main&label=backend%20tests)](https://github.com/araguaney-lat/araguaney/actions/workflows/backend-tests.yml)
+[![Frontend tests](https://img.shields.io/github/actions/workflow/status/araguaney-lat/araguaney/frontend-tests.yml?branch=main&label=frontend%20tests)](https://github.com/araguaney-lat/araguaney/actions/workflows/frontend-tests.yml)
+[![Security scan](https://img.shields.io/github/actions/workflow/status/araguaney-lat/araguaney/security-scan.yml?branch=main&label=security%20scan)](https://github.com/araguaney-lat/araguaney/actions/workflows/security-scan.yml)
+[![Licence: AGPL-3.0](https://img.shields.io/badge/licence-AGPL--3.0-blue)](LICENSE)
+
 > **A common standard for coordinating collection centres and humanitarian aid logistics.**
 > A free, multi-centre web application: it records **in-kind** donations item by item, packs them
 > into **homogeneous boxes** with QR codes, consolidates those into **pallets** and **shipments**
@@ -20,6 +25,22 @@ scenario landings, an FAQ hub and a changelog. Country-agnostic; it works for an
 > rules, live in [`CLAUDE.md`](CLAUDE.md); the **phase roadmap** in
 > [`docs/roadmap/`](docs/roadmap/); SEO/AEO maintenance in
 > [`docs/seo-maintenance.md`](docs/seo-maintenance.md).
+
+## Project status
+
+Deployed and publicly reachable at [araguaney.lat](https://www.araguaney.lat). The platform is
+built, not a prototype: the operational panel, the public site and the background jobs all run in
+production.
+
+| | |
+|---|---|
+| **Roadmap** | 27 phases · 450 of 477 tasks done (94%) — [`docs/roadmap/`](docs/roadmap/) |
+| **Tests** | 883 backend (`pytest`) · 49 frontend (`vitest`) |
+| **API contract** | `/v1` accepts additive changes only, enforced against an OpenAPI fingerprint so an old native client cannot be broken by a deploy |
+| **Offline capture** | Intake queues locally (IndexedDB) and syncs on reconnect, with an idempotency key minted before the first attempt |
+| **Privacy** | No beneficiary data. Donor data is optional, has a declared retention period and purges itself |
+| **Observability** | Every cron declares a heartbeat window and alerts naming the promise it broke, not the exception it raised |
+| **Licence** | AGPL-3.0 |
 
 ## Tech Stack
 
@@ -45,6 +66,24 @@ Multi-tenant "pool / row-level": **one deploy, one database, `center_id` discrim
 centre** — which is what makes national aggregation a single `GROUP BY`. Every data access goes
 through tenant scoping.
 
+```mermaid
+flowchart LR
+    subgraph centre["Collection centre · tenant"]
+        direction LR
+        I["Intake<br/>donation received"]
+        B["Box<br/>homogeneous · QR"]
+        P["Pallet<br/>mixed · QR"]
+        I --> B --> P
+    end
+
+    P --> S["Shipment<br/>exportable manifest"]
+    S --> R["Reception at destination<br/>one line per box"]
+    R -.->|when something is wrong| X["Incident<br/>missing · damaged · retained"]
+    centre -.->|"GROUP BY center_id"| N["National dashboard<br/>aggregate stock"]
+```
+
+Only **sealed** boxes enter a pallet, and only **closed** pallets enter a shipment.
+
 | Entity | Essence |
 |---|---|
 | `Center` | The tenant (collection centre) |
@@ -58,8 +97,51 @@ through tenant scoping.
 | `Campaign` | Campaign/event (public slug at `/eventos/{slug}`) |
 | `Transfer` | Inventory transfer between centres |
 
-State machines with an audit trail (`*_event`): `Box` DRAFT→SEALED→SHIPPED (+REJECTED),
-`Pallet` OPEN→CLOSED→SHIPPED, `Shipment` OPEN→CLOSED→SHIPPED→DELIVERED→RECONCILED.
+### State machines
+
+Every transition writes its `*_event` row: `from_status → to_status`, who did it and when.
+
+```mermaid
+stateDiagram-v2
+    direction LR
+
+    state "Box" as BoxSM {
+        direction LR
+        b0: DRAFT
+        b1: SEALED
+        b2: SHIPPED
+        b3: REJECTED
+        [*] --> b0
+        b0 --> b1: seal
+        b0 --> b3: reject
+        b1 --> b2: dispatch
+    }
+
+    state "Pallet" as PalletSM {
+        direction LR
+        p0: OPEN
+        p1: CLOSED
+        p2: SHIPPED
+        [*] --> p0
+        p0 --> p1: close
+        p1 --> p2: dispatch
+    }
+
+    state "Shipment" as ShipmentSM {
+        direction LR
+        s0: OPEN
+        s1: CLOSED
+        s2: SHIPPED
+        s3: DELIVERED
+        s4: RECONCILED
+        [*] --> s0
+        s0 --> s1: close
+        s1 --> s2: dispatch
+        s2 --> s3: arrival confirmed
+        s3 --> s4: reception recorded
+        s2 --> s2: logistics milestone
+    }
+```
 
 **Dispatched inventory stays frozen.** `DELIVERED` says it arrived and `RECONCILED` says what
 arrived has been recorded, but neither touches a box or a pallet. Sent and received are two
