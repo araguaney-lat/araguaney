@@ -16,6 +16,12 @@
 **The flow:** `Intake` → `Box` (homogeneous + QR) → `Pallet` → `Shipment` (with manifest) →
 reception at the destination → national aggregate dashboard.
 
+![National dashboard: stock aggregated across every active centre](docs/assets/national-dashboard.png)
+
+<sup>The national dashboard — sealed boxes, units and weight aggregated across every active
+centre, broken down by category, by centre, and by INN for medicines. This is the view a single
+centre's spreadsheet cannot produce.</sup>
+
 **Public and multilingual:** beyond the operational panel, it serves a **bilingual public site
 (ES/EN)** tuned for SEO/AEO — pillars, guides, a glossary, "what is needed" (`/necesidades`),
 scenario landings, an FAQ hub and a changelog. Country-agnostic; it works for any emergency
@@ -41,6 +47,52 @@ production.
 | **Privacy** | No beneficiary data. Donor data is optional, has a declared retention period and purges itself |
 | **Observability** | Every cron declares a heartbeat window and alerts naming the promise it broke, not the exception it raised |
 | **Licence** | AGPL-3.0 |
+
+## What it looks like
+
+Every screenshot below is the running application against seeded demo data — roughly five tonnes
+walking the whole flow (`backend/scripts/seed_demo_inventory.py`). No mockups.
+
+### Intake — one box, one product, one batch, one expiry
+
+![Intake form](docs/assets/intake.png)
+
+The homogeneous-box rule is enforced by the form, not by a convention someone has to remember.
+Donation is anonymous unless the donor asks otherwise, the barcode field prefills from GTIN
+lookups, and the banner states whether barcode lookup is currently reachable.
+
+### Boxes — sealed, coded, ready to label
+
+![Box list](docs/assets/boxes.png)
+
+Each box carries its own code and QR, its batch and its expiry. Labels print in A4 sheets, because
+a centre labels in batches rather than one box at a time.
+
+### Shipments and the manifest
+
+<table>
+<tr>
+<td width="50%"><img src="docs/assets/shipments.png" alt="Shipment list"></td>
+<td width="50%"><img src="docs/assets/manifest.png" alt="Generated manifest PDF"></td>
+</tr>
+</table>
+
+The manifest is the document the shipment exists to produce: one line per box, grouped by pallet,
+with INN, strength, batch, expiry, quantity and weight. It is generated as a queued job, never
+inline, because a slow export must not hold a request open.
+
+### On a phone, which is where a centre actually works
+
+<table>
+<tr>
+<td width="50%"><img src="docs/assets/mobile-intake.png" alt="Intake on a phone"></td>
+<td width="50%"><img src="docs/assets/mobile-boxes.png" alt="Box list on a phone"></td>
+</tr>
+</table>
+
+Many centres operate in basements with no coverage. Intake capture queues locally and syncs on
+reconnect; everything else waits for a connection on purpose, because sealing a box or closing a
+pallet depends on state that another device may be changing.
 
 ## Tech Stack
 
