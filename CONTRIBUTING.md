@@ -32,7 +32,7 @@ cd backend
 python3.12 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 pip install pytest pytest-asyncio httpx
-python -m pytest -q          # 730+ tests, no external services
+python -m pytest -q          # 880+ tests, no external services
 ```
 
 The whole suite — including the multi-tenant isolation tests in `tests/tenant/`
