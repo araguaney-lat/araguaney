@@ -1,0 +1,46 @@
+name: Feature request
+description: Propose a change to what the platform does
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Araguaney has a single maintainer. A proposal that starts from a real
+        operational problem, and is small enough to review, has a far better
+        chance than a large one.
+
+        Two things are out of scope by product decision, not by lack of time:
+        **personal data about beneficiaries**, and anything that turns the
+        platform into a donor CRM. `CLAUDE.md` lists the rest of the
+        non-objectives.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: The operational problem
+      description: What goes wrong today, for whom, and how often.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What you propose
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: What you already tried or considered
+      description: Including whether an existing part of the platform nearly covers it.
+
+  - type: checkboxes
+    id: scope
+    attributes:
+      label: Scope check
+      options:
+        - label: This introduces no personal data about beneficiaries.
+          required: true
+        - label: I read the non-objectives in CLAUDE.md and this is not one of them.
+          required: true
