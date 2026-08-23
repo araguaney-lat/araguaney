@@ -8,8 +8,7 @@
     "login": "Iniciar sesión"
   },
   "hero": {
-    "eyebrow_desktop": "Coordinación de centros de acopio",
-    "eyebrow_mobile": "Centros de acopio",
+    "eyebrow": "Software para centros de acopio",
     "title": "Que cada donación llegue ordenada.",
     "desc_mobile": "Un mismo estándar para registrar, empacar en cajas homogéneas con QR y enviar con manifiesto.",
     "desc_desktop": "Araguaney conecta a los centros de acopio en un mismo estándar: registra los insumos a nivel de ítem, los empaca en cajas homogéneas con QR y los consolida en envíos con manifiesto exportable.",

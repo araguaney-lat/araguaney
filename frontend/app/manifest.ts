@@ -2,9 +2,13 @@ import type { MetadataRoute } from "next"
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Araguaney — Centros de acopio",
+    // Nombre y descripción dicen "software para", no "centros de acopio" a
+    // secas: instalada en el teléfono, esta ficha es lo único que se lee, y sin
+    // el "para" Araguaney parece ser un centro de acopio en vez de la
+    // herramienta que usan.
+    name: "Araguaney — Software para centros de acopio",
     short_name: "Araguaney",
-    description: "Coordinación de centros de acopio humanitario",
+    description: "Software para centros de acopio de ayuda humanitaria",
     start_url: "/dashboard",
     display: "standalone",
     background_color: "#FBF7EE",

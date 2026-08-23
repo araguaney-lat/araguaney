@@ -8,8 +8,7 @@
     "login": "Sign in"
   },
   "hero": {
-    "eyebrow_desktop": "Aid center coordination",
-    "eyebrow_mobile": "Aid centers",
+    "eyebrow": "Software for aid centers",
     "title": "Every donation delivered in order.",
     "desc_mobile": "One standard to register, pack in homogeneous boxes with QR codes, and ship with a manifest.",
     "desc_desktop": "Araguaney connects aid centers under one standard: registers items with category, batch, and expiry, packs them in homogeneous boxes with QR codes, and consolidates them into shipments with an exportable manifest.",

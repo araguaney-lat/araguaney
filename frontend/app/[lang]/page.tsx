@@ -119,8 +119,7 @@ export default async function HomePage({
               className="w-[18px] md:w-[24px]"
               style={{ height: 1.5, background: "#906400" }}
             />
-            <span className="hidden md:inline">{dict.hero.eyebrow_desktop}</span>
-            <span className="md:hidden">{dict.hero.eyebrow_mobile}</span>
+            <span>{dict.hero.eyebrow}</span>
           </div>
 
           <h1
