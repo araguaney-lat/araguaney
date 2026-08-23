@@ -250,7 +250,13 @@ states.
 │       └── types/            # Shared TypeScript interfaces
 ├── .github/
 │   ├── dependabot.yml        # Grouped weekly dep updates (npm + pip + actions)
+│   ├── PULL_REQUEST_TEMPLATE.md
+│   │                         # Bilingual structure (RULE #3) + merge checklist
+│   ├── ISSUE_TEMPLATE/       # Operator report, bug report, feature request
 │   └── workflows/
+│       ├── backend-tests.yml # pytest on Python 3.12
+│       ├── frontend-tests.yml
+│       │                     # tsc, vitest, next build
 │       └── security-scan.yml # npm/pip audit — blocks only if the PR changes deps
 ├── docs/
 │   ├── roadmap/              # Phase roadmap (source of truth for progress)

@@ -1,0 +1,86 @@
+name: Report from a collection centre
+description: Something gets in the way while operating a real centre. Puedes escribir en español.
+title: "[centre] "
+labels: ["operator-report"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Reports from people running an actual collection centre are the most
+        useful thing this project receives. Write in English or Spanish —
+        whichever you are faster in. Escribe en inglés o en español, lo que te
+        resulte más rápido.
+
+        **Do not include personal data** about donors, volunteers or
+        beneficiaries: no names, emails, phone numbers or identification
+        numbers. A box code or a shipment code is enough to locate the case.
+
+  - type: dropdown
+    id: step
+    attributes:
+      label: Where in the flow
+      options:
+        - Intake — receiving a donation
+        - Box — filling, sealing, label or QR
+        - Pallet — building or closing
+        - Shipment — closing, manifest or documents
+        - Reception at destination — what arrived, incidents
+        - National dashboard or reports
+        - Users, centres or campaigns
+        - Public site (donation, needs, QR page)
+        - Offline capture
+        - Something else
+    validations:
+      required: true
+
+  - type: textarea
+    id: what_happened
+    attributes:
+      label: What happened
+      description: What you were doing and what the system did instead.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+    validations:
+      required: true
+
+  - type: input
+    id: reference
+    attributes:
+      label: Reference code (optional)
+      description: A box, pallet or shipment code. Never a person's name.
+      placeholder: "BX-XXXXXXXX / TM-XXXXXXXX / ENV-2026-001"
+
+  - type: dropdown
+    id: device
+    attributes:
+      label: Device
+      options:
+        - Phone
+        - Tablet
+        - Laptop or desktop
+        - Not sure
+    validations:
+      required: true
+
+  - type: dropdown
+    id: connectivity
+    attributes:
+      label: Connectivity at the time
+      options:
+        - Good
+        - Weak or intermittent
+        - None — working offline
+        - Not sure
+    validations:
+      required: true
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: Anything else
+      description: Screenshots help. Blur or crop any personal data first.

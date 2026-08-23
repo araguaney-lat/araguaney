@@ -1,0 +1,70 @@
+name: Bug report
+description: Something in the code behaves incorrectly
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        For a vulnerability, do **not** open a public issue — follow
+        [`SECURITY.md`](https://github.com/araguaney-lat/araguaney/blob/main/SECURITY.md).
+
+        If you hit this while operating a collection centre rather than while
+        reading the code, the *Report from a collection centre* template asks
+        better questions.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Backend (FastAPI)
+        - Frontend (Next.js)
+        - Database or migration
+        - Background job, cron or queue
+        - Public site / SEO
+        - Offline capture and sync
+        - Not sure
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Numbered, starting from a known state.
+      placeholder: |
+        1. Seal a box with …
+        2. Add it to a pallet …
+        3. …
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected_actual
+    attributes:
+      label: Expected and actual behaviour
+    validations:
+      required: true
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Logs, stack trace or failing test
+      description: Redact any credential, host or personal data before pasting.
+      render: shell
+
+  - type: input
+    id: version
+    attributes:
+      label: Commit or deploy
+      description: The commit SHA you reproduced it on, or the date if it was on the hosted site.
+
+  - type: checkboxes
+    id: confirmations
+    attributes:
+      label: Before submitting
+      options:
+        - label: This is not a security vulnerability (those go through SECURITY.md).
+          required: true
+        - label: I removed credentials, hosts and personal data from everything I pasted.
+          required: true

@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Report a security vulnerability
+    url: https://github.com/araguaney-lat/araguaney/blob/main/SECURITY.md
+    about: Never in a public issue. SECURITY.md explains the private channel and what to expect.
+  - name: How to contribute
+    url: https://github.com/araguaney-lat/araguaney/blob/main/CONTRIBUTING.md
+    about: Development setup, conventions, and what is most likely to be merged.
+  - name: Product rules and domain decisions
+    url: https://github.com/araguaney-lat/araguaney/blob/main/CLAUDE.md
+    about: What the platform does, what it deliberately does not do, and why.
