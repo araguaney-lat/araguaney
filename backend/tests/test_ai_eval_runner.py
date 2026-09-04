@@ -8,6 +8,9 @@ shortened copy for the test) and calls `text_mapping.suggest()` itself, with
 a stub provider standing in for the network call so the suite never needs one.
 """
 
+import os
+import pathlib
+import sys
 from unittest.mock import patch
 from uuid import uuid4
 
@@ -130,3 +133,36 @@ def test_a_perfect_classifier_scores_above_zero(db):
         )
 
     assert reporte.metrics["top3"] > 0.0
+
+
+def test_the_script_runs_as_a_real_subprocess_without_its_own_test_shim():
+    """`_seed_catalog` needs a JSONB-to-JSON compile shim for SQLite
+    (`audit_log` and every other JSONB column, not just this module's own
+    table). Every fixture in this suite registers one, and that's exactly
+    what let a version of `evals/run.py` missing its own shim pass every test
+    here while still crashing for real: `python -m evals.run` runs in a fresh
+    process that never imports this file. Only a real subprocess catches
+    that; mocking `subprocess` would just re-hide the same gap. Pointing at
+    an address nothing listens on, instead of the real OpenAI API, still
+    exercises `create_all` and the whole seed-shortlist-prompt pipeline for
+    real, stays offline like the rest of this suite, and fails fast at the
+    connection rather than a real network call.
+    """
+    import subprocess
+
+    result = subprocess.run(
+        [sys.executable, "-m", "evals.run", "--capability", "mapping"],
+        cwd=str(pathlib.Path(__file__).parent.parent),
+        env={
+            **os.environ,
+            "AI_API_KEY": "sk-test-key-for-ci",
+            "AI_BASE_URL": "http://127.0.0.1:1",
+        },
+        capture_output=True,
+        text=True,
+        timeout=60,
+    )
+
+    assert "Traceback" not in result.stderr, result.stderr
+    assert "30 casos" in result.stdout
+    assert result.returncode == 1  # nothing listening there can't pass the threshold
