@@ -18,6 +18,8 @@ al pre-registrarse; la traducción ocurre después. `ensure_available` exige un
 from __future__ import annotations
 
 import logging
+import re
+import unicodedata
 from uuid import UUID
 
 from sqlalchemy.orm import Session
@@ -55,20 +57,104 @@ _PROMPT = (
 )
 
 
-def _shortlist(db: Session, text: str, campaign_ids: list[UUID] | None) -> list[ProductType]:
-    """Candidatos plausibles con la búsqueda que ya existe.
+# Palabras funcionales del español: pasan el filtro de largo mínimo pero no
+# dicen nada del producto, y al compararse por substring encuentran cualquier
+# nombre que las contenga por casualidad ortográfica ("para" dentro de
+# "comparativa"). Van sin acento porque se comparan ya normalizadas.
+_STOPWORDS = {
+    "que", "para", "por", "con", "sin", "los", "las", "del", "una", "unos",
+    "unas", "esa", "ese", "esta", "este", "sus", "mas", "pero", "como",
+}
 
-    Se buscan las palabras del texto por separado porque la búsqueda es por
-    subcadena: "20 latas de atún" no encuentra nada, "atún" sí.
+# Un plural en español agrega "s" o "es", así que dos formas de la misma
+# palabra se llevan a lo más dos letras. Más allá de eso, que una esté dentro
+# de la otra ya no dice que sean la misma palabra sino que coinciden por
+# casualidad: "gel" dentro de "gelatina", "sal" dentro de "salchichas".
+_MAX_STEM_DELTA = 2
+
+# Sobre texto ya normalizado no quedan acentos ni mayúsculas, así que separar
+# corridas alfanuméricas basta — y de paso descarta la puntuación que traen
+# varios nombres del catálogo: "(paquete)", "Gasa estéril 10x10 cm".
+_WORD = re.compile(r"[a-z0-9]+")
+
+
+def _normalize(text: str) -> str:
+    """Minúsculas y sin acentos, para que 'ATÚN' y 'atun' comparen igual.
+
+    Quien captura con prisa no siempre teclea el acento, y el español lo usa
+    donde no cambia a qué producto se refiere.
     """
-    repo = ProductTypeRepository(db)
-    vistos: dict[UUID, ProductType] = {}
+    sin_acentos = "".join(
+        c for c in unicodedata.normalize("NFKD", text) if not unicodedata.combining(c)
+    )
+    return sin_acentos.lower()
 
-    for palabra in sorted(set(text.lower().split()), key=len, reverse=True):
-        if len(palabra) < 3 or palabra.isdigit():
-            continue
-        for pt in repo.search(palabra, campaign_ids=campaign_ids):
-            vistos.setdefault(pt.id, pt)
+
+def _words(text: str) -> list[str]:
+    """Palabras que vale la pena comparar: normalizadas, sin puntuación, sin
+    palabras funcionales, sin números sueltos y de al menos tres letras.
+
+    La misma regla corre sobre el texto del donante y sobre el nombre del
+    producto a propósito: dos lados que se comparan tienen que haber pasado
+    por la misma normalización, o la comparación termina midiendo la
+    diferencia entre las reglas y no entre las palabras.
+    """
+    return [
+        palabra
+        for palabra in _WORD.findall(_normalize(text))
+        if len(palabra) >= 3 and not palabra.isdigit() and palabra not in _STOPWORDS
+    ]
+
+
+def _catalog_words(pt: ProductType) -> set[str]:
+    """Palabras del producto donde puede aparecer lo que el donante escribió."""
+    return set(_words(" ".join(w for w in (pt.display_name, pt.inn_name) if w)))
+
+
+def _shares_stem(word: str, catalog_words: set[str]) -> bool:
+    """Si `word` es una variante de alguna palabra del producto.
+
+    El español pluraliza agregando terminación ("cobija" -> "cobijas",
+    "pañal" -> "pañales"), así que el singular queda dentro del plural. Se
+    compara en los dos sentidos —por si el catálogo guarda el plural— y con
+    un límite de longitud: sin él, toda palabra corta dentro de una larga
+    contaría como variante.
+    """
+    for candidata in catalog_words:
+        corta, larga = sorted((word, candidata), key=len)
+        if len(larga) - len(corta) <= _MAX_STEM_DELTA and corta in larga:
+            return True
+    return False
+
+
+def _shortlist(db: Session, text: str, campaign_ids: list[UUID] | None) -> list[ProductType]:
+    """Candidatos plausibles comparando palabra por palabra, no la frase
+    completa: "20 latas de atún" no encuentra nada como frase, "atún" sí.
+
+    Se compara en Python y no con `ILIKE` porque acentos y plurales solo se
+    normalizan de un lado si el otro también pasa por la misma normalización;
+    el catálogo global no es tan grande (unos cientos de filas) para que esto
+    cueste más que la propia llamada a la IA que sigue después.
+    """
+    terminos = _words(text)
+    if not terminos:
+        return []
+
+    catalogo = ProductTypeRepository(db).find_all(campaign_ids=campaign_ids)
+    palabras_por_producto = {pt.id: (_catalog_words(pt), pt) for pt in catalogo}
+
+    vistos: dict[UUID, ProductType] = {}
+    # Palabra más larga primero, porque es la más específica ("paracetamol"
+    # dice más que "caja"), y a igual largo en orden alfabético: cuando el
+    # tope corta la lista, el mismo texto tiene que dejar los mismos
+    # candidatos. Dos capturas idénticas que proponen cosas distintas es
+    # justo lo que hace dudar de la herramienta a quien la usa.
+    for termino in sorted(set(terminos), key=lambda w: (-len(w), w)):
+        for pt_id, (palabras, pt) in palabras_por_producto.items():
+            if pt_id in vistos:
+                continue
+            if _shares_stem(termino, palabras):
+                vistos[pt_id] = pt
         if len(vistos) >= _SHORTLIST_SIZE:
             break
 
