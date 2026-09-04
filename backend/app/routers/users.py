@@ -37,13 +37,13 @@ def invite_user(
         raise api_error("FORBIDDEN", "You can only invite users to your own center", status_code=403)
 
     if data.center_role not in CENTER_ROLES or data.center_role == "national_admin":
-        raise api_error("INVALID_ROLE", "Role must be coordinator or volunteer", field="center_role")
+        raise api_error("INVALID_ROLE", "El rol debe ser coordinator o volunteer", field="center_role")
 
     repo = UserRepository(db)
     if repo.email_exists(data.email):
-        raise api_error("EMAIL_TAKEN", "Email already registered", field="email")
+        raise api_error("EMAIL_TAKEN", "Este correo ya está registrado", field="email")
     if repo.username_exists(data.username):
-        raise api_error("USERNAME_TAKEN", "Username already taken", field="username")
+        raise api_error("USERNAME_TAKEN", "Este nombre de usuario ya está en uso", field="username")
 
     raw_password = secrets.token_urlsafe(16)
     user = repo.save(User(
@@ -94,7 +94,7 @@ def reinvite_center_user(
     if not user or str(user.center_id) != str(center_id):
         raise api_error("NOT_FOUND", "User not found", status_code=404)
     if not user.is_active:
-        raise api_error("ACCOUNT_DISABLED", "Cannot reinvite a disabled account", status_code=400)
+        raise api_error("ACCOUNT_DISABLED", "No se puede reinvitar a una cuenta deshabilitada", status_code=400)
 
     raw_password = secrets.token_urlsafe(12)
     user.hashed_password = AuthService.hash_password(raw_password)

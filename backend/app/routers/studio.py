@@ -78,15 +78,15 @@ def create_user(
     admin: User = Depends(require_user_manager),
 ):
     if data.center_role not in CENTER_ROLES:
-        raise api_error("INVALID_ROLE", "Invalid center role", field="center_role")
+        raise api_error("INVALID_ROLE", "Rol de centro inválido", field="center_role")
     ensure_can_assign_role(admin, data.center_role)
     center_id = resolve_center_id(admin, data.center_id)
 
     repo = UserRepository(db)
     if repo.email_exists(data.email):
-        raise api_error("EMAIL_TAKEN", "Email already registered", field="email")
+        raise api_error("EMAIL_TAKEN", "Este correo ya está registrado", field="email")
     if repo.username_exists(data.username):
-        raise api_error("USERNAME_TAKEN", "Username already taken", field="username")
+        raise api_error("USERNAME_TAKEN", "Este nombre de usuario ya está en uso", field="username")
 
     raw_password = data.password or secrets.token_urlsafe(12)
     user = repo.save(User(
@@ -134,7 +134,7 @@ def reinvite_user(
         raise api_error("NOT_FOUND", "User not found", status_code=404)
     ensure_can_manage(admin, user)
     if not user.is_active:
-        raise api_error("ACCOUNT_DISABLED", "Cannot reinvite a disabled account", status_code=400)
+        raise api_error("ACCOUNT_DISABLED", "No se puede reinvitar a una cuenta deshabilitada", status_code=400)
 
     raw_password = secrets.token_urlsafe(12)
     user.hashed_password = AuthService.hash_password(raw_password)
@@ -168,7 +168,7 @@ def patch_user(
         raise api_error("NOT_FOUND", "User not found", status_code=404)
     ensure_can_manage(admin, user)
     if data.center_role is not None and data.center_role not in CENTER_ROLES:
-        raise api_error("INVALID_ROLE", "Invalid center role", field="center_role")
+        raise api_error("INVALID_ROLE", "Rol de centro inválido", field="center_role")
     # Ni ascender a alguien ni dejarlo sin centro: las dos cosas fabrican una
     # cuenta de administración nacional por la puerta de atrás.
     ensure_can_assign_role(admin, data.center_role)

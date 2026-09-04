@@ -161,7 +161,7 @@ class CenterApplicationService(BaseService):
         if user_repo.email_exists(application.contact_email):
             raise api_error(
                 "EMAIL_TAKEN",
-                "A user already exists with this email — resolve manually",
+                "Ya existe un usuario con este correo — resuélvelo manualmente",
                 field="contact_email",
             )
 

@@ -45,6 +45,17 @@ class TestIntakes:
         assert str(world.a["intake"].id) not in ids
         assert str(world.b["intake"].id) in ids
 
+    def test_detail_of_own_intake(self, client, world):
+        res = client.get(f"/v1/intakes/{world.b['intake'].id}",
+                         headers=world.token(world.coordinator_b))
+        assert res.status_code == 200
+        assert res.json()["id"] == str(world.b["intake"].id)
+
+    def test_detail_of_foreign_intake_is_404(self, client, world):
+        res = client.get(f"/v1/intakes/{world.a['intake'].id}",
+                         headers=world.token(world.coordinator_b))
+        assert res.status_code == 404
+
 
 class TestPallets:
     def test_list_only_own_center(self, client, world):

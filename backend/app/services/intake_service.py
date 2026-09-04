@@ -68,7 +68,7 @@ class IntakeService(BaseService):
             if not campaign or not campaign.is_active:
                 raise api_error("CAMPAIGN_NOT_FOUND", "Campaign not found or inactive", status_code=400)
             if not UserCampaignRepository(self.db).is_member(user_id, campaign_id):
-                raise api_error("NOT_CAMPAIGN_MEMBER", "User is not assigned to this campaign", status_code=403)
+                raise api_error("NOT_CAMPAIGN_MEMBER", "No perteneces a esta campaña", status_code=403)
 
         pt_repo = ProductTypeRepository(self.db)
         intake_repo = IntakeRepository(self.db)
@@ -311,3 +311,9 @@ class IntakeService(BaseService):
 
     def list(self, center_id: UUID | None, limit: int = 200, offset: int = 0) -> list[Intake]:
         return IntakeRepository(self.db).find_all(center_id, limit=limit, offset=offset)
+
+    def get(self, intake_id: UUID, center_id: UUID | None) -> IntakeOut:
+        intake = IntakeRepository(self.db).find_by_id(intake_id, center_id)
+        if intake is None:
+            raise api_error("INTAKE_NOT_FOUND", "Intake not found", status_code=404)
+        return self._to_out(intake)

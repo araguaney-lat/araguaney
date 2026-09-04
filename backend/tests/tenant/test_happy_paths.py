@@ -22,6 +22,8 @@ class TestTransferCycle:
         assert created.status_code == 201, created.text
         transfer_id = created.json()["id"]
         assert created.json()["status"] == "REQUESTED"
+        assert created.json()["from_center_name"] == world.center_a.name
+        assert created.json()["to_center_name"] == world.center_b.name
 
         # La coordinación del centro de origen aprueba y despacha.
         approved = client.post(

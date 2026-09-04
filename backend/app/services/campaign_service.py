@@ -62,7 +62,7 @@ class CampaignService(BaseService):
         if not campaign:
             raise api_error("CAMPAIGN_NOT_FOUND", "Campaign not found", status_code=404)
         if campaign.is_general and data.is_active is False:
-            raise api_error("PROTECTED_CAMPAIGN", "The general campaign cannot be deactivated", status_code=422)
+            raise api_error("PROTECTED_CAMPAIGN", "La campaña general no se puede desactivar", status_code=422)
         for field, value in data.model_dump(exclude_none=True).items():
             setattr(campaign, field, value)
         repo.commit()

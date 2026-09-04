@@ -149,7 +149,14 @@ class AuthService(BaseService):
             center_id=str(user.center_id) if user.center_id else None,
             center_role=user.center_role,
         )
-        return {"access_token": access, "refresh_token": new_raw, "token_type": "bearer"}
+        return {
+            "access_token": access,
+            "refresh_token": new_raw,
+            "token_type": "bearer",
+            "role": user.role,
+            "center_role": user.center_role,
+            "center_id": str(user.center_id) if user.center_id else None,
+        }
 
     def revoke_refresh_token(self, raw_token: str) -> None:
         """Revoca la familia de un refresh token (cierre de sesión). Silencioso
@@ -177,9 +184,9 @@ class AuthService(BaseService):
     ) -> dict:
         repo = UserRepository(self.db)
         if repo.email_exists(data.email):
-            raise api_error("EMAIL_TAKEN", "Email already registered", field="email")
+            raise api_error("EMAIL_TAKEN", "Este correo ya está registrado", field="email")
         if repo.username_exists(data.username):
-            raise api_error("USERNAME_TAKEN", "Username already taken", field="username")
+            raise api_error("USERNAME_TAKEN", "Este nombre de usuario ya está en uso", field="username")
 
         token = secrets.token_urlsafe(32)
         user = repo.save(User(
@@ -209,7 +216,7 @@ class AuthService(BaseService):
 
         # Check account status before spending time on bcrypt
         if not user.is_active:
-            raise api_error("ACCOUNT_DISABLED", "Account is disabled", status_code=403)
+            raise api_error("ACCOUNT_DISABLED", "La cuenta está deshabilitada", status_code=403)
 
         now = datetime.now(timezone.utc)
         if user.lockout_until and user.lockout_until.replace(tzinfo=timezone.utc) > now:
@@ -240,7 +247,7 @@ class AuthService(BaseService):
         self.db.commit()
 
         if not user.is_verified:
-            raise api_error("EMAIL_NOT_VERIFIED", "Email address not verified", status_code=403)
+            raise api_error("EMAIL_NOT_VERIFIED", "El correo no está verificado", status_code=403)
 
         if user.totp_enabled and user.totp_secret:
             partial = self._create_partial_token(str(user.id))

@@ -24,6 +24,18 @@ class CenterRepository(BaseRepository[Center]):
     def find_by_id(self, center_id: UUID) -> Center | None:
         return self.db.get(Center, center_id)
 
+    def names_by_ids(self, ids: set[UUID]) -> dict[UUID, str]:
+        """Batch name lookup, one query for as many centers as the caller needs.
+
+        Used to label a coordinator-facing response (e.g. a transfer's two
+        centers) without a per-row query and without requiring `GET /v1/centers`,
+        which `national_admin` gates.
+        """
+        if not ids:
+            return {}
+        rows = self.db.execute(select(Center.id, Center.name).where(Center.id.in_(ids))).all()
+        return {row.id: row.name for row in rows}
+
     def save(self, center: Center) -> Center:
         self.db.add(center)
         self.db.commit()

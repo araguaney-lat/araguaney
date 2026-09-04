@@ -138,7 +138,7 @@ def remove_member(
         raise api_error("CAMPAIGN_NOT_FOUND", "Campaign not found", status_code=404)
 
     if campaign.is_general:
-        raise api_error("PROTECTED_CAMPAIGN", "Cannot remove members from the general campaign", status_code=422)
+        raise api_error("PROTECTED_CAMPAIGN", "No se pueden quitar miembros de la campaña general", status_code=422)
 
     target = UserRepository(db).find_by_id(user_id)
     if not target:
