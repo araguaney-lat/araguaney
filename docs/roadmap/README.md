@@ -5,41 +5,50 @@
 ```mermaid
 pie title Tareas completadas (477 tareas)
     "Listas" : 456
-    "Pendientes" : 21
+    "Pendientes" : 11
+    "Canceladas" : 10
 ```
 
-| Fase | Nombre | Listas | Pendientes | Progreso |
-|------|--------|-------:|-----------:|----------|
-| 0 | [Scaffolding + multi-tenant + roles](phase-00-scaffolding.md) | 18 | 0 | ✅ 100% |
-| 1 | [Catálogo e intake con validaciones](phase-01-catalog-intake.md) | 8 | 0 | ✅ 100% |
-| 2 | [Caja homogénea, QR y etiqueta](phase-02-box-qr-label.md) | 6 | 0 | ✅ 100% |
-| 3 | [Tarima, envío y manifiesto](phase-03-pallet-shipment-manifest.md) | 9 | 0 | ✅ 100% |
-| 4 | [Panel agregado nacional + endurecimiento + OTP + scanning móvil](phase-04-national-dashboard-hardening.md) | 23 | 2 | ✅ 92% |
-| 5 | [Studio — panel de administración + solicitudes](phase-05-studio.md) | 39 | 0 | ✅ 100% |
-| 6 | [Catálogos de referencia + lookups en tiempo real](phase-06-catalog-integrations.md) | 37 | 0 | ✅ 100% |
-| 7 | [Transferencias entre centros](phase-07-transfers.md) | 21 | 0 | ✅ 100% |
-| 8 | [Mensajería entre usuarios](phase-08-messaging.md) | 22 | 0 | ✅ 100% |
-| 9 | [Reportes de campaña](phase-09-reports.md) | 8 | 0 | ✅ 100% |
-| 10 | [Endurecimiento de seguridad (post-auditoría)](phase-10-security-hardening.md) | 22 | 0 | ✅ 100% |
-| 11 | [SEO y reposicionamiento genérico](phase-11-seo-positioning.md) | 26 | 0 | ✅ 100% |
-| 12 | [Optimización y rendimiento](phase-12-optimization.md) | 29 | 0 | ✅ 100% |
-| 13 | [Compliance y legal](phase-13-compliance-legal.md) | 10 | 10 | 🟡 50% |
-| 14 | [Auto-registro de centros con aprobación](phase-14-center-self-registration.md) | 17 | 0 | ✅ 100% |
-| 15 | [Deliverability de emails + aviso de solicitudes](phase-15-email-deliverability.md) | 15 | 0 | ✅ 100% |
-| 16 | [Rediseño de plantillas de email con marca](phase-16-email-brand-redesign.md) | 10 | 0 | ✅ 100% |
-| 17 | [AEO/GEO + expansión de keywords](phase-17-aeo-keyword-expansion.md) | 16 | 5 | 🟡 76% |
-| 18 | [Pre-registro de donaciones por el donante](phase-18-donor-preregistration.md) | 23 | 0 | ✅ 100% |
-| 19 | [Identidad estructurada del donante en el intake](phase-19-structured-donor-identity.md) | 9 | 0 | ✅ 100% |
-| 20 | [Prevención de riesgos: responsabilidad y anti-lavado en especie](phase-20-risk-prevention.md) | 6 | 4 | 🟡 60% |
-| 21 | [Logística: pesaje, declaración de mercancías y perfiles de paletizado](phase-21-logistics-weighing.md) | 12 | 0 | ✅ 100% |
-| 22 | [Trazabilidad extendida: avión y destino](phase-22-extended-traceability.md) | 14 | 0 | ✅ 100% |
-| 23 | [IA asistida: captura, catálogo y necesidades](phase-23-ai-assisted-capture.md) | 11 | 0 | ✅ 100% |
-| 24 | [Observabilidad: que un fallo silencioso deje de serlo](phase-24-observability.md) | 11 | 0 | ✅ 100% |
-| 25 | [Captura sin conexión: cola local y sincronización diferida](phase-25-offline-capture.md) | 14 | 0 | ✅ 100% |
-| 26 | [Soporte de backend para el cliente nativo](phase-26-native-client-support.md) | 20 | 0 | ✅ 100% |
-| **Total** | | **456** | **21** | **🟡 96%** |
+| Fase | Nombre | Listas | Pendientes | Canceladas | Progreso |
+|------|--------|-------:|-----------:|-----------:|----------|
+| 0 | [Scaffolding + multi-tenant + roles](phase-00-scaffolding.md) | 18 | 0 | 0 | ✅ 100% |
+| 1 | [Catálogo e intake con validaciones](phase-01-catalog-intake.md) | 8 | 0 | 0 | ✅ 100% |
+| 2 | [Caja homogénea, QR y etiqueta](phase-02-box-qr-label.md) | 6 | 0 | 0 | ✅ 100% |
+| 3 | [Tarima, envío y manifiesto](phase-03-pallet-shipment-manifest.md) | 9 | 0 | 0 | ✅ 100% |
+| 4 | [Panel agregado nacional + endurecimiento + OTP + scanning móvil](phase-04-national-dashboard-hardening.md) | 23 | 2 | 0 | ✅ 92% |
+| 5 | [Studio — panel de administración + solicitudes](phase-05-studio.md) | 39 | 0 | 0 | ✅ 100% |
+| 6 | [Catálogos de referencia + lookups en tiempo real](phase-06-catalog-integrations.md) | 37 | 0 | 0 | ✅ 100% |
+| 7 | [Transferencias entre centros](phase-07-transfers.md) | 21 | 0 | 0 | ✅ 100% |
+| 8 | [Mensajería entre usuarios](phase-08-messaging.md) | 22 | 0 | 0 | ✅ 100% |
+| 9 | [Reportes de campaña](phase-09-reports.md) | 8 | 0 | 0 | ✅ 100% |
+| 10 | [Endurecimiento de seguridad (post-auditoría)](phase-10-security-hardening.md) | 22 | 0 | 0 | ✅ 100% |
+| 11 | [SEO y reposicionamiento genérico](phase-11-seo-positioning.md) | 26 | 0 | 0 | ✅ 100% |
+| 12 | [Optimización y rendimiento](phase-12-optimization.md) | 29 | 0 | 0 | ✅ 100% |
+| 13 | [Compliance y legal](phase-13-compliance-legal.md) | 10 | 0 | 10 | ✅ 100% |
+| 14 | [Auto-registro de centros con aprobación](phase-14-center-self-registration.md) | 17 | 0 | 0 | ✅ 100% |
+| 15 | [Deliverability de emails + aviso de solicitudes](phase-15-email-deliverability.md) | 15 | 0 | 0 | ✅ 100% |
+| 16 | [Rediseño de plantillas de email con marca](phase-16-email-brand-redesign.md) | 10 | 0 | 0 | ✅ 100% |
+| 17 | [AEO/GEO + expansión de keywords](phase-17-aeo-keyword-expansion.md) | 16 | 5 | 0 | 🟡 76% |
+| 18 | [Pre-registro de donaciones por el donante](phase-18-donor-preregistration.md) | 23 | 0 | 0 | ✅ 100% |
+| 19 | [Identidad estructurada del donante en el intake](phase-19-structured-donor-identity.md) | 9 | 0 | 0 | ✅ 100% |
+| 20 | [Prevención de riesgos: responsabilidad y anti-lavado en especie](phase-20-risk-prevention.md) | 6 | 4 | 0 | 🟡 60% |
+| 21 | [Logística: pesaje, declaración de mercancías y perfiles de paletizado](phase-21-logistics-weighing.md) | 12 | 0 | 0 | ✅ 100% |
+| 22 | [Trazabilidad extendida: avión y destino](phase-22-extended-traceability.md) | 14 | 0 | 0 | ✅ 100% |
+| 23 | [IA asistida: captura, catálogo y necesidades](phase-23-ai-assisted-capture.md) | 11 | 0 | 0 | ✅ 100% |
+| 24 | [Observabilidad: que un fallo silencioso deje de serlo](phase-24-observability.md) | 11 | 0 | 0 | ✅ 100% |
+| 25 | [Captura sin conexión: cola local y sincronización diferida](phase-25-offline-capture.md) | 14 | 0 | 0 | ✅ 100% |
+| 26 | [Soporte de backend para el cliente nativo](phase-26-native-client-support.md) | 20 | 0 | 0 | ✅ 100% |
+| **Total** | | **456** | **11** | **10** | **🟡 98%** |
 
-> **Pendientes (21):**
+> **Canceladas (10):** el bloque de donativos/pagos de la Fase 13 (Grupo B: entidad receptora,
+> asesoría legal/contable, procesador de pagos, T&C de donación, transparencia) se canceló el
+> 2026-09-03. Contradice el no-objetivo declarado en `CLAUDE.md` §2 ("No gestiona dinero ni
+> donativos económicos") y no hay decisión de negocio de habilitarlo. El diseño queda documentado
+> en [`phase-13-compliance-legal.md`](phase-13-compliance-legal.md) por si se retoma algún día,
+> pero deja de contar como progreso pendiente. El Grupo A de esa misma fase (privacidad, lo que
+> aplica hoy) está completo.
+
+> **Pendientes (11):**
 > - **Fase 26 (soporte al cliente nativo) está completa: 0 pendientes.** El bloque de
 >   contrato, el de avisos push y las seis tareas que pedía el cliente móvil (report por
 >   estado, identidad en refresh, códigos de error con nombre, nombres de centro en
@@ -50,7 +59,6 @@ pie title Tareas completadas (477 tareas)
 >   primeros van a la coordinación del centro. El de mensajes solo cubre
 >   hilos privados y no repite mientras quien recibe no haya abierto el anterior: los hilos
 >   de campaña son difusión y el correo, que no interrumpe, ya los cubre.
-> El grupo A de la Fase 13 (privacidad, lo que aplica hoy) está completo.
 > - Los borradores legales de la Fase 20 están escritos y esperando revisión de abogado:
 >   [`docs/legal/drafts/`](../legal/drafts/README.md). Sus tareas siguen abiertas hasta que esa
 >   revisión ocurra. El borrador fiscal de la Fase 21 quedó sin uso: la declaración de mercancías
@@ -65,11 +73,7 @@ pie title Tareas completadas (477 tareas)
 >   Encender cualquier capacidad exige antes completar su conjunto de referencia con capturas
 >   reales y superar su umbral: el código está listo, la medición no. Diseño en
 >   [su spec](../superpowers/specs/2026-07-29-ai-assisted-capture-design.md).
-> - **12 gated por pago o por decisión de negocio:** Fase 4 → 2 (spend caps + alertas, requieren
->   plan de pago de infra). Fase 13 → 10 (bloque de donativos/pagos: entidad receptora, asesoría
->   legal/contable, procesador de pagos, T&C de donación, transparencia). Todo el bloque de
->   donativos depende de una decisión previa —"¿Araguaney recibe dinero?"— que además
->   contradice el no-objetivo declarado en `CLAUDE.md`.
+> - **2 gated por pago (Fase 4):** spend caps + alertas, requieren plan de pago de infra.
 > - **5 ejecutables (Fase 17):** tasks 6 (Wikidata) y 8 (directorios) preparadas en
 >   [`docs/seo/entity-registration.md`](../seo/entity-registration.md); 17 (video demo, requiere
 >   grabar el video). Las de medición (19 monitoreo de citas en IA, 20 analítica de Bing) quedan
@@ -109,6 +113,8 @@ Fase 0 ─► Fase 1 ─► Fase 2 ─► Fase 3 ─► Fase 4
 
 Cada fase vive en su propio archivo bajo `docs/roadmap/`. Al editar:
 
-- Actualiza el archivo de fase con el cambio de tarea (✅ Done / 🟡 In progress / ⬜ Pendiente).
-- Actualiza los totales y el pie chart en este índice al completar o agregar tareas.
+- Actualiza el archivo de fase con el cambio de tarea (✅ Done / 🟡 In progress / ⬜ Pendiente /
+  🚫 Cancelada — se decidió no hacerla, se documenta el porqué y deja de contar como pendiente).
+- Actualiza los totales, el pie chart y la columna Canceladas en este índice al completar,
+  cancelar o agregar tareas.
 - Nuevas fases: archivo `phase-NN-<slug>.md` + fila en la tabla de arriba.
