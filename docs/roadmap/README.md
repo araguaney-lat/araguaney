@@ -44,10 +44,10 @@ pie title Tareas completadas (477 tareas)
 >   contrato, el de avisos push y las seis tareas que pedía el cliente móvil (report por
 >   estado, identidad en refresh, códigos de error con nombre, nombres de centro en
 >   transferencias, detalle de intake y cuerpo tipado en `add-box`) quedaron cerrados. El
->   despacho de push se despliega apagado (`PUSH_ENABLED=false`) — prenderlo es una
->   variable de entorno (`FIREBASE_SERVICE_ACCOUNT_JSON`), no código pendiente — y hoy avisa
->   de tres hechos: una revisión de riesgo abierta, un envío entregado y un mensaje privado
->   recibido. Los dos primeros van a la coordinación del centro. El de mensajes solo cubre
+>   despacho de push está **prendido en producción** (`PUSH_ENABLED=true`) y verificado de
+>   punta a punta el 2026-09-03 con un envío real a un dispositivo. Hoy avisa de tres hechos:
+>   una revisión de riesgo abierta, un envío entregado y un mensaje privado recibido. Los dos
+>   primeros van a la coordinación del centro. El de mensajes solo cubre
 >   hilos privados y no repite mientras quien recibe no haya abierto el anterior: los hilos
 >   de campaña son difusión y el correo, que no interrumpe, ya los cubre.
 > El grupo A de la Fase 13 (privacidad, lo que aplica hoy) está completo.
