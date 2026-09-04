@@ -87,6 +87,45 @@
 > construir su ground truth real exige antes una liga en el esquema, no solo
 > un endpoint de registro.
 
+> **2026-09-04 — primera medición del pipeline real, y lo que enseñó.** Con
+> el runner ya corrigiendo, la primera corrida contra `gpt-4o-mini` dio
+> `top1 = top3 = 57%` (umbrales: 60% y 85%). **Que las dos métricas fueran
+> iguales era el hallazgo**, no el número: `top3` cuenta que el producto
+> correcto aparezca entre las tres sugerencias y `top1` que aparezca primero,
+> así que solo coinciden si el modelo, todas las veces que vio el producto
+> correcto, lo eligió de primero. De los 13 fallos, 12 no devolvieron ninguna
+> sugerencia. El cuello de botella no era el modelo sino la lista corta, que
+> buscaba con `ILIKE '%palabra%'` contra el nombre completo y por eso no podía
+> encontrar un plural cuando el catálogo guarda el singular ("cobijas" contra
+> "Cobija"), ni una palabra sin acento contra una con acento, y además dejaba
+> pasar palabras funcionales que traían candidatos por casualidad ortográfica.
+>
+> Corregida la recuperación (comparación palabra por palabra ya normalizada,
+> acotada a la diferencia de dos letras con la que el español pluraliza), la
+> corrida del mismo día dio **`top1 = top3 = 87%`, sobre ambos umbrales**, a
+> un costo de $0.0018 por los 30 casos. Treinta puntos sin tocar el prompt ni
+> cambiar de modelo. La misma firma se repitió: `top1` volvió a igualar a
+> `top3`, así que para la interfaz la primera sugerencia es la que importa.
+>
+> Quedan cuatro fallos, y no son la misma cosa. Tres —`frazadas`,
+> `acetaminofén`, `advil`— son sinónimos regionales y marcas comerciales sin
+> una letra en común con su entrada del catálogo: ninguna mejora de búsqueda
+> los alcanza, piden un diccionario de sinónimos que es decisión de producto.
+> El cuarto, `cobijas matrimoniales nuevas`, **sí tenía el producto correcto
+> entre los candidatos** y el modelo devolvió vacío; el catálogo no tiene
+> ninguna cobija matrimonial y el prompt declara que una lista vacía es una
+> respuesta correcta cuando ninguna corresponde, así que probablemente el
+> caso de referencia es el que está mal, no el modelo. Se deja como está: un
+> caso que se corrige porque falló deja de medir y pasa a justificar.
+>
+> **Lo que este número no dice.** Los 30 casos siguen escritos a mano desde el
+> dominio, no son capturas reales, y la fase pide ~100 reales por capacidad.
+> Es evidencia de que el arreglo funcionó y de que la capacidad —encendida en
+> producción desde antes— hoy acierta mucho más; no es la medición con datos
+> reales que la task 8 exige. Esa sigue esperando volumen en
+> `product_mapping_choices`, que sigue esperando que el panel llame al
+> endpoint.
+
 ---
 
 ## Orden sugerido
