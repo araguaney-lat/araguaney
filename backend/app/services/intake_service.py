@@ -80,10 +80,16 @@ class IntakeService(BaseService):
             if bd.product_type_id not in product_types:
                 pt = pt_repo.find_by_id(bd.product_type_id)
                 if not pt:
+                    # A reference inside the request body, not a URL resource —
+                    # same category as CAMPAIGN_NOT_FOUND above, which is why
+                    # this is 400 and not 404. A 404 here would tell the mobile
+                    # client "nothing to say about this", when the actual fix
+                    # (refresh the cached catalog) is something the person
+                    # capturing can act on.
                     raise api_error(
                         "PRODUCT_TYPE_NOT_FOUND",
-                        f"Product type {bd.product_type_id} not found",
-                        status_code=404,
+                        f"No existe el tipo de producto {bd.product_type_id}",
+                        status_code=400,
                     )
                 product_types[bd.product_type_id] = pt
 

@@ -40,6 +40,7 @@ for _m in (
     "intake", "box", "events", "campaign", "audit_log", "request",
     "user_campaign", "transfer", "messaging", "export_job",
     "center_application", "email_failure", "donor", "donation",
+    "product_mapping_choice",
 ):
     __import__(f"app.models.{_m}")
 

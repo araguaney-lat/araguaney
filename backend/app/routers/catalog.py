@@ -9,7 +9,9 @@ from app.dependencies import require_center_role
 from app.models.user import User
 from app.repositories.product_type_repository import ProductTypeRepository
 from app.repositories.user_campaign_repository import UserCampaignRepository
+from app.schemas.catalog_mapping_choice import CatalogMappingChoiceIn
 from app.schemas.product_type import BarcodePrefill, BarcodeResult, ProductTypeOut, RxNormSuggestion
+from app.services.catalog_learning_service import CatalogLearningService
 from app.utils import cache
 from app.utils.errors import api_error
 from app.utils.rate_limit import limiter
@@ -130,3 +132,20 @@ async def rxnorm_search(
 
     cache.set(cache_key, json.dumps(results), ttl=_RXNORM_TTL)
     return results
+
+
+@router.post("/mapping-choices", status_code=204)
+@limiter.limit("60/minute")
+def record_mapping_choice(
+    request: Request,
+    data: CatalogMappingChoiceIn,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_center_role),
+):
+    """El panel llama esto cuando alguien resuelve una sugerencia de mapeo de
+    texto libre — la aceptó, la cambió, o buscó/creó el producto por su
+    cuenta. Es la única forma de que exista un conjunto de evaluación con
+    datos reales (Fase 23, task 8) en vez de casos escritos a mano."""
+    CatalogLearningService(db).record_mapping_choice(
+        data, user_id=current_user.id, center_id=current_user.center_id
+    )

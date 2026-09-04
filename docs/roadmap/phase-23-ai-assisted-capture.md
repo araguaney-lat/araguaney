@@ -69,6 +69,24 @@
 | 10 | Legal y privacidad | Aviso de privacidad: transferencia de datos a proveedor externo (categoría, finalidad, proveedor, país) y datos personales incidentales en fotos; retención según Fase 13. Prompts sin PII. Documentar Ollama local como salida si la revisión legal desaconseja el envío a terceros. | 🟠 Media | ✅ Done |
 | 11 | Roadmap + `CLAUDE.md` | Registrar el principio rector y la regla de "ningún endpoint público invoca IA"; actualizar totales. | 🟢 Baja | ✅ Done |
 
+> **2026-09-03 — se destapó y se cerró parte del hueco entre "el arnés existe"
+> y "se midió con datos reales".** `evals/run.py` le hablaba al proveedor con
+> un prompt propio, sin catálogo y sin pasar por `text_mapping.suggest()` /
+> `label_ocr.extract()`: medía un modelo distinto al que las 4 banderas ya
+> encendidas en producción (`AI_ENABLE_*=true` desde antes de esta fecha,
+> verificado con `AI_MONTHLY_BUDGET_USD=10` y uso real registrado en
+> `/studio/ai`) de verdad corren. Se corrigió para llamar al pipeline real
+> contra un catálogo sembrado con los datos globales reales
+> (`app/seeds/common_food.py`, `who_medicines.py`, `iom_nonfood.py`), y se
+> agregó `product_mapping_choices` (migración 046) + `POST
+> /v1/catalog/mapping-choices` para que la elección real de una coordinación
+> empiece a acumularse en vez de perderse en cada petición. Sigue pendiente:
+> (a) que el panel (frontend) llame a ese endpoint cuando alguien resuelve una
+> sugerencia — sin eso la tabla se queda vacía — y (b) el OCR no tiene
+> equivalente: ninguna foto se liga hoy a la caja final que confirma, así que
+> construir su ground truth real exige antes una liga en el esquema, no solo
+> un endpoint de registro.
+
 ---
 
 ## Orden sugerido
