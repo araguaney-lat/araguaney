@@ -2,15 +2,16 @@
 
 > Cumplimiento legal y de privacidad de la plataforma. Se divide en dos bloques:
 > **Grupo A — necesario ahora** (la plataforma ya trata datos personales de usuarios: emails,
-> IPs, logs de auditoría) y **Grupo B — necesario solo cuando se habiliten donaciones de dinero**
-> para sostener la plataforma (no para lucro personal).
+> IPs, logs de auditoría) y **Grupo B — cancelado** (donaciones de dinero; contradice el
+> no-objetivo del proyecto, ver más abajo).
 
 > Marco de referencia: **LFPDPPP** (Ley Federal de Protección de Datos Personales en Posesión de
 > los Particulares, México) y su Reglamento. El producto NO trata PII de donantes/beneficiarios
 > por diseño (CLAUDE.md §2, §9), pero SÍ trata datos personales de los **operadores/usuarios**.
 
-> ⚠️ Este documento no es asesoría legal. El Grupo B (donaciones de dinero) requiere revisión de
-> un abogado y contador en México **antes** de escribir código de pagos.
+> ⚠️ Este documento no es asesoría legal. El Grupo B (donaciones de dinero) está **cancelado**;
+> si se retomara, requeriría revisión de un abogado y contador en México **antes** de escribir
+> código de pagos.
 
 ---
 
@@ -53,36 +54,44 @@ declararse en el aviso.
 
 ---
 
-## Grupo B — Necesario CUANDO se habiliten donaciones de dinero
+## Grupo B — CANCELADO (2026-09-03)
 
-> **No implementar hasta decidir habilitar donaciones.** Requiere asesoría legal/fiscal previa.
-> El objetivo declarado es **sostener la plataforma, no beneficio personal** — eso debe quedar
-> explícito, verificable y separado contablemente.
+> **Cancelado, no pendiente.** El bloque completo (tasks 9-18) contradice el no-objetivo
+> declarado en `CLAUDE.md` §2 ("No gestiona dinero ni donativos económicos") y no hay decisión de
+> negocio de habilitarlo. Se conserva el diseño tal cual abajo por si en algún momento se retoma
+> — no se borra, pero deja de contar como trabajo pendiente del proyecto. Si se retoma, la
+> pregunta previa sigue siendo la misma: "¿Araguaney recibe dinero?", y esa decisión reabre el
+> bloque, no una tarea suelta de la lista.
+
+> Diseño original, sin implementar: necesario **si algún día** se habilitaran donaciones de
+> dinero. Requeriría asesoría legal/fiscal previa. El objetivo declarado sería **sostener la
+> plataforma, no beneficio personal** — eso tendría que quedar explícito, verificable y separado
+> contablemente.
 
 ### B.1 — Estructura jurídica y fiscal (ANTES de escribir código de pagos)
 
 | # | Tarea | Descripción | Prioridad | Estado |
 |---|-------|-------------|-----------|--------|
-| 9 | Definir entidad receptora | Determinar **quién** recibe los fondos legalmente. Recibir donativos "a nombre personal" para la plataforma es problemático fiscal/legalmente aunque no sea para lucro. Evaluar constituir AC / OSC (México) o figura equivalente. **Decisión previa a todo código de pagos.** | 🔴 | ⬜ Pendiente |
-| 10 | Asesoría legal + contable (MX) | Contratar revisión de abogado y contador: obligaciones fiscales de recibir donativos, CFDI, régimen de donatarias autorizadas si se busca deducibilidad, reporte de uso de fondos. | 🔴 | ⬜ Pendiente |
-| 11 | Separación contable de fondos | Cuenta/registro separado para donativos de sostenimiento. Trazabilidad de que se usan para infraestructura (Vercel/Railway/Cloudflare/dominio), no para beneficio personal. | 🔴 | ⬜ Pendiente |
+| 9 | Definir entidad receptora | Determinar **quién** recibe los fondos legalmente. Recibir donativos "a nombre personal" para la plataforma es problemático fiscal/legalmente aunque no sea para lucro. Evaluar constituir AC / OSC (México) o figura equivalente. **Decisión previa a todo código de pagos.** | 🔴 | 🚫 Cancelada |
+| 10 | Asesoría legal + contable (MX) | Contratar revisión de abogado y contador: obligaciones fiscales de recibir donativos, CFDI, régimen de donatarias autorizadas si se busca deducibilidad, reporte de uso de fondos. | 🔴 | 🚫 Cancelada |
+| 11 | Separación contable de fondos | Cuenta/registro separado para donativos de sostenimiento. Trazabilidad de que se usan para infraestructura (Vercel/Railway/Cloudflare/dominio), no para beneficio personal. | 🔴 | 🚫 Cancelada |
 
 ### B.2 — Legal y privacidad de pagos
 
 | # | Tarea | Descripción | Prioridad | Estado |
 |---|-------|-------------|-----------|--------|
-| 12 | Ampliar Aviso de Privacidad (pagos) | Agregar tratamiento de datos financieros del donante: nombre, email, monto, quizá RFC para recibo. Declarar al procesador de pago como encargado/transferencia. | 🔴 | ⬜ Pendiente |
-| 13 | Términos de donación | Documento/sección separada: naturaleza voluntaria y **no reembolsable** del donativo, destino (sostenimiento de la plataforma), que NO otorga contraprestación ni participación, transparencia del uso. | 🔴 | ⬜ Pendiente |
-| 14 | Reflejar T&C del procesador | Stripe/PayPal/Mercado Pago imponen sus propios términos y políticas de datos. Reflejarlos/enlazarlos donde corresponda. | 🟡 | ⬜ Pendiente |
-| 15 | Página de transparencia de fondos | Página pública que reporte ingresos por donativos y su uso (costos de infraestructura). Refuerza el "no para beneficio personal" y genera confianza. Alinear con proyecto sensible. | 🟡 | ⬜ Pendiente |
+| 12 | Ampliar Aviso de Privacidad (pagos) | Agregar tratamiento de datos financieros del donante: nombre, email, monto, quizá RFC para recibo. Declarar al procesador de pago como encargado/transferencia. | 🔴 | 🚫 Cancelada |
+| 13 | Términos de donación | Documento/sección separada: naturaleza voluntaria y **no reembolsable** del donativo, destino (sostenimiento de la plataforma), que NO otorga contraprestación ni participación, transparencia del uso. | 🔴 | 🚫 Cancelada |
+| 14 | Reflejar T&C del procesador | Stripe/PayPal/Mercado Pago imponen sus propios términos y políticas de datos. Reflejarlos/enlazarlos donde corresponda. | 🟡 | 🚫 Cancelada |
+| 15 | Página de transparencia de fondos | Página pública que reporte ingresos por donativos y su uso (costos de infraestructura). Refuerza el "no para beneficio personal" y genera confianza. Alinear con proyecto sensible. | 🟡 | 🚫 Cancelada |
 
 ### B.3 — Seguridad técnica de pagos
 
 | # | Tarea | Descripción | Prioridad | Estado |
 |---|-------|-------------|-----------|--------|
-| 16 | Usar procesador hosted (NO tocar tarjeta) | Integrar con **Stripe Checkout / hosted fields** (o equivalente) para que los datos de tarjeta nunca pasen por el backend → minimiza alcance PCI-DSS (SAQ-A). El boilerplate ya trae capa Stripe opcional (CLAUDE.md §14). | 🔴 | ⬜ Pendiente |
-| 17 | Webhooks firmados + idempotencia | Verificar firma de webhooks del procesador, manejar idempotencia, no confiar en el cliente para confirmar el pago. Rate-limit + auth en endpoints de pago. | 🔴 | ⬜ Pendiente |
-| 18 | Turnstile en formulario de donación | Formulario público de escritura → Turnstile (CLAUDE.md §9) para anti-abuso/fraude. Edge cache solo en lectura, nunca en el POST. | 🟡 | ⬜ Pendiente |
+| 16 | Usar procesador hosted (NO tocar tarjeta) | Integrar con **Stripe Checkout / hosted fields** (o equivalente) para que los datos de tarjeta nunca pasen por el backend → minimiza alcance PCI-DSS (SAQ-A). El boilerplate ya trae capa Stripe opcional (CLAUDE.md §14). | 🔴 | 🚫 Cancelada |
+| 17 | Webhooks firmados + idempotencia | Verificar firma de webhooks del procesador, manejar idempotencia, no confiar en el cliente para confirmar el pago. Rate-limit + auth en endpoints de pago. | 🔴 | 🚫 Cancelada |
+| 18 | Turnstile en formulario de donación | Formulario público de escritura → Turnstile (CLAUDE.md §9) para anti-abuso/fraude. Edge cache solo en lectura, nunca en el POST. | 🟡 | 🚫 Cancelada |
 
 ---
 
@@ -92,8 +101,9 @@ declararse en el aviso.
   SEO) para reutilizar layout público, footer y metadata.
 - **Task 5** coordina con Fase 10 (trazado de IP) y Fase 12 (retención/purga de `audit_log`).
 - **Task 3** toca `users` → migración Alembic + ajuste al flujo de registro/invitación (CLAUDE.md §6).
-- **Grupo B completo depende del Grupo A** (el aviso y términos se amplían, no se reescriben) y de
-  una **decisión de negocio + asesoría profesional** que precede a cualquier implementación.
+- **Grupo B queda cancelado** (ver arriba). Si algún día se retoma, seguiría dependiendo del
+  Grupo A (el aviso y términos se ampliarían, no se reescribirían) y de una **decisión de
+  negocio + asesoría profesional** previa a cualquier implementación.
 - La capa Stripe del boilerplate está desactivada por default (CLAUDE.md §14, `docs/optional-layers.md`).
 - Mantener la postura del producto: **sin PII de beneficiarios** (CLAUDE.md §2). Las donaciones de
   dinero introducen PII del **donante**, que es una superficie nueva a declarar y proteger.
@@ -108,9 +118,10 @@ declararse en el aviso.
 - El aviso declara el tratamiento de IP/auditoría y su retención.
 - Mecanismo ARCO documentado y operativo (mínimo email dedicado).
 
-### Grupo B (al habilitar donaciones)
-- Entidad receptora definida y asesoría legal/fiscal completada **antes** de implementar pagos.
-- Datos de tarjeta nunca tocan el backend (procesador hosted, alcance PCI-DSS mínimo).
-- Aviso de Privacidad y Términos de donación amplían el marco existente.
-- Página de transparencia de uso de fondos publicada.
-- Separación contable verificable de los donativos de sostenimiento.
+### Grupo B — cancelado, sin Definition of Done vigente
+
+No aplica mientras el bloque siga cancelado. Si se retoma, el diseño original preveía:
+entidad receptora definida y asesoría legal/fiscal completada antes de implementar pagos; datos
+de tarjeta nunca tocan el backend (procesador hosted, alcance PCI-DSS mínimo); Aviso de
+Privacidad y Términos de donación ampliando el marco existente; página de transparencia de uso
+de fondos; separación contable verificable de los donativos de sostenimiento.
