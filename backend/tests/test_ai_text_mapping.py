@@ -60,6 +60,18 @@ def catalogo(db):
         ProductType(category="MEDICINE", display_name="Ibuprofeno 800 mg",
                     inn_name="Ibuprofeno", strength="800 mg", form="Tableta", default_unit="tableta"),
         ProductType(category="OTHER", display_name="Cobija matrimonial", default_unit="pieza"),
+        ProductType(category="HYGIENE", display_name="Pañal desechable talla M", default_unit="paquete"),
+        # Contains "para" as a plain substring ("comPARAtiva"), unrelated to any
+        # donation — here to prove a Spanish stopword never becomes a search
+        # term, not to represent a real product.
+        ProductType(category="OTHER", display_name="Comparativa de mangueras", default_unit="pieza"),
+        # "masa" is within two letters of the accented stopword "más", so it
+        # only stays out of a shortlist if stopwords are compared already
+        # normalized.
+        ProductType(category="FOOD", display_name="Harina de masa", default_unit="kg"),
+        # "gel" sits inside "gelatina" — a short catalog word swallowed by a
+        # long donor word, which is a coincidence and not a shared stem.
+        ProductType(category="HYGIENE", display_name="Gel antibacterial", default_unit="pieza"),
     ]
     db.add_all(productos)
     db.commit()
@@ -142,6 +154,78 @@ def test_the_shortlist_reaches_the_model_with_real_candidates(db, catalogo):
 
     assert "Ibuprofeno 400 mg" in proveedor.last_question
     assert "Cobija" not in proveedor.last_question
+
+
+def test_a_plural_donor_word_finds_the_singular_catalog_entry(db, catalogo):
+    """Quien dona escribe 'cobijas'; el catálogo guarda 'Cobija'. El español
+    pluraliza agregando la terminación, así que la forma singular siempre
+    queda como prefijo de la plural — comparar palabra por palabra en vez de
+    contra la frase completa basta para encontrarla, sin necesitar un
+    lematizador de verdad."""
+    proveedor = _Provider([])
+
+    _sugerir(db, "3 cobijas", proveedor)
+
+    assert "Cobija matrimonial" in proveedor.last_question
+
+
+def test_a_spanish_es_plural_also_finds_its_singular(db, catalogo):
+    """La otra forma de pluralizar en español: agregar 'es' en vez de 's'.
+    'Pañal' sigue siendo prefijo de 'pañales', así que la misma comparación
+    por palabra la encuentra sin una regla aparte para este caso."""
+    proveedor = _Provider([])
+
+    _sugerir(db, "pañales etapa 3", proveedor)
+
+    assert "Pañal desechable talla M" in proveedor.last_question
+
+
+def test_accents_do_not_block_a_match(db, catalogo):
+    """Quien captura con prisa no siempre teclea el acento. 'ATUN' sin acento
+    y en mayúsculas tiene que seguir encontrando 'Atún'."""
+    proveedor = _Provider([])
+
+    _sugerir(db, "ATUN ENLATADO", proveedor)
+
+    assert "Atún en lata 140 g" in proveedor.last_question
+
+
+def test_a_spanish_stopword_never_becomes_a_search_term(db, catalogo):
+    """'para' es una palabra funcional de 4 letras: pasa el filtro de largo
+    mínimo y aparece como substring de palabras que no tienen nada que ver
+    ('comPARAtiva'). Sin excluirla, un candidato irrelevante llega al modelo
+    y puede ganar la elección solo por casualidad ortográfica."""
+    proveedor = _Provider([])
+
+    _sugerir(db, "pañales para bebé", proveedor)
+
+    assert "Comparativa de mangueras" not in proveedor.last_question
+
+
+def test_an_accented_stopword_is_compared_already_normalized(db, catalogo):
+    """La lista de palabras funcionales se compara contra palabras ya sin
+    acento, así que guardarlas con acento las vuelve inalcanzables: 'más'
+    escrito con acento nunca coincidiría con el 'mas' que llega a la
+    comparación, y volvería a arrastrar candidatos como 'Harina de masa'."""
+    proveedor = _Provider([])
+
+    _sugerir(db, "más atún", proveedor)
+
+    assert "Atún en lata 140 g" in proveedor.last_question
+    assert "Harina de masa" not in proveedor.last_question
+
+
+def test_a_short_catalog_word_inside_a_long_one_is_not_a_stem(db, catalogo):
+    """Un plural se lleva una o dos letras con su singular. 'gel' dentro de
+    'gelatina' se lleva cinco: es coincidencia ortográfica, no la misma
+    palabra, y sin un límite de longitud el catálogo entero se cuela en la
+    lista corta por pedazos de palabra."""
+    proveedor = _Provider([])
+
+    _sugerir(db, "atún y gelatinas", proveedor)
+
+    assert "Atún en lata 140 g" in proveedor.last_question
+    assert "Gel antibacterial" not in proveedor.last_question
 
 
 # ── Cuándo no llama ──────────────────────────────────────────────────────────
