@@ -31,10 +31,22 @@ import sys
 import uuid
 
 from sqlalchemy import create_engine
+from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.ext.compiler import compiles
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.pool import StaticPool
 
-import app.models  # noqa: F401 — registers every model on Base before create_all
+
+@compiles(JSONB, "sqlite")
+def _jsonb_as_json(element, compiler, **kw):  # noqa: ANN001, ANN003
+    """The eval catalog is SQLite-only; production's JSONB columns (audit_log,
+    product_mapping_choices, ...) need a stand-in or `create_all` fails on the
+    very first table. Same shim every `tests/tenant/conftest.py`-style fixture
+    already registers — this script just isn't one of those fixtures."""
+    return "JSON"
+
+
+import app.models  # noqa: E402,F401 — registers every model on Base before create_all
 from app.config import settings
 from app.database import Base
 from app.models.product_type import ProductType
