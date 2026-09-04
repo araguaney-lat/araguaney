@@ -6,6 +6,7 @@ import { redirect } from "next/navigation"
 import { revalidatePath } from "next/cache"
 import { apiFetch, ApiError } from "@/lib/api"
 import { CURRENT_TERMS_VERSION } from "@/lib/legal"
+import type { MappingChoice } from "@/lib/mapping-choices"
 import { getLocale, getDictionary } from "@/lib/i18n"
 
 const API_URL = process.env.API_URL ?? "http://localhost:8000"
@@ -368,4 +369,30 @@ export async function createIntakeAction(payload: CreateIntakePayload) {
       code: err instanceof ApiError ? err.code : undefined,
     }
   }
+}
+
+/**
+ * Registra qué producto eligió quien captura para el renglón que escribió quien
+ * dona (Fase 23, task 8).
+ *
+ * Corre después de que el intake ya quedó registrado, y nunca puede estropearlo:
+ * un fallo aquí cuesta un caso de medición, y devolver un error haría que la
+ * pantalla mostrara una falla por algo que a quien captura no le toca resolver.
+ * Por eso cada envío se traga su propio error y la función no devuelve nada.
+ */
+export async function recordMappingChoicesAction(choices: MappingChoice[]): Promise<void> {
+  if (choices.length === 0) return
+
+  const session = await auth()
+  if (!session?.accessToken) return
+
+  await Promise.all(
+    choices.map((choice) =>
+      apiFetch("/v1/catalog/mapping-choices", {
+        method: "POST",
+        body: JSON.stringify(choice),
+        token: session.accessToken,
+      }).catch(() => undefined),
+    ),
+  )
 }

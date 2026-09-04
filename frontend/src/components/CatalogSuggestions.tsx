@@ -9,6 +9,14 @@ import type { ProductType } from "@/types"
 interface Props {
   donationCode: string
   text: string
+  /** Qué hacer cuando alguien elige una sugerencia. Sin esto las sugerencias
+   *  se muestran de solo lectura, que es lo correcto donde no hay ningún campo
+   *  que llenar — la ficha de la donación, por ejemplo. */
+  onPick?: (pt: ProductType) => void
+  /** Qué se llegó a proponer, en orden. Lo necesita quien registra después la
+   *  elección real: sin la lista mostrada no se puede saber si el modelo
+   *  acertó en la primera, en las tres, o en ninguna. */
+  onLoaded?: (ids: string[]) => void
 }
 
 /**
@@ -23,7 +31,7 @@ interface Props {
  * respuesta llega vacía y aquí se dice sin dramatismo: la captura manual nunca
  * dependió de esto.
  */
-export function CatalogSuggestions({ donationCode, text }: Props) {
+export function CatalogSuggestions({ donationCode, text, onPick, onLoaded }: Props) {
   const { data: session } = useSession()
   const [suggestions, setSuggestions] = useState<ProductType[] | null>(null)
   const [loading, setLoading] = useState(false)
@@ -37,6 +45,7 @@ export function CatalogSuggestions({ donationCode, text }: Props) {
         { token: session.accessToken },
       )
       setSuggestions(data)
+      onLoaded?.(data.map((pt) => pt.id))
     } catch {
       // Un fallo aquí no interrumpe nada: se muestra como "sin sugerencias".
       setSuggestions([])
@@ -69,12 +78,21 @@ export function CatalogSuggestions({ donationCode, text }: Props) {
   return (
     <ul className="flex flex-wrap gap-1">
       {suggestions.map((pt) => (
-        <li
-          key={pt.id}
-          className="rounded-full bg-chip px-2 py-0.5 text-xs text-tx"
-          title={pt.category}
-        >
-          {pt.display_name}
+        <li key={pt.id}>
+          {onPick ? (
+            <button
+              type="button"
+              onClick={() => onPick(pt)}
+              title={pt.category}
+              className="rounded-full bg-chip px-2 py-0.5 text-xs text-tx hover:bg-card2"
+            >
+              {pt.display_name}
+            </button>
+          ) : (
+            <span className="rounded-full bg-chip px-2 py-0.5 text-xs text-tx" title={pt.category}>
+              {pt.display_name}
+            </span>
+          )}
         </li>
       ))}
     </ul>

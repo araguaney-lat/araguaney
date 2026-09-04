@@ -126,6 +126,34 @@
 > `product_mapping_choices`, que sigue esperando que el panel llame al
 > endpoint.
 
+> **2026-09-04 — el panel ya alimenta el conjunto real.** La captura que nace
+> de un pre-registro (`/dashboard/intake/new?donation=CODE`) ya creaba una fila
+> por renglón recibido, con su cantidad y su unidad; el texto del donante, en
+> cambio, se volcaba a un blob de notas y ahí se perdía qué texto correspondía
+> a qué caja. Ahora cada fila conserva el renglón que la originó, muestra sus
+> sugerencias junto al buscador de producto, y al enviar registra en
+> `product_mapping_choices` el par (texto, producto elegido) con lo que la IA
+> había propuesto.
+>
+> Dos decisiones que valen más que el código:
+>
+> - **Se registra al enviar, no al pulsar.** Quien captura puede aceptar una
+>   sugerencia y cambiarla antes de guardar, y lo que hay que medir es en qué
+>   terminó el inventario. Registrar el clic mediría intenciones.
+> - **La sugerencia llena el campo.** Un botón que solo alimenta telemetría es
+>   uno que la gente deja de pulsar, y —peor— uno que se pulsa sin mirar
+>   justamente porque no tiene consecuencia. El dato tiene que salir de trabajo
+>   útil: elegir la sugerencia ahorra la búsqueda, y el par queda como efecto
+>   secundario. El principio de la fase no se mueve: nada se llena solo, la
+>   persona pulsa.
+>
+> Límite conocido: una captura que se encola sin señal no registra el par. Sin
+> conexión tampoco se puede cargar la donación, así que esas filas nacen sin
+> texto del donante y no hay par que guardar; el caso que sí se pierde es el de
+> quien carga la donación con señal y la envía después de que se cayó.
+> Arrastrar la medición por la cola offline costaría más que el caso que
+> recupera.
+
 ---
 
 ## Orden sugerido

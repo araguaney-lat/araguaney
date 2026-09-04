@@ -6,7 +6,14 @@ import dynamic from "next/dynamic"
 import { useSession } from "next-auth/react"
 import { apiFetch } from "@/lib/api"
 import type { Campaign, Center, ProductType, BarcodeResult, DonorDraft } from "@/types"
-import { createIntakeAction, type BoxDraft, type DonorPayload } from "@/lib/actions"
+import {
+  createIntakeAction,
+  recordMappingChoicesAction,
+  type BoxDraft,
+  type DonorPayload,
+} from "@/lib/actions"
+import { mappingChoicesFrom } from "@/lib/mapping-choices"
+import { CatalogSuggestions } from "@/components/CatalogSuggestions"
 import { DonorForm } from "@/components/DonorForm"
 import { useOnlineStatus } from "@/components/ConnectivityBanner"
 import { useDict } from "@/context/DictionaryContext"
@@ -33,6 +40,14 @@ interface BoxRow {
   // Codigo leido durante la captura. No viaja a la caja: alimenta el catalogo,
   // que aprende que GTIN corresponde al tipo de producto elegido.
   scannedGtin: string
+  // El renglón que escribió quien dona y del que nació esta fila. Vacío en las
+  // cajas que se agregan a mano. No viaja a la caja: al enviar se registra
+  // junto al producto elegido, que es el par que hoy no queda en ningún lado
+  // (Fase 23, task 8).
+  donorText: string
+  // Lo que la IA propuso para ese renglón, en orden. Vacío mientras nadie pida
+  // sugerencias, que es el caso normal.
+  suggestedIds: string[]
 }
 
 /** Referencia del catálogo: cuánto pesaría solo el contenido.
@@ -62,6 +77,8 @@ function newRow(): BoxRow {
     weight_kg: "",
     offlineBlocked: false,
     scannedGtin: "",
+    donorText: "",
+    suggestedIds: [],
   }
 }
 
@@ -130,12 +147,16 @@ function useProductSearch(campaignId: string) {
 function BoxRowInput({
   row,
   campaignId,
+  donationCode,
   autoFocusBarcode,
   onChange,
   onRemove,
 }: {
   row: BoxRow
   campaignId: string
+  /** El pre-registro del que viene la captura, cuando viene de uno. Es lo que
+   *  permite pedir sugerencias para el renglón que escribió quien dona. */
+  donationCode: string
   /** La última fila arranca con el cursor en su código de barras. El ciclo en
    *  el andén es agregar caja → disparar la pistola → agregar caja, y obligar a
    *  tocar la pantalla en medio lo convierte en tres gestos. */
@@ -299,6 +320,20 @@ function BoxRowInput({
                 ))}
               </ul>
             )}
+            {/* Solo cuando la fila nació de un renglón del donante: ahí hay un
+                texto que traducir, y elegir la sugerencia ahorra la búsqueda.
+                La IA propone, la persona pulsa — nada se llena solo. */}
+            {row.donorText && donationCode && (
+              <div className="mt-2">
+                <p className="mb-1 text-xs text-fnt">“{row.donorText}”</p>
+                <CatalogSuggestions
+                  donationCode={donationCode}
+                  text={row.donorText}
+                  onPick={selectProduct}
+                  onLoaded={(ids) => onChange({ ...row, suggestedIds: ids })}
+                />
+              </div>
+            )}
           </>
         )}
       </div>
@@ -457,6 +492,10 @@ export default function NewIntakePage() {
             ...newRow(),
             quantity: String(i.quantity),
             unit: i.unit,
+            // La fila se queda con el renglón que la originó. Antes solo iba al
+            // blob de notas, y ahí ya no se puede saber qué texto corresponde a
+            // qué caja.
+            donorText: i.free_text ?? "",
           })))
           setNotes(
             `${t.from_donation.replace("{code}", d.code)}\n` +
@@ -609,6 +648,12 @@ export default function NewIntakePage() {
         // la salida es la excepción con motivo, que abre una revisión.
         if (result.code === "DONOR_REQUIRED_FOR_VOLUME") setNeedsException(true)
       } else {
+        // Se registra lo que quedó en la caja, no lo que se pulsó: quien
+        // captura puede aceptar una sugerencia y cambiarla antes de enviar, y
+        // lo que hay que medir es en qué terminó el inventario. Corre después
+        // del intake y sin await sobre su resultado: es medición, y no puede
+        // demorar ni estropear una captura que ya está guardada.
+        void recordMappingChoicesAction(mappingChoicesFrom(rows))
         router.push("/dashboard/intake")
       }
     } catch {
@@ -748,6 +793,7 @@ export default function NewIntakePage() {
               key={row.key}
               row={row}
               campaignId={campaignId}
+              donationCode={donation?.code ?? ""}
               autoFocusBarcode={i === rows.length - 1 && rows.length > 1}
               onChange={updateRow(row.key)}
               onRemove={() => removeRow(row.key)}
