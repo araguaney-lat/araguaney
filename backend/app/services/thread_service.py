@@ -52,7 +52,7 @@ class ThreadService:
                 raise api_error("FORBIDDEN", "No tienes acceso a este hilo", status_code=403)
         else:
             if not self.repo.is_campaign_member(thread.campaign_id, user.id):
-                raise api_error("FORBIDDEN", "No eres miembro de esta campaña", status_code=403)
+                raise api_error("NOT_CAMPAIGN_MEMBER", "No eres miembro de esta campaña", status_code=403)
 
     # ── Upload presigned URL ───────────────────────────────────────────────────
 
@@ -113,7 +113,7 @@ class ThreadService:
     ) -> ThreadOut:
         # Sender must be a campaign member
         if not self.repo.is_campaign_member(data.campaign_id, user.id):
-            raise api_error("FORBIDDEN", "No eres miembro de esta campaña", status_code=403)
+            raise api_error("NOT_CAMPAIGN_MEMBER", "No eres miembro de esta campaña", status_code=403)
 
         if data.thread_type == "PRIVATE":
             if not data.recipient_ids:

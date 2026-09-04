@@ -141,6 +141,16 @@ class TestTransfers:
                          headers=world.token(world.coordinator_b))
         assert res.status_code == 403
 
+    def test_detail_names_both_centers(self, client, world):
+        """Task 18 (roadmap Fase 26): una coordinación no tiene `national_admin`
+        y no puede resolver `GET /v1/centers`, así que la respuesta trae el
+        nombre del otro centro en la propia transferencia."""
+        res = client.get(f"/v1/transfers/{world.transfer_a.id}",
+                         headers=world.token(world.coordinator_a))
+        assert res.status_code == 200
+        assert res.json()["from_center_name"] == world.center_a.name
+        assert res.json()["to_center_name"] == world.center_a.name
+
 
 class TestMessaging:
     def test_private_thread_hidden_from_non_participant(self, client, world):

@@ -2,6 +2,8 @@ from datetime import datetime
 from decimal import Decimal
 from uuid import UUID
 
+from pydantic import Field
+
 from app.schemas._base import StrictModel, StrictORMModel, StrictUUID, StrictDecimal
 from app.schemas.box import BoxOut
 
@@ -64,3 +66,7 @@ class PalletCloseIn(StrictModel):
 
     gross_weight_kg: StrictDecimal | None = None
     height_cm: int | None = None
+
+
+class PalletAddBoxIn(StrictModel):
+    code: str = Field(min_length=1)

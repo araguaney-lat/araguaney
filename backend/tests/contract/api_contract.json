@@ -160,6 +160,13 @@
     "username"
   ],
   "POST /v1/centers/{center_id}/users/{user_id}/reinvite": [],
+  "POST /v1/devices": [
+    "platform",
+    "token"
+  ],
+  "POST /v1/devices/unregister": [
+    "token"
+  ],
   "POST /v1/donations/{code}/photos/{photo_id}/read-label": [],
   "POST /v1/donations/{code}/receive": [],
   "POST /v1/email-failures/{failure_id}/resend": [],
@@ -190,7 +197,9 @@
     "body"
   ],
   "POST /v1/pallets": [],
-  "POST /v1/pallets/{pallet_id}/add-box": [],
+  "POST /v1/pallets/{pallet_id}/add-box": [
+    "code"
+  ],
   "POST /v1/pallets/{pallet_id}/close": [],
   "POST /v1/pallets/{pallet_id}/label.pdf": [],
   "POST /v1/product-types": [

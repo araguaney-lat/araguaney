@@ -12,7 +12,14 @@ from app.models.user import User
 from app.repositories.export_job_repository import ExportJobRepository
 from app.repositories.pallet_repository import PalletRepository
 from app.schemas.export_job import ExportJobOut
-from app.schemas.pallet import PalletCloseIn, PalletCreate, PalletDetailOut, PalletOut, PalletPublicOut
+from app.schemas.pallet import (
+    PalletAddBoxIn,
+    PalletCloseIn,
+    PalletCreate,
+    PalletDetailOut,
+    PalletOut,
+    PalletPublicOut,
+)
 from app.schemas.qr_ficha import QrEventOut
 from app.services.pallet_service import PalletService
 from app.repositories.audit_repository import AuditRepository
@@ -113,16 +120,12 @@ def get_pallet(
 def add_box_to_pallet(
     request: Request,
     pallet_id: UUID,
-    body: dict,
+    data: PalletAddBoxIn,
     db: Session = Depends(get_db),
     current_user: User = Depends(require_coordinator),
     scope: UUID | None = Depends(tenant_scope),
 ):
-    box_code: str = body.get("code", "")
-    if not box_code:
-        from app.utils.errors import api_error
-        raise api_error("MISSING_CODE", "box code is required", field="code", status_code=422)
-    return PalletService(db).add_box(pallet_id, box_code, center_id=scope, user_id=current_user.id)
+    return PalletService(db).add_box(pallet_id, data.code, center_id=scope, user_id=current_user.id)
 
 
 @router.delete("/v1/pallets/{pallet_id}/boxes/{box_code}", response_model=PalletDetailOut)

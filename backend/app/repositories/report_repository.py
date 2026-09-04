@@ -202,7 +202,14 @@ class ReportRepository:
 
         return list(by_day.values())
 
-    def by_category(self, campaign_id: UUID, center_id: UUID | None, start: date, end: date) -> list[dict]:
+    def by_category(
+        self,
+        campaign_id: UUID,
+        center_id: UUID | None,
+        start: date,
+        end: date,
+        status: str | None = None,
+    ) -> list[dict]:
         stmt = (
             select(
                 ProductType.category,
@@ -216,6 +223,7 @@ class ReportRepository:
                 Box.created_at >= _start_dt(start),
                 Box.created_at <= _end_dt(end),
                 *([Box.center_id == center_id] if center_id else []),
+                *([Box.status == status] if status else []),
             )
             .group_by(ProductType.category)
             .order_by(func.count(Box.id).desc())

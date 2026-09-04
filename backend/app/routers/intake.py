@@ -66,6 +66,18 @@ def list_intakes(
     ]
 
 
+@router.get("/{intake_id}", response_model=IntakeOut)
+@limiter.limit("120/minute")
+def get_intake(
+    request: Request,
+    intake_id: UUID,
+    db: Session = Depends(get_db),
+    _: User = Depends(require_center_role),
+    scope: UUID | None = Depends(tenant_scope),
+):
+    return IntakeService(db).get(intake_id, center_id=scope)
+
+
 @router.get("/donors/search", response_model=list[DonorOut])
 @limiter.limit("60/minute")
 def search_donors(

@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 from app.arq_pool import enqueue
 from app.database import get_db
 from app.dependencies import get_current_user, tenant_scope
+from app.models.box import BOX_STATUSES
 from app.models.user import User
 from app.repositories.export_job_repository import ExportJobRepository
 from app.repositories.report_repository import ReportRepository
@@ -102,13 +103,18 @@ def get_by_category(
     campaign_id: UUID,
     start: date | None = Query(None),
     end: date | None = Query(None),
+    # Sin filtro: "capturado en la ventana", sea cual sea su estado de hoy —
+    # el nombre de la pantalla móvil. Con `status=SEALED` se lee como stock.
+    status: str | None = Query(None),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
+    if status is not None and status not in BOX_STATUSES:
+        raise api_error("INVALID_STATUS", f"Status must be one of {BOX_STATUSES}", field="status")
     repo = ReportRepository(db)
     _require_campaign_access(repo, current_user, campaign_id)
     s, e = _resolve_dates(start, end)
-    return repo.by_category(campaign_id, tenant_scope(current_user), s, e)
+    return repo.by_category(campaign_id, tenant_scope(current_user), s, e, status=status)
 
 
 @router.get("/campaign/{campaign_id}/by-center", response_model=list[CenterBreakdown])

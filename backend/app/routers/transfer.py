@@ -35,8 +35,9 @@ def list_transfers_studio(
 ):
     """All transfers across all centers — superadmin only."""
     transfers = TransferRepository(db).list_by_center(center_id=None, status=status)
-    from app.services.transfer_service import _transfer_out
-    return [_transfer_out(t) for t in transfers]
+    from app.services.transfer_service import _names_for, _transfer_out
+    names = _names_for(db, *transfers)
+    return [_transfer_out(t, names) for t in transfers]
 
 
 @router.post("", response_model=TransferOut, status_code=201)

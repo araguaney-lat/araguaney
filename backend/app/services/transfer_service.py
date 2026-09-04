@@ -5,6 +5,7 @@ from app.models.events import BoxEvent
 from app.models.transfer import Transfer
 from app.models.user import User
 from app.repositories.box_repository import BoxRepository
+from app.repositories.center_repository import CenterRepository
 from app.repositories.transfer_repository import TransferRepository
 from app.schemas.transfer import TransferCreate, TransferDetailOut, TransferEventOut, TransferOut
 from app.schemas.box import BoxOut
@@ -12,11 +13,19 @@ from app.services.base import BaseService
 from app.utils.errors import api_error
 
 
-def _transfer_out(t: Transfer) -> TransferOut:
+def _names_for(db, *transfers: Transfer) -> dict[UUID, str]:
+    ids = {c for t in transfers for c in (t.from_center_id, t.to_center_id)}
+    return CenterRepository(db).names_by_ids(ids)
+
+
+def _transfer_out(t: Transfer, names: dict[UUID, str] | None = None) -> TransferOut:
+    names = names or {}
     return TransferOut(
         id=t.id,
         from_center_id=t.from_center_id,
         to_center_id=t.to_center_id,
+        from_center_name=names.get(t.from_center_id),
+        to_center_name=names.get(t.to_center_id),
         status=t.status,
         initiated_by=t.initiated_by,
         notes=t.notes,
@@ -73,7 +82,7 @@ class TransferService(BaseService):
         repo.add_event(transfer.id, None, "REQUESTED", current_user.id)
         repo.commit()
         self.db.refresh(transfer)
-        return _transfer_out(transfer)
+        return _transfer_out(transfer, _names_for(self.db, transfer))
 
     def get_detail(self, transfer_id: UUID, current_user: User) -> TransferDetailOut:
         repo = TransferRepository(self.db)
@@ -84,10 +93,13 @@ class TransferService(BaseService):
 
         boxes = repo.find_boxes(transfer_id)
         events = repo.find_events(transfer_id)
+        names = _names_for(self.db, transfer)
         return TransferDetailOut(
             id=transfer.id,
             from_center_id=transfer.from_center_id,
             to_center_id=transfer.to_center_id,
+            from_center_name=names.get(transfer.from_center_id),
+            to_center_name=names.get(transfer.to_center_id),
             status=transfer.status,
             initiated_by=transfer.initiated_by,
             notes=transfer.notes,
@@ -115,7 +127,8 @@ class TransferService(BaseService):
             limit=limit,
             offset=offset,
         )
-        return [_transfer_out(t) for t in transfers]
+        names = _names_for(self.db, *transfers)
+        return [_transfer_out(t, names) for t in transfers]
 
     def approve(self, transfer_id: UUID, current_user: User) -> TransferOut:
         return self._transition(transfer_id, "REQUESTED", "APPROVED", current_user,
@@ -156,7 +169,7 @@ class TransferService(BaseService):
         repo.add_event(transfer_id, "IN_TRANSIT", "RECEIVED", current_user.id)
         repo.commit()
         self.db.refresh(transfer)
-        return _transfer_out(transfer)
+        return _transfer_out(transfer, _names_for(self.db, transfer))
 
     # ── Helpers ───────────────────────────────────────────────────────────────
 
@@ -202,4 +215,4 @@ class TransferService(BaseService):
         repo.add_event(transfer_id, from_status, to_status, user.id, note=note)
         repo.commit()
         self.db.refresh(transfer)
-        return _transfer_out(transfer)
+        return _transfer_out(transfer, _names_for(self.db, transfer))

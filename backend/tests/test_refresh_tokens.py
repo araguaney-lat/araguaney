@@ -87,6 +87,20 @@ def test_refresh_rotates_and_revokes_the_old_token(db, user):
     assert old.replaced_by is not None
 
 
+def test_refresh_response_carries_identity_like_login(db, user):
+    """Task 16 (roadmap Fase 26): login declara `role`/`center_id`/`center_role`,
+    y la app restaura sesión por refresh en cada arranque en frío — si refresh
+    no los trae, cada reinicio devuelve a la coordinación convertida en
+    voluntariado."""
+    first = AuthService(db)._issue_session(user)["refresh_token"]
+
+    rotated = AuthService(db).refresh(first)
+
+    assert rotated["role"] == user.role
+    assert rotated["center_role"] == user.center_role
+    assert rotated["center_id"] == (str(user.center_id) if user.center_id else None)
+
+
 def test_reusing_an_old_token_after_the_chain_moved_kills_the_family(db, user):
     # Robo real: la cadena ya avanzó dos veces, así que reusar el primer eslabón
     # no es un doble disparo concurrente sino un token viejo resucitado.

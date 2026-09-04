@@ -30,6 +30,11 @@ class TransferOut(StrictORMModel):
     id: UUID
     from_center_id: UUID
     to_center_id: UUID
+    # Nombres resueltos al construir la respuesta. Una coordinación no tiene
+    # acceso a `GET /v1/centers` (national_admin-only), así que sin esto no
+    # podía nombrar al otro centro en su propia transferencia.
+    from_center_name: str | None = None
+    to_center_name: str | None = None
     status: str
     initiated_by: UUID | None
     notes: str | None
@@ -41,6 +46,8 @@ class TransferDetailOut(StrictModel):
     id: UUID
     from_center_id: UUID
     to_center_id: UUID
+    from_center_name: str | None = None
+    to_center_name: str | None = None
     status: str
     initiated_by: UUID | None
     notes: str | None
