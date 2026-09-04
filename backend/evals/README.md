@@ -59,9 +59,30 @@ etiqueta puede llevar datos personales incidentales). No hay manera de correrlo
 hoy sin que alguien suba fotos reales primero.
 
 Completarlo de verdad exige capturas reales: renglones que hayan escrito
-donantes de verdad y fotos de cajas que hayan pasado por un centro. **Ninguna
-capacidad se enciende en producción hasta que su conjunto llegue a ese
-tamaño con datos reales**, porque un conjunto pequeño o sintético mide poco y
-da confianza de más — ver la nota de la Fase 26 sobre el enganche que empieza a
-capturar esas confirmaciones (`ProductMappingChoice` en
-`app/models/product_mapping_choice.py`), pendiente de acumular volumen.
+donantes de verdad y fotos de cajas que hayan pasado por un centro. Un conjunto
+pequeño o sintético mide poco y da confianza de más. El enganche que empieza a
+capturar esas confirmaciones ya existe (`ProductMappingChoice` en
+`app/models/product_mapping_choice.py`, `POST /v1/catalog/mapping-choices`) y
+espera dos cosas: que el panel lo llame cuando alguien resuelve una sugerencia,
+y luego volumen.
+
+La regla de la fase es que ninguna capacidad se encienda sin superar el umbral
+de su conjunto. Conviene decir en voz alta que las cuatro banderas se
+encendieron en producción antes de que ese conjunto existiera con datos reales,
+así que hoy la regla describe el orden deseado y no lo que pasó.
+
+## Última medición
+
+| Fecha | Capacidad | Modelo | Casos | top-1 | top-3 | Costo |
+|---|---|---|---|---:|---:|---:|
+| 2026-09-04 | mapeo de texto | `gpt-4o-mini` | 30 | 87% | 87% | $0.0018 |
+
+Supera ambos umbrales (60% / 85%). La corrida anterior del mismo día, antes de
+corregir la recuperación de candidatos, daba 57% / 57%: el modelo acertaba
+siempre que veía el producto correcto, y casi todos los fallos eran listas
+cortas vacías. El detalle de qué se corrigió y qué sigue fallando —sinónimos
+regionales y marcas comerciales, que ninguna búsqueda alcanza— está en la nota
+del 2026-09-04 de [`docs/roadmap/phase-23-ai-assisted-capture.md`](../../docs/roadmap/phase-23-ai-assisted-capture.md).
+
+Vale para lo que es: mide el pipeline real contra casos escritos a mano, no
+contra capturas reales.
