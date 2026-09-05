@@ -2,6 +2,13 @@
 .env
 .env.local
 .env.*.local
+# Cualquier otra variante de .env, incluidos los respaldos que dejan las
+# herramientas (`.env.bak.1788317192`). Los tres patrones de arriba no los
+# cubren, y `git add -A` se los lleva sin decir nada: pasó el 2026-09-04 y se
+# atrapó antes del push por pura revisión del `git status`. En un repositorio
+# público un push así no se deshace (REGLA #2).
+.env.*
+!.env.example
 
 # Python
 __pycache__/
