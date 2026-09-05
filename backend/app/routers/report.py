@@ -1,4 +1,4 @@
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta, timezone
 from uuid import UUID
 
 from fastapi import APIRouter, BackgroundTasks, Depends, Query, Request
@@ -30,8 +30,24 @@ _DEFAULT_DAYS = 30
 _MAX_RANGE_DAYS = 366
 
 
+def _now() -> datetime:
+    """El reloj de los reportes, en UTC y por separado para poder fijarlo.
+
+    Existe como función y no como una llamada suelta porque una prueba de la
+    frontera del día necesita un instante fijo: con el reloj real, la prueba
+    solo fallaría durante las horas en que el día local y el UTC difieren.
+    """
+    return datetime.now(timezone.utc)
+
+
 def _resolve_dates(start: date | None, end: date | None) -> tuple[date, date]:
-    today = date.today()
+    # El día es UTC, igual que las marcas de tiempo guardadas: el repositorio
+    # convierte estas fechas con `_start_dt`/`_end_dt`, que son UTC. Con
+    # `date.today()` la respuesta dependía del reloj del proceso, así que un
+    # servidor fuera de UTC cortaba la ventana en otro punto que las filas que
+    # va a contar — y en México, después de las 18:00, la ventana por omisión
+    # terminaba antes de lo capturado esa misma tarde.
+    today = _now().date()
     end = end or today
     start = start or (today - timedelta(days=_DEFAULT_DAYS - 1))
     if start > end:

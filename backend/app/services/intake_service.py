@@ -1,5 +1,5 @@
 import secrets
-from datetime import date, timezone
+from datetime import date, datetime, timezone
 from typing import TYPE_CHECKING
 from uuid import UUID
 
@@ -31,6 +31,22 @@ from app.utils.volume import exceeds_volume_threshold
 
 def _box_code() -> str:
     return f"BX-{secrets.token_urlsafe(6).upper()}"
+
+
+def _capture_date() -> date:
+    """El día de la captura, en UTC.
+
+    Alimenta la regla de vida útil (`validate_box`), que resta esta fecha de una
+    caducidad impresa en la caja para decidir si se acepta. Antes salía de
+    `date.today()`, o sea del reloj del proceso: la misma caja podía aceptarse o
+    rechazarse según dónde corriera el servidor, y eso no puede depender de ahí.
+
+    UTC y no la hora local del centro porque es lo mismo que guardan las marcas
+    de tiempo de todo lo demás. La diferencia máxima es de un día contra el
+    calendario de quien captura, y cae del lado estricto: cuenta un día menos de
+    vida útil, nunca uno de más.
+    """
+    return datetime.now(timezone.utc).date()
 
 
 class IntakeService(BaseService):
@@ -72,7 +88,7 @@ class IntakeService(BaseService):
 
         pt_repo = ProductTypeRepository(self.db)
         intake_repo = IntakeRepository(self.db)
-        capture_date = date.today()
+        capture_date = _capture_date()
 
         # Validate all product types exist before writing anything
         product_types = {}
