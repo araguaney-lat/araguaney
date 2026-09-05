@@ -154,6 +154,44 @@
 > Arrastrar la medición por la cola offline costaría más que el caso que
 > recupera.
 
+> **2026-09-04 — el OCR: por qué su ground truth no necesita una liga en el
+> esquema.** La nota anterior daba por hecho que medir el OCR con datos reales
+> exigía ligar una foto guardada con la caja que la confirma. Al revisarlo, esa
+> conclusión estaba mal, y la razón importa: para el mapeo de texto lo "real"
+> es irremplazable porque nadie puede inventar fielmente cómo escribe una
+> persona —"advil 400", "frazadas"—, pero el insumo del OCR es la fotografía de
+> una caja impresa. Una foto de un medicamento real, tomada con mala luz y la
+> caja abollada, **es** un caso real venga de donde venga; lo que la hace
+> realista son las condiciones de la toma, no por dónde entró al sistema. El
+> conjunto de referencia del OCR se arma entonces con fotos curadas a
+> propósito, y eso lo desacopla por completo de la persistencia.
+>
+> Lo que sí faltaba era **alcance**. El OCR solo se podía invocar desde la app
+> móvil, sobre una foto que el donante ya había subido a su pre-registro, y en
+> una pantalla que mostraba los campos como lista de solo lectura: había que
+> leerlos y teclearlos a mano en otra pantalla. El panel web ni siquiera lo
+> llamaba. Por eso `/studio/ai` registraba **cero llamadas** — no era falta de
+> persistencia, era que casi nadie podía llegar.
+>
+> `POST /v1/intakes/read-label` recibe la foto directamente, sin exigir que
+> exista antes: en el mostrador hay una cajita en la mano, no un pre-registro.
+> **La imagen no se guarda en ningún lado**: viaja incrustada en la llamada a la
+> IA y se descarta. Como el conjunto de referencia sale de fotos curadas,
+> guardarla no compraría nada, y una foto tomada en un centro puede llevar datos
+> personales de refilón — la misma razón por la que `ai_usage` nunca guardó
+> contenido. La caché va por huella del contenido, así que volver a leer la
+> misma cajita porque la primera foto salió movida no se cobra dos veces.
+>
+> Un archivo que no es imagen se rechaza con error, a diferencia de la IA no
+> disponible, que devuelve vacío. Son cosas distintas: lo primero lo corrige
+> quien eligió el archivo, lo segundo se resuelve tecleando como siempre, y
+> confundirlas dejaría a alguien esperando una lectura que nunca iba a llegar.
+>
+> Pendiente: que la app móvil ofrezca esta lectura dentro del formulario de
+> captura, prellenando lote y caducidad. `inn_name`, `form` y `strength`
+> identifican al `ProductType` y no a la caja, así que por ahora se muestran
+> como texto junto al buscador de producto en vez de elegir el SKU solos.
+
 ---
 
 ## Orden sugerido

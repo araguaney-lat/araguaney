@@ -54,9 +54,26 @@ pilas AA, guante de látex) son huecos reales del catálogo semilla, no fallas d
 modelo, y se reportan aparte en cada corrida.
 
 El de OCR tiene 3 casos declarados y **cero fotos**: `image_ref` apunta a un
-almacenamiento de evaluación que nadie llenó todavía (a propósito — una foto de
-etiqueta puede llevar datos personales incidentales). No hay manera de correrlo
-hoy sin que alguien suba fotos reales primero.
+almacenamiento de evaluación que nadie llenó todavía. No hay manera de correrlo
+hoy sin que alguien suba fotos primero.
+
+Esas fotos se toman a propósito, no se cosechan del sistema. Para el mapeo de
+texto lo real es irremplazable —nadie inventa fielmente que alguien escriba
+"advil 400"— pero el insumo del OCR es la fotografía de una caja impresa: una
+foto de un medicamento real **es** un caso real venga de donde venga, y lo que
+la hace representativa son las condiciones de la toma. Al armar el conjunto,
+que se parezcan a lo que pasa en un centro:
+
+- Cajas de medicamento reales, no maquetas ni fotos de catálogo.
+- Luz de bodega, no de estudio. Sombras, reflejo del plástico, foto de noche.
+- Ángulos torcidos, cajas abolladas, etiquetas despegadas o con precio encima.
+- Algunas donde falte un campo: sin lote visible, o con caducidad solo mes/año.
+- Teléfonos distintos, que es lo que va a haber.
+
+Por cada foto se escriben a mano los campos correctos —los que una persona lee
+de la caja— y se agrega el caso a `ocr_cases.json`. La respuesta esperada se
+escribe **antes** de correr el OCR: escribirla después de ver lo que el modelo
+contestó deja de ser una medición.
 
 Completarlo de verdad exige capturas reales: renglones que hayan escrito
 donantes de verdad y fotos de cajas que hayan pasado por un centro. Un conjunto
