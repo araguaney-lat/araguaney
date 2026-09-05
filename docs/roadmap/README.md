@@ -4,8 +4,8 @@
 
 ```mermaid
 pie title Tareas completadas (491 tareas)
-    "Listas" : 461
-    "Pendientes" : 20
+    "Listas" : 462
+    "Pendientes" : 19
     "Canceladas" : 10
 ```
 
@@ -39,8 +39,8 @@ pie title Tareas completadas (491 tareas)
 | 25 | [Captura sin conexión: cola local y sincronización diferida](phase-25-offline-capture.md) | 14 | 0 | 0 | ✅ 100% |
 | 26 | [Soporte de backend para el cliente nativo](phase-26-native-client-support.md) | 20 | 0 | 0 | ✅ 100% |
 | 27 | [De quién es el día: zona horaria del centro](phase-27-center-timezone.md) | 0 | 6 | 0 | ⬜ 0% |
-| 28 | [Otro nombre para el mismo producto](phase-28-product-aliases.md) | 5 | 3 | 0 | 🟡 63% |
-| **Total** | | **461** | **20** | **10** | **🟡 94%** |
+| 28 | [Otro nombre para el mismo producto](phase-28-product-aliases.md) | 6 | 2 | 0 | 🟡 75% |
+| **Total** | | **462** | **19** | **10** | **🟡 94%** |
 
 > **Canceladas (10):** el bloque de donativos/pagos de la Fase 13 (Grupo B: entidad receptora,
 > asesoría legal/contable, procesador de pagos, T&C de donación, transparencia) se canceló el

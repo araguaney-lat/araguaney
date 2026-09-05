@@ -90,6 +90,47 @@ class ProductTypeRepository(BaseRepository):
             stmt = stmt.where(ProductType.category == category)
         return list(self.db.execute(stmt.order_by(ProductType.display_name).limit(20)).scalars())
 
+    def list_aliases(self, product_type_id: UUID) -> list[ProductAlias]:
+        return list(self.db.execute(
+            select(ProductAlias)
+            .where(ProductAlias.product_type_id == product_type_id)
+            .order_by(ProductAlias.alias)
+        ).scalars().all())
+
+    def find_alias(self, alias_id: UUID) -> ProductAlias | None:
+        return self.db.get(ProductAlias, alias_id)
+
+    def find_alias_by_text(self, product_type_id: UUID, normalized: str) -> ProductAlias | None:
+        return self.db.execute(
+            select(ProductAlias).where(
+                ProductAlias.product_type_id == product_type_id,
+                ProductAlias.normalized == normalized,
+            )
+        ).scalar_one_or_none()
+
+    def add_alias(
+        self,
+        *,
+        product_type_id: UUID,
+        alias: str,
+        source: str = "manual",
+        user_id: UUID | None = None,
+    ) -> ProductAlias:
+        fila = ProductAlias(
+            product_type_id=product_type_id,
+            alias=alias,
+            normalized=normalize(alias),
+            source=source,
+            created_by_user_id=user_id,
+        )
+        self.db.add(fila)
+        self.db.flush()
+        self.db.refresh(fila)
+        return fila
+
+    def delete_alias(self, fila: ProductAlias) -> None:
+        self.db.delete(fila)
+
     def find_by_id(self, pt_id: UUID) -> ProductType | None:
         return self.db.get(ProductType, pt_id)
 

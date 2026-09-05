@@ -3,6 +3,7 @@ from uuid import UUID
 from app.models.product_gtin import ProductGtin
 from app.models.product_type import ProductType, PRODUCT_CATEGORIES
 from app.repositories.audit_repository import AuditRepository
+from app.utils.text_matching import normalize, shares_stem, words
 from app.repositories.product_type_repository import ProductTypeRepository
 from app.schemas.product_type import ProductTypeCreate, ProductTypeUpdate
 from app.services.base import BaseService
@@ -41,6 +42,90 @@ class ProductTypeService(BaseService):
         if not repo.find_by_id(pt_id):
             raise api_error("PRODUCT_TYPE_NOT_FOUND", "Product type not found", status_code=404)
         return repo.list_gtins(pt_id)
+
+    def list_aliases(self, pt_id: UUID) -> list:
+        repo = ProductTypeRepository(self.db)
+        if not repo.find_by_id(pt_id):
+            raise api_error("PRODUCT_TYPE_NOT_FOUND", "Product type not found", status_code=404)
+        return repo.list_aliases(pt_id)
+
+    def add_alias(self, pt_id: UUID, alias: str, user_id: UUID | None = None):
+        """Agrega otro nombre por el que la gente pide este producto.
+
+        Tres rechazos, y el tercero es el que importa: **un alias que el
+        catálogo ya encontraba no se guarda**. No rompe nada tenerlo, pero hace
+        creer que la lista cubre más de lo que cubre, y quien la mantiene deja
+        de distinguir lo que agrega valor de lo que solo ocupa lugar. Es la
+        misma regla que vigila a los alias sembrados, aplicada en la frontera.
+        """
+        repo = ProductTypeRepository(self.db)
+        producto = repo.find_by_id(pt_id)
+        if not producto:
+            raise api_error("PRODUCT_TYPE_NOT_FOUND", "Product type not found", status_code=404)
+
+        limpio = " ".join(alias.split())
+        palabras = words(limpio)
+        if not palabras:
+            raise api_error(
+                "ALIAS_TOO_SHORT",
+                "Escribe al menos una palabra de tres letras o más.",
+                field="alias",
+            )
+
+        if repo.find_alias_by_text(pt_id, normalize(limpio)) is not None:
+            raise api_error(
+                "ALIAS_ALREADY_EXISTS",
+                f"«{limpio}» ya está registrado para este producto.",
+                field="alias",
+            )
+
+        propias = set(words(" ".join(
+            w for w in (producto.display_name, producto.inn_name, producto.brand) if w
+        )))
+        if all(shares_stem(palabra, propias) for palabra in palabras):
+            raise api_error(
+                "ALIAS_ALREADY_FOUND",
+                f"«{limpio}» ya encuentra este producto sin necesidad del alias. "
+                "Guardarlo no cambiaría nada.",
+                field="alias",
+            )
+
+        fila = repo.add_alias(
+            product_type_id=pt_id, alias=limpio, source="manual", user_id=user_id
+        )
+        AuditRepository(self.db).log(
+            "PRODUCT_ALIAS_ADDED",
+            "product_type",
+            user_id=user_id,
+            entity_id=str(pt_id),
+            extra={"alias": limpio},
+        )
+        repo.commit()
+        return fila
+
+    def delete_alias(self, pt_id: UUID, alias_id: UUID, user_id: UUID | None = None) -> None:
+        """Quita un alias. También los sembrados: uno que resultó equivocado
+        arrastra al producto equivocado en cada captura, y dejarlo fijo por
+        haber venido con el catálogo no lo haría más correcto.
+
+        Queda en auditoría porque el catálogo es de todos los centros.
+        """
+        repo = ProductTypeRepository(self.db)
+        fila = repo.find_alias(alias_id)
+        # Si el alias cuelga de otro producto se responde igual que si no
+        # existiera: la ruta declara a qué producto pertenece.
+        if not fila or fila.product_type_id != pt_id:
+            raise api_error("ALIAS_NOT_FOUND", "Alias not found", status_code=404)
+
+        AuditRepository(self.db).log(
+            "PRODUCT_ALIAS_REMOVED",
+            "product_type",
+            user_id=user_id,
+            entity_id=str(pt_id),
+            extra={"alias": fila.alias, "source": fila.source},
+        )
+        repo.delete_alias(fila)
+        repo.commit()
 
     def unlink_gtin(self, pt_id: UUID, gtin_id: UUID, user_id: UUID | None = None) -> None:
         """Desliga un código de barras capturado por error.

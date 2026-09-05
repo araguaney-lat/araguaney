@@ -3,8 +3,13 @@
 import { Fragment, useState, useEffect, useTransition } from "react"
 import Link from "next/link"
 import { useSession } from "next-auth/react"
-import type { ProductType, Campaign, ProductGtin } from "@/types"
-import { promoteProductTypeAction, unlinkProductGtinAction } from "@/lib/catalog-actions"
+import type { ProductType, Campaign, ProductGtin, ProductAlias } from "@/types"
+import {
+  addProductAliasAction,
+  promoteProductTypeAction,
+  removeProductAliasAction,
+  unlinkProductGtinAction,
+} from "@/lib/catalog-actions"
 import { useDict } from "@/context/DictionaryContext"
 
 import { PageAction } from "@/components/PageAction"
@@ -31,9 +36,26 @@ export default function CatalogPage() {
   const [gtins, setGtins] = useState<Record<string, ProductGtin[]>>({})
   const [loadingGtins, setLoadingGtins] = useState(false)
 
+  // Los alias cuelgan de la misma fila desplegada: son dos formas de decir
+  // "cómo se encuentra este producto", y separarlas en dos pantallas obligaría
+  // a buscar el producto dos veces.
+  const [aliases, setAliases] = useState<Record<string, ProductAlias[]>>({})
+  const [aliasDraft, setAliasDraft] = useState("")
+  const [aliasError, setAliasError] = useState<string | null>(null)
+
   const toggleGtins = (ptId: string) => {
+    setAliasDraft("")
+    setAliasError(null)
     if (expanded === ptId) { setExpanded(null); return }
     setExpanded(ptId)
+
+    if (!aliases[ptId]) {
+      fetch(`/api/product-types/${ptId}/aliases`)
+        .then((r) => (r.ok ? r.json() : []))
+        .then((data: ProductAlias[]) => setAliases((prev) => ({ ...prev, [ptId]: data })))
+        .catch(() => setAliases((prev) => ({ ...prev, [ptId]: [] })))
+    }
+
     if (gtins[ptId]) return
     setLoadingGtins(true)
     fetch(`/api/product-types/${ptId}/gtins`)
@@ -41,6 +63,39 @@ export default function CatalogPage() {
       .then((data: ProductGtin[]) => setGtins((prev) => ({ ...prev, [ptId]: data })))
       .catch(() => setGtins((prev) => ({ ...prev, [ptId]: [] })))
       .finally(() => setLoadingGtins(false))
+  }
+
+  const handleAddAlias = (ptId: string) => {
+    const texto = aliasDraft.trim()
+    if (!texto) return
+    setAliasError(null)
+    startTransition(async () => {
+      const result = await addProductAliasAction(ptId, texto)
+      if (result.error || !result.data) {
+        // El servidor dice por qué —ya existe, o el catálogo ya lo encontraba—
+        // y ese mensaje es el que sirve: dice qué hacer, no solo que no se pudo.
+        setAliasError(result.error ?? null)
+        return
+      }
+      const creado = result.data
+      setAliases((prev) => ({ ...prev, [ptId]: [...(prev[ptId] ?? []), creado] }))
+      setAliasDraft("")
+    })
+  }
+
+  const handleRemoveAlias = (ptId: string, aliasId: string) => {
+    setAliasError(null)
+    startTransition(async () => {
+      const result = await removeProductAliasAction(ptId, aliasId)
+      if (result.error) {
+        setAliasError(result.error)
+        return
+      }
+      setAliases((prev) => ({
+        ...prev,
+        [ptId]: (prev[ptId] ?? []).filter((a) => a.id !== aliasId),
+      }))
+    })
   }
 
   const handleUnlink = (ptId: string, gtinId: string) => {
@@ -228,7 +283,60 @@ export default function CatalogPage() {
                 {isAdmin && expanded === pt.id && (
                   <tr className="bg-card2">
                     <td colSpan={4} className="px-4 py-3">
-                      <p className="mb-2 text-xs font-semibold text-mut">{t.gtins_title}</p>
+                      <p className="text-xs font-semibold text-mut">{t.aliases_title}</p>
+                      <p className="mb-2 text-xs text-fnt">{t.aliases_help}</p>
+
+                      {(aliases[pt.id] ?? []).length === 0 ? (
+                        <p className="text-xs text-fnt">{t.aliases_empty}</p>
+                      ) : (
+                        <ul className="space-y-1">
+                          {(aliases[pt.id] ?? []).map((a) => (
+                            <li key={a.id} className="flex items-center gap-3 text-xs">
+                              <span className="text-tx">{a.alias}</span>
+                              <span className="text-fnt">
+                                {t.aliases_source[a.source as keyof typeof t.aliases_source] ?? a.source}
+                              </span>
+                              <button
+                                type="button"
+                                disabled={isPending}
+                                onClick={() => handleRemoveAlias(pt.id, a.id)}
+                                className="ml-auto text-[var(--dRejT)] hover:underline disabled:opacity-50"
+                              >
+                                {t.aliases_remove}
+                              </button>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+
+                      <div className="mt-2 flex items-center gap-2">
+                        <input
+                          type="text"
+                          value={aliasDraft}
+                          onChange={(e) => setAliasDraft(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              e.preventDefault()
+                              handleAddAlias(pt.id)
+                            }
+                          }}
+                          placeholder={t.aliases_placeholder}
+                          className="w-48 rounded border border-bd bg-card px-2 py-1 text-xs text-tx"
+                        />
+                        <button
+                          type="button"
+                          disabled={isPending || aliasDraft.trim() === ""}
+                          onClick={() => handleAddAlias(pt.id)}
+                          className="text-xs text-[var(--blue)] hover:underline disabled:opacity-50"
+                        >
+                          {t.aliases_add}
+                        </button>
+                      </div>
+                      {aliasError && (
+                        <p className="mt-1 text-xs text-[var(--dRejT)]">{aliasError}</p>
+                      )}
+
+                      <p className="mb-2 mt-4 text-xs font-semibold text-mut">{t.gtins_title}</p>
                       {loadingGtins && !gtins[pt.id] ? (
                         <p className="text-xs text-fnt">{t.loading}</p>
                       ) : (gtins[pt.id] ?? []).length === 0 ? (
