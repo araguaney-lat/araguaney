@@ -8,10 +8,13 @@ import { apiFetch } from "@/lib/api"
 import type { Campaign, Center, ProductType, BarcodeResult, DonorDraft } from "@/types"
 import {
   createIntakeAction,
+  readLabelAction,
   recordMappingChoicesAction,
   type BoxDraft,
   type DonorPayload,
 } from "@/lib/actions"
+import { applyLabelReading, labelHint } from "@/lib/label-reading"
+import { downscaleImage } from "@/lib/downscale-image"
 import { mappingChoicesFrom } from "@/lib/mapping-choices"
 import { CatalogSuggestions } from "@/components/CatalogSuggestions"
 import { DonorForm } from "@/components/DonorForm"
@@ -172,6 +175,29 @@ function BoxRowInput({
   const [barcodeInput, setBarcodeInput] = useState("")
   const [barcodeError, setBarcodeError] = useState<string | null>(null)
   const [scanning, setScanning] = useState(false)
+  const [readingLabel, setReadingLabel] = useState(false)
+  const [labelText, setLabelText] = useState<string | null>(null)
+  const labelInput = useRef<HTMLInputElement>(null)
+
+  /** Foto de la etiqueta: se reduce antes de subir y lo leído solo llena lo que
+   *  está vacío. Un fallo deja el formulario intacto y se teclea como siempre. */
+  const readLabel = async (file: File) => {
+    setReadingLabel(true)
+    setLabelText(null)
+    try {
+      const form = new FormData()
+      form.append("file", await downscaleImage(file))
+      const { suggested } = await readLabelAction(form)
+      const leido = suggested ?? {}
+      onChange(applyLabelReading(row, leido))
+      setLabelText(labelHint(leido) || t.read_label_unread)
+    } catch {
+      setLabelText(t.read_label_unread)
+    } finally {
+      setReadingLabel(false)
+      if (labelInput.current) labelInput.current.value = ""
+    }
+  }
 
   const set = (field: keyof BoxRow) => (e: React.ChangeEvent<HTMLInputElement>) =>
     onChange({ ...row, [field]: e.target.value })
@@ -259,6 +285,32 @@ function BoxRowInput({
             label={t.scan_label}
           />
         )}
+      </div>
+
+      {/* Leer la etiqueta de un medicamento. `capture` abre la cámara en el
+          teléfono, que es donde se captura en el andén; en un escritorio el
+          mismo control ofrece elegir un archivo. */}
+      <div>
+        <input
+          ref={labelInput}
+          type="file"
+          accept="image/*"
+          capture="environment"
+          className="hidden"
+          onChange={(e) => {
+            const file = e.target.files?.[0]
+            if (file) void readLabel(file)
+          }}
+        />
+        <button
+          type="button"
+          disabled={readingLabel}
+          onClick={() => labelInput.current?.click()}
+          className="rounded-lg border border-inpB px-3 py-2 text-sm text-tx hover:bg-card2 disabled:opacity-50"
+        >
+          {readingLabel ? t.read_label_reading : `📷 ${t.read_label_action}`}
+        </button>
+        {labelText && <p className="mt-1 text-xs text-fnt">{labelText}</p>}
       </div>
 
       {/* Product search */}

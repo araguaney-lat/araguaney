@@ -811,7 +811,11 @@
       "offline_ready": "En este dispositivo: {products} productos del catálogo y {codes} códigos de caja apartados.",
       "error_offline_no_center": "La captura sin conexión es de quien opera un centro. Conéctate para registrar a nombre de un centro.",
       "error_offline_storage": "Este navegador no permite guardar capturas en el dispositivo. Conéctate para registrar la donación.",
-      "error_offline_network": "No se pudo contactar al servidor y esta cuenta no tiene un centro propio donde guardar la captura. Inténtalo de nuevo con conexión."
+      "error_offline_network": "No se pudo contactar al servidor y esta cuenta no tiene un centro propio donde guardar la captura. Inténtalo de nuevo con conexión.",
+      "read_label_action": "Leer etiqueta con foto",
+      "read_label_reading": "Leyendo la etiqueta…",
+      "read_label_unread": "No se pudo leer la etiqueta. Teclea los datos como siempre.",
+      "read_label_hint": "Leído de la etiqueta: {fields}. Confírmalo contra la caja."
     },
     "campaign_members": {
       "back": "← Campañas",

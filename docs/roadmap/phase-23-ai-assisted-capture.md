@@ -187,10 +187,28 @@
 > quien eligió el archivo, lo segundo se resuelve tecleando como siempre, y
 > confundirlas dejaría a alguien esperando una lectura que nunca iba a llegar.
 >
-> Pendiente: que la app móvil ofrezca esta lectura dentro del formulario de
-> captura, prellenando lote y caducidad. `inn_name`, `form` y `strength`
-> identifican al `ProductType` y no a la caja, así que por ahora se muestran
-> como texto junto al buscador de producto en vez de elegir el SKU solos.
+> El formulario de captura del panel ya ofrece esa lectura. `inn_name`, `form`
+> y `strength` identifican al `ProductType` y no a la caja, así que se muestran
+> como texto para ayudar a encontrar el producto, no eligen el SKU solos.
+>
+> **Dos decisiones del lado del cliente.** La primera: lo leído **solo llena
+> campos vacíos**. La IA pre-llena y la persona confirma; sobrescribir lo que
+> alguien ya tecleó invierte esa relación y además destruye trabajo hecho con la
+> caja a la vista. La segunda: **la foto se reduce a 1600px antes de subirla**.
+> Una foto de teléfono pesa entre 8 y 12 MB y el tope del endpoint son 5, así
+> que sin eso la mayoría de las fotos reales fallarían — pero el motivo de fondo
+> es el sótano: subir doce megas para leer una cajita se come la conexión que
+> hace falta para registrar la captura, y el modelo no necesita esa resolución.
+>
+> **Por qué el panel antes que la app.** La app no tiene con qué tomar una foto
+> —`mobile_scanner` escanea códigos, no captura imágenes— así que ahí el cambio
+> pide dependencia nueva, permisos, regenerar el cliente del OpenAPI y una
+> release de tienda. Pero la razón que decide no es el costo sino que **una
+> release es cara de corregir**: se valida el diseño donde se rectifica con un
+> merge, y después se lleva a un binario que la gente tarda semanas en
+> actualizar. La app queda como seguimiento; ninguna pieza se tira, porque el
+> endpoint es agnóstico del cliente y la regla de qué se llena está escrita
+> aparte del formulario.
 
 ---
 

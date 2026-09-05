@@ -6,6 +6,7 @@ import { redirect } from "next/navigation"
 import { revalidatePath } from "next/cache"
 import { apiFetch, ApiError } from "@/lib/api"
 import { CURRENT_TERMS_VERSION } from "@/lib/legal"
+import type { LabelReading } from "@/lib/label-reading"
 import type { MappingChoice } from "@/lib/mapping-choices"
 import { getLocale, getDictionary } from "@/lib/i18n"
 
@@ -369,6 +370,41 @@ export async function createIntakeAction(payload: CreateIntakePayload) {
       code: err instanceof ApiError ? err.code : undefined,
     }
   }
+}
+
+/**
+ * Lee la etiqueta de una foto tomada en el mostrador (Fase 23, task 5).
+ *
+ * La foto no se guarda en ninguna parte: el backend la manda incrustada al
+ * proveedor y la descarta. Los campos vuelven como sugerencia — quien captura
+ * los confirma o los corrige, y la caducidad sigue pasando por la validación de
+ * vida útil antes de que la caja pueda sellarse.
+ */
+export async function readLabelAction(
+  formData: FormData,
+): Promise<{ suggested?: LabelReading; error?: string }> {
+  const session = await auth()
+  if (!session?.accessToken) return { error: "No autenticado" }
+
+  const file = formData.get("file")
+  if (!(file instanceof File) || file.size === 0) return { error: "Toma la foto de nuevo" }
+
+  const form = new FormData()
+  form.append("file", file)
+
+  const res = await fetch(`${API_URL}/v1/intakes/read-label`, {
+    method: "POST",
+    body: form,
+    headers: { Authorization: `Bearer ${session.accessToken}` },
+  })
+
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}))
+    return { error: extractError(body, "No se pudo leer la etiqueta") }
+  }
+
+  const data = await res.json()
+  return { suggested: (data.suggested ?? {}) as LabelReading }
 }
 
 /**

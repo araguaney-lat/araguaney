@@ -811,7 +811,11 @@
       "offline_ready": "On this device: {products} catalogue products and {codes} box codes set aside.",
       "error_offline_no_center": "Offline capture is for centre staff. Reconnect to register on behalf of a centre.",
       "error_offline_storage": "This browser will not store captures on the device. Reconnect to register the donation.",
-      "error_offline_network": "The server could not be reached and this account has no home centre to hold the capture. Try again with a connection."
+      "error_offline_network": "The server could not be reached and this account has no home centre to hold the capture. Try again with a connection.",
+      "read_label_action": "Read label from a photo",
+      "read_label_reading": "Reading the label…",
+      "read_label_unread": "The label could not be read. Type the details as usual.",
+      "read_label_hint": "Read from the label: {fields}. Check it against the box."
     },
     "campaign_members": {
       "back": "← Campaigns",
