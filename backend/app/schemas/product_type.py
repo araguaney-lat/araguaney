@@ -72,6 +72,17 @@ class ProductTypeOut(StrictORMModel):
     created_at: datetime
 
 
+class ProductAliasCreate(StrictModel):
+    alias: str
+
+
+class ProductAliasOut(StrictORMModel):
+    id: UUID
+    alias: str
+    source: str
+    created_at: datetime
+
+
 class ProductGtinOut(StrictORMModel):
     id: UUID
     gtin: str

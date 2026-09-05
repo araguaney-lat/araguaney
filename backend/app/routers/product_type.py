@@ -8,6 +8,8 @@ from app.dependencies import get_current_user, require_national_admin
 from app.models.user import User
 from app.schemas.product_type import (
     BarcodeResult,
+    ProductAliasCreate,
+    ProductAliasOut,
     ProductGtinOut,
     ProductTypeCreate,
     ProductTypeOut,
@@ -104,6 +106,45 @@ def promote_product_type(
 ):
     """Promote a campaign-scoped ProductType to the global catalog (campaign_id → NULL)."""
     return ProductTypeService(db).promote(pt_id)
+
+
+@router.get("/{pt_id}/aliases", response_model=list[ProductAliasOut])
+@limiter.limit("60/minute")
+def list_product_aliases(
+    request: Request,
+    pt_id: UUID,
+    db: Session = Depends(get_db),
+    _: User = Depends(get_current_user),
+):
+    """Otros nombres por los que la gente pide este producto."""
+    return ProductTypeService(db).list_aliases(pt_id)
+
+
+@router.post("/{pt_id}/aliases", response_model=ProductAliasOut, status_code=201)
+@limiter.limit("30/minute")
+def add_product_alias(
+    request: Request,
+    pt_id: UUID,
+    data: ProductAliasCreate,
+    db: Session = Depends(get_db),
+    admin: User = Depends(require_national_admin),
+):
+    """Agrega un alias. Solo administración nacional: el catálogo es global."""
+    return ProductTypeService(db).add_alias(pt_id, data.alias, user_id=admin.id)
+
+
+@router.delete("/{pt_id}/aliases/{alias_id}", status_code=204)
+@limiter.limit("30/minute")
+def remove_product_alias(
+    request: Request,
+    pt_id: UUID,
+    alias_id: UUID,
+    db: Session = Depends(get_db),
+    admin: User = Depends(require_national_admin),
+):
+    """Quita un alias, incluidos los sembrados: uno equivocado arrastra al
+    producto equivocado en cada captura."""
+    ProductTypeService(db).delete_alias(pt_id, alias_id, user_id=admin.id)
 
 
 @router.get("/{pt_id}/gtins", response_model=list[ProductGtinOut])

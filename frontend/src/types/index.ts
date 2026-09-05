@@ -371,6 +371,16 @@ export interface PublicNeedsOut {
 }
 
 /** Código de barras aprendido durante una captura y ligado a un tipo de producto. */
+/** Otro nombre por el que la gente pide el mismo producto (Fase 28).
+ *  `source`: 'seed' vino con el catálogo, 'manual' lo agregó la administración
+ *  nacional, 'learned' se graduó de elecciones reales de captura. */
+export interface ProductAlias {
+  id: string
+  alias: string
+  source: string
+  created_at: string
+}
+
 export interface ProductGtin {
   id: string
   gtin: string

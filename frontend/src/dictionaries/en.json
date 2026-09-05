@@ -888,6 +888,17 @@
         "intake": "captured at a center",
         "catalog": "from the catalog",
         "seed": "seeded"
+      },
+      "aliases_title": "Other names people ask for this product by",
+      "aliases_help": "They let search and suggestions find the product even when the donor calls it something else: «frazada» for a blanket, «acetaminophen» for paracetamol.",
+      "aliases_empty": "No other names yet.",
+      "aliases_add": "Add",
+      "aliases_placeholder": "frazada",
+      "aliases_remove": "Remove",
+      "aliases_source": {
+        "seed": "seeded",
+        "manual": "added by hand",
+        "learned": "learned from captures"
       }
     },
     "catalog_new": {

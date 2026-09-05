@@ -89,3 +89,33 @@ def test_registry_matches_alembic_env():
         f"solo en __init__.py: {sorted(en_init - en_alembic)} | "
         f"solo en alembic/env.py: {sorted(en_alembic - en_init)}"
     )
+
+
+def test_every_model_module_is_registered():
+    """Un modelo que no está en ninguno de los dos registros pasa desapercibido.
+
+    `test_registry_matches_alembic_env` compara las dos listas entre sí, así
+    que un modelo ausente de **ambas** las deja iguales y no falla. Y como su
+    módulo nunca se importa, su tabla tampoco entra al `MetaData`: las pruebas
+    de llaves foráneas de arriba tampoco lo echan de menos. El modelo queda
+    fuera del autogenerate de Alembic y fuera del proceso del worker, que es
+    donde reaparece como `NoReferencedTableError`.
+
+    Pasó de verdad al agregar `product_alias` (Fase 28): el archivo existía,
+    la migración estaba escrita a mano y toda la suite pasaba en verde.
+    """
+    modulos = {
+        ruta.stem
+        for ruta in (_BACKEND / "app/models").glob("*.py")
+        if ruta.stem != "__init__"
+    }
+    declarados = {
+        line.split("import ")[1].split()[0]
+        for line in (_BACKEND / "app/models/__init__.py").read_text().splitlines()
+        if line.startswith("from app.models import ")
+    }
+
+    faltantes = sorted(modulos - declarados)
+    assert faltantes == [], (
+        f"módulos de modelo sin registrar en app/models/__init__.py: {faltantes}"
+    )

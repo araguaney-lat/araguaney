@@ -18,8 +18,6 @@ al pre-registrarse; la traducción ocurre después. `ensure_available` exige un
 from __future__ import annotations
 
 import logging
-import re
-import unicodedata
 from uuid import UUID
 
 from sqlalchemy.orm import Session
@@ -29,6 +27,7 @@ from app.repositories.product_type_repository import ProductTypeRepository
 from app.services.ai import budget
 from app.services.ai.budget import AIDisabled
 from app.services.ai.provider import AIUnavailable, get_provider
+from app.utils.text_matching import shares_stem, words
 
 logger = logging.getLogger(__name__)
 
@@ -57,74 +56,16 @@ _PROMPT = (
 )
 
 
-# Palabras funcionales del español: pasan el filtro de largo mínimo pero no
-# dicen nada del producto, y al compararse por substring encuentran cualquier
-# nombre que las contenga por casualidad ortográfica ("para" dentro de
-# "comparativa"). Van sin acento porque se comparan ya normalizadas.
-_STOPWORDS = {
-    "que", "para", "por", "con", "sin", "los", "las", "del", "una", "unos",
-    "unas", "esa", "ese", "esta", "este", "sus", "mas", "pero", "como",
-}
+def _catalog_words(pt: ProductType, aliases: list[str]) -> set[str]:
+    """Palabras del producto donde puede aparecer lo que el donante escribió.
 
-# Un plural en español agrega "s" o "es", así que dos formas de la misma
-# palabra se llevan a lo más dos letras. Más allá de eso, que una esté dentro
-# de la otra ya no dice que sean la misma palabra sino que coinciden por
-# casualidad: "gel" dentro de "gelatina", "sal" dentro de "salchichas".
-_MAX_STEM_DELTA = 2
-
-# Sobre texto ya normalizado no quedan acentos ni mayúsculas, así que separar
-# corridas alfanuméricas basta — y de paso descarta la puntuación que traen
-# varios nombres del catálogo: "(paquete)", "Gasa estéril 10x10 cm".
-_WORD = re.compile(r"[a-z0-9]+")
-
-
-def _normalize(text: str) -> str:
-    """Minúsculas y sin acentos, para que 'ATÚN' y 'atun' comparen igual.
-
-    Quien captura con prisa no siempre teclea el acento, y el español lo usa
-    donde no cambia a qué producto se refiere.
+    Incluye la marca y los alias, que es lo que alcanza los casos que ninguna
+    mejora de búsqueda podía: "advil" no comparte una letra con "Ibuprofeno", y
+    "frazada" ninguna con "Cobija de lana". Sin esto, el modelo nunca llega a
+    ver el producto correcto y su respuesta vacía es la correcta.
     """
-    sin_acentos = "".join(
-        c for c in unicodedata.normalize("NFKD", text) if not unicodedata.combining(c)
-    )
-    return sin_acentos.lower()
-
-
-def _words(text: str) -> list[str]:
-    """Palabras que vale la pena comparar: normalizadas, sin puntuación, sin
-    palabras funcionales, sin números sueltos y de al menos tres letras.
-
-    La misma regla corre sobre el texto del donante y sobre el nombre del
-    producto a propósito: dos lados que se comparan tienen que haber pasado
-    por la misma normalización, o la comparación termina midiendo la
-    diferencia entre las reglas y no entre las palabras.
-    """
-    return [
-        palabra
-        for palabra in _WORD.findall(_normalize(text))
-        if len(palabra) >= 3 and not palabra.isdigit() and palabra not in _STOPWORDS
-    ]
-
-
-def _catalog_words(pt: ProductType) -> set[str]:
-    """Palabras del producto donde puede aparecer lo que el donante escribió."""
-    return set(_words(" ".join(w for w in (pt.display_name, pt.inn_name) if w)))
-
-
-def _shares_stem(word: str, catalog_words: set[str]) -> bool:
-    """Si `word` es una variante de alguna palabra del producto.
-
-    El español pluraliza agregando terminación ("cobija" -> "cobijas",
-    "pañal" -> "pañales"), así que el singular queda dentro del plural. Se
-    compara en los dos sentidos —por si el catálogo guarda el plural— y con
-    un límite de longitud: sin él, toda palabra corta dentro de una larga
-    contaría como variante.
-    """
-    for candidata in catalog_words:
-        corta, larga = sorted((word, candidata), key=len)
-        if len(larga) - len(corta) <= _MAX_STEM_DELTA and corta in larga:
-            return True
-    return False
+    partes = [pt.display_name, pt.inn_name, pt.brand, *aliases]
+    return set(words(" ".join(w for w in partes if w)))
 
 
 def _shortlist(db: Session, text: str, campaign_ids: list[UUID] | None) -> list[ProductType]:
@@ -136,12 +77,17 @@ def _shortlist(db: Session, text: str, campaign_ids: list[UUID] | None) -> list[
     el catálogo global no es tan grande (unos cientos de filas) para que esto
     cueste más que la propia llamada a la IA que sigue después.
     """
-    terminos = _words(text)
+    terminos = words(text)
     if not terminos:
         return []
 
-    catalogo = ProductTypeRepository(db).find_all(campaign_ids=campaign_ids)
-    palabras_por_producto = {pt.id: (_catalog_words(pt), pt) for pt in catalogo}
+    repo = ProductTypeRepository(db)
+    catalogo = repo.find_all(campaign_ids=campaign_ids)
+    alias_por_producto = repo.aliases_by_product(campaign_ids=campaign_ids)
+    palabras_por_producto = {
+        pt.id: (_catalog_words(pt, alias_por_producto.get(pt.id, [])), pt)
+        for pt in catalogo
+    }
 
     vistos: dict[UUID, ProductType] = {}
     # Palabra más larga primero, porque es la más específica ("paracetamol"
@@ -153,7 +99,7 @@ def _shortlist(db: Session, text: str, campaign_ids: list[UUID] | None) -> list[
         for pt_id, (palabras, pt) in palabras_por_producto.items():
             if pt_id in vistos:
                 continue
-            if _shares_stem(termino, palabras):
+            if shares_stem(termino, palabras):
                 vistos[pt_id] = pt
         if len(vistos) >= _SHORTLIST_SIZE:
             break

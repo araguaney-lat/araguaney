@@ -888,6 +888,17 @@
         "intake": "capturado en un centro",
         "catalog": "del catálogo",
         "seed": "sembrado"
+      },
+      "aliases_title": "Otros nombres por los que piden este producto",
+      "aliases_help": "Sirven para que la búsqueda y las sugerencias encuentren el producto aunque quien dona lo llame de otra forma: «frazada» por cobija, «acetaminofén» por paracetamol.",
+      "aliases_empty": "Sin otros nombres todavía.",
+      "aliases_add": "Agregar",
+      "aliases_placeholder": "frazada",
+      "aliases_remove": "Quitar",
+      "aliases_source": {
+        "seed": "sembrado",
+        "manual": "agregado a mano",
+        "learned": "aprendido de capturas"
       }
     },
     "catalog_new": {

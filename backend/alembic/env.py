@@ -18,6 +18,7 @@ import app.models.box_code_reservation  # noqa: F401
 import app.models.ai_usage        # noqa: F401
 import app.models.incident        # noqa: F401
 import app.models.product_type    # noqa: F401
+import app.models.product_alias  # noqa: F401
 import app.models.product_gtin    # noqa: F401
 import app.models.shipment        # noqa: F401
 import app.models.pallet          # noqa: F401
