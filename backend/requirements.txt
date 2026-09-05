@@ -1,7 +1,7 @@
 # ── Core ─────────────────────────────────────────────────────────────────────
 # Versions tracked against the bioflow production app (battle-tested).
 fastapi==0.141.1
-uvicorn[standard]==0.52.3
+uvicorn[standard]==0.52.4
 sqlalchemy==2.0.52
 psycopg2-binary==2.9.12
 pydantic[email]==2.13.4
@@ -10,7 +10,7 @@ PyJWT==2.13.0
 bcrypt==4.3.0
 python-multipart==0.0.32
 requests==2.34.2
-resend==2.36.0
+resend==2.38.0
 svix==1.99.1
 httpx==0.28.1
 user-agents==2.2.0
@@ -32,7 +32,7 @@ cryptography>=42.0.8
 # Uncomment the section(s) you need. See docs/optional-layers.md for setup.
 
 # Cloudinary — image / video uploads (avatars)
-cloudinary==1.45.0
+cloudinary==1.46.0
 
 # AI / OpenAI-compatible providers (OpenAI, DeepSeek, Groq, etc.)
 openai==1.109.1
@@ -66,4 +66,4 @@ weasyprint==69.0
 # elevenlabs==1.9.0
 
 # Cloudflare R2 / S3-compatible storage (messaging attachments)
-boto3==1.43.71
+boto3==1.43.77
