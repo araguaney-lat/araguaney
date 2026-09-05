@@ -20,6 +20,8 @@ Qué se lee y qué no:
 
 from __future__ import annotations
 
+import base64
+import hashlib
 import logging
 import re
 from datetime import date
@@ -30,6 +32,7 @@ from sqlalchemy.orm import Session
 from app.services.ai import budget
 from app.services.ai.budget import AIDisabled
 from app.services.ai.provider import AIUnavailable, get_provider
+from app.utils.errors import api_error
 
 logger = logging.getLogger(__name__)
 
@@ -58,6 +61,15 @@ _PROMPT = (
 
 _DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
+# Lo que la API de visión entiende, y lo que alguien puede tomar con un
+# teléfono. Un PDF o un documento no son una etiqueta fotografiada.
+ALLOWED_IMAGE_TYPES = ("image/jpeg", "image/png", "image/webp")
+
+# El tamaño de la imagen se paga en tokens. El tope es más bajo que el de los
+# adjuntos de mensajería a propósito: una foto de una cajita no necesita más, y
+# rechazar antes de llamar es la diferencia entre un error y una factura.
+MAX_IMAGE_BYTES = 5 * 1024 * 1024
+
 
 def extract(
     db: Session,
@@ -73,21 +85,78 @@ def extract(
     if not image_url:
         return {}
 
+    # La URL firmada cambia en cada petición aunque la foto sea la misma, así
+    # que la clave se arma con el objeto y no con la URL: si no, la caché nunca
+    # acertaría y cada vista de la misma foto se cobraría de nuevo.
+    return _read(db, image_url, _storage_key(image_url), user_id, center_id)
+
+
+def extract_from_bytes(
+    db: Session,
+    data: bytes,
+    content_type: str,
+    user_id: UUID | None,
+    center_id: UUID | None = None,
+) -> dict[str, str | None]:
+    """Campos leídos de una foto que llega en la petición, sin guardarla.
+
+    Es la vía del mostrador: quien captura tiene la cajita en la mano y no hay
+    ninguna foto subida antes a la que apuntar. La imagen viaja incrustada en la
+    llamada a la IA y no toca disco — el conjunto de evaluación del OCR se
+    arma con fotos curadas aparte, así que guardarla no compraría nada y una
+    foto tomada en un centro puede llevar datos personales de refilón.
+
+    A diferencia de la IA no disponible, un archivo que no es una imagen **sí**
+    se rechaza con error: es algo que quien lo eligió puede corregir, y
+    devolverle un diccionario vacío lo dejaría esperando una lectura que nunca
+    iba a llegar.
+    """
+    if content_type not in ALLOWED_IMAGE_TYPES or not data:
+        raise api_error(
+            "UNSUPPORTED_IMAGE",
+            f"Formato no admitido. Toma la foto en {', '.join(ALLOWED_IMAGE_TYPES)}.",
+            field="file",
+        )
+    if len(data) > MAX_IMAGE_BYTES:
+        raise api_error(
+            "IMAGE_TOO_LARGE",
+            f"La foto pesa más de {MAX_IMAGE_BYTES // (1024 * 1024)} MB. "
+            "Vuelve a tomarla más cerca de la etiqueta.",
+            field="file",
+        )
+
+    incrustada = f"data:{content_type};base64,{base64.b64encode(data).decode()}"
+    # La caché va por contenido: volver a leer la misma cajita porque la primera
+    # foto salió movida es el caso normal, y no tiene por qué cobrarse dos veces.
+    huella = hashlib.sha256(data).hexdigest()
+    return _read(db, incrustada, huella, user_id, center_id)
+
+
+def _read(
+    db: Session,
+    image_ref: str,
+    cache_subject: str,
+    user_id: UUID | None,
+    center_id: UUID | None,
+) -> dict[str, str | None]:
+    """El camino común: puerta de gasto, caché, llamada, limpieza y registro.
+
+    `image_ref` es lo que ve el proveedor —una URL firmada o la imagen
+    incrustada— y `cache_subject` lo que identifica a esa foto entre llamadas,
+    que no es lo mismo: una URL firmada cambia cada vez sin que la foto cambie.
+    """
     try:
         budget.ensure_available(db, CAPABILITY, user_id=user_id)
     except AIDisabled as exc:
         logger.debug("OCR no disponible: %s", exc)
         return {}
 
-    # La URL firmada cambia en cada petición aunque la foto sea la misma, así
-    # que la clave se arma con el objeto y no con la URL: si no, la caché nunca
-    # acertaría y cada vista de la misma foto se cobraría de nuevo.
-    clave = budget.cache_key(CAPABILITY, {"objeto": _storage_key(image_url)})
+    clave = budget.cache_key(CAPABILITY, {"objeto": cache_subject})
 
     campos = budget.cached(clave)
     if campos is None:
         try:
-            resultado = get_provider().extract_from_image(_PROMPT, image_url)
+            resultado = get_provider().extract_from_image(_PROMPT, image_ref)
         except AIUnavailable as exc:
             logger.info("El proveedor de IA no respondió al leer la etiqueta: %s", exc)
             return {}

@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from fastapi import APIRouter, BackgroundTasks, Depends, Query, Request
+from fastapi import APIRouter, BackgroundTasks, Depends, File, Query, Request, UploadFile
 from sqlalchemy.orm import Session
 
 from app.database import get_db
@@ -9,6 +9,7 @@ from app.models.user import User
 from app.repositories.donor_repository import DonorRepository
 from app.schemas.donor import DonorOut
 from app.schemas.intake import IntakeCreate, IntakeOut
+from app.services.ai import label_ocr
 from app.services.intake_service import IntakeService
 from app.utils.audit import fire_audit
 from app.utils.cloudflare import get_client_ip
@@ -64,6 +65,38 @@ def list_intakes(
         )
         for i in intakes
     ]
+
+
+@router.post("/read-label", response_model=dict)
+@limiter.limit("20/minute")
+async def read_label(
+    request: Request,
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_center_role),
+):
+    """Lee la etiqueta de una foto tomada en el mostrador.
+
+    Existe aparte de la que lee una foto del pre-registro porque ahí hay una
+    foto subida antes y aquí no: hay una cajita en la mano. La imagen no se
+    guarda en ningún lado — llega, se lee y se descarta.
+
+    Los campos vuelven como **sugerencia**: quien captura los confirma o los
+    corrige antes de sellar, y la caducidad sigue pasando por la validación de
+    vida útil. Diccionario vacío si la capacidad está apagada, sin presupuesto o
+    el proveedor no responde: se teclea como siempre.
+    """
+    contents = await file.read()
+    campos = label_ocr.extract_from_bytes(
+        db,
+        contents,
+        file.content_type or "",
+        user_id=current_user.id,
+        center_id=current_user.center_id,
+    )
+    # `suggested` es explícito para que ningún cliente confunda esto con datos
+    # confirmados: nada llega a SEALED sin que una persona lo haya mirado.
+    return {"suggested": campos}
 
 
 @router.get("/{intake_id}", response_model=IntakeOut)
