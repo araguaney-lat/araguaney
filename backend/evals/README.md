@@ -28,8 +28,13 @@ prompt, o se queda apagada.
 AI_API_KEY=sk-... python -m evals.run --capability mapping
 AI_API_KEY=sk-... AI_MODEL=deepseek-chat python -m evals.run --capability mapping
 
-# OCR no corre todavía — ver "Estado del conjunto" abajo.
-python -m evals.run --capability ocr
+# OCR: lee las fotos de `evals/labels/` (o de donde diga --labels-dir) y las
+# manda incrustadas, por la misma vía que el formulario de captura. Si falta
+# una foto o alguna pesa de más, no se corre nada y se listan todas: descubrir
+# en el caso 60 que el 61 tiene el nombre mal escrito es pagar 60 llamadas
+# para enterarse.
+AI_API_KEY=sk-... python -m evals.run --capability ocr
+AI_API_KEY=sk-... python -m evals.run --capability ocr --labels-dir ~/etiquetas
 
 # En CI corre contra un proveedor simulado: la suite no debe depender de que un
 # tercero tenga un buen día. Estos prueban el instrumento (evaluation.py), no
@@ -53,11 +58,22 @@ un producto real detrás en el catálogo de hoy (`_SLUG_TO_REAL_PRODUCT` en
 pilas AA, guante de látex) son huecos reales del catálogo semilla, no fallas del
 modelo, y se reportan aparte en cada corrida.
 
-El de OCR tiene 3 casos declarados y **cero fotos**: `image_ref` apunta a un
-almacenamiento de evaluación que nadie llenó todavía. No hay manera de correrlo
-hoy sin que alguien suba fotos primero.
+El de OCR tiene 3 casos declarados y **cero fotos**: falta tomarlas. El runner
+ya las lee de `evals/labels/`, así que basta con dejarlas ahí con el nombre que
+declara cada caso.
 
-Esas fotos se toman a propósito, no se cosechan del sistema. Para el mapeo de
+**Las fotos no se versionan.** La carpeta está en `.gitignore` porque el
+repositorio es público y un push no se deshace (REGLA #2): una caja de
+medicamento puede traer de refilón la etiqueta de la farmacia con el nombre de
+quien lo recibió, y revisar cien fotos con ojos adversarios es mucho más difícil
+que revisar cien líneas de texto. Respáldalas donde quieras, fuera del código.
+Al repositorio sube solo `ocr_cases.json`, que es donde está el trabajo de
+verdad: la respuesta correcta de cada foto, escrita a mano antes de medir.
+
+Esas fotos se toman a propósito, no se cosechan del sistema. **Con la cámara
+normal del teléfono**, no desde la aplicación: para armar la regla solo hacen
+falta archivos de imagen, así que no hay nada que instalar ni ninguna versión
+que publicar. Para el mapeo de
 texto lo real es irremplazable —nadie inventa fielmente que alguien escriba
 "advil 400"— pero el insumo del OCR es la fotografía de una caja impresa: una
 foto de un medicamento real **es** un caso real venga de donde venga, y lo que
@@ -69,6 +85,22 @@ que se parezcan a lo que pasa en un centro:
 - Ángulos torcidos, cajas abolladas, etiquetas despegadas o con precio encima.
 - Algunas donde falte un campo: sin lote visible, o con caducidad solo mes/año.
 - Teléfonos distintos, que es lo que va a haber.
+
+Guarda cada foto **al tamaño que manda la aplicación**: lado largo 1600 px. El
+formulario de captura reduce antes de subir, así que medir sobre la original de
+12 MB mide una imagen que en producción nunca se envía — y de paso el runner la
+rechaza, porque el backend corta en 5 MB. De eso se encarga un comando:
+
+```bash
+# Lee de la carpeta de origen y escribe en evals/labels/. Las originales
+# quedan intactas, y una foto que ya esté en el destino no se pisa sin --force.
+python -m evals.resize_labels ~/Downloads/fotos-etiquetas
+```
+
+Aplica la rotación que el teléfono anota en EXIF —el navegador la respeta y una
+reducción ingenua no, así que sin esto el conjunto quedaría con etiquetas
+acostadas— y no arrastra los metadatos, incluida la ubicación donde se tomó
+cada foto.
 
 Por cada foto se escriben a mano los campos correctos —los que una persona lee
 de la caja— y se agrega el caso a `ocr_cases.json`. La respuesta esperada se

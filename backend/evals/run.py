@@ -14,12 +14,19 @@ dinero (unos centavos de dólar por corrida completa).
     AI_API_KEY=sk-... python -m evals.run --capability mapping
     AI_API_KEY=sk-... AI_MODEL=deepseek-chat python -m evals.run --capability mapping
 
-`--capability ocr` no puede correr todavía: `evals/ocr_cases.json` declara
-`image_ref` como una clave en "el almacenamiento de evaluación de cada
-quien", y ese almacenamiento no existe — no hay fotos de etiqueta en este
-repo (a propósito: pueden llevar datos personales incidentales). Correrlo
-exige que alguien suba unas fotos reales de etiqueta y apunte los
-`image_ref` a URLs alcanzables por la API de visión.
+`--capability ocr` lee las fotos de una carpeta local, `evals/labels/` por
+omisión (`--labels-dir` la cambia). Esas fotos **no se versionan** y la
+carpeta está en `.gitignore`: pueden llevar datos personales de refilón —el
+nombre de quien recibió el medicamento en la etiqueta de la farmacia— y este
+repositorio es público, donde un push no se deshace. Al repositorio sube solo
+`ocr_cases.json`, que es donde está el trabajo de verdad: la respuesta
+correcta de cada foto, escrita a mano antes de que el modelo la viera.
+
+    AI_API_KEY=sk-... python -m evals.run --capability ocr
+    AI_API_KEY=sk-... python -m evals.run --capability ocr --labels-dir ~/etiquetas
+
+No hace falta subir las fotos a ningún lado: viajan incrustadas en la llamada,
+por la misma vía que usa el formulario de captura.
 """
 
 from __future__ import annotations
@@ -54,10 +61,29 @@ from app.seeds._base import build_rows
 from app.seeds.common_food import FOOD
 from app.seeds.iom_nonfood import NONFOOD
 from app.seeds.who_medicines import MEDICINES
-from app.services.ai import budget, text_mapping
-from app.services.ai.evaluation import MappingCase, evaluate_mapping
+from app.services.ai import budget, label_ocr, text_mapping
+from app.services.ai.evaluation import (
+    EvalReport,
+    MappingCase,
+    OCRCase,
+    evaluate_mapping,
+    evaluate_ocr,
+)
 
 AQUI = pathlib.Path(__file__).parent
+
+# Las fotos de etiqueta no se versionan (ver el docstring): esta carpeta está
+# en `.gitignore` y la llena quien corre la evaluación.
+LABELS_DIR = AQUI / "labels"
+
+# Los tres formatos que `extract_from_bytes` acepta, por extensión. Un `.gif`
+# se rechaza aquí y no tras pagar la llamada.
+_CONTENT_TYPES = {
+    ".jpg": "image/jpeg",
+    ".jpeg": "image/jpeg",
+    ".png": "image/png",
+    ".webp": "image/webp",
+}
 
 # Cada caso de `mapping_cases.json` trae un `expected_slug` que nunca existió
 # como columna real (`ProductType` no tiene `slug`): es un identificador de
@@ -161,36 +187,114 @@ def _run_mapping(db: Session) -> tuple:
     return evaluate_mapping(cases, sugerir), skipped
 
 
-def _run_ocr() -> int:
-    print(
-        "No se puede correr todavía: evals/ocr_cases.json apunta a fotos que\n"
-        "no existen en este repositorio (a propósito — pueden llevar datos\n"
-        "personales incidentales, y ninguna fue capturada aún).\n\n"
-        "Para correrlo de verdad: sube unas fotos reales de etiqueta a donde\n"
-        "sea que resuelva image_ref en tu entorno (una URL que la API de\n"
-        "visión pueda alcanzar) y actualiza evals/ocr_cases.json con esas\n"
-        "referencias y los campos correctos leídos a mano de cada una.",
-        file=sys.stderr,
-    )
-    return 2
+def _load_ocr_cases(
+    cases_file: pathlib.Path = AQUI / "ocr_cases.json",
+    labels_dir: pathlib.Path = LABELS_DIR,
+) -> list[OCRCase]:
+    """Los casos con `image_ref` ya resuelto a una ruta absoluta del disco.
+
+    El archivo declara solo el nombre del archivo y no una ruta completa: son
+    cien renglones escritos a mano y la carpeta puede estar en otro lado en
+    cada máquina.
+    """
+    return [
+        OCRCase(image_ref=str(labels_dir / raw["image_path"]), expected=raw["expected"])
+        for raw in json.loads(cases_file.read_text())["cases"]
+    ]
+
+
+def _check_photos(cases: list[OCRCase]) -> list[str]:
+    """Todo lo que impediría leer una foto, junto y antes de gastar un peso.
+
+    Cada llamada cuesta dinero, así que descubrir en el caso 60 que el 61 tiene
+    el nombre mal escrito es pagar 60 llamadas para enterarse. Se revisa el
+    conjunto entero primero y se aborta si algo falta: la corrida completa o
+    ninguna.
+    """
+    problemas: list[str] = []
+
+    for caso in cases:
+        ruta = pathlib.Path(caso.image_ref)
+        if not ruta.is_file():
+            problemas.append(f"{ruta.name}: no está en {ruta.parent}")
+            continue
+        if ruta.suffix.lower() not in _CONTENT_TYPES:
+            problemas.append(
+                f"{ruta.name}: formato no admitido "
+                f"(se admiten {', '.join(sorted(_CONTENT_TYPES))})"
+            )
+            continue
+        peso = ruta.stat().st_size
+        if peso > label_ocr.MAX_IMAGE_BYTES:
+            problemas.append(
+                f"{ruta.name}: pesa {peso / 1024 / 1024:.1f} MB y el máximo es "
+                f"{label_ocr.MAX_IMAGE_BYTES // (1024 * 1024)} MB. Guarda la foto "
+                "al tamaño que manda la aplicación (lado largo 1600 px)."
+            )
+
+    return problemas
+
+
+def _run_ocr(
+    db: Session,
+    cases_file: pathlib.Path = AQUI / "ocr_cases.json",
+    labels_dir: pathlib.Path = LABELS_DIR,
+) -> EvalReport:
+    """Mide leyendo los bytes del disco por la misma vía que el mostrador.
+
+    `extract_from_bytes` es exactamente lo que llama el formulario de captura
+    —misma puerta de gasto, misma caché, misma limpieza de campos—, así que un
+    resultado que pasa aquí dice que ese camino sirve, no un camino paralelo
+    construido para la medición.
+    """
+    cases = _load_ocr_cases(cases_file, labels_dir)
+    # Un usuario sintético basta: `ensure_available` solo comprueba que venga
+    # uno, nunca que exista la fila.
+    user_id = uuid.uuid4()
+
+    def leer(image_ref: str) -> dict[str, str]:
+        ruta = pathlib.Path(image_ref)
+        return label_ocr.extract_from_bytes(
+            db,
+            ruta.read_bytes(),
+            _CONTENT_TYPES[ruta.suffix.lower()],
+            user_id=user_id,
+        )
+
+    return evaluate_ocr(cases, leer)
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--capability", choices=("mapping", "ocr"), required=True)
+    parser.add_argument(
+        "--labels-dir",
+        type=pathlib.Path,
+        default=LABELS_DIR,
+        help="Carpeta con las fotos de etiqueta (solo con --capability ocr).",
+    )
     args = parser.parse_args()
-
-    if args.capability == "ocr":
-        return _run_ocr()
 
     if not settings.ai_api_key:
         print("Falta AI_API_KEY en el entorno.", file=sys.stderr)
         return 2
 
+    if args.capability == "ocr":
+        problemas = _check_photos(_load_ocr_cases(labels_dir=args.labels_dir))
+        if problemas:
+            print(
+                f"No se corrió nada. {len(problemas)} fotos no se pueden leer:",
+                file=sys.stderr,
+            )
+            for problema in problemas:
+                print(f"  · {problema}", file=sys.stderr)
+            return 2
+
     # Solo para esta corrida: la bandera de producción no se toca. Un catálogo
     # local efímero no puede agotar el tope real, así que no hay riesgo de
     # apagar la capacidad para nadie más.
     settings.ai_enable_text_mapping = True
+    settings.ai_enable_label_ocr = True
 
     engine = create_engine(
         "sqlite://", connect_args={"check_same_thread": False}, poolclass=StaticPool
@@ -199,7 +303,10 @@ def main() -> int:
     db = sessionmaker(bind=engine, expire_on_commit=False)()
 
     try:
-        reporte, skipped = _run_mapping(db)
+        if args.capability == "ocr":
+            reporte, skipped = _run_ocr(db, labels_dir=args.labels_dir), []
+        else:
+            reporte, skipped = _run_mapping(db)
         costo = budget.month_spend_usd(db)
     finally:
         db.close()

@@ -61,3 +61,14 @@ screenshots/
 # Las capturas de Playwright caen en la raiz del repo si no se les da ruta
 /*.png
 .vercel
+
+# Fotos de etiqueta del conjunto de evaluación del OCR (Fase 23).
+#
+# Se ignoran porque el repositorio es publico y un push no se deshace (REGLA
+# #2): una foto de una caja de medicamento puede traer de refilon la etiqueta
+# de la farmacia con el nombre de quien lo recibio, y revisar cien fotos con
+# ojos adversarios es mucho mas dificil que revisar cien lineas de texto.
+#
+# Lo que si se versiona es `evals/ocr_cases.json`: ahi esta el trabajo de
+# verdad, la respuesta correcta de cada foto escrita a mano antes de medir.
+backend/evals/labels/

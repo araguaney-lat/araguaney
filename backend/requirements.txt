@@ -47,6 +47,8 @@ openai==1.109.1
 pyotp==2.10.0
 
 # QR codes + PDF label generation
+# Pillow entra por el extra [pil] y tiene un segundo consumidor:
+# evals/resize_labels.py. Cambiar a un generador de QR sin Pillow lo rompe.
 qrcode[pil]==8.2
 reportlab==4.5.1
 
