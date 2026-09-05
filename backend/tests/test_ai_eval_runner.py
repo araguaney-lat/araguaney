@@ -33,7 +33,14 @@ from app.services.ai import budget, text_mapping  # noqa: E402
 from app.services.ai.evaluation import evaluate_mapping  # noqa: E402
 from app.services.ai.provider import AIResult  # noqa: E402
 
-from evals.run import _resolve_mapping_cases, _run_mapping, _seed_catalog  # noqa: E402
+from evals.run import (  # noqa: E402
+    _check_photos,
+    _load_ocr_cases,
+    _resolve_mapping_cases,
+    _run_mapping,
+    _run_ocr,
+    _seed_catalog,
+)
 
 
 def _capability_on():
@@ -166,3 +173,115 @@ def test_the_script_runs_as_a_real_subprocess_without_its_own_test_shim():
     assert "Traceback" not in result.stderr, result.stderr
     assert "30 casos" in result.stdout
     assert result.returncode == 1  # nothing listening there can't pass the threshold
+
+
+# ── OCR: the label photos live outside the repository ────────────────────────
+#
+# Label photos are never committed (they can carry incidental personal data and
+# they are heavy), so the runner reads them from a local folder the person
+# running the eval controls. That makes "the file isn't there" the normal
+# failure, not an exotic one — and it must be caught before any money is spent.
+
+
+def _write_photo(directory: pathlib.Path, name: str, size: int = 32) -> pathlib.Path:
+    path = directory / name
+    path.write_bytes(b"\xff\xd8\xff" + b"0" * size)
+    return path
+
+
+@pytest.fixture()
+def labels_dir(tmp_path):
+    directory = tmp_path / "labels"
+    directory.mkdir()
+    return directory
+
+
+def _cases_file(tmp_path, entries):
+    import json
+
+    path = tmp_path / "ocr_cases.json"
+    path.write_text(json.dumps({"cases": entries}))
+    return path
+
+
+_EXPECTED = {"inn_name": "Paracetamol", "batch": "L1", "expiry_date": "2028-03-31"}
+
+
+def test_a_photo_that_is_not_there_is_reported_and_nothing_is_spent(tmp_path, labels_dir):
+    """Half of a hundred hand-curated photos is easy to mistype. Finding out at
+    case 60, after paying for 59 calls, is the outcome worth preventing."""
+    cases_file = _cases_file(tmp_path, [{"image_path": "no-existe.jpg", "expected": _EXPECTED}])
+    cases = _load_ocr_cases(cases_file, labels_dir)
+
+    problems = _check_photos(cases)
+
+    assert len(problems) == 1
+    assert "no-existe.jpg" in problems[0]
+
+
+def test_an_unsupported_format_is_reported_before_the_call(tmp_path, labels_dir):
+    """The backend refuses anything but JPEG, PNG and WebP. Learning that from
+    a paid round trip, one photo at a time, is the slow way to learn it."""
+    _write_photo(labels_dir, "etiqueta.gif")
+    cases_file = _cases_file(tmp_path, [{"image_path": "etiqueta.gif", "expected": _EXPECTED}])
+
+    problems = _check_photos(_load_ocr_cases(cases_file, labels_dir))
+
+    assert len(problems) == 1
+    assert "etiqueta.gif" in problems[0]
+
+
+def test_a_photo_over_the_limit_is_reported_before_the_call(tmp_path, labels_dir):
+    """`extract_from_bytes` rejects above 5 MB, so an un-downscaled phone photo
+    would fail anyway — but only after the whole file went over the wire."""
+    from app.services.ai.label_ocr import MAX_IMAGE_BYTES
+
+    _write_photo(labels_dir, "pesada.jpg", size=MAX_IMAGE_BYTES + 1)
+    cases_file = _cases_file(tmp_path, [{"image_path": "pesada.jpg", "expected": _EXPECTED}])
+
+    problems = _check_photos(_load_ocr_cases(cases_file, labels_dir))
+
+    assert len(problems) == 1
+    assert "pesada.jpg" in problems[0]
+
+
+def test_photos_that_are_all_fine_report_no_problems(tmp_path, labels_dir):
+    for name in ("uno.jpg", "dos.png", "tres.webp"):
+        _write_photo(labels_dir, name)
+    cases_file = _cases_file(
+        tmp_path,
+        [{"image_path": n, "expected": _EXPECTED} for n in ("uno.jpg", "dos.png", "tres.webp")],
+    )
+
+    assert _check_photos(_load_ocr_cases(cases_file, labels_dir)) == []
+
+
+def test_the_ocr_run_sends_the_real_bytes_through_the_production_reader(
+    db, tmp_path, labels_dir
+):
+    """The eval must exercise `label_ocr.extract_from_bytes()` — the same
+    budget gate, cache and field cleaning the capture form goes through — so a
+    passing score means that path works, not a parallel one built for the test.
+    """
+    _write_photo(labels_dir, "paracetamol.jpg")
+    cases_file = _cases_file(tmp_path, [{"image_path": "paracetamol.jpg", "expected": _EXPECTED}])
+
+    stub = AIResult(data=dict(_EXPECTED), input_tokens=10, output_tokens=5)
+    with (
+        patch.object(budget.settings, "ai_api_key", "test-key"),
+        patch.object(budget.settings, "ai_enable_label_ocr", True),
+        patch("app.services.ai.label_ocr.get_provider") as get_provider,
+    ):
+        get_provider.return_value.extract_from_image.return_value = stub
+        reporte = _run_ocr(db, cases_file, labels_dir)
+
+    get_provider.return_value.extract_from_image.assert_called()
+    # A reader that returns exactly what was expected scores 100% per field:
+    # proves bytes → provider → `_clean` → report is wired end to end.
+    assert reporte.total == 1
+    assert reporte.metrics["expiry_date"] == 1.0
+
+    # The image reaches the provider embedded, never as a path: a local path
+    # would be unreachable for it and would silently score zero.
+    _, image_ref = get_provider.return_value.extract_from_image.call_args[0]
+    assert image_ref.startswith("data:image/jpeg;base64,")

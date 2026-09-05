@@ -1,8 +1,8 @@
 {
-  "_comment": "Cada caso apunta a una foto de etiqueta y declara los campos que deberían leerse. Las imágenes NO viven en el repositorio: pueden contener datos personales incidentales y son pesadas. `image_ref` es la clave en el almacenamiento de evaluación de cada quien.",
+  "_comment": "Cada caso nombra una foto de etiqueta y declara los campos que deberían leerse de ella. Las fotos NO se versionan: pueden llevar datos personales de refilón (una etiqueta de farmacia con el nombre de quien recibió el medicamento) y este repositorio es público, donde un push no se deshace. Viven en `evals/labels/`, que está en .gitignore, o donde diga --labels-dir. Lo que sí sube al repositorio es este archivo: es donde está el trabajo de verdad, la respuesta correcta escrita a mano ANTES de que el modelo viera la foto. Guarda cada foto al tamaño que manda la aplicación (lado largo 1600 px): medir sobre una imagen distinta a la que se envía en producción mide otra cosa.",
   "cases": [
     {
-      "image_ref": "eval/labels/paracetamol-500-caja.jpg",
+      "image_path": "paracetamol-500-caja.jpg",
       "expected": {
         "inn_name": "Paracetamol",
         "form": "Tableta",
@@ -12,7 +12,7 @@
       }
     },
     {
-      "image_ref": "eval/labels/ibuprofeno-400-blister.jpg",
+      "image_path": "ibuprofeno-400-blister.jpg",
       "expected": {
         "inn_name": "Ibuprofeno",
         "form": "Tableta",
@@ -22,7 +22,7 @@
       }
     },
     {
-      "image_ref": "eval/labels/amoxicilina-suspension.jpg",
+      "image_path": "amoxicilina-suspension.jpg",
       "expected": {
         "inn_name": "Amoxicilina",
         "form": "Suspensión oral",
