@@ -3,9 +3,11 @@ from uuid import UUID
 from sqlalchemy import func, or_, select
 from sqlalchemy.orm import Session
 
+from app.models.product_alias import ProductAlias
 from app.models.product_gtin import ProductGtin
 from app.models.product_type import ProductType
 from app.repositories.base import BaseRepository
+from app.utils.text_matching import normalize
 
 
 class ProductTypeRepository(BaseRepository):
@@ -35,6 +37,24 @@ class ProductTypeRepository(BaseRepository):
             stmt = stmt.where(ProductType.category == category)
         return list(self.db.execute(stmt.order_by(ProductType.display_name)).scalars())
 
+    def aliases_by_product(
+        self, campaign_ids: list[UUID] | None = None
+    ) -> dict[UUID, list[str]]:
+        """Los alias del catálogo visible, agrupados por producto.
+
+        Una sola consulta y no una por producto: el shortlist los necesita
+        todos a la vez y la tabla se cuenta en cientos de filas.
+        """
+        stmt = select(ProductAlias.product_type_id, ProductAlias.alias).join(
+            ProductType, ProductType.id == ProductAlias.product_type_id
+        )
+        stmt = self._visible_scope(stmt, campaign_ids)
+
+        agrupados: dict[UUID, list[str]] = {}
+        for product_type_id, alias in self.db.execute(stmt):
+            agrupados.setdefault(product_type_id, []).append(alias)
+        return agrupados
+
     def search(
         self,
         q: str,
@@ -42,12 +62,27 @@ class ProductTypeRepository(BaseRepository):
         campaign_ids: list[UUID] | None = None,
     ) -> list[ProductType]:
         term = f"%{q}%"
+        # El alias se compara contra la columna ya normalizada y con `like`
+        # sobre un término también normalizado, no con `ilike`: así el buscador
+        # encuentra "frazadas" igual que lo encuentra el shortlist de la IA. Con
+        # `unaccent` en SQL la consulta dependería de una extensión de Postgres
+        # que SQLite no tiene, y la prueba dejaría de vigilar lo que corre en
+        # producción.
+        alias_term = f"%{normalize(q)}%"
+        coincide_alias = select(ProductAlias.id).where(
+            ProductAlias.product_type_id == ProductType.id,
+            ProductAlias.normalized.like(alias_term),
+        )
         stmt = select(ProductType).where(
             or_(
                 ProductType.display_name.ilike(term),
                 ProductType.inn_name.ilike(term),
+                # La marca es donde vive "Advil". La columna existía desde el
+                # principio y no la consultaba nadie.
+                ProductType.brand.ilike(term),
                 ProductType.gtin.ilike(term),
                 ProductType.unspsc_code.ilike(term),
+                coincide_alias.exists(),
             )
         )
         stmt = self._visible_scope(stmt, campaign_ids)
