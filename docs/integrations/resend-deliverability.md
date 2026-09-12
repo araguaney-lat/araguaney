@@ -26,9 +26,17 @@
 
 ## Estado en araguaney: apagado (septiembre 2026)
 
-El webhook está **apagado** y `/studio/emails` **fuera del menú**. La ruta, la
-API, el modelo, el manejador del webhook y el filtro de remitente siguen en pie:
-volver es encender el interruptor, no reconstruir nada.
+El webhook está **apagado desde Resend** —el endpoint está desactivado ahí— y
+`/studio/emails` **fuera del menú**. La ruta, la API, el modelo, el manejador
+del webhook y el filtro de remitente siguen en pie: volver es encender el
+interruptor, no reconstruir nada.
+
+**El interruptor es uno solo y vive en Resend.** `RESEND_WEBHOOK_SECRET` se
+conserva puesto a propósito: mientras Resend no entrega nada, el secreto no
+abre nada. Vaciarlo también habría servido, pero pone el apagado en dos
+consolas distintas, y reencender pasaría a ser dos pasos de los que el segundo
+es el que se olvida. Un interruptor que se opera desde un solo lugar es el que
+se vuelve a encontrar meses después.
 
 El motivo es que el panel de Resend muestra el mismo detalle de entrega y lo
 muestra mejor. Mantener una segunda pantalla con los mismos datos obliga a
@@ -51,9 +59,13 @@ webhook, no reconstruirlo.
 
 | Paso | Apagar | Encender |
 |---|---|---|
-| Railway (servicio backend) | `RESEND_WEBHOOK_SECRET` vacío → el endpoint responde 503 | volver a poner el secreto de firma |
 | Resend → Webhooks | desactivar el endpoint | reactivarlo |
 | `frontend/src/lib/nav-config.ts` | sin entrada `/studio/emails` | volver a agregarla a `STUDIO_NAV_ITEMS` |
+| Railway (servicio backend) | nada: `RESEND_WEBHOOK_SECRET` se queda puesto | nada |
+
+Vaciar `RESEND_WEBHOOK_SECRET` sigue siendo un apagado válido —el endpoint pasa
+a responder 503— y es el camino cuando lo que se quiere es que el backend no
+procese webhooks aunque Resend los mande. No es el caso de aquí.
 
 ## Una cuenta de Resend compartida entre productos
 

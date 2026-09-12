@@ -194,10 +194,11 @@ export interface StudioNavItem {
  *
  * El panel de Resend ya muestra el mismo detalle de entrega y lo muestra mejor,
  * así que mantener una segunda pantalla con los mismos datos era pedirle a
- * alguien que eligiera entre dos fuentes de la misma verdad. Se apaga el
- * webhook (`RESEND_WEBHOOK_SECRET` vacío → el endpoint responde 503) y se
- * quita la entrada del menú; la ruta, la API, el modelo y el manejador del
- * webhook quedan intactos para que volver sea encender el interruptor.
+ * alguien que eligiera entre dos fuentes de la misma verdad. El webhook se
+ * apaga desde Resend —el endpoint queda desactivado ahí— y se quita la
+ * entrada del menú; la ruta, la API, el modelo y el manejador del webhook
+ * quedan intactos para que volver sea encender el interruptor, que es uno
+ * solo y está en Resend.
  *
  * Lo que se pierde con eso —y no lo cubre el panel de Resend, que es pasivo—
  * es `bounce_watchdog_cron`: el aviso a Slack cuando los rebotes se disparan o
