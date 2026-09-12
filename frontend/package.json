@@ -27,7 +27,7 @@
     "react-turnstile": "^1.1.5",
     "recharts": "^3.10.1",
     "resend": "^6.24.0",
-    "zod": "^4.4.3"
+    "zod": "^4.6.2"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
