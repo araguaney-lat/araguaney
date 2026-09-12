@@ -66,6 +66,22 @@ jobs:
               || echo "::warning::CVE no relacionada con este PR (no cambió package*.json). No bloquea el merge; se atiende vía Dependabot."
           fi
 
+      # Segundo pase, informativo. El audit de arriba corre con `--omit=dev`, así
+      # que una CVE que solo vive en dependencias de desarrollo no aparece en
+      # ninguna corrida: js-yaml (GHSA-2883-xcg3-v3hh) la encontró una auditoría
+      # a mano, no CI. Bloquear por eso sería desproporcionado, porque esa
+      # dependencia no se despliega, pero no verla nunca es peor que verla y
+      # decidir.
+      #
+      # `if: !cancelled()` porque un paso que falla detiene el job. Sin eso, las
+      # veces que el audit de arriba sí bloquea, que es justo cuando más interesa
+      # el panorama completo, este paso no llegaría a correr.
+      - name: Audit including dev dependencies (informational)
+        if: ${{ !cancelled() }}
+        run: |
+          npm audit --audit-level=high \
+            || echo "::warning::CVE en dependencias de desarrollo. No bloquea: no se despliega. Se atiende vía Dependabot."
+
   pip-audit:
     name: pip-audit (backend)
     runs-on: ubuntu-latest
