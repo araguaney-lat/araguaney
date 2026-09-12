@@ -4,20 +4,20 @@ fastapi==0.141.1
 uvicorn[standard]==0.52.4
 sqlalchemy==2.0.52
 psycopg2-binary==2.9.12
-pydantic[email]==2.13.4
+pydantic[email]==2.13.5
 pydantic-settings==2.15.0
 PyJWT==2.13.0
 bcrypt==4.3.0
 python-multipart==0.0.32
 requests==2.34.2
-resend==2.38.0
+resend==2.42.0
 svix==1.99.1
 httpx==0.28.1
 user-agents==2.2.0
 slowapi==0.1.10
 jinja2==3.1.6
 alembic==1.19.1
-sentry-sdk[fastapi]>=2.68.0
+sentry-sdk[fastapi]>=2.68.1
 
 # ── Background jobs + cache ───────────────────────────────────────────────────
 # Both degrade gracefully: with no REDIS_URL the cache is a no-op and queued
@@ -32,7 +32,7 @@ cryptography>=42.0.8
 # Uncomment the section(s) you need. See docs/optional-layers.md for setup.
 
 # Cloudinary — image / video uploads (avatars)
-cloudinary==1.46.0
+cloudinary==1.46.2
 
 # AI / OpenAI-compatible providers (OpenAI, DeepSeek, Groq, etc.)
 openai==1.109.1
@@ -57,7 +57,7 @@ openpyxl==3.1.5
 
 # Manifest PDF (HTML → PDF via WeasyPrint + Jinja2 is already above)
 # Dockerfile system deps required: apt-get install -y libpango-1.0-0 libpangocairo-1.0-0 libcairo2 libgif-dev fonts-liberation
-weasyprint==69.0
+weasyprint==70.0
 
 # GeoIP — MaxMind GeoLite2 country/city lookup
 # geoip2==4.8.0
@@ -66,4 +66,4 @@ weasyprint==69.0
 # elevenlabs==1.9.0
 
 # Cloudflare R2 / S3-compatible storage (messaging attachments)
-boto3==1.43.77
+boto3==1.43.88
