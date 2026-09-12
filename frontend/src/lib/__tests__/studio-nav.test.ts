@@ -38,12 +38,20 @@ describe("navegación de studio", () => {
 
   it("`/studio` no se marca activa desde sus subrutas", () => {
     const inicio = STUDIO_NAV_ITEMS.find((i) => i.href === "/studio")!
-    const emails = STUDIO_NAV_ITEMS.find((i) => i.href === "/studio/emails")!
+    const ai = STUDIO_NAV_ITEMS.find((i) => i.href === "/studio/ai")!
 
     expect(isStudioItemActive("/studio", inicio)).toBe(true)
-    // Sin `exact`, estar en Emails encendería también Métricas.
-    expect(isStudioItemActive("/studio/emails", inicio)).toBe(false)
-    expect(isStudioItemActive("/studio/emails", emails)).toBe(true)
+    // Sin `exact`, estar en una subruta encendería también Métricas.
+    expect(isStudioItemActive("/studio/ai", inicio)).toBe(false)
+    expect(isStudioItemActive("/studio/ai", ai)).toBe(true)
+  })
+
+  it("Emails no está en el menú y su página sigue en pie", () => {
+    // El panel de Resend cubre lo mismo mejor, así que la entrada se quitó y el
+    // webhook se apagó por variable de entorno. La ruta se conserva a
+    // propósito: volver tiene que ser encender un interruptor, no reconstruir.
+    expect(STUDIO_NAV_ITEMS.map((i) => i.href)).not.toContain("/studio/emails")
+    expect(fs.existsSync(path.join(process.cwd(), "app", "studio", "emails", "page.tsx"))).toBe(true)
   })
 
   it("los dos menús leen la misma lista", () => {

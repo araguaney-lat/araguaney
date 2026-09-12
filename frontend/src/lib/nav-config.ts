@@ -20,7 +20,6 @@ import {
   Gift,
   ShieldAlert,
   TriangleAlert,
-  MailWarning,
   Settings,
   Sparkles,
 } from "lucide-react"
@@ -191,25 +190,35 @@ export interface StudioNavItem {
   exact?: boolean
 }
 
+/* `/studio/emails` no aparece aquí y la página **sigue existiendo**.
+ *
+ * El panel de Resend ya muestra el mismo detalle de entrega y lo muestra mejor,
+ * así que mantener una segunda pantalla con los mismos datos era pedirle a
+ * alguien que eligiera entre dos fuentes de la misma verdad. Se apaga el
+ * webhook (`RESEND_WEBHOOK_SECRET` vacío → el endpoint responde 503) y se
+ * quita la entrada del menú; la ruta, la API, el modelo y el manejador del
+ * webhook quedan intactos para que volver sea encender el interruptor.
+ *
+ * Lo que se pierde con eso —y no lo cubre el panel de Resend, que es pasivo—
+ * es `bounce_watchdog_cron`: el aviso a Slack cuando los rebotes se disparan o
+ * se concentran en un proveedor. Volver a encenderlo es volver a tener aviso.
+ */
 export const STUDIO_NAV_ITEMS: StudioNavItem[] = [
   { href: "/studio", labelKey: "metrics", icon: BarChart2, exact: true },
   { href: "/studio/users", labelKey: "users", icon: Users },
   { href: "/studio/center-applications", labelKey: "center_applications", icon: Inbox },
-  { href: "/studio/emails", labelKey: "emails", icon: MailWarning },
   { href: "/studio/ai", labelKey: "ai", icon: Sparkles },
   { href: "/studio/audit", labelKey: "audit", icon: ScrollText },
   { href: "/studio/settings", labelKey: "settings", icon: Settings },
 ]
 
-/* Las cuatro que quedan al alcance del pulgar son **las cuatro que hoy
- * funcionan**. `/studio/users`, `/studio/audit` y `/studio/settings` son
- * marcadores de "Próximamente"; darles un lugar permanente en la barra sería
- * ofrecer cuatro veces al día algo que no hace nada. Cuando se construyan,
- * suben. */
+/* Las que quedan al alcance del pulgar son **las que hoy funcionan**.
+ * `/studio/users`, `/studio/audit` y `/studio/settings` son marcadores de
+ * "Próximamente"; darles un lugar permanente en la barra sería ofrecer cuatro
+ * veces al día algo que no hace nada. Cuando se construyan, suben. */
 export const STUDIO_PRIMARY_HREFS = [
   "/studio",
   "/studio/center-applications",
-  "/studio/emails",
   "/studio/ai",
 ]
 

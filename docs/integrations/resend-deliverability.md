@@ -24,6 +24,37 @@
 | **Dedupe por `svix_id`** | Resend reintenta; el `svix-id` es único por entrega. |
 | **Filtro por remitente al recibir** | Un endpoint de webhook está en el alcance de la **cuenta**, no del dominio ni de la clave de API. Si la cuenta es compartida, sin este filtro la tabla se llena con los rebotes del otro producto. Ver abajo. |
 
+## Estado en araguaney: apagado (septiembre 2026)
+
+El webhook está **apagado** y `/studio/emails` **fuera del menú**. La ruta, la
+API, el modelo, el manejador del webhook y el filtro de remitente siguen en pie:
+volver es encender el interruptor, no reconstruir nada.
+
+El motivo es que el panel de Resend muestra el mismo detalle de entrega y lo
+muestra mejor. Mantener una segunda pantalla con los mismos datos obliga a
+elegir entre dos fuentes de la misma verdad, y la que se actualiza sola gana.
+
+**Lo que se pierde al apagarlo**, y conviene tenerlo escrito porque no se nota:
+
+- `bounce_watchdog_cron` deja de tener de qué avisar. El panel de Resend es
+  pasivo — alguien tiene que ir a mirarlo — y este cron era el único aviso
+  activo cuando los rebotes se disparan o se concentran en un proveedor. El
+  cron sigue corriendo y no falla; simplemente no encuentra nada, así que **su
+  silencio se ve igual que el de todo en orden**.
+- El botón de reenvío de `/studio/emails`, que no reenviaba el mismo correo:
+  rotaba la contraseña temporal de la invitación. Eso Resend no puede hacerlo.
+
+Si vuelve a hacer falta el aviso de rebotes, el camino es reencender el
+webhook, no reconstruirlo.
+
+### Cómo se apaga y cómo se vuelve a encender
+
+| Paso | Apagar | Encender |
+|---|---|---|
+| Railway (servicio backend) | `RESEND_WEBHOOK_SECRET` vacío → el endpoint responde 503 | volver a poner el secreto de firma |
+| Resend → Webhooks | desactivar el endpoint | reactivarlo |
+| `frontend/src/lib/nav-config.ts` | sin entrada `/studio/emails` | volver a agregarla a `STUDIO_NAV_ITEMS` |
+
 ## Una cuenta de Resend compartida entre productos
 
 **Un endpoint de webhook está en el alcance de la cuenta.** No del dominio de
