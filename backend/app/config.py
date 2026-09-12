@@ -62,6 +62,11 @@ class Settings(BaseSettings):
     resend_api_key: str = ""
     mail_from: str = "noreply@yourdomain.com"
     mail_from_name: str = "My App"
+    # Dominios propios, separados por comas. En blanco se deduce de MAIL_FROM.
+    # Un endpoint de webhook de Resend recibe TODOS los eventos de la cuenta,
+    # no solo los de un dominio: si la cuenta es compartida, esto es lo que
+    # separa nuestros rebotes de los ajenos (ver services/email_sender_scope.py).
+    email_owned_domains: str = ""
     # Svix signing secret for the Resend webhook (Dashboard → Webhooks). Empty
     # disables webhook processing (endpoint returns 503).
     resend_webhook_secret: str = ""
