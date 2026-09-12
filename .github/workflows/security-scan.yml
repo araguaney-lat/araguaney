@@ -5,6 +5,19 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  # Los avisos se publican contra un lockfile que nadie está tocando. Un escaneo
+  # que solo corre cuando alguien empuja código nunca vuelve a mirar un árbol que
+  # se volvió vulnerable estando quieto: el aviso de sharp (GHSA-rgj7-g3m4-5g8c)
+  # salió después de la última corrida en `main` y nada lo habría notado hasta el
+  # siguiente empujón. El latido semanal es lo único que atrapa eso.
+  schedule:
+    - cron: "0 6 * * 1"
+
+# Un empujón nuevo cancela la corrida anterior del mismo PR, pero nunca una de
+# `main`: en la rama por defecto cada commit tiene que quedar verificado.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   npm-audit:

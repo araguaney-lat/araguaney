@@ -7,6 +7,12 @@ on:
   pull_request:
     paths: ["frontend/**", ".github/workflows/frontend-tests.yml"]
 
+# Un empujón nuevo cancela la corrida anterior del mismo PR, pero nunca una de
+# `main`: en la rama por defecto cada commit tiene que quedar verificado.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   checks:
     runs-on: ubuntu-latest
