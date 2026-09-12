@@ -10,6 +10,7 @@ from app.models.email_failure import EMAIL_FAILURE_EVENTS, EmailFailure
 from app.repositories.email_failure_repository import EmailFailureRepository
 from app.repositories.user_repository import UserRepository
 from app.services.auth_service import AuthService
+from app.services.email_sender_scope import is_ours
 from app.utils.errors import api_error
 
 # email_type values whose bounce is worth re-sending (and how).
@@ -44,7 +45,16 @@ class EmailFailureService:
         self.repo = EmailFailureRepository(db)
 
     def record_event(self, event_type_full: str, svix_id: str, data: dict) -> None:
-        """Process one Resend webhook event. Idempotent by svix_id."""
+        """Process one Resend webhook event. Idempotent by svix_id.
+
+        Se descarta antes de mirar nada más lo que no salió de un dominio
+        nuestro: el endpoint recibe todos los eventos de la cuenta de Resend,
+        que puede ser compartida con otro producto. Filtrar aquí y no al leer
+        es lo que impide que la tabla siga creciendo con datos ajenos.
+        """
+        if not is_ours(data):
+            return
+
         # "email.bounced" -> "bounced"
         event = event_type_full.split(".", 1)[-1]
 

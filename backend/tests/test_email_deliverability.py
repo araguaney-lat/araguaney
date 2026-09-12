@@ -41,9 +41,15 @@ def test_parse_dt_handles_z_suffix():
 # ── record_event ──────────────────────────────────────────────────────────────
 
 class TestRecordEvent:
+    @pytest.fixture(autouse=True)
+    def _our_domain(self, monkeypatch):
+        monkeypatch.setattr("app.config.settings.email_owned_domains", "")
+        monkeypatch.setattr("app.config.settings.mail_from", "noreply@araguaney.lat")
+
     def _data(self, **kw):
         base = dict(
             email_id="re_123",
+            **{"from": "Araguaney <noreply@araguaney.lat>"},
             to=["x@mail.com"],
             tags=[{"name": "email_type", "value": "invitation"}],
             bounce={"message": "mailbox full"},
@@ -80,6 +86,27 @@ class TestRecordEvent:
             repo.get_by_svix_id.return_value = object()  # already recorded
             EmailFailureService(MagicMock()).record_event("email.bounced", "svix_1", self._data())
             repo.save.assert_not_called()
+
+    def test_foreign_sender_is_not_recorded(self):
+        """La cuenta de Resend es compartida y el endpoint recibe todo lo que
+        ella produce. Un rebote de otro producto no es nuestro."""
+        with patch(f"{_EFS}.EmailFailureRepository") as Repo:
+            repo = Repo.return_value
+            repo.get_by_svix_id.return_value = None
+            EmailFailureService(MagicMock()).record_event(
+                "email.bounced", "svix_f", self._data(**{"from": "Bioflow <noreply@bioflow.app>"})
+            )
+            repo.save.assert_not_called()
+
+    def test_foreign_delivered_does_not_resolve(self):
+        with patch(f"{_EFS}.EmailFailureRepository") as Repo:
+            repo = Repo.return_value
+            EmailFailureService(MagicMock()).record_event(
+                "email.delivered",
+                "svix_g",
+                {"email_id": "re_9", "from": "Bioflow <noreply@bioflow.app>"},
+            )
+            repo.mark_resolved.assert_not_called()
 
     def test_unknown_event_ignored(self):
         with patch(f"{_EFS}.EmailFailureRepository") as Repo:

@@ -22,6 +22,41 @@
 | **Webhook (push), no polling** | La API de Resend no filtra por estado; pollear en cada carga = cientos de llamadas + rate limits. El webhook es más barato y da filtrado instantáneo. |
 | **Correlación por `email_type` + destinatario** | Evita threadear `entity_id` por todo el envío; al reenviar se busca la entidad por email. |
 | **Dedupe por `svix_id`** | Resend reintenta; el `svix-id` es único por entrega. |
+| **Filtro por remitente al recibir** | Un endpoint de webhook está en el alcance de la **cuenta**, no del dominio ni de la clave de API. Si la cuenta es compartida, sin este filtro la tabla se llena con los rebotes del otro producto. Ver abajo. |
+
+## Una cuenta de Resend compartida entre productos
+
+**Un endpoint de webhook está en el alcance de la cuenta.** No del dominio de
+envío, no de la clave de API. Tener un endpoint por producto no reparte los
+eventos entre ellos: **duplica**. Cada endpoint recibe todo lo que la cuenta
+produce.
+
+La intuición contraria es fácil de tener y difícil de descubrir sola, porque el
+síntoma no parece un error: la pantalla de fallos simplemente se llena de
+correos que este producto no manda. En un caso medido, el 97 % de las filas
+eran de otro producto de la misma cuenta.
+
+Y no es solo cosmético. `bounce_watch` avisa **por volumen** de rebotes, así que
+el volumen ajeno dispara el aviso propio: el canal termina reportando la
+reputación de un dominio que no es el nuestro.
+
+**El filtro va al recibir, no al leer.** Filtrar en la consulta deja la tabla
+creciendo y obliga a repetir la salvedad en cada consulta futura.
+
+**Se filtra por remitente (`data.from`), no por `email_type`.** Dos productos
+etiquetan igual justo los tipos que comparten (`verification`,
+`password_reset`), así que filtrar por etiqueta dejaría pasar exactamente los
+casos ambiguos. El remitente es lo que identifica al producto. Todos los
+eventos `email.*` de Resend lo traen, en la forma `"Nombre <buzon@dominio>"` o
+`"buzon@dominio"`.
+
+Implementación: `services/email_sender_scope.py` + `EMAIL_OWNED_DOMAINS`.
+**Falla abierta**: sin remitente legible, o sin saber cuál es nuestro dominio,
+el evento se conserva. Guardar un rebote ajeno se ve y se corrige; perder uno
+propio no se nota hasta que alguien no recibió su invitación.
+
+Al portar esto a otro repo de la familia, el filtro es parte del mínimo: los
+tres monorepos comparten cuenta.
 
 ## Arquitectura / flujo
 
@@ -49,9 +84,10 @@ Backend (`backend/app/`):
 |---|---|
 | `models/email_failure.py` | Modelo `EmailFailure` (solo fallos). Import en `alembic/env.py`. |
 | `alembic/versions/0NN_email_failures.py` | Migración: tabla + `UNIQUE(svix_id)` + CHECK `event_type` + índices. |
-| `config.py` | `resend_webhook_secret: str = ""`. |
+| `config.py` | `resend_webhook_secret: str = ""`, `email_owned_domains: str = ""`. |
 | `email.py` | `_send(..., email_type=None)` añade `payload["tags"]=[{"name":"email_type","value":...}]`. Cada `send_*` pasa su `email_type`. |
 | `repositories/email_failure_repository.py` | `get_by_svix_id`, `save`, `mark_resolved`, `list_recent`, `purge_older_than`. |
+| `services/email_sender_scope.py` | `is_ours(data)` — descarta los eventos de otro producto de la misma cuenta de Resend. |
 | `services/email_failure_service.py` | `record_event(event, svix_id, data)` (lógica del webhook) + `resend(id, bg)`. Helpers `_tag_value` (list u obj), `_parse_dt`. |
 | `routers/resend_webhook.py` | `POST /webhooks/resend` **sin `/v1`**; verifica Svix; nunca 500 en payload raro. |
 | `routers/email_failures.py` | `GET /v1/email-failures`, `POST /v1/email-failures/{id}/resend` (superadmin). |
