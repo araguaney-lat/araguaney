@@ -94,7 +94,7 @@ class TestRecordEvent:
             repo = Repo.return_value
             repo.get_by_svix_id.return_value = None
             EmailFailureService(MagicMock()).record_event(
-                "email.bounced", "svix_f", self._data(**{"from": "Bioflow <noreply@bioflow.app>"})
+                "email.bounced", "svix_f", self._data(**{"from": "Otro Producto <noreply@otroproducto.example>"})
             )
             repo.save.assert_not_called()
 
@@ -104,7 +104,7 @@ class TestRecordEvent:
             EmailFailureService(MagicMock()).record_event(
                 "email.delivered",
                 "svix_g",
-                {"email_id": "re_9", "from": "Bioflow <noreply@bioflow.app>"},
+                {"email_id": "re_9", "from": "Otro Producto <noreply@otroproducto.example>"},
             )
             repo.mark_resolved.assert_not_called()
 

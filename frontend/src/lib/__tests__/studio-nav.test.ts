@@ -48,8 +48,8 @@ describe("navegación de studio", () => {
 
   it("Emails no está en el menú y su página sigue en pie", () => {
     // El panel de Resend cubre lo mismo mejor, así que la entrada se quitó y el
-    // webhook se apagó por variable de entorno. La ruta se conserva a
-    // propósito: volver tiene que ser encender un interruptor, no reconstruir.
+    // endpoint se desactivó en Resend. La ruta se conserva a propósito: volver
+    // tiene que ser encender un interruptor, no reconstruir.
     expect(STUDIO_NAV_ITEMS.map((i) => i.href)).not.toContain("/studio/emails")
     expect(fs.existsSync(path.join(process.cwd(), "app", "studio", "emails", "page.tsx"))).toBe(true)
   })

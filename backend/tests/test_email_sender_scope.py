@@ -17,7 +17,7 @@ class TestSenderDomain:
             ("Araguaney <noreply@araguaney.lat>", "araguaney.lat"),
             ("noreply@araguaney.lat", "araguaney.lat"),
             ("  NoReply@Araguaney.LAT  ", "araguaney.lat"),
-            ("Bioflow <noreply@bioflow.app>", "bioflow.app"),
+            ("Otro Producto <noreply@otroproducto.example>", "otroproducto.example"),
         ],
     )
     def test_extracts_domain(self, value, expected):
@@ -60,7 +60,7 @@ class TestIsOurs:
         assert is_ours({"from": "Araguaney <noreply@mail.araguaney.lat>"}) is True
 
     def test_drops_another_product_on_the_same_account(self):
-        assert is_ours({"from": "Bioflow <noreply@bioflow.app>"}) is False
+        assert is_ours({"from": "Otro Producto <noreply@otroproducto.example>"}) is False
 
     def test_does_not_match_a_domain_that_merely_ends_the_same(self):
         assert is_ours({"from": "no@notaraguaney.lat"}) is False
@@ -71,4 +71,4 @@ class TestIsOurs:
 
     def test_keeps_everything_when_our_domain_is_unknown(self, monkeypatch):
         monkeypatch.setattr("app.config.settings.mail_from", "")
-        assert is_ours({"from": "Bioflow <noreply@bioflow.app>"}) is True
+        assert is_ours({"from": "Otro Producto <noreply@otroproducto.example>"}) is True
