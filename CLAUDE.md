@@ -396,14 +396,19 @@ no maneja dinero (FATF R.8 pide controles proporcionales al riesgo).
 
 ## 9. Seguridad y protección DDoS/EDoS
 
-1. Cloudflare delante de todo (plan Free): DDoS + WAF + rate limiting.
+1. Cloudflare delante de la **API** (zona `araguaney.org`, plan Business por Project
+   Galileo): DDoS + WAF + ruleset administrado + rate limiting + alertas. La web no pasa
+   por Cloudflare: la sirve Vercel con su propio firewall (ver `docs/observability.md`).
 2. **Activar Cloudflare-only mode** en backend (`CLOUDFLARE_ONLY=true`). Requiere
    `CLOUDFLARE_SHARED_SECRET` + una Transform Rule en Cloudflare (ver `.env.example`)
    — el chequeo valida un header secreto, **no** el IP del TCP peer, porque en Railway
    ese peer es siempre el proxy interno de Railway, nunca el edge de Cloudflare.
 3. Vercel WAF + rate limiting en el front.
 4. **Turnstile** (gratis) en formularios públicos de escritura.
-5. **Cache en el edge** de toda lectura pública (ficha QR, panel "qué falta").
+5. **Cache en el edge** de las lecturas públicas de la API (panel "qué falta", campañas,
+   fichas de tarima y de donación, imágenes QR): una Cache Rule de la zona que respeta el
+   `Cache-Control` del origen (Fase 30). La ficha de caja es `no-store` a propósito, porque
+   va detrás de Turnstile.
 6. **Spend caps** en Vercel + alertas de presupuesto.
 7. Endpoints caros (PDF/export) detrás de auth + `slowapi` + cola ARQ.
 8. Sin PII de beneficiarios → menor superficie LFPDPPP. La del donante es opcional,

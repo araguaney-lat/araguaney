@@ -34,6 +34,9 @@ Por eso hay dos familias de señal: **algo falló** y **algo dejó de ocurrir**.
 | `Rebotes de correo por encima de lo normal` | Los rebotes sin resolver superan el total de la ventana, o se concentran en un dominio | Slack, nombrando dominios y nunca direcciones | Revisar reputación, SPF/DKIM y el panel de Resend. El pre-registro de donaciones depende de que el correo llegue |
 | Excepción del worker | Cualquier fallo en el proceso del worker | Sentry | Diagnóstico. El worker corre aparte y sus trazas no aparecerían en ningún lado |
 | Error del frontend | Excepción en cliente, servidor o edge de Next | Sentry | Diagnóstico |
+| `Origen de la API inalcanzable` | Cloudflare deja de alcanzar Railway durante 5 minutos (errores 521) | Correo del buzón del proyecto (alerta de Cloudflare) | Railway está caído o rechazando todo. Revisar el despliegue y el encabezado de origen; ver el runbook de emergencia |
+| `Ataque DDoS HTTP mitigado` | Cloudflare detecta y mitiga un ataque DDoS de capa 7 contra la API | Correo del buzón del proyecto | Normalmente no hay que hacer nada: ya se mitigó. Confirmar que la API sigue respondiendo y que el gasto de Railway no se movió |
+| `Pico de eventos de seguridad` | Aumento anómalo de peticiones que el WAF bloquea o registra en la zona de la API | Correo del buzón del proyecto | Mirar *Security → Analytics → Events*: si es un ataque, seguir el runbook; si son falsos positivos del ruleset administrado, ajustarlo antes de pasarlo a bloqueo |
 
 ### Dos decisiones de diseño que explican el ruido que no ves
 
@@ -397,6 +400,44 @@ Mientras tanto, el correo sigue llegando: no hay ventana ciega, solo un aviso en
 un lugar distinto al resto.
 
 ---
+
+## Runbook: la API bajo ataque
+
+La API vive detrás de la zona `araguaney.org`, que tiene Project Galileo. La
+mitigación de DDoS de Cloudflare actúa sola; esto es para cuando lo que llega no
+es volumétrico sino dirigido, o cuando una alerta dice que algo pasa.
+
+1. **Mirar antes de tocar.** *Security → Analytics → Events* en la zona: qué ruta,
+   qué país o ASN, qué método, y si las peticiones ya se están bloqueando.
+2. **Endurecer lo que ya existe.** Bajar el umbral de la regla de límite de tasa o
+   ampliar sus rutas, o crear una regla personalizada de **bloqueo** acotada a lo
+   que muestra el paso 1 (ruta, ASN, país). Es la herramienta correcta para una
+   API.
+3. **No usar "I'm Under Attack" ni subir el *Security Level*.** Los dos responden
+   con un desafío de JavaScript o un CAPTCHA, que la aplicación nativa, la cola
+   offline y las llamadas `fetch` del navegador **no pueden resolver**: el resultado
+   es tumbar la API para los usuarios legítimos, que es justo lo que el atacante
+   buscaba. Las guías generales los recomiendan pensando en sitios web, no en una
+   API.
+4. **Cortar la fuente si es una sola.** *Security → WAF → Tools → IP Access Rules*
+   para bloquear una IP o un ASN concretos.
+5. **Escalar a Cloudflare.** Galileo da un canal de soporte dedicado para
+   participantes del programa; la dirección está en el manual del programa y no se
+   publica aquí.
+6. **Después:** anotar qué pasó, qué regla se agregó y si queda temporal o
+   permanente. Una regla de emergencia que nadie retira termina bloqueando tráfico
+   legítimo meses después.
+
+### La caché del borde también es defensa
+
+Las lecturas públicas de la API (`/v1/public/*`, `/v1/client/version`,
+`/v1/d/*`, `/p/*` y las imágenes QR de caja) las sirve Cloudflare desde su caché
+mientras dure el `s-maxage` que manda el origen. Un ataque contra esas rutas
+golpea el borde y no llega a Railway. La regla excluye las peticiones con
+`Authorization`, el pre-registro de donaciones y todo lo que el origen marca
+`no-store`. Un 404 de esas rutas puede quedar en caché unos minutos con el
+comportamiento por defecto de Cloudflare: es aceptable porque los códigos existen
+antes de imprimirse.
 
 ## Cómo agregar una alerta sin romper la política
 
