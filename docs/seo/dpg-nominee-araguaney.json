@@ -6,7 +6,7 @@
   "license": [
     {
       "spdx": "AGPL-3.0",
-      "licenseURL": "https://github.com/araguaney-lat/araguaney/blob/main/LICENSE"
+      "licenseURL": "https://github.com/araguaney-org/araguaney/blob/main/LICENSE"
     }
   ],
   "SDGs": [
@@ -30,7 +30,7 @@
   "type": [
     "software"
   ],
-  "repositoryURL": "https://github.com/araguaney-lat/araguaney",
+  "repositoryURL": "https://github.com/araguaney-org/araguaney",
   "organizations": [
     {
       "name": "Araguaney",
@@ -49,8 +49,8 @@
     "indicator_9_do_no_harm": "Strengthened: in-kind donation is a known trade-based money-laundering channel, so the platform added an irrevocable-transfer acceptance recorded with its version, structural controls (a donor cannot designate the consignee nor trace goods to destination, and pallets are mixed by design), an escalation queue for unusual-volume captures resolved by coordination and never by whoever captured it, and a published red-flag guide for coordinators. Scope is deliberately proportionate per FATF R.8: recording and escalation, no sanctions screening or documentary identity verification.",
     "evidence": [
       "https://www.araguaney.org/aviso-de-privacidad",
-      "https://github.com/araguaney-lat/araguaney/blob/main/docs/security.md",
-      "https://github.com/araguaney-lat/araguaney/blob/main/backend/app/services/donation_purge_service.py"
+      "https://github.com/araguaney-org/araguaney/blob/main/docs/security.md",
+      "https://github.com/araguaney-org/araguaney/blob/main/backend/app/services/donation_purge_service.py"
     ]
   }
 }

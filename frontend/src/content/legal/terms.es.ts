@@ -76,7 +76,7 @@ export const termsEs: LegalDoc = {
       heading: "Titularidad de la plataforma",
       blocks: [
         "Araguaney es un proyecto de Antony Delgado Casanova, titular del copyright del código fuente, del nombre \"Araguaney\", del logotipo y de los dominios araguaney.org y araguaney.lat. No existe una entidad jurídica asociada al proyecto.",
-        "El código fuente se publica como software libre bajo licencia AGPL-3.0 y está disponible en https://github.com/araguaney-lat/araguaney. Cualquiera puede usarlo, estudiarlo, modificarlo y desplegar su propia instancia en los términos de esa licencia.",
+        "El código fuente se publica como software libre bajo licencia AGPL-3.0 y está disponible en https://github.com/araguaney-org/araguaney. Cualquiera puede usarlo, estudiarlo, modificarlo y desplegar su propia instancia en los términos de esa licencia.",
         "La marca no se licencia junto con el código: una instancia derivada debe operar bajo otro nombre y dominio, sin presentarse como la instancia oficial.",
       ],
     },

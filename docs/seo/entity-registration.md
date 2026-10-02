@@ -45,7 +45,7 @@ existe en el repositorio:
 |---|---|---|---|
 | 1 | Relevancia para los ODS | ⚠️ | Encaje claro con **ODS 11.5** (reducir pérdidas por desastres) y **ODS 17** (alianzas). **Falta declararlo explícitamente** en el README o en `/nosotros`: el indicador exige que el proyecto indique a qué ODS contribuye |
 | 2 | Licencia abierta | ✅ | AGPL-3.0 (`LICENSE`), aprobada por OSI |
-| 3 | Propiedad clara | ✅ | Repo en la organización `araguaney-lat`; fundador identificado en `/nosotros` con perfil público |
+| 3 | Propiedad clara | ✅ | Repo en la organización `araguaney-org`; fundador identificado en `/nosotros` con perfil público |
 | 4 | Independencia de plataforma | ✅ | `backend/Dockerfile`, `frontend/Dockerfile` y `docker-compose.yml`. Stack sin dependencias propietarias obligatorias: FastAPI + Postgres + Next.js. Vercel y Railway son conveniencia, no requisito |
 | 5 | Documentación | ✅ | `README.md`, `CLAUDE.md` (dominio y reglas), `CONTRIBUTING.md` (setup reproducible sin servicios externos), `docs/` |
 | 6 | Extracción de datos no-PII | ✅ | De personas beneficiarias no existe ni un dato. Los exportes (manifiesto PDF/XLSX, reportes CSV) llevan inventario, nunca datos del donante, y la ficha pública del QR muestra estado y contenido, nunca quién donó |
@@ -117,11 +117,11 @@ indicadores. Estas son las respuestas con las URLs exactas.
 y ODS 17 targets 17.16-17.17, cada uno con su evidencia).
 
 **2. Licencia abierta**: AGPL-3.0, aprobada por OSI:
-https://github.com/araguaney-lat/araguaney/blob/main/LICENSE
+https://github.com/araguaney-org/araguaney/blob/main/LICENSE
 
-**3. Propiedad clara**: repositorio bajo la organización `araguaney-lat`;
+**3. Propiedad clara**: repositorio bajo la organización `araguaney-org`;
 sección "Licencia y marca" del README
-(https://github.com/araguaney-lat/araguaney#licencia-y-marca), que separa el
+(https://github.com/araguaney-org/araguaney#licencia-y-marca), que separa el
 código libre de la marca; sección "Propiedad y responsabilidad de los datos"
 de los Términos (https://www.araguaney.org/terminos); autoría del fundador en
 https://www.araguaney.org/nosotros
@@ -135,7 +135,7 @@ Cloudinary, Resend) degradan de forma controlada o se sustituyen por
 configuración.
 
 **5. Documentación**: README (arquitectura, stack, setup),
-[`CONTRIBUTING.md`](https://github.com/araguaney-lat/araguaney/blob/main/CONTRIBUTING.md)
+[`CONTRIBUTING.md`](https://github.com/araguaney-org/araguaney/blob/main/CONTRIBUTING.md)
 (entorno de desarrollo reproducible sin servicios externos), `CLAUDE.md`
 (reglas de dominio y de negocio), carpeta `docs/`, y manuales de usuario dentro
 de la app en `/dashboard/ayuda`.
@@ -173,7 +173,7 @@ listados con su función en https://www.araguaney.org/nosotros
   rate limiting, WAF de Cloudflare, headers de seguridad y CSP. Aislamiento
   entre centros verificado por una suite de tests que corre en cada PR
   (`backend/tests/tenant/`). Política de reporte:
-  [`SECURITY.md`](https://github.com/araguaney-lat/araguaney/blob/main/SECURITY.md),
+  [`SECURITY.md`](https://github.com/araguaney-org/araguaney/blob/main/SECURITY.md),
   con reporte privado habilitado en GitHub.
 - *Contenido ilegal o inapropiado*: no hay contenido público generado por
   usuarios. La mensajería es interna entre operadores autenticados de centros
@@ -181,7 +181,7 @@ listados con su función en https://www.araguaney.org/nosotros
 - *Protección frente al acoso*: sin funciones sociales públicas; la mensajería
   exige ser participante del hilo o miembro de la campaña, y cada acción queda
   en la auditoría. Código de conducta:
-  [`CODE_OF_CONDUCT.md`](https://github.com/araguaney-lat/araguaney/blob/main/CODE_OF_CONDUCT.md)
+  [`CODE_OF_CONDUCT.md`](https://github.com/araguaney-org/araguaney/blob/main/CODE_OF_CONDUCT.md)
 
 ### Después de postular
 
@@ -229,7 +229,7 @@ and humanitarian logistics.
 > dashboard. It stores no personal data of donors or beneficiaries.
 
 **Enlaces**: sitio `https://www.araguaney.org` · código
-`https://github.com/araguaney-lat/araguaney` · licencia AGPL-3.0
+`https://github.com/araguaney-org/araguaney` · licencia AGPL-3.0
 
 ---
 
@@ -288,7 +288,7 @@ LAST	P31	Q189210
 LAST	P31	Q341
 LAST	P275	Q27017232
 LAST	P856	"https://www.araguaney.org"
-LAST	P1324	"https://github.com/araguaney-lat/araguaney"
+LAST	P1324	"https://github.com/araguaney-org/araguaney"
 LAST	P277	Q28865
 LAST	P277	Q978185
 LAST	P571	+2026-00-00T00:00:00Z/9
@@ -313,7 +313,7 @@ Notas:
    ```ts
    export const BRAND_SAME_AS: readonly string[] = [
      "https://www.linkedin.com/company/araguaney-lat",
-     "https://github.com/araguaney-lat",
+     "https://github.com/araguaney-org",
      "https://www.wikidata.org/wiki/Q<QID>",   // ← nuevo
    ]
    ```

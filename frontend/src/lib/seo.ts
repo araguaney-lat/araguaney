@@ -33,12 +33,12 @@ export function contactEmail(localPart: string): string {
 // automatically — only rendered when non-empty. See Fase 17 task 5.
 export const BRAND_SAME_AS: readonly string[] = [
   "https://www.linkedin.com/company/araguaney-lat",
-  "https://github.com/araguaney-lat",
+  "https://github.com/araguaney-org",
 ]
 
 // Repositorio público y licencia. El código abierto es una señal de confianza
 // verificable: cualquiera puede auditar que no se guardan datos personales.
-export const SOURCE_REPO_URL = "https://github.com/araguaney-lat/araguaney"
+export const SOURCE_REPO_URL = "https://github.com/araguaney-org/araguaney"
 export const LICENSE_URL = "https://www.gnu.org/licenses/agpl-3.0.html"
 export const LICENSE_NAME = "AGPL-3.0"
 

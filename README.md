@@ -1,8 +1,8 @@
 # Araguaney
 
-[![Backend tests](https://img.shields.io/github/actions/workflow/status/araguaney-lat/araguaney/backend-tests.yml?branch=main&label=backend%20tests)](https://github.com/araguaney-lat/araguaney/actions/workflows/backend-tests.yml)
-[![Frontend tests](https://img.shields.io/github/actions/workflow/status/araguaney-lat/araguaney/frontend-tests.yml?branch=main&label=frontend%20tests)](https://github.com/araguaney-lat/araguaney/actions/workflows/frontend-tests.yml)
-[![Security scan](https://img.shields.io/github/actions/workflow/status/araguaney-lat/araguaney/security-scan.yml?branch=main&label=security%20scan)](https://github.com/araguaney-lat/araguaney/actions/workflows/security-scan.yml)
+[![Backend tests](https://img.shields.io/github/actions/workflow/status/araguaney-org/araguaney/backend-tests.yml?branch=main&label=backend%20tests)](https://github.com/araguaney-org/araguaney/actions/workflows/backend-tests.yml)
+[![Frontend tests](https://img.shields.io/github/actions/workflow/status/araguaney-org/araguaney/frontend-tests.yml?branch=main&label=frontend%20tests)](https://github.com/araguaney-org/araguaney/actions/workflows/frontend-tests.yml)
+[![Security scan](https://img.shields.io/github/actions/workflow/status/araguaney-org/araguaney/security-scan.yml?branch=main&label=security%20scan)](https://github.com/araguaney-org/araguaney/actions/workflows/security-scan.yml)
 [![Licence: AGPL-3.0](https://img.shields.io/badge/licence-AGPL--3.0-blue)](LICENSE)
 
 > **A common standard for coordinating collection centres and humanitarian aid logistics.**

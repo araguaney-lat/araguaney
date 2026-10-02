@@ -74,7 +74,7 @@ más con citas de IA que los backlinks. Cada ancla nueva suma.
 ```ts
 export const BRAND_SAME_AS: readonly string[] = [
   "https://www.linkedin.com/company/araguaney-lat",
-  "https://github.com/araguaney-lat",
+  "https://github.com/araguaney-org",
   "https://www.instagram.com/araguaney.lat",     // ← ejemplo: perfil nuevo
   "https://www.wikidata.org/wiki/Q123456789",    // ← el QID de Wikidata cuando exista (task 6)
 ]
