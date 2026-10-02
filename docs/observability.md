@@ -141,6 +141,13 @@ Huecos conocidos, a la fecha de este documento:
    señal de degradación intermedia: muchos tokens cayéndose a la vez se vería
    como bajas normales. La forma de detectarlo sería vigilar el ritmo de bajas
    con motivo `unregistered`, y no está hecho.
+7. **El webhook de Resend está apagado a propósito.** Sin eventos entrantes,
+   `email_failures` no se alimenta y la alerta de volumen de rebotes no puede
+   dispararse: hoy un rebote masivo no avisa por Slack. La fuente para revisar la
+   entrega es el panel de Resend. Si se reactiva, el endpoint va al dominio
+   vigente de la API (hoy `api.araguaney.org`), no a uno heredado, y conviene
+   verificar con un rebote real que el evento llega y pasa el filtro de
+   remitente propio.
 
 ---
 
@@ -240,7 +247,7 @@ En el borde de Vercel, que es por donde ahora pasa todo el tráfico de Sentry:
 
 ### Por qué el frontend no está detrás de Cloudflare
 
-Cloudflare protege `api.araguaney.lat` porque **Railway no trae WAF ni límite de
+Cloudflare protege la API (`api.araguaney.org`; `api.araguaney.lat` sigue activo mientras la app nativa lo use) porque **Railway no trae WAF ni límite de
 tasa**: sin ella, el backend estaría expuesto tal cual.
 
 Vercel sí los trae, y su mitigación de DDoS está activa en todos los planes sin

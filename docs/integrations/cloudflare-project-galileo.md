@@ -37,7 +37,8 @@ sondeos de exploits, Turnstile en formularios públicos.
 | 2026-08-10 | Cloudflare responde (coordinación del programa de impacto) pidiendo **documentación del estatus sin fines de lucro** de la organización |
 | 2026-08-10 | Se responde por el camino 1: no hay figura legal ni la habrá, con el paquete de evidencia sustituta y la nominación ante la DPGA. Se cierra con una sola pregunta, la de patrocinio por organización socia |
 | 2026-10-02 | Cloudflare responde: Galileo se revisa **por dominio** y queda activado en `araguaney.org`, que vive en otra cuenta de Cloudflare. La revisión del programa sigue abierta y avisarán cuando haya resultado |
-| — | **Pendiente:** mudar el producto a `araguaney.org` ([Fase 29](../roadmap/phase-29-domain-migration.md)) y el resultado de la revisión del programa |
+| 2026-10-02 | La web y la API pasan a `araguaney.org`. La API queda detrás del proxy de la zona con Galileo, con su origen cerrado y sus reglas de WAF y límite de tasa verificadas; `araguaney.lat` redirige a `.org` ([Fase 29](../roadmap/phase-29-domain-migration.md)) |
+| — | **Pendiente:** el resultado de la revisión del programa, y retirar `api.araguaney.lat` cuando la app nativa ya use `.org` |
 
 Cloudflare aclara en su respuesta que nunca menciona públicamente a un sitio como
 cliente del programa ni comenta su interés en él sin permiso escrito explícito.
@@ -233,7 +234,7 @@ o ante una organización socia.
 
 ### Datos de apoyo
 
-- **Sitio:** <https://araguaney.lat>
+- **Sitio:** <https://www.araguaney.org> (antes <https://araguaney.lat>, que hoy redirige)
 - **Países:** centros de acopio en México; envíos a Venezuela.
 - **Comercial:** no. Sin fines de lucro de hecho, sin figura legal constituida.
 - **Equipo:** voluntariado, pequeño.
