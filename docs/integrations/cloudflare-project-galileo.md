@@ -1,6 +1,7 @@
 # Project Galileo (Cloudflare) — solicitud y seguimiento
 
-> Bitácora viva de la postulación de `araguaney.lat` a Project Galileo.
+> Bitácora viva de la postulación de Araguaney a Project Galileo. Empezó con
+> `araguaney.lat`; la protección se otorgó a `araguaney.org` (ver Estado).
 > Se actualiza cada vez que hay un movimiento con Cloudflare.
 
 ## Qué es y por qué lo queremos
@@ -35,10 +36,26 @@ sondeos de exploits, Turnstile en formularios públicos.
 | 2026-08 | Se envía la solicitud a Project Galileo para `araguaney.lat` |
 | 2026-08-10 | Cloudflare responde (coordinación del programa de impacto) pidiendo **documentación del estatus sin fines de lucro** de la organización |
 | 2026-08-10 | Se responde por el camino 1: no hay figura legal ni la habrá, con el paquete de evidencia sustituta y la nominación ante la DPGA. Se cierra con una sola pregunta, la de patrocinio por organización socia |
-| — | **Pendiente:** respuesta del programa |
+| 2026-10-02 | Cloudflare responde: Galileo se revisa **por dominio** y queda activado en `araguaney.org`, que vive en otra cuenta de Cloudflare. La revisión del programa sigue abierta y avisarán cuando haya resultado |
+| — | **Pendiente:** mudar el producto a `araguaney.org` ([Fase 29](../roadmap/phase-29-domain-migration.md)) y el resultado de la revisión del programa |
 
 Cloudflare aclara en su respuesta que nunca menciona públicamente a un sitio como
 cliente del programa ni comenta su interés en él sin permiso escrito explícito.
+
+## Lo que aclaró Cloudflare el 2026-10-02
+
+- **La cobertura es por dominio.** Está activa en `araguaney.org`; `araguaney.lat`
+  no está cubierto. Mientras el producto siga en `.lat`, la protección no aplica.
+- **Galileo protege la API y no la web.** La web corre en Vercel con DNS sin proxy,
+  y Cloudflare no inspecciona ese tráfico. El patrón recomendado es mantener la
+  zona de la API con proxy y protegida, y dejar la web a las protecciones de
+  Vercel. No hay un patrón soportado para proxiar una web de Vercel.
+- **Zone Hold solo existe en Enterprise.** El error 1005 del API en el plan Business
+  es esperado. Las mitigaciones correctas son el bloqueo de transferencia y el 2FA
+  del registrador.
+- **Cloudflare for SaaS** (hostnames personalizados) está disponible en Business.
+  Hoy no se necesita.
+- Quedaron registradas las condiciones para un eventual caso de estudio.
 
 ## El hueco: no hay figura legal que documentar
 
