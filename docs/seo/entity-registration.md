@@ -104,7 +104,7 @@ y organización responsable.
 > "or later").
 
 > **Antes de postular**: el campo `contact_email` apunta a
-> `security@araguaney.lat`. Si prefieres un buzón general (`hola@`, `contacto@`),
+> `security@araguaney.org`. Si prefieres un buzón general (`hola@`, `contacto@`),
 > créalo y úsalo en el formulario.
 
 ### Respuestas por indicador (para copiar al formulario)
@@ -123,8 +123,8 @@ https://github.com/araguaney-lat/araguaney/blob/main/LICENSE
 sección "Licencia y marca" del README
 (https://github.com/araguaney-lat/araguaney#licencia-y-marca), que separa el
 código libre de la marca; sección "Propiedad y responsabilidad de los datos"
-de los Términos (https://www.araguaney.lat/terminos); autoría del fundador en
-https://www.araguaney.lat/nosotros
+de los Términos (https://www.araguaney.org/terminos); autoría del fundador en
+https://www.araguaney.org/nosotros
 
 **4. Independencia de plataforma**: sin dependencias propietarias
 obligatorias: FastAPI + PostgreSQL + Next.js, todos open source.
@@ -152,18 +152,18 @@ beneficiarios.
 **7. Privacidad y cumplimiento legal**: sí se recogen datos personales, pero
 solo de las **personas operadoras** (nombre, correo institucional), no de
 donantes ni beneficiarios. Aviso de privacidad:
-https://www.araguaney.lat/aviso-de-privacidad · Términos:
-https://www.araguaney.lat/terminos · Jurisdicción y ley aplicable: México
+https://www.araguaney.org/aviso-de-privacidad · Términos:
+https://www.araguaney.org/terminos · Jurisdicción y ley aplicable: México
 (LFPDPPP), declarada en los Términos.
 
 **8. Estándares abiertos y buenas prácticas**: WHO Guidelines for Medicine
 Donations (vida útil, INN, controlados), catálogo de materiales IFRC/ICRC, IOM
 Emergency Relief Items Catalogue, taxonomía UNSPSC, códigos GS1/GTIN. Todos
-listados con su función en https://www.araguaney.lat/nosotros
+listados con su función en https://www.araguaney.org/nosotros
 
 **9. No causar daño por diseño**
 - *Borrado de datos*: la cancelación ARCO se atiende de forma manual por el canal
-  publicado (`privacidad@araguaney.lat`); los adjuntos de mensajería se purgan
+  publicado (`privacidad@araguaney.org`); los adjuntos de mensajería se purgan
   automáticamente al vencer. **No hay borrado autoservicio en producto**: es la
   única respuesta del cuestionario que hoy admite un "no existe", y quedó como
   task 19 de la Fase 13 con el diseño esbozado (anonimizar en vez de borrar en
@@ -228,7 +228,7 @@ and humanitarian logistics.
 > customs-ready manifest, and aggregates every center's stock into a national
 > dashboard. It stores no personal data of donors or beneficiaries.
 
-**Enlaces**: sitio `https://www.araguaney.lat` · código
+**Enlaces**: sitio `https://www.araguaney.org` · código
 `https://github.com/araguaney-lat/araguaney` · licencia AGPL-3.0
 
 ---
@@ -287,7 +287,7 @@ LAST	P31	Q7397
 LAST	P31	Q189210
 LAST	P31	Q341
 LAST	P275	Q27017232
-LAST	P856	"https://www.araguaney.lat"
+LAST	P856	"https://www.araguaney.org"
 LAST	P1324	"https://github.com/araguaney-lat/araguaney"
 LAST	P277	Q28865
 LAST	P277	Q978185

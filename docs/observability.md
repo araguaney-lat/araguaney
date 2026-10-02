@@ -247,7 +247,7 @@ En el borde de Vercel, que es por donde ahora pasa todo el tráfico de Sentry:
 
 ### Por qué el frontend no está detrás de Cloudflare
 
-Cloudflare protege `api.araguaney.lat` porque **Railway no trae WAF ni límite de
+Cloudflare protege la API (`api.araguaney.org`; `api.araguaney.lat` sigue activo mientras la app nativa lo use) porque **Railway no trae WAF ni límite de
 tasa**: sin ella, el backend estaría expuesto tal cual.
 
 Vercel sí los trae, y su mitigación de DDoS está activa en todos los planes sin

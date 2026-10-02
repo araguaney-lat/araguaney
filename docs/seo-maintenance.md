@@ -120,8 +120,9 @@ la renovación, no solo para la postulación inicial.
 
 Estos ya están hechos; anótalos por si migras de entorno o alguien pregunta:
 
-- **Host canónico:** `www.araguaney.lat`. `NEXT_PUBLIC_SITE_URL=https://www.araguaney.lat` en
-  Vercel; el apex hace 301 a www.
+- **Host canónico:** `www.araguaney.org` desde el 2026-10-02 (Fase 29). `NEXT_PUBLIC_SITE_URL=https://www.araguaney.org`
+  en Vercel; el apex redirige con 308 a www, y `araguaney.lat` y `www.araguaney.lat` redirigen con 308
+  a `www.araguaney.org`, conservando ruta y parámetros.
 - **IndexNow:** `INDEXNOW_KEY` seteada en Railway = valor del key file
   `frontend/public/9c4a1e7b6f0d42a8b3e5c8d1f2a06b7e.txt`. Al crear una campaña pública, el backend
   pinguea IndexNow solo. Si cambias el key, cambia ambos (env + archivo).
