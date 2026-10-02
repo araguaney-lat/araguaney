@@ -6,7 +6,7 @@ If you find a vulnerability, report it privately:
 
 - **GitHub**: use [private vulnerability reporting](../../security/advisories/new)
   (*Security* tab → *Report a vulnerability*). This is the preferred channel.
-- **Email**: security@araguaney.lat, subject `[SECURITY] araguaney`.
+- **Email**: security@araguaney.org, subject `[SECURITY] araguaney`.
 
 Please do not open a public issue. Include a description, reproduction steps and
 your estimate of the impact.
@@ -65,6 +65,6 @@ request.
 
 Puedes reportar una vulnerabilidad en español por los mismos canales: el
 [reporte privado de GitHub](../../security/advisories/new) o
-security@araguaney.lat. Este documento se mantiene en inglés porque se dirige a
+security@araguaney.org. Este documento se mantiene en inglés porque se dirige a
 quien evalúa o audita el proyecto desde fuera, pero el idioma del reporte no
 importa: se atiende igual.

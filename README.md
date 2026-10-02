@@ -34,7 +34,7 @@ scenario landings, an FAQ hub and a changelog. Country-agnostic; it works for an
 
 ## Project status
 
-Deployed and publicly reachable at [araguaney.lat](https://www.araguaney.lat). The platform is
+Deployed and publicly reachable at [araguaney.org](https://www.araguaney.org). The platform is
 built, not a prototype: the operational panel, the public site and the background jobs all run in
 production.
 
@@ -342,7 +342,7 @@ See `.env.example` for all variables with descriptions.
 | `NEXTAUTH_SECRET` | NextAuth signing secret |
 | `API_URL` | FastAPI base URL — server-side calls |
 | `NEXT_PUBLIC_API_URL` | FastAPI base URL — client-side calls |
-| `NEXT_PUBLIC_SITE_URL` | Canonical public host (`https://www.araguaney.lat`) — drives canonicals, sitemap, robots, hreflang |
+| `NEXT_PUBLIC_SITE_URL` | Canonical public host (`https://www.araguaney.org`) — drives canonicals, sitemap, robots, hreflang, and the domain shown in footers and contact addresses |
 | `INTERNAL_API_SECRET` | Same value as backend |
 
 ## Database Migrations
@@ -578,16 +578,16 @@ Araguaney's code is **free software under [AGPL-3.0](LICENSE)**: you may use it,
 study it, modify it and deploy your own instance. If you run a modified version
 as a service, the AGPL requires you to publish your changes.
 
-Using the platform at [araguaney.lat](https://www.araguaney.lat) is **free** for
+Using the platform at [araguaney.org](https://www.araguaney.org) is **free** for
 collection centres and humanitarian coordinators: no licences, no box limits and
 no usage fees.
 
 **Ownership.** Araguaney is a project by **Antony Delgado Casanova**, who holds
-copyright over the code, the name "Araguaney" and the araguaney.lat domain. No
+copyright over the code, the name "Araguaney" and the araguaney.org and araguaney.lat domains. No
 legal entity is associated with the project.
 
 **The trademark is not licensed with the code.** The name "Araguaney", the logo
-and the araguaney.lat domain identify the official instance and its network of
+and the araguaney.org and araguaney.lat domains identify the official instance and its network of
 centres. A fork must operate under a different name and domain, without
 presenting itself as the official instance — especially during an emergency,
 when confusion costs the most.
