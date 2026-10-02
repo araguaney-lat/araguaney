@@ -3,6 +3,7 @@
 import { z } from "zod"
 import { Resend } from "resend"
 import { verifyTurnstile } from "@/lib/turnstile"
+import { contactEmail } from "@/lib/seo"
 
 const schema = z.object({
   nombre: z.string().min(2).max(100),
@@ -43,8 +44,8 @@ export async function submitContact(formData: unknown): Promise<ContactResult> {
 
   const resend = new Resend(apiKey)
   const { error } = await resend.emails.send({
-    from: "Araguaney <contacto@araguaney.lat>",
-    to: ["hola@araguaney.lat"],
+    from: `Araguaney <${contactEmail("contacto")}>`,
+    to: [contactEmail("hola")],
     replyTo: correo,
     subject: `[Contacto] ${tipoLabel[tipo]} — ${organizacion}`,
     text: [

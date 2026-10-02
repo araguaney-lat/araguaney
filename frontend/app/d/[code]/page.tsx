@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import { SITE_DOMAIN } from "@/lib/seo"
 
 const API_URL = process.env.API_URL ?? "http://localhost:8000"
 
@@ -78,7 +79,7 @@ export default async function PublicDonationPage({
             ))}
           </ul>
           <p className="text-center text-xs text-zinc-400">
-            Araguaney · Coordinación humanitaria · araguaney.lat
+            Araguaney · Coordinación humanitaria · {SITE_DOMAIN}
           </p>
         </div>
       </div>

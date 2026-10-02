@@ -6,13 +6,24 @@ import {
   localizedPath,
 } from "@/lib/routes"
 
-// Canonical host is www: production 308-redirects the apex (araguaney.lat) to
-// www.araguaney.lat, and the Google Search Console property is verified on www.
-// Keep this in sync with NEXT_PUBLIC_SITE_URL in Vercel and the redirect at the
-// edge — every canonical/sitemap/robots URL derives from here.
+// Canonical host is www: production 308-redirects the apex to www, and the
+// Google Search Console property is verified on www. Keep this in sync with
+// NEXT_PUBLIC_SITE_URL in Vercel and the redirect at the edge — every
+// canonical/sitemap/robots URL derives from here.
 export const SITE_URL = (
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.araguaney.lat"
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.araguaney.org"
 ).replace(/\/$/, "")
+
+// El dominio que lee una persona: pies de página, direcciones de contacto,
+// llms.txt. Sale de SITE_URL para que mudar de dominio (Fase 29) sea cambiar
+// una variable en Vercel y no buscar y reemplazar texto.
+export const SITE_DOMAIN = new URL(SITE_URL).hostname.replace(/^www\./, "")
+
+// Una dirección de contacto del dominio público (`hola`, `privacidad`, …). Esos
+// buzones tienen que existir en el dominio antes de cambiarlo.
+export function contactEmail(localPart: string): string {
+  return `${localPart}@${SITE_DOMAIN}`
+}
 
 // Single source of truth for the brand entity's `sameAs` links — the
 // authoritative external profiles Google/AI use to resolve the entity in the

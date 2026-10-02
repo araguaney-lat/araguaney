@@ -5,6 +5,7 @@ import HomeFooter from "@/components/HomeFooter"
 import ManageDonation from "@/components/ManageDonation"
 import { getManagedDonation } from "@/lib/donation-actions"
 import { getDictionary } from "@/lib/i18n"
+import { contactEmail } from "@/lib/seo"
 
 // Es un enlace privado que llega por correo: no se indexa ni se comparte.
 export const metadata: Metadata = { robots: { index: false, follow: false } }
@@ -37,7 +38,7 @@ export default async function ManageDonationPage({
               <p className="mt-3 text-sm text-zinc-600">
                 Los enlaces de gestión vencen a los 30 días, y dejan de funcionar en cuanto entregas
                 la donación. Si necesitas algo, escríbenos a{" "}
-                <a className="text-amber-700 underline" href="mailto:hola@araguaney.lat">hola@araguaney.lat</a>.
+                <a className="text-amber-700 underline" href={`mailto:${contactEmail("hola")}`}>{contactEmail("hola")}</a>.
               </p>
             </div>
           ) : (

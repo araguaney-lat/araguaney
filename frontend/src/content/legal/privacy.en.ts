@@ -1,4 +1,5 @@
 import type { LegalDoc } from "./types"
+import { contactEmail } from "@/lib/seo"
 
 // Privacy Notice — English mirror of privacy.es.ts. Framed under Mexico's
 // LFPDPPP (the platform operates from Mexico). First version; not legal advice.
@@ -18,7 +19,7 @@ export const privacyEn: LegalDoc = {
       blocks: [
         "The controller of your personal data is the Araguaney project (\"Araguaney\", \"the platform\", \"we\"), a non-profit initiative to coordinate humanitarian aid collection centers.",
         "As of the date of this notice there is no legal entity associated with the project: the data controller is Antony Delgado Casanova, the project's owner, who personally handles privacy requests through the email listed below and in the Data Subject Rights section. If a legal entity is constituted in the future, this notice will be updated with its legal name and registered address.",
-        "For any matter related to your personal data or this notice, contact us at: privacidad@araguaney.lat",
+        `For any matter related to your personal data or this notice, contact us at: ${contactEmail("privacidad")}`,
       ],
     },
     {
@@ -172,7 +173,7 @@ export const privacyEn: LegalDoc = {
         "To exercise any of these rights, or if you prefer that we do it for you, send your request to:",
         {
           emphasis:
-            "privacidad@araguaney.lat — Include your name, the email associated with your account and a clear description of your request. We will respond within a maximum of 20 business days.",
+            `${contactEmail("privacidad")} — Include your name, the email associated with your account and a clear description of your request. We will respond within a maximum of 20 business days.`,
         },
         "Some data —such as certain audit records— may be retained for legal or security reasons even after a cancellation request, for the strictly necessary time. We will inform you if that is the case.",
       ],
