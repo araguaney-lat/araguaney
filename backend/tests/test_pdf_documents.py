@@ -8,6 +8,7 @@ alguien va a imprimir.
 from datetime import date, datetime, timezone
 from pathlib import Path
 
+from app.config import settings
 from app.utils.pdf_labels import LabelData, generate_labels_pdf
 from app.utils.pdf_pallet_label import PalletLabelData, generate_pallet_label_pdf
 
@@ -96,7 +97,8 @@ class TestIdentidadEnDocumentos:
         ))
         texto = "\n".join((p.extract_text() or "") for p in PdfReader(io.BytesIO(pdf)).pages)
         assert "acopio.org" not in texto
-        assert "araguaney.lat" in texto
+        assert "araguaney.lat" not in texto
+        assert settings.site_domain in texto
 
     def test_las_plantillas_declaran_tamano_de_pagina(self):
         """Sin @page el ancho útil depende del renderizador y se corta una columna."""
@@ -261,7 +263,7 @@ class TestAtribucionAlPie:
         """Diez etiquetas por hoja A4: cada milímetro es contenido.
 
         Es el único documento que se pega a una caja física, y el QR ya resuelve
-        a araguaney.lat, así que la atribución está de todos modos. Meter un logo
+        al dominio del producto, así que la atribución está de todos modos. Meter un logo
         aquí se lo quitaría al código de la caja, que es lo que alguien busca con
         la vista en un andén.
         """

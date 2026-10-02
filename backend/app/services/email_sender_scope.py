@@ -31,8 +31,8 @@ logger = logging.getLogger(__name__)
 def sender_domain(value: object) -> str | None:
     """Dominio de un campo `from` de Resend.
 
-    Acepta las dos formas que manda Resend: `"Araguaney <noreply@araguaney.lat>"`
-    y `"noreply@araguaney.lat"`. Devuelve None si no hay un dominio legible.
+    Acepta las dos formas que manda Resend: `"Araguaney <noreply@araguaney.org>"`
+    y `"noreply@araguaney.org"`. Devuelve None si no hay un dominio legible.
     """
     if not isinstance(value, str) or "@" not in value:
         return None
@@ -67,6 +67,6 @@ def is_ours(data: dict) -> bool:
         logger.warning("Evento de Resend sin remitente legible; se conserva por prudencia")
         return True
 
-    # El sufijo cubre subdominios de envío (`mail.araguaney.lat`), con el punto
-    # para que `notaraguaney.lat` no pase por ser nuestro.
+    # El sufijo cubre subdominios de envío (`mail.araguaney.org`), con el punto
+    # para que `notaraguaney.org` no pase por ser nuestro.
     return any(domain == owned or domain.endswith(f".{owned}") for owned in ours)

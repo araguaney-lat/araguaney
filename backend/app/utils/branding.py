@@ -33,6 +33,8 @@ import base64
 from functools import lru_cache
 from pathlib import Path
 
+from app.config import settings
+
 LOGO_PATH = Path(__file__).resolve().parent.parent / "assets" / "logo.png"
 
 ATTRIBUTION = {
@@ -40,7 +42,18 @@ ATTRIBUTION = {
     "en": "Document generated with Araguaney",
 }
 
-SITE = "araguaney.lat"
+def site_domain() -> str:
+    """El dominio que lee una persona al pie de un documento o en un correo.
+
+    Se lee de la configuración en cada llamada, no al importar: así una prueba
+    puede cambiarlo y el valor de producción vive en el entorno, no aquí.
+    """
+    return settings.site_domain.strip().lower()
+
+
+def contact_email(local_part: str) -> str:
+    """Una dirección de contacto del dominio público (`hola`, `privacidad`, …)."""
+    return f"{local_part}@{site_domain()}"
 
 
 def attribution_for(lang: str | None) -> str:

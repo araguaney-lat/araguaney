@@ -9,7 +9,7 @@ from datetime import datetime
 
 import qrcode
 from app.legal import CUSTOMS_LEGEND_EN, CUSTOMS_LEGEND_ES
-from app.utils.branding import LOGO_PATH
+from app.utils.branding import LOGO_PATH, site_domain
 from app.utils.label_strings import date_format_for, strings_for
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.utils import ImageReader
@@ -124,7 +124,7 @@ def generate_pallet_label_pdf(pallet: PalletLabelData, lang: str | None = None) 
     # Atribución al pie: el logo del tamaño de la letra, y el par centrado como
     # una sola unidad para que no quede el texto corrido a un lado.
     c.setFont("Helvetica", 7)
-    texto = t["footer"]
+    texto = f"{t['footer']} · {site_domain()}"
     marca = 4 * mm
     ancho_texto = c.stringWidth(texto, "Helvetica", 7)
     x = (w - (marca + 1.5 * mm + ancho_texto)) / 2
