@@ -3,9 +3,9 @@
 ## Progreso general
 
 ```mermaid
-pie title Tareas completadas (515 tareas)
-    "Listas" : 477
-    "Pendientes" : 27
+pie title Tareas completadas (521 tareas)
+    "Listas" : 482
+    "Pendientes" : 28
     "Canceladas" : 11
 ```
 
@@ -41,7 +41,8 @@ pie title Tareas completadas (515 tareas)
 | 27 | [De quién es el día: zona horaria del centro](phase-27-center-timezone.md) | 0 | 6 | 0 | ⬜ 0% |
 | 28 | [Otro nombre para el mismo producto](phase-28-product-aliases.md) | 6 | 2 | 0 | 🟡 75% |
 | 29 | [De `araguaney.lat` a `araguaney.org`](phase-29-domain-migration.md) | 15 | 8 | 1 | 🟡 65% |
-| **Total** | | **477** | **27** | **11** | **🟡 93%** |
+| 30 | [Aprovechar Project Galileo](phase-30-galileo-hardening.md) | 5 | 1 | 0 | 🟡 83% |
+| **Total** | | **482** | **28** | **11** | **🟡 92%** |
 
 > **Canceladas (11):** la tarea 16 de la Fase 29 (mover el webhook de Resend) no aplica mientras el webhook siga apagado a propósito; el hueco queda en `docs/observability.md`. Las otras diez: el bloque de donativos/pagos de la Fase 13 (Grupo B: entidad receptora,
 > asesoría legal/contable, procesador de pagos, T&C de donación, transparencia) se canceló el
