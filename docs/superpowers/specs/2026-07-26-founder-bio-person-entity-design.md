@@ -22,7 +22,7 @@ Tres piezas, en un solo PR:
 
 **Fuera de alcance (a propósito):** foto/retrato, página `/autor` propia,
 GitHub personal en `sameAs`. Los perfiles de la organización
-(`linkedin.com/company/araguaney-lat`, `github.com/araguaney-lat`) ya viven en
+(`linkedin.com/company/araguaney-lat`, `github.com/araguaney-org`) ya viven en
 `BRAND_SAME_AS` y no se tocan.
 
 ---

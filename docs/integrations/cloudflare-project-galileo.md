@@ -77,7 +77,7 @@ Lo que sí es cierto y sí se puede evidenciar:
   gestiona donativos económicos (`CLAUDE.md`, sección 2: NO-objetivos).
 - **No hay PII de personas beneficiarias.** Solo inventario humanitario.
 - **Es software libre**, AGPL-3.0, con el código completo en público:
-  <https://github.com/araguaney-lat/araguaney>.
+  <https://github.com/araguaney-org/araguaney>.
 - **Sigue estándares del sector**: WHO (donación de medicamentos), IFRC/ICRC, IOM,
   UNSPSC, GS1.
 - **Incorpora controles antidesvío** de la donación en especie (fase 20), lo que
@@ -158,7 +158,7 @@ para que nadie lo reabra cada vez que un formulario pida un acta constitutiva.
 >
 > - **The source code is publicly released** under the AGPL-3.0 licence — free
 >   software in the strict sense, auditable and reusable by anyone:
->   https://github.com/araguaney-lat/araguaney
+>   https://github.com/araguaney-org/araguaney
 > - **It is provided free of charge.** There is no licence fee, no paid tier, no
 >   revenue of any kind, and none is planned.
 > - **It handles no money.** The platform does not process payments or monetary

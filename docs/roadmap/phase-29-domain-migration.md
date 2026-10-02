@@ -147,6 +147,8 @@ una reparación conocida.
   su caché y sus certificados.
 - **No usa Cloudflare for SaaS.** Está disponible en Business y serviría si algún
   día un centro quisiera operar con su propio dominio, pero hoy nadie lo pide.
-- **No cambia el nombre del producto, el repositorio ni la organización de
-  GitHub** (`araguaney-lat`). Son identificadores, no el dominio, y moverlos no
-  agrega protección.
+- **No cambia el nombre del producto ni del repositorio.** La organización de
+  GitHub sí se renombró el 2026-10-02, de `araguaney-lat` a `araguaney-org`,
+  porque el `.lat` del nombre ya no correspondía a nada (`araguaney` estaba
+  reservado). GitHub redirige las URLs viejas mientras nadie registre el nombre
+  anterior, así que los enlaces externos se actualizan igual.

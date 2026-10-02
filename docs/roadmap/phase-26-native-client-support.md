@@ -1,7 +1,7 @@
 # Fase 26 — Soporte de backend para el cliente nativo
 
 > El cliente móvil vive en un repositorio aparte
-> ([`araguaney-lat/araguaney-app`](https://github.com/araguaney-lat/araguaney-app), Flutter)
+> ([`araguaney-org/araguaney-app`](https://github.com/araguaney-org/araguaney-app), Flutter)
 > y consume esta API a través de un cliente Dart **generado** desde el
 > `openapi.json` que publica este backend. Esa forma de trabajar convierte en
 > defecto lo que antes era una omisión inocua: un endpoint que no declara su
@@ -121,4 +121,4 @@ una prueba nueva falla si alguien devuelve la ficha a una etiqueta compartida.
 
 El detalle completo de cada petición, con lo que la aplicación hace mientras
 tanto, vive en
-[`araguaney-app/docs/backend-requests.md`](https://github.com/araguaney-lat/araguaney-app/blob/main/docs/backend-requests.md).
+[`araguaney-app/docs/backend-requests.md`](https://github.com/araguaney-org/araguaney-app/blob/main/docs/backend-requests.md).
