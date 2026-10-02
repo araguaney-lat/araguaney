@@ -121,6 +121,7 @@ una reparación conocida.
 |---|---|---|---|---|
 | 17 | Compilar contra el dominio nuevo | La URL base de la API no está escrita en `lib/`, entra en build. Compilar con el dominio nuevo, revisar los enlaces universales (archivos de asociación servidos desde la web, si existen) y los datos de prueba con `.lat` (cosmético). Las notificaciones push no dependen del dominio. | 🟠 Media | ⬜ Pendiente |
 | 18 | Versión mínima | Cuando la versión nueva esté publicada, subir `MIN_SUPPORTED_CLIENT_VERSION` para que los binarios viejos pidan actualización en vez de fallar el día que se retire `api.araguaney.lat`. | 🟢 Baja | ⬜ Pendiente |
+| 25 | Proyecto de Firebase en la cuenta del proyecto | El proyecto de Firebase `araguaney-ba08e`, que manda las notificaciones push en producción, probablemente vive en la misma cuenta compartida que tenía Analytics. Revisar quién es propietario, agregar la cuenta del proyecto como Owner y, si conviene, retirar la otra. Firebase no se mueve como una propiedad de Analytics: cambian los propietarios, no el proyecto, y las credenciales de servicio que usa el backend no cambian. Va junto con el trabajo de la app nativa. | 🟢 Baja | ⬜ Pendiente |
 
 ### Bloque F — Retiro de lo viejo
 
@@ -138,7 +139,7 @@ una reparación conocida.
 | # | Tarea | Descripción | Complejidad | Estado |
 |---|---|---|---|---|
 | 22 | Google Play Console | Ficha de la app: sitio web, correo de contacto y URL del aviso de privacidad al dominio nuevo. Si la app usa enlaces verificados, publicar `assetlinks.json` en el dominio nuevo antes de la versión que los declara. | 🟢 Baja | ⬜ Pendiente |
-| 23 | Analytics y Sentry | URL del flujo web en Analytics; en Sentry, los dominios permitidos del proyecto web, si el filtro está activo. Verificar que llega un evento real desde `.org` a cada uno: un panel vacío se ve igual sano que mudo. | 🟢 Baja | ⬜ Pendiente |
+| 23 | Analytics y Sentry | **Analytics** (2026-10-02): las dos propiedades de Araguaney, la de la web y la de la app, se **movieron** desde la cuenta compartida con otro producto a una cuenta de Analytics propia del proyecto. Mover conserva el historial, el Measurement ID y el enlace con Firebase, así que no hubo que tocar código. Verificado con un navegador sin extensiones: la web en `.org` envía las mediciones y se crean las cookies de Analytics; un navegador con bloqueador no envía nada, y por eso el panel mostraba "sin datos". Falta borrar la propiedad temporal que exigió crear la cuenta y cambiar la URL escrita en el flujo web, que es solo informativa. **Sentry** no requiere cambios: sus dominios permitidos están en `*` (ver `docs/observability.md`). | 🟢 Baja | 🟡 In progress |
 
 ## Lo que esta fase no hace
 
