@@ -46,18 +46,35 @@ después de verificar el nuevo:
 En cada paso, volver atrás consiste en revertir una variable o quitar una
 redirección. No hay migración de datos: la base de datos no guarda el dominio.
 
-## Lo que se rompe, y cómo se contiene
+## Lo que se rompe, cómo se nota y cómo se repara
 
-| Qué | Por qué | Mitigación |
+Hoy no hay usuarios externos, así que se acepta romper algo durante la mudanza.
+Lo que no se acepta es dejarlo roto: cada riesgo tiene un síntoma que lo delata y
+una reparación conocida.
+
+| Qué | Síntoma | Prevención | Reparación |
+|---|---|---|---|
+| **Toda la API** al activar `api.araguaney.org` | Todas las peticiones al hostname nuevo responden 403: el modo solo-Cloudflare no encuentra el encabezado secreto | La regla de transformación va en la zona nueva antes de mandarle tráfico (tarea 14) | Crear la regla con el mismo secreto; mientras tanto, `API_URL` vuelve a `.lat` |
+| **El correo saliente** | Las invitaciones y los reinicios de contraseña no llegan; Resend registra el rechazo del remitente | `MAIL_FROM` cambia después de verificar el dominio (tarea 5 → 12) | Regresar `MAIL_FROM` a `.lat` en Railway |
+| **El CORS** del navegador hacia la API | El panel en `.org` falla al cargar datos, y la consola del navegador muestra un error de CORS | `.org` entra a `FRONTEND_URL` en cuanto la web responde en ese dominio (tarea 7) | Agregar el origen a `FRONTEND_URL` |
+| **Turnstile** | Los formularios públicos (contacto, `/donar`, alta de centro) rechazan el envío | Widget nuevo con los dos dominios registrados, y las dos llaves cambian en el mismo despliegue (tareas 6 y 9) | Agregar el hostname al widget, o regresar las llaves anteriores |
+| **Las imágenes de QR** de la ficha pública | La ficha carga sin la imagen del código, y la consola muestra un bloqueo por CSP | Reconstruir al cambiar `NEXT_PUBLIC_API_URL`, porque la CSP se calcula en build (tarea 15) | Volver a desplegar |
+| **SSL entre Cloudflare y Railway** | Bucle de redirecciones o error 525/526 en `api.araguaney.org` | Modo SSL/TLS compatible con Railway desde el principio (tarea 13) | Ajustar el modo en la zona nueva |
+| **El correo entrante** | Un mensaje a una dirección publicada en `.org` rebota | Los buzones se crean y se prueban antes de que algún texto los mencione (tarea 4 → 8) | Crear la ruta del buzón que falta |
+| **Los eventos de Resend** | El webhook descarta como ajenos los eventos de correos ya enviados desde `.lat` (#322) | `EMAIL_OWNED_DOMAINS` declara los dos dominios durante la transición | Agregar el dominio que falta |
+| **El inicio de sesión** | Las sesiones abiertas se pierden, y si la URL de autenticación quedó en `.lat`, el ingreso regresa al dominio viejo | `NEXTAUTH_URL`, si está definida, cambia en el corte (tarea 9) | Corregir la variable y volver a desplegar; la sesión perdida solo pide entrar de nuevo |
+
+## Qué se toca en cada plataforma
+
+| Plataforma | Qué cambia | Bloque |
 |---|---|---|
-| Las llamadas del navegador a la API desde `.org` | El navegador llama a la API directamente, y el backend solo acepta los orígenes de `FRONTEND_URL` | `.org` entra a `FRONTEND_URL` en cuanto la web responde en ese dominio (tarea 7), antes del corte |
-| Las sesiones abiertas en el panel | La cookie de sesión pertenece al host; en el dominio nuevo no existe | Aceptado: hay que volver a iniciar sesión una vez. Hoy no hay usuarios externos |
-| El correo saliente, si el remitente cambia antes de tiempo | Resend rechaza un remitente de un dominio sin verificar, y con eso se caen las invitaciones y el reinicio de contraseña | `MAIL_FROM` cambia **después** de verificar el dominio (tarea 5 → 12) |
-| Toda la API, al activar `api.araguaney.org` | Con el modo solo-Cloudflare activo, el backend rechaza lo que no trae el encabezado secreto, y la zona nueva todavía no lo inyecta | La regla de transformación va en la zona nueva **antes** de mandarle tráfico, y se prueba directo contra el hostname nuevo (tarea 14) |
-| Turnstile, si cambia la llave sin el hostname | El widget rechaza un dominio que no tiene registrado y bloquea los formularios públicos | Widget nuevo con **los dos** dominios registrados; las dos llaves cambian en un mismo despliegue (tareas 6 y 9) |
-| Las imágenes de QR de la ficha pública | La CSP calcula `img-src` a partir de `NEXT_PUBLIC_API_URL` **en build** | Cambiar la variable obliga a reconstruir; se verifica la ficha `/qr/<código>` después del despliegue (tarea 15) |
-| El correo entrante a las direcciones públicas | Si un texto publica `hola@araguaney.org` antes de que exista el buzón, el mensaje rebota | Los buzones de `.org` se crean y se prueban antes de que algún texto los mencione (tarea 4 → 8) |
-| Los eventos de Resend de correos ya enviados | El webhook descarta remitentes que no son nuestros (#322), y durante el cambio llegan eventos de los dos dominios | `EMAIL_OWNED_DOMAINS` declara **los dos** dominios mientras dure la transición |
+| **Cloudflare** (cuenta nueva) | Zona `araguaney.org`: DNS, regla de transformación, WAF y límites de tasa, buzones de correo, Turnstile, DNSSEC | A, D |
+| **Cloudflare** (cuenta vieja) | Zona `araguaney.lat`: solo lo necesario para que siga redirigiendo, y al final decidir si se muda | F |
+| **Vercel** | Dominios del proyecto, redirección de `.lat` y variables (`NEXT_PUBLIC_SITE_URL`, `NEXTAUTH_URL`, `API_URL`, `NEXT_PUBLIC_API_URL`, Turnstile) | B, D |
+| **Railway** | Dominio propio del servicio `araguaney backend` y variables (`FRONTEND_URL`, `MAIL_FROM`, `EMAIL_OWNED_DOMAINS`). El worker no expone dominio, pero comparte las variables de correo | C, D |
+| **Resend** | Dominio de envío nuevo y URL del webhook | A, C, D |
+| **Google** | Search Console, Analytics, Play Console (ficha, sitio web, correo de contacto, aviso de privacidad) | G |
+| **Sentry** | Dominios permitidos del proyecto web, si el filtro está activo | G |
 
 ## Tareas
 
@@ -80,7 +97,7 @@ redirección. No hay migración de datos: la base de datos no guarda el dominio.
 | 8 | El dominio en un solo lugar del código | Hoy aparece escrito a mano en unas 170 líneas: plantillas de correo, pie de manifiestos y etiquetas, páginas públicas, textos legales, `llms.txt`. Concentrarlo en `app/utils/branding.py` (sitio y direcciones de contacto) para el backend y en una constante junto a `src/lib/seo.ts` para el frontend, y que todo lo demás lo lea de ahí. Así, cambiar de dominio es cambiar un valor y no hacer un reemplazo masivo de texto. En el mismo PR: textos legales, `llms*.txt`, `README`, `SECURITY`, `CODE_OF_CONDUCT`, `.env.example` y las pruebas. | 🟠 Media | ⬜ Pendiente |
 | 9 | Corte de la web | Un solo despliegue: el merge de la tarea 8 más las variables de Vercel (`NEXT_PUBLIC_SITE_URL`, `NEXTAUTH_URL` si está definida, las dos llaves de Turnstile) y, en el backend, `FRONTEND_URL` con `.org` **primero**: la primera entrada es la que arma los enlaces de los correos y los QR, y `.lat` se queda después para el CORS. Verificar: inicio de sesión, un formulario público con Turnstile, la ficha de QR, una captura. | 🟠 Media | ⬜ Pendiente |
 | 10 | `.lat` redirige a `.org` | En Vercel, `araguaney.lat` y `www.araguaney.lat` pasan a redirigir con 308 a `www.araguaney.org`, conservando la ruta. Va **después** de verificar la tarea 9. Para deshacerlo basta con quitar la redirección. | 🟢 Baja | ⬜ Pendiente |
-| 11 | Buscadores | Propiedad nueva en Search Console verificada por DNS en la zona nueva, aviso de cambio de dirección desde la propiedad vieja, envío del sitemap y flujo de Analytics con el dominio nuevo. La llave de IndexNow vive en `public/` y se muda sola. | 🟢 Baja | ⬜ Pendiente |
+| 11 | Buscadores | Propiedad nueva en Google Search Console verificada por DNS en la zona nueva, aviso de cambio de dirección desde la propiedad vieja, envío del sitemap y flujo de Analytics con el dominio nuevo. La llave de IndexNow vive en `public/` y se muda sola. | 🟢 Baja | ⬜ Pendiente |
 
 ### Bloque C — Correo saliente
 
@@ -111,6 +128,16 @@ redirección. No hay migración de datos: la base de datos no guarda el dominio.
 | 19 | Retirar `api.araguaney.lat` | Solo cuando ninguna versión soportada de la app lo use (tarea 18). Quitarlo de Railway y de la zona vieja, y dejar `FRONTEND_URL` y `EMAIL_OWNED_DOMAINS` solo con `.org`. | 🟢 Baja | ⬜ Pendiente |
 | 20 | Qué pasa con `araguaney.lat` | Recomendado: **mantenerlo renovado y redirigiendo**. Si caduca, un tercero puede registrarlo y recibir el tráfico de cualquier enlace viejo bajo nuestro nombre. Decidir además si su zona se muda a la cuenta nueva para tener todo en un solo lugar. | 🟢 Baja | ⬜ Pendiente |
 | 21 | Documentación | Reemplazar `.lat` en `docs/` (observabilidad, mantenimiento SEO, integraciones) y en el `CLAUDE.md`, y cerrar la bitácora de Galileo con la fecha del corte. | 🟢 Baja | ⬜ Pendiente |
+
+### Bloque G — Google y servicios de terceros
+
+> Se ejecuta después del corte de la web: varias de estas consolas verifican el
+> dominio nuevo contra la web ya publicada.
+
+| # | Tarea | Descripción | Complejidad | Estado |
+|---|---|---|---|---|
+| 22 | Google Play Console | Ficha de la app: sitio web, correo de contacto y URL del aviso de privacidad al dominio nuevo. Si la app usa enlaces verificados, publicar `assetlinks.json` en el dominio nuevo antes de la versión que los declara. | 🟢 Baja | ⬜ Pendiente |
+| 23 | Analytics y Sentry | URL del flujo web en Analytics; en Sentry, los dominios permitidos del proyecto web, si el filtro está activo. Verificar que llega un evento real desde `.org` a cada uno: un panel vacío se ve igual sano que mudo. | 🟢 Baja | ⬜ Pendiente |
 
 ## Lo que esta fase no hace
 
