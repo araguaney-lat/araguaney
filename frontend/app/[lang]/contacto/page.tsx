@@ -3,7 +3,7 @@ import ContactForm, { type ContactFormLabels } from "@/components/ContactForm"
 import HomeNav from "@/components/HomeNav"
 import HomeFooter from "@/components/HomeFooter"
 import { getDictionary } from "@/lib/i18n"
-import { alternates } from "@/lib/seo"
+import { alternates, contactEmail } from "@/lib/seo"
 import { type Locale, localizedPath } from "@/lib/routes"
 
 const KEY = "contacto"
@@ -37,7 +37,7 @@ const CONTENT: Record<Locale, Content> = {
     h1End: "?",
     lead: "Súmate a la red. Te ayudamos a dar de alta tu centro y a estandarizar tu inventario con el resto.",
     info: [
-      { title: "Correo", val: "hola@araguaney.lat" },
+      { title: "Correo", val: contactEmail("hola") },
       { title: "Alta de centro", val: "Respuesta en menos de 48 horas hábiles" },
       { title: "Centros activos", val: "Operando en México · múltiples destinos" },
     ],
@@ -74,7 +74,7 @@ const CONTENT: Record<Locale, Content> = {
     h1End: "?",
     lead: "Join the network. We'll help you register your center and standardize your inventory with everyone else.",
     info: [
-      { title: "Email", val: "hola@araguaney.lat" },
+      { title: "Email", val: contactEmail("hola") },
       { title: "Center onboarding", val: "Reply within 48 business hours" },
       { title: "Active centers", val: "Operating in Mexico · multiple destinations" },
     ],

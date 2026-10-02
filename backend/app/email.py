@@ -17,6 +17,7 @@ import resend
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 from app.config import settings
+from app.utils.branding import contact_email, site_domain
 
 _TEMPLATES_DIR = Path(__file__).parent / "templates" / "emails"
 _jinja = Environment(
@@ -41,6 +42,8 @@ def _render(template_name: str, **kwargs: object) -> str:
         site_url=site_url,
         logo_url=_LOGO_URL,
         current_year=datetime.now(timezone.utc).year,
+        site_domain=site_domain(),
+        contact_email=contact_email("hola"),
         **kwargs,
     )
 

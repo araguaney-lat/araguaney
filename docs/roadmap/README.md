@@ -3,9 +3,9 @@
 ## Progreso general
 
 ```mermaid
-pie title Tareas completadas (491 tareas)
-    "Listas" : 462
-    "Pendientes" : 19
+pie title Tareas completadas (515 tareas)
+    "Listas" : 469
+    "Pendientes" : 36
     "Canceladas" : 10
 ```
 
@@ -40,7 +40,8 @@ pie title Tareas completadas (491 tareas)
 | 26 | [Soporte de backend para el cliente nativo](phase-26-native-client-support.md) | 20 | 0 | 0 | ✅ 100% |
 | 27 | [De quién es el día: zona horaria del centro](phase-27-center-timezone.md) | 0 | 6 | 0 | ⬜ 0% |
 | 28 | [Otro nombre para el mismo producto](phase-28-product-aliases.md) | 6 | 2 | 0 | 🟡 75% |
-| **Total** | | **462** | **19** | **10** | **🟡 94%** |
+| 29 | [De `araguaney.lat` a `araguaney.org`](phase-29-domain-migration.md) | 7 | 17 | 0 | 🟡 29% |
+| **Total** | | **469** | **36** | **10** | **🟡 91%** |
 
 > **Canceladas (10):** el bloque de donativos/pagos de la Fase 13 (Grupo B: entidad receptora,
 > asesoría legal/contable, procesador de pagos, T&C de donación, transparencia) se canceló el

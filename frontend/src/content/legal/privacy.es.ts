@@ -1,4 +1,5 @@
 import type { LegalDoc } from "./types"
+import { contactEmail } from "@/lib/seo"
 
 // Aviso de Privacidad — marco LFPDPPP (México), arts. 15–16 y su Reglamento.
 // Primera versión. No constituye asesoría legal; debe revisarse por un
@@ -19,7 +20,7 @@ export const privacyEs: LegalDoc = {
       blocks: [
         "El responsable del tratamiento de tus datos personales es el proyecto Araguaney (\"Araguaney\", \"la plataforma\", \"nosotros\"), una iniciativa sin fines de lucro para la coordinación de centros de acopio de ayuda humanitaria.",
         "A la fecha de este aviso no existe una entidad jurídica asociada al proyecto: el responsable del tratamiento es Antony Delgado Casanova, titular del proyecto, quien atiende personalmente las solicitudes de privacidad a través del correo indicado abajo y en la sección de Derechos ARCO. Si en el futuro se constituye una entidad jurídica, este aviso se actualizará con su razón social y domicilio fiscal.",
-        "Para cualquier asunto relacionado con tus datos personales o este aviso, contáctanos en: privacidad@araguaney.lat",
+        `Para cualquier asunto relacionado con tus datos personales o este aviso, contáctanos en: ${contactEmail("privacidad")}`,
       ],
     },
     {
@@ -173,7 +174,7 @@ export const privacyEs: LegalDoc = {
         "Para ejercer cualquiera de estos derechos, o si prefieres que lo hagamos por ti, envía tu solicitud al correo:",
         {
           emphasis:
-            "privacidad@araguaney.lat — Incluye tu nombre, el correo asociado a tu cuenta y una descripción clara de tu solicitud. Responderemos en un plazo máximo de 20 días hábiles.",
+            `${contactEmail("privacidad")} — Incluye tu nombre, el correo asociado a tu cuenta y una descripción clara de tu solicitud. Responderemos en un plazo máximo de 20 días hábiles.`,
         },
         "Algunos datos —como ciertos registros de auditoría— pueden conservarse por razones legales o de seguridad aun después de una solicitud de cancelación, por el tiempo estrictamente necesario. Te informaremos si ese es el caso.",
       ],

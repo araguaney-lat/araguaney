@@ -53,6 +53,13 @@ class Settings(BaseSettings):
     # When building URLs for emails, always use: frontend_url.split(",")[0].strip()
     frontend_url: str = "http://localhost:3000"
 
+    # ── Dominio público ───────────────────────────────────────────────────────
+    # El dominio que se imprime en correos, manifiestos y etiquetas, y del que
+    # cuelgan las direcciones de contacto (`hola@`, …). No es la URL de la web
+    # (eso es FRONTEND_URL): es el nombre que lee una persona. Cambiarlo exige
+    # que esos buzones existan en el dominio nuevo (ver Fase 29).
+    site_domain: str = "araguaney.org"
+
     # ── Internal API secret ───────────────────────────────────────────────────
     # Shared between Next.js server actions and FastAPI to protect
     # server-to-server endpoints (e.g. POST /internal/*) from public access

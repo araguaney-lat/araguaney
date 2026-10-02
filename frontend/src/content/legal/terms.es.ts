@@ -1,4 +1,5 @@
 import type { LegalDoc } from "./types"
+import { contactEmail } from "@/lib/seo"
 
 // Términos y Condiciones — primera versión. No constituye asesoría legal.
 // Cubre: naturaleza del servicio, límite de responsabilidad, conducta,
@@ -74,7 +75,7 @@ export const termsEs: LegalDoc = {
     {
       heading: "Titularidad de la plataforma",
       blocks: [
-        "Araguaney es un proyecto de Antony Delgado Casanova, titular del copyright del código fuente, del nombre \"Araguaney\", del logotipo y del dominio araguaney.lat. No existe una entidad jurídica asociada al proyecto.",
+        "Araguaney es un proyecto de Antony Delgado Casanova, titular del copyright del código fuente, del nombre \"Araguaney\", del logotipo y de los dominios araguaney.org y araguaney.lat. No existe una entidad jurídica asociada al proyecto.",
         "El código fuente se publica como software libre bajo licencia AGPL-3.0 y está disponible en https://github.com/araguaney-lat/araguaney. Cualquiera puede usarlo, estudiarlo, modificarlo y desplegar su propia instancia en los términos de esa licencia.",
         "La marca no se licencia junto con el código: una instancia derivada debe operar bajo otro nombre y dominio, sin presentarse como la instancia oficial.",
       ],
@@ -101,7 +102,7 @@ export const termsEs: LegalDoc = {
     {
       heading: "Suspensión y cancelación",
       blocks: [
-        "Podemos suspender o cancelar el acceso a una cuenta que incumpla estos términos, que ponga en riesgo la seguridad de la plataforma o de otros usuarios, o cuando lo exija la ley. Tú puedes solicitar la cancelación de tu cuenta en cualquier momento escribiendo a privacidad@araguaney.lat.",
+        `Podemos suspender o cancelar el acceso a una cuenta que incumpla estos términos, que ponga en riesgo la seguridad de la plataforma o de otros usuarios, o cuando lo exija la ley. Tú puedes solicitar la cancelación de tu cuenta en cualquier momento escribiendo a ${contactEmail("privacidad")}.`,
       ],
     },
     {

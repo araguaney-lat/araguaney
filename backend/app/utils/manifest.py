@@ -12,7 +12,7 @@ from pathlib import Path
 from jinja2 import Environment, FileSystemLoader
 
 from app.legal import CUSTOMS_LEGEND_EN, CUSTOMS_LEGEND_ES
-from app.utils.branding import attribution_for, logo_data_uri
+from app.utils.branding import attribution_for, logo_data_uri, site_domain
 
 _TEMPLATE_DIR = Path(__file__).parent.parent / "templates"
 _jinja_env = Environment(loader=FileSystemLoader(str(_TEMPLATE_DIR)), autoescape=True)
@@ -91,6 +91,7 @@ def render_manifest_html(data: ManifestData) -> str:
         legend_en=CUSTOMS_LEGEND_EN,
         logo=logo_data_uri(),
         attribution=attribution_for(None),
+        site_domain=site_domain(),
     )
 
 
@@ -124,6 +125,7 @@ def render_transfer_manifest_html(data: TransferManifestData) -> str:
         legend_en=CUSTOMS_LEGEND_EN,
         logo=logo_data_uri(),
         attribution=attribution_for(None),
+        site_domain=site_domain(),
     )
 
 

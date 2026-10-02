@@ -51,7 +51,7 @@ sistema.
 
 ## Aplicación
 
-Reporta conductas abusivas, de acoso o inaceptables a **conducta@araguaney.lat**.
+Reporta conductas abusivas, de acoso o inaceptables a **conducta@araguaney.org**.
 Todos los reportes se revisan de forma confidencial. Quien mantiene el proyecto
 está obligado a mantener la confidencialidad de quien reporta.
 
@@ -121,7 +121,7 @@ administers, and every action is recorded in the system's audit log.
 ## Enforcement
 
 Report abusive, harassing or otherwise unacceptable behavior to
-**conducta@araguaney.lat**. All reports are reviewed confidentially. The
+**conducta@araguaney.org**. All reports are reviewed confidentially. The
 maintainer is obligated to maintain confidentiality with regard to the reporter.
 
 Possible responses, depending on severity: private warning, removal of comments

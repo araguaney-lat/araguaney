@@ -4,6 +4,7 @@ import { useState } from "react"
 import { useParams } from "next/navigation"
 import Turnstile from "react-turnstile"
 import type { BoxPublicOut } from "@/types"
+import { SITE_DOMAIN } from "@/lib/seo"
 
 type Loc = "es" | "en"
 
@@ -34,7 +35,7 @@ const LABELS: Record<Loc, {
     expiry: "Caducidad",
     sealed: "Sellada",
     delivered: "Entregada en destino",
-    footer: "Araguaney · Coordinación humanitaria · araguaney.lat",
+    footer: `Araguaney · Coordinación humanitaria · ${SITE_DOMAIN}`,
     verifying: "Verificando acceso…",
     confirmHuman: "Confirma que eres humano para ver la ficha",
     loadError: "Error al cargar. Intenta de nuevo.",
@@ -50,7 +51,7 @@ const LABELS: Record<Loc, {
     expiry: "Expiry",
     sealed: "Sealed",
     delivered: "Delivered at destination",
-    footer: "Araguaney · Humanitarian coordination · araguaney.lat",
+    footer: `Araguaney · Humanitarian coordination · ${SITE_DOMAIN}`,
     verifying: "Verifying access…",
     confirmHuman: "Confirm you're human to see the details",
     loadError: "Couldn't load. Try again.",
